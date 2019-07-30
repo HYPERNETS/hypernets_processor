@@ -68,6 +68,25 @@ du.add_encoding(u_s_var, data_type=np.uint8, scale_factor=0.1, offset=0.0)
 u_s_var.data[:] = np.random.normal(1.0, 0.5, (n_wavelengths, n_measurements))
 dataset["u_systematic_reflectance"] = u_s_var
 
+cov_r_reflectance = du.create_array_variable(n_wavelengths, n_wavelengths, dim_names=["wavelength", "wavelength"],
+                                             dtype=np.float32, fill_value=-1)
+du.add_encoding(cov_r_reflectance, data_type=np.uint8, scale_factor=0.1, offset=0.0)
+cov_r_reflectance.data[:] = np.random.normal(1.0, 0.5, (n_wavelengths, n_wavelengths))
+dataset["cov_random_reflectance"] = cov_r_reflectance
+
+cov_d_reflectance = du.create_array_variable(n_wavelengths, n_wavelengths, dim_names=["wavelength", "wavelength"],
+                                             dtype=np.float32, fill_value=-1)
+du.add_encoding(cov_d_reflectance, data_type=np.uint8, scale_factor=0.1, offset=0.0)
+cov_d_reflectance.data[:] = np.random.normal(1.0, 0.5, (n_wavelengths, n_wavelengths))
+dataset["cov_deployment_reflectance"] = cov_d_reflectance
+
+cov_s_reflectance = du.create_array_variable(n_wavelengths, n_wavelengths, dim_names=["wavelength", "wavelength"],
+                                             dtype=np.float32, fill_value=-1)
+du.add_encoding(cov_s_reflectance, data_type=np.uint8, scale_factor=0.1, offset=0.0)
+cov_s_reflectance.data[:] = np.random.normal(1.0, 0.5, (n_wavelengths, n_wavelengths))
+dataset["cov_systematic_reflectance"] = cov_s_reflectance
+
+
 ref = du.create_array_variable(n_measurements, n_wavelengths, standard_name="surface_bidirectional_reflectance",
                                long_name='The surface called "surface" means the lower boundary of the\
                                           atmosphere. "Bidirectional_reflectance" depends on the angles\
