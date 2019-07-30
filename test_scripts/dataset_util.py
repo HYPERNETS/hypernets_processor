@@ -31,6 +31,20 @@ class DatasetUtil:
 
         return default_array
 
+    @staticmethod
+    def create_default_array3d(length, width, height, dtype, dims_names=None, fill_value=None):
+        if fill_value is None:
+            fill_value = -1
+
+        empty_array = np.full([height, width, length], fill_value, dtype)
+
+        if dims_names is not None:
+            default_array = DataArray(empty_array, dims=dims_names)
+        else:
+            default_array = DataArray(empty_array, dims=['z', 'y', 'x'])
+
+        return default_array
+
     def create_vector_variable(self, height, dtype, standard_name=None, long_name=None, dim_names=None, fill_value=None):
         if fill_value is None:
             default_vector = self.create_default_vector(height, dtype)
@@ -63,6 +77,30 @@ class DatasetUtil:
 
         if dim_names is None:
             variable = Variable(["y", "x"], default_array)
+        else:
+            variable = Variable(dim_names, default_array)
+
+        if fill_value is None:
+            variable.attrs["_FillValue"] = -1
+        else:
+            variable.attrs["_FillValue"] = fill_value
+
+        if standard_name is not None:
+            variable.attrs["standard_name"] = standard_name
+
+        if long_name is not None:
+            variable.attrs["long_name"] = long_name
+
+        return variable
+
+    def create_array3d_variable(self, length, width, height, dtype, standard_name=None, long_name=None, dim_names=None, fill_value=None):
+        if fill_value is None:
+            default_array = self.create_default_array3d(length, width, height, dtype)
+        else:
+            default_array = self.create_default_array3d(length, width, height, dtype, fill_value=fill_value)
+
+        if dim_names is None:
+            variable = Variable(["z", "y", "x"], default_array)
         else:
             variable = Variable(dim_names, default_array)
 
