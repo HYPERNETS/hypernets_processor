@@ -1,8 +1,25 @@
+"""
+DatasetUtil class
+"""
+
 from xarray import Variable, DataArray
 import numpy as np
 
 
+'''___Authorship___'''
+__author__ = "Sam Hunt"
+__created__ = "12/2/2020"
+__version__ = "0.0"
+__maintainer__ = "Sam Hunt"
+__email__ = "sam.hunt@npl.co.uk"
+__status__ = "Development"
+
+
 class DatasetUtil:
+    """
+    Class to provide utilities for generating standard xarray DataArrays
+    """
+
     @staticmethod
     def create_default_vector(len, dtype, dims_names=None, fill_value=None):
         if fill_value is None:
