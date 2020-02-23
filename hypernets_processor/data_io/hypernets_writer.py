@@ -52,11 +52,18 @@ class HypernetsWriter:
             Empty dataset
         """
 
+        # Initialise dataset
         dataset = xr.Dataset()
+
         tu = TemplateUtil()
 
-        dataset = tu.add_common_variables(dataset, n_wavelengths, n_series)
-        dataset = tu.add_l1_variables(dataset, n_wavelengths, n_series)
+        # Add variables from template
+        tu.add_common_variables(dataset, n_wavelengths, n_series)
+        tu.add_l1_variables(dataset, n_wavelengths, n_series)
+
+        # Add metadata from template
+        tu.add_common_metadata(dataset)
+        tu.add_l1_metadata(dataset)
 
         return dataset
 
@@ -77,11 +84,18 @@ class HypernetsWriter:
             Empty dataset
         """
 
+        # Initialise dataset
         dataset = xr.Dataset()
+
         tu = TemplateUtil()
 
-        dataset = tu.add_common_variables(dataset, n_wavelengths, n_series)
-        dataset = tu.add_l2a_variables(dataset, n_wavelengths, n_series)
+        # Add variables from template
+        tu.add_common_variables(dataset, n_wavelengths, n_series)
+        tu.add_l2a_variables(dataset, n_wavelengths, n_series)
+
+        # Add metadata from template
+        tu.add_common_metadata(dataset)
+        tu.add_l2_metadata(dataset)
 
         return dataset
 
@@ -102,11 +116,18 @@ class HypernetsWriter:
             Empty dataset
         """
 
+        # Initialise dataset
         dataset = xr.Dataset()
+
         tu = TemplateUtil()
 
-        dataset = tu.add_common_variables(dataset, n_wavelengths, n_series)
-        dataset = tu.add_l2b_variables(dataset, n_wavelengths, n_series)
+        # Add variables from template
+        tu.add_common_variables(dataset, n_wavelengths, n_series)
+        tu.add_l2b_variables(dataset, n_wavelengths, n_series)
+
+        # Add metadata from template
+        tu.add_common_metadata(dataset)
+        tu.add_l2_metadata(dataset)
 
         return dataset
 
