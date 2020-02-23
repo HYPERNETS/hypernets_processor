@@ -19,21 +19,61 @@ TIME_FMT_L12A = "%Y%m%d%H%M"
 TIME_FMT_L2B = "%Y%m%d"
 
 
+# todo - Add land and water metadata to templates
+
+
 class HypernetsWriter:
     """
     Class to write Hypernets output files
     """
 
     @staticmethod
-    def write(dataset, path, overwrite=False):
+    def write(dataset, path, overwrite=False, fmt='netCDF4', compression_level=None):
+        """
+        Write xarray dataset to file
 
-        if os.path.isfile(path):
-            if overwrite is True:
-                os.remove(path)
-            else:
-                raise IOError("The file already exists: " + path)
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
 
-        dataset.to_write(path)
+        :type path: str
+        :param path: file path
+
+        :type overwrite: bool
+        :param overwrite: set to true to overwrite existing file
+
+        :type fmt: str
+        :param fmt: format to write to, may be 'netCDF4' or 'csv'
+
+        :type compression_level: int
+        :param compression_level: the file compression level if 'netCDF4' fmt, 0 - 9 (default is 5)
+        """
+
+        if fmt == 'netCDF4':
+            if os.path.isfile(path):
+                if overwrite is True:
+                    os.remove(path)
+                else:
+                    raise IOError("The file already exists: " + path)
+
+            if compression_level is None:
+                compression_level = 5
+
+            comp = dict(zlib=True, complevel=compression_level)
+
+            encoding = dict()
+            for var_name in dataset.data_vars:
+                var_encoding = dict(comp)
+                var_encoding.update(dataset[var_name].encoding)
+                encoding.update({var_name: var_encoding})
+
+            dataset.to_netcdf(path, format='netCDF4', engine='netcdf4', encoding=encoding)
+
+        elif fmt == 'csv':
+            # todo - Add csv write format to write for debug mode
+            pass
+
+        else:
+            raise NameError("Invalid fmt: "+fmt)
 
     @staticmethod
     def create_template_dataset_l1(n_wavelengths, n_series):
