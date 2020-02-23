@@ -5,7 +5,7 @@ TemplateUtil class
 import numpy as np
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.metadata import COMMON_METADATA, L1_METADATA, L2_METADATA, \
-    LAND_NETWORK_METADATA, OCEAN_NETWORK_METADATA
+    LAND_NETWORK_METADATA, WATER_NETWORK_METADATA
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -272,15 +272,15 @@ class TemplateUtil:
         dataset.attrs.update(LAND_NETWORK_METADATA)
 
     @staticmethod
-    def add_ocean_network_metadata(dataset):
+    def add_water_network_metadata(dataset):
         """
-        Adds ocean network metadata to dataset
+        Adds water network metadata to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
         """
 
-        dataset.attrs.update(OCEAN_NETWORK_METADATA)
+        dataset.attrs.update(WATER_NETWORK_METADATA)
 
     @staticmethod
     def add_l1_metadata(dataset):

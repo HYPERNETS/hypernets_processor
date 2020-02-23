@@ -35,7 +35,7 @@ LAND_NETWORK_METADATA = {"responsible_party": "National Physical Laboratory, UK"
                          "creator_email": "sam.hunt@npl.co.uk",
                          "topic_category": "land, environment, geoscientific information"}
 
-OCEAN_NETWORK_METADATA = {"responsible_party": "Royal Belgian Institute for Natural Sciences, "
+WATER_NETWORK_METADATA = {"responsible_party": "Royal Belgian Institute for Natural Sciences, "
                                                "Directorate Natural Environment, REMSEM",
                           "creator_name": "Goyens Clémence",
                           "creator_email": "cgoyens@naturalsciences.be",
