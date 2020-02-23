@@ -48,7 +48,7 @@ class HypernetsWriter:
         :param compression_level: the file compression level if 'netCDF4' fmt, 0 - 9 (default is 5)
         """
 
-        if fmt == 'netCDF4':
+        if (fmt.lower() == 'netcdf4') or (fmt.lower() == 'netcdf'):
             if os.path.isfile(path):
                 if overwrite is True:
                     os.remove(path)
@@ -76,7 +76,7 @@ class HypernetsWriter:
             raise NameError("Invalid fmt: "+fmt)
 
     @staticmethod
-    def create_template_dataset_l1(n_wavelengths, n_series):
+    def create_template_dataset_l1(n_wavelengths, n_series, network):
         """
         Returns empty Hypernets Level 1 dataset to be populated with data
 
@@ -85,6 +85,9 @@ class HypernetsWriter:
 
         :type n_series:
         :param n_series: number of series
+
+        :type network:
+        :param network: Hypernets network, "land" or "water"
 
         :returns:
             dataset *xarray.Dataset*
@@ -105,10 +108,17 @@ class HypernetsWriter:
         tu.add_common_metadata(dataset)
         tu.add_l1_metadata(dataset)
 
+        if network.lower() == 'land':
+            tu.add_land_network_metadata(dataset)
+        elif network.lower() == 'water':
+            tu.add_water_network_metadata(dataset)
+        else:
+            raise NameError("Invalid network name: "+network)
+
         return dataset
 
     @staticmethod
-    def create_template_dataset_l2a(n_wavelengths, n_series):
+    def create_template_dataset_l2a(n_wavelengths, n_series, network):
         """
         Returns empty Hypernets Level 2a dataset to be populated with data
 
@@ -117,6 +127,9 @@ class HypernetsWriter:
 
         :type n_series:
         :param n_series: number of series
+
+        :type network:
+        :param network: Hypernets network, "land" or "water"
 
         :returns:
             dataset *xarray.Dataset*
@@ -137,10 +150,17 @@ class HypernetsWriter:
         tu.add_common_metadata(dataset)
         tu.add_l2_metadata(dataset)
 
+        if network.lower() == 'land':
+            tu.add_land_network_metadata(dataset)
+        elif network.lower() == 'water':
+            tu.add_water_network_metadata(dataset)
+        else:
+            raise NameError("Invalid network name: "+network)
+
         return dataset
 
     @staticmethod
-    def create_template_dataset_l2b(n_wavelengths, n_series):
+    def create_template_dataset_l2b(n_wavelengths, n_series, network):
         """
         Returns empty Hypernets Level 2b dataset to be populated with data
 
@@ -149,6 +169,9 @@ class HypernetsWriter:
 
         :type n_series:
         :param n_series: number of series
+
+        :type network:
+        :param network: Hypernets network, "land" or "water"
 
         :returns:
             dataset *xarray.Dataset*
@@ -168,6 +191,13 @@ class HypernetsWriter:
         # Add metadata from template
         tu.add_common_metadata(dataset)
         tu.add_l2_metadata(dataset)
+
+        if network.lower() == 'land':
+            tu.add_land_network_metadata(dataset)
+        elif network.lower() == 'water':
+            tu.add_water_network_metadata(dataset)
+        else:
+            raise NameError("Invalid network name: "+network)
 
         return dataset
 

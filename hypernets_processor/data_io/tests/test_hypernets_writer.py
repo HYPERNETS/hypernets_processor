@@ -27,8 +27,8 @@ L2B_VARIABLES = ["u_random_reflectance", "u_systematic_reflectance", "cov_random
 
 
 class TestHypernetsWriter(unittest.TestCase):
-    def test_create_template_dataset_l1(self):
-        ds = HypernetsWriter.create_template_dataset_l1(271, 10)
+    def test_create_template_dataset_l1_land(self):
+        ds = HypernetsWriter.create_template_dataset_l1(271, 10, network="land")
 
         self.assertEqual(len(COMMON_VARIABLES) + len(L1_VARIABLES), len(ds.data_vars) + len(ds.coords))
 
@@ -38,8 +38,29 @@ class TestHypernetsWriter(unittest.TestCase):
         for var in L1_VARIABLES:
             self.assertIsNotNone(ds.variables[var])
 
-    def test_create_template_dataset_l2a(self):
-        ds = HypernetsWriter.create_template_dataset_l2a(271, 10)
+        self.assertEqual("eng", ds.attrs["metadata_language"])
+        self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
+                         ds.attrs["resource_title"])
+        self.assertEqual("Hunt Sam", ds.attrs["creator_name"])
+
+    def test_create_template_dataset_l1_water(self):
+        ds = HypernetsWriter.create_template_dataset_l1(271, 10, network="water")
+
+        self.assertEqual(len(COMMON_VARIABLES) + len(L1_VARIABLES), len(ds.data_vars) + len(ds.coords))
+
+        for var in COMMON_VARIABLES:
+            self.assertIsNotNone(ds.variables[var])
+
+        for var in L1_VARIABLES:
+            self.assertIsNotNone(ds.variables[var])
+
+        self.assertEqual("eng", ds.attrs["metadata_language"])
+        self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
+                         ds.attrs["resource_title"])
+        self.assertEqual("Goyens Clémence", ds.attrs["creator_name"])
+
+    def test_create_template_dataset_l2a_land(self):
+        ds = HypernetsWriter.create_template_dataset_l2a(271, 10, network="land")
 
         self.assertEqual(len(COMMON_VARIABLES) + len(L2A_VARIABLES), len(ds.data_vars) + len(ds.coords))
 
@@ -49,8 +70,29 @@ class TestHypernetsWriter(unittest.TestCase):
         for var in L2A_VARIABLES:
             self.assertIsNotNone(ds.variables[var])
 
-    def test_create_template_dataset_l2b(self):
-        ds = HypernetsWriter.create_template_dataset_l2b(271, 10)
+        self.assertEqual("eng", ds.attrs["metadata_language"])
+        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
+                         ds.attrs["resource_title"])
+        self.assertEqual("Hunt Sam", ds.attrs["creator_name"])
+
+    def test_create_template_dataset_l2a_water(self):
+        ds = HypernetsWriter.create_template_dataset_l2a(271, 10, network="water")
+
+        self.assertEqual(len(COMMON_VARIABLES) + len(L2A_VARIABLES), len(ds.data_vars) + len(ds.coords))
+
+        for var in COMMON_VARIABLES:
+            self.assertIsNotNone(ds.variables[var])
+
+        for var in L2A_VARIABLES:
+            self.assertIsNotNone(ds.variables[var])
+
+        self.assertEqual("eng", ds.attrs["metadata_language"])
+        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
+                         ds.attrs["resource_title"])
+        self.assertEqual("Goyens Clémence", ds.attrs["creator_name"])
+
+    def test_create_template_dataset_l2b_land(self):
+        ds = HypernetsWriter.create_template_dataset_l2b(271, 10, network="land")
 
         self.assertEqual(len(COMMON_VARIABLES) + len(L2B_VARIABLES), len(ds.data_vars) + len(ds.coords))
 
@@ -59,6 +101,27 @@ class TestHypernetsWriter(unittest.TestCase):
 
         for var in L2B_VARIABLES:
             self.assertIsNotNone(ds.variables[var])
+
+        self.assertEqual("eng", ds.attrs["metadata_language"])
+        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
+                         ds.attrs["resource_title"])
+        self.assertEqual("Hunt Sam", ds.attrs["creator_name"])
+
+    def test_create_template_dataset_l2b_water(self):
+        ds = HypernetsWriter.create_template_dataset_l2b(271, 10, network="water")
+
+        self.assertEqual(len(COMMON_VARIABLES) + len(L2B_VARIABLES), len(ds.data_vars) + len(ds.coords))
+
+        for var in COMMON_VARIABLES:
+            self.assertIsNotNone(ds.variables[var])
+
+        for var in L2B_VARIABLES:
+            self.assertIsNotNone(ds.variables[var])
+
+        self.assertEqual("eng", ds.attrs["metadata_language"])
+        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
+                         ds.attrs["resource_title"])
+        self.assertEqual("Goyens Clémence", ds.attrs["creator_name"])
 
     def test_create_file_name_l1(self):
 
