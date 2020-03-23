@@ -6,16 +6,15 @@ python:
   # - "3.5"
   - "3.7"
 
-#install:
-#  - conda env create --file environment.yml
-#  - source activate fiduceo-user-tools-env
-#
-#script:
-#  # For the unit-tests, disable Numba JIT, otherwise Coverage wont reach the actual Python code
-#  - python setup.py install
-#  - python -m unittest discover  -p "*_test.py"
-#  - coverage run -m unittest discover  -p "*_test.py"
-#
-#after_success:
-#  - pip install codecov
-#  - codecov
+install:
+  - conda env create --file environment.yml
+  - source activate fiduceo-user-tools-env
+
+script:
+  - python setup.py install
+  - python -m unittest discover  -p "test_*.py"
+  - coverage run -m unittest discover  -p "test_*.py"
+
+after_success:
+  - pip install codecov
+  - codecov
