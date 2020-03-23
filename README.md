@@ -7,5 +7,5 @@ Add project description
 
 ## Documentation
 
-For more information see our documentation: [https://hypernets-processor.readthedocs.io/en/latest/]_
+For more information visit our [documentation](https://hypernets-processor.readthedocs.io/en/latest/).
 
