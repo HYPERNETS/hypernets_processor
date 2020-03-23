@@ -7,10 +7,6 @@ python:
   - "3.7"
 
 install:
-  - conda env create --file environment.yml
-  - source activate hypernets_processor
-
-script:
   - sudo apt-get update
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
         wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -24,10 +20,15 @@ script:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
- 
+
+  - conda env create --file environment.yml
+  - source activate hypernets_processor
+
+script:
+  # For the unit-tests, disable Numba JIT, otherwise Coverage wont reach the actual Python code
   - python setup.py install
-  - python -m unittest discover  -p "test_*.py"
-  - coverage run -m unittest discover  -p "test_*.py"
+  - python -m unittest discover  -p "*_test.py"
+  - coverage run -m unittest discover  -p "*_test.py"
 
 after_success:
   - pip install codecov
