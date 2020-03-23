@@ -20,11 +20,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
 
-def run_apidoc(_):
-    doc_source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "content", "API"))
-    project_dir = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-    module_dir = os.path.join(project_dir, "hypernets_processor")
 
+def run_apidoc(_):
     ignore_paths = []
 
     argv = [
@@ -32,8 +29,9 @@ def run_apidoc(_):
         "-T",
         "-e",
         "-M",
-        "-o", doc_source_dir,
-        module_dir,
+        "-o",
+        "./content/API",
+        "./../../hypernets_processor",
     ] + ignore_paths
 
     try:
