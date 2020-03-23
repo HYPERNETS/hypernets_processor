@@ -19,8 +19,6 @@ TIME_FMT_L12A = "%Y%m%d%H%M"
 TIME_FMT_L2B = "%Y%m%d"
 
 
-
-
 class HypernetsWriter:
     """
     Class to write Hypernets output files
