@@ -1,7 +1,7 @@
-from setuptools import find_packages, setup
-
-from os import path
 from io import open
+from os import path
+
+from setuptools import find_packages, setup
 
 # Get package __version__.
 # Same effect as "from s import __version__",
@@ -18,7 +18,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(name='hypernets_processor',
       version=__version__,
       description='Software for processing Hypernets field data',
-      author='Sam Hunt',
+      authors=['Sam Hunt', 'Clémence Goyens'],
       long_description=long_description,
       author_email='sam.hunt@npl.co.uk',
       url='http://hypernets.eu',
