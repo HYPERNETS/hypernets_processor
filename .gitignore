@@ -1,3 +1,11 @@
-.idea
+# Python
 *.pyc
 *.egg-info
+.ipynb_checkpoints
+
+#IDE Specific
+.idea
+
+# Documentation specific
+docs/sphinx/_build
+docs/sphinx/content/API

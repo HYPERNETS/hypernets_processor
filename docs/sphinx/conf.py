@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# EOPy documentation build configuration file, created by
-# sphinx-quickstart on Sat May 05 14:18:14 2018.
+# hypernets_processor documentation build configuration file, created by
+# sphinx-quickstart on Friday March 20 2020.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -18,7 +18,7 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('sphinx'))
 
 
 def run_apidoc(_):
@@ -295,7 +295,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'hypernets_processor.tex', u'hypernets_processor Documentation',
+    (master_doc, 'hypernets_processor.tex', u'Hypernets Processor Documentation',
      u'Hypernets Project Team', 'manual'),
 ]
 
