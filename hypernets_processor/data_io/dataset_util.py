@@ -37,10 +37,8 @@ class DatasetUtil:
         :type fill_value: int/float
         :param fill_value: (optional) fill value
 
-        :return:
-            default_vector *xarray.DataArray*
-
-            Default empty vector
+        :return: Default empty vector
+        :rtype: xarray.DataArray
         """
 
         if fill_value is None:
@@ -75,10 +73,8 @@ class DatasetUtil:
         :type fill_value: int/float
         :param fill_value: (optional) fill value
 
-        :return:
-            default_array *xarray.DataArray*
-
-            Default empty array
+        :return: Default empty array
+        :rtype: xarray.DataArray
         """
 
         if fill_value is None:
@@ -116,10 +112,8 @@ class DatasetUtil:
         :type fill_value: int/float
         :param fill_value: (optional) fill value
 
-        :return:
-            default_array *xarray.DataArray*
-
-            Default empty 3D array
+        :return: Default empty 3D array
+        :rtype: xarray.DataArray
         """
 
         if fill_value is None:
@@ -157,10 +151,8 @@ class DatasetUtil:
         :type fill_value: int/float
         :param fill_value: (optional) fill value
 
-        :return:
-            default_vector_variable *xarray.Variable*
-
-            Default empty vector variable
+        :return: Default empty vector variable
+        :rtype: xarray.Variable
         """
         
         if fill_value is None:
@@ -210,10 +202,8 @@ class DatasetUtil:
         :type fill_value: int/float
         :param fill_value: (optional) fill value
 
-        :return:
-            default_array_variable *xarray.Variable*
-
-            Default empty array variable
+        :return: Default empty array variable
+        :rtype: xarray.Variable
         """
         
         if fill_value is None:
@@ -266,10 +256,8 @@ class DatasetUtil:
         :type fill_value: int/float
         :param fill_value: (optional) fill value
 
-        :return:
-            default_array_variable *xarray.Variable*
-
-            Default empty array variable
+        :return: Default empty 3D array variable
+        :rtype: xarray.Variable
         """
         
         if fill_value is None:
@@ -348,10 +336,8 @@ class DatasetUtil:
         :type dtype: type
         :param dtype: numpy dtype
 
-        :return:
-            fill_value
-
-            CF-conforming fill value
+        :return: CF-conforming fill value
+        :rtype: fill_value
         """
 
         if dtype == np.int8:

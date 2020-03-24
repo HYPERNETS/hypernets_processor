@@ -86,10 +86,8 @@ class HypernetsWriter:
         :type network:
         :param network: Hypernets network, "land" or "water"
 
-        :returns:
-            dataset *xarray.Dataset*
-
-            Empty dataset
+        :return: Empty L1 dataset
+        :rtype: xarray.Dataset
         """
 
         # Initialise dataset
@@ -128,10 +126,8 @@ class HypernetsWriter:
         :type network:
         :param network: Hypernets network, "land" or "water"
 
-        :returns:
-            dataset *xarray.Dataset*
-
-            Empty dataset
+        :return: Empty L2a dataset
+        :rtype: xarray.Dataset
         """
 
         # Initialise dataset
@@ -170,10 +166,8 @@ class HypernetsWriter:
         :type network:
         :param network: Hypernets network, "land" or "water"
 
-        :returns:
-            dataset *xarray.Dataset*
-
-            Empty dataset
+        :return: Empty L2b dataset
+        :rtype: xarray.Dataset
         """
 
         # Initialise dataset
@@ -215,10 +209,8 @@ class HypernetsWriter:
         :type version: str
         :param version: processing version
 
-        :return:
-            fname *str*
-
-            Level 1 filename
+        :return: Level 1 filename
+        :rtype: str
         """
 
         time_string = time.strftime(TIME_FMT_L12A)
@@ -241,10 +233,8 @@ class HypernetsWriter:
         :type version: str
         :param version: processing version
 
-        :return:
-            fname *str*
-
-            Level 2a filename
+        :return: Level 2a filename
+        :rtype: str
         """
 
         time_string = time.strftime(TIME_FMT_L12A)
@@ -267,10 +257,8 @@ class HypernetsWriter:
         :type version: str
         :param version: processing version
 
-        :return:
-            fname *str*
-
-            Level 2b filename
+        :return: Level 2b filename
+        :rtype: str
         """
 
         time_string = time.strftime(TIME_FMT_L2B)
