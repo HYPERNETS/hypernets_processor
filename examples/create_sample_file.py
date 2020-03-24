@@ -19,7 +19,7 @@ __status__ = "Development"
 N_WAVELENGTHS = 271
 
 
-def create_test_file(output_directory, n_series, network, site):
+def create_sample_file(output_directory, n_series, network, site):
     hw = HypernetsWriter()
     dataset = hw.create_template_dataset_l2a(N_WAVELENGTHS, n_series)
 
@@ -49,4 +49,4 @@ def create_test_file(output_directory, n_series, network, site):
 
 
 if __name__ == '__main__':
-    create_test_file(".", 26, "land", "gbna")
+    create_sample_file(".", 26, "land", "gbna")
