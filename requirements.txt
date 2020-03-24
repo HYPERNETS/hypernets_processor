@@ -1,0 +1,13 @@
+# required modules
+numpy >= 1.18.1
+scipy >= 1.4.1
+netcdf4 >= 1.5.3
+xarray >=0.8.2
+
+# for testing only
+pytest >=5.4.1
+pytest-cov >=2.8.1
+
+# for docs
+sphinx
+sphinx-rtd-theme
