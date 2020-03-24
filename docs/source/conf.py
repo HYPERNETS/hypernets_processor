@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 
 def run_apidoc(_):
-    ignore_paths = []
+    ignore_paths = ["./../../*/tests/"]
 
     argv = [
         "-f",
@@ -163,7 +163,7 @@ html_theme = 'sphinx_rtd_theme'
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'EOPy v0.1'
+# html_title = u'hypernets_processor v0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -172,13 +172,13 @@ html_theme = 'sphinx_rtd_theme'
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
-# html_logo = None
+html_logo = "content/images/hypernets-logo.png"
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 #
-# html_favicon = None
+html_favicon = "content/images/hypernets-logo.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
