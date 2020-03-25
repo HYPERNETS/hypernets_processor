@@ -1,0 +1,143 @@
+\documentclass{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{pdflscape} % for 'landscape' environment
+%% load packages
+\usepackage{pdfpages}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[section]{placeins}
+\usepackage[flushleft]{threeparttable} % http://ctan.org/pkg/threeparttable
+\usepackage[authoryear, round]{natbib}
+\usepackage[tablegrid]{vhistory} % for version history
+\usepackage[official]{eurosym} % for the euro sign
+\usepackage{enumitem}
+\setdescription{itemsep=0pt,parsep=0pt,leftmargin=0.5cm}
+
+\usepackage[top=1.8cm]{geometry} % Adjust page margins
+\usepackage{amsmath} % Required for equation customization
+\usepackage{amssymb} % Required to include mathematical symbols
+\usepackage{xcolor} % Required to specify colors by name
+\usepackage{caption}
+\usepackage{fancyhdr} % Required to customize headers
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{setspace}
+
+\usepackage{nomencl}
+\makenomenclature
+
+
+\usepackage{etoolbox}
+\renewcommand\nomgroup[1]{%
+  \item[\Large\bfseries
+  \ifstrequal{#1}{N}{Nomenclature}{%
+  \ifstrequal{#1}{A}{List of Abbreviations}{}}%
+]\vspace{10pt}} % this is to add vertical space between the groups.
+
+\usepackage{array}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}>{\baselineskip=10pt}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
+\setlength{\headheight}{55pt} % Increase the size of the header to accommodate meta-information
+\pagestyle{fancy}\fancyhf{} % Use the custom header specified below
+\fancyfoot[L]{\small{Confidential©HYPERNETS Consortium (RBINS, TARTU, SU, CNR, NPL, GFZ, CONICET)}}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt} % Remove the default horizontal rule under the header
+
+\setlength{\parindent}{4em}
+\setlength{\parskip}{1em}
+\renewcommand{\baselinestretch}{1.5}
+
+\newsavebox{\myTitleBlock}
+\begin{lrbox}{\myTitleBlock}
+\begin{minipage}{\textwidth}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|P{6cm}|p{2,5cm}|p{6cm}|}
+\hline
+\multirow{3}{*}{\includegraphics[width=6cm]{LOGOHYPERNETS_BGNRV3.png}} & \multicolumn{1}{l|}{Reference} & 
+\texttt{HYPERNETS Ground Processor ATBD}\\
+\cline{2-3} & \multicolumn{1}{l|}{Version} & \vhCurrentVersion\\
+\cline{2-3} & \multicolumn{1}{l|}{Date} & \vhCurrentDate\\
+\hline
+\end{tabular}
+\end{minipage}
+\end{lrbox}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\chead{\usebox{\myTitleBlock}}
+
+\usepackage[titletoc,title]{appendix}
+\setlength\parindent{0pt}
+
+\begin{document}
+
+\title{\includegraphics[width=12cm]{LOGOHYPERNETS_BGNRV3.png}\\
+\textbf{HYPERNETS Ground Processor\\
+Algorithm Theoretical Basis Document\\
+Version \vhCurrentVersion}}
+\maketitle
+\thispagestyle{fancy}
+\pagebreak
+
+\begin{versionhistory}
+\renewcommand \vhAuthorColWidth{5cm}
+\renewcommand \vhChangeColWidth{5cm}
+\vhEntry{0.0}{22.08.2019}{Samuel Hunt, Agnieszka Bia\l{}ek, Niall Origo}{Initial draft}
+\end{versionhistory}
+\pagebreak
+ 
+\section*{Executive summary}
+\addcontentsline{toc}{section}{Executive summary}%
+\pagebreak
+
+\pagebreak
+
+%article
+\tableofcontents
+\pagebreak
+
+%\addcontentsline{toc}{section}{\listfigurename}
+%\listoffigures
+%\pagebreak
+%\addcontentsline{toc}{section}{\listtablename}
+%\listoftables
+%\pagebreak
+
+\pagebreak
+
+\section{Introduction}\label{sec-intro}
+\input{HYPROCESSOR_ATBD_INTRO.tex}
+\pagebreak
+
+\section{Instrument and Network Design}\label{sec-instr}
+\input{HYPROCESSOR_ATBD_INSTR.tex}
+\pagebreak
+
+\section{Processor Algorithm Description}\label{sec-algo}
+\input{HYPROCESSOR_ATBD_ALGO.tex}
+\pagebreak
+
+\section{Processor Implementation}\label{sec-imple}
+\input{HYPROCESSOR_ATBD_IMPLE.tex}
+\pagebreak
+
+\section{Products}\label{sec-prod}
+\input{HYPROCESSOR_ATBD_PROD.tex}
+\pagebreak
+
+\begin{appendices}
+\section{...}
+\end{appendices}
+\pagebreak
+
+\addcontentsline{toc}{section}{References}
+\bibliography{HYPROCESSOR_ATBD} 
+\bibliographystyle{plainnat}
+
+\end{document}
