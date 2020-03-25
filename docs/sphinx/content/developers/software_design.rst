@@ -21,12 +21,14 @@ The following flowchart describes the overall processing flow of the *hypernets_
 
 Each of the file formats are described in a series of `file format specification documents <https://github.com/HYPERNETS/hypernets_processor/tree/master/docs/file_formats>`_.
 
-.. image:: images/design-flowchart.png
+.. image:: ../../../images/design-flowchart.png
 
 Architecture
 ------------
 
-TBC
+The high-level architecture of the should be as followed
+
+.. image:: ../../../images/design-class_interations.png
 
 Class Description
 -----------------
