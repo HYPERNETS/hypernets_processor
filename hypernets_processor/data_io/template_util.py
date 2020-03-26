@@ -2,15 +2,16 @@
 TemplateUtil class
 """
 
-import numpy as np
+from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.metadata import COMMON_METADATA, L1_METADATA, L2_METADATA, \
     LAND_NETWORK_METADATA, WATER_NETWORK_METADATA
+import numpy as np
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
 __created__ = "12/2/2020"
-__version__ = "0.0"
+__version__ = __version__
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
