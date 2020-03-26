@@ -6,12 +6,13 @@ import unittest
 import numpy as np
 from xarray import DataArray, Variable
 from hypernets_processor.data_io.dataset_util import DatasetUtil
+from hypernets_processor.version import __version__
 
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
 __created__ = "21/2/2020"
-__version__ = "0.0"
+__version__ = __version__
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"

@@ -2,6 +2,7 @@
 HypernetsWriter class
 """
 
+from hypernets_processor.version import __version__
 from hypernets_processor.data_io.template_util import TemplateUtil
 import xarray as xr
 import os
@@ -9,7 +10,7 @@ import os
 '''___Authorship___'''
 __author__ = "Sam Hunt"
 __created__ = "12/2/2020"
-__version__ = "0.0"
+__version__ = __version__
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
