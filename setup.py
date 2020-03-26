@@ -26,6 +26,7 @@ setup(name='hypernets_processor',
       install_requires=['numpy', 'netCDF4', 'xarray'],
       entry_points={
           'console_scripts': [
+                'hypernets_processor =  hypernets_processor.cli.hypernets_processor_cli:cli'
           ],
                     }
       )
