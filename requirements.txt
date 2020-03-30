@@ -3,6 +3,7 @@ numpy >= 1.18.1
 scipy >= 1.4.1
 netcdf4 >= 1.5.3
 xarray >=0.8.2
+schedule>=0.6.0
 
 # for testing only
 pytest >=5.4.1

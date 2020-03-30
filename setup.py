@@ -23,7 +23,7 @@ setup(name='hypernets_processor',
       author_email='sam.hunt@npl.co.uk',
       url='http://hypernets.eu',
       packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-      install_requires=['numpy', 'netCDF4', 'xarray'],
+      install_requires=['numpy', 'netCDF4', 'xarray', 'schedule'],
       entry_points={
           'console_scripts': [
                 'hypernets_processor =  hypernets_processor.cli.hypernets_processor_cli:cli'
