@@ -28,6 +28,7 @@ def main(processor_config, job_config):
     :type job_config: dict
     :param job_config: job configuration information, with entries:
 
+    * name (str) - Job name, default path of job config file
     * log_path (str) - Path to write log to, default None (means log goes to stdout)
     * verbose (bool) - Switch for verbose output, default False
     * quiet (bool) - Switch for quiet output, default False

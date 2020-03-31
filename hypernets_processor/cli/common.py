@@ -223,6 +223,7 @@ def read_job_config_file(fname):
     :rtype: dict
     :return: job configuration information, with entries (defaults occur if entry omitted from config file):
 
+    * name (str) - Job name, default path of job config file
     * log_path (str) - Path to write log to, default None (means log goes to stdout)
     * verbose (bool) - Switch for verbose output, default False
     * quiet (bool) - Switch for quiet output, default False
@@ -232,7 +233,10 @@ def read_job_config_file(fname):
     job_config = read_config_file(fname)
     job_config_dict = read_std_config(job_config)
 
-    # todo - read job config information
+    # Job Configuration
+    job_config_dict["name"] = fname
+    if "Job" in job_config.keys():
+        job_config_dict["name"] = job_config["Job"]["name"] if "name" in job_config["Job"].keys() else fname
 
     return job_config_dict
 
