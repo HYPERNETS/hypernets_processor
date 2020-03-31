@@ -111,12 +111,12 @@ class TestScheduler(unittest.TestCase):
 
         s = Scheduler()
 
-        job_config = {"seconds": 2,
-                      "parallel": False,
-                      "logger": return_test_logger(),
-                      "name": "test name"}
+        scheduler_job_config = {"seconds": 2,
+                                "parallel": False,
+                                "logger": return_test_logger(),
+                                "name": "test name"}
 
-        s.schedule(test_job, 2, 4, job_config=job_config)
+        s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
         jobs = s.get_scheduled_jobs()
 
         self.assertEqual(1, len(jobs))
@@ -140,12 +140,12 @@ class TestScheduler(unittest.TestCase):
 
         logger = return_test_logger(log_fname)
 
-        job_config = {"seconds": 2,
-                      "parallel": False,
-                      "logger": logger,
-                      "name": "test name"}
+        scheduler_job_config = {"seconds": 2,
+                                "parallel": False,
+                                "logger": logger,
+                                "name": "test name"}
 
-        s.schedule(test_job, 2, 4, job_config=job_config)
+        s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
 
         p = multiprocessing.Process(target=s.run)
 
