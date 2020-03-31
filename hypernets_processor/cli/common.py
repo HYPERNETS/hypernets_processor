@@ -3,8 +3,10 @@ Common functions for command line interfaces
 """
 
 from hypernets_processor.version import __version__
+from hypernets_processor.utils.paths import relative_path
 import logging
 import sys
+import os
 import argparse
 import configparser
 
@@ -97,7 +99,7 @@ def configure_std_parser(description=None):
 
 def read_config(fname):
     """
-    Returns information from hypernets_processor configuration file
+    Returns information from configuration file
 
     :type fname: str
     :param fname: path of configuration file
@@ -111,6 +113,78 @@ def read_config(fname):
     config.read(fname)
 
     return config
+
+
+def read_scheduler_config(fname):
+    """
+    Returns information from scheduler configuration file
+
+    :type fname: str
+    :param fname: path of configuration file
+
+    :rtype: dict
+    :return: scheduler configuration information, with entries (defaults occur if entry omitted from config file):
+
+    * seconds (int) - Scheduled job repeat interval in seconds, default None (if not None minutes and hours are None)
+    * minutes (int) - Scheduled job repeat interval in minutes, default None (if not None seconds and hours are None)
+    * hours (int) - Scheduled job repeat interval in hour, default None (if not None seconds and minutes are None)
+    * start_time (datetime.datetime) - Scheduled time to start running tasks, default None (means start now)
+    * log_path (str) - Path to write log to, default None (means log goes to stdout)
+    * verbose (bool) - Switch for verbose output, default False
+    * quiet (bool) - Switch for quiet output, default False
+    """
+
+    scheduler_config = read_config(fname)
+
+    scheduler_config_dict = dict()
+
+    # Schedule Configuration
+    scheduler_config_dict["seconds"] = scheduler_config["Schedule"]["seconds"] if "seconds" in \
+                                           scheduler_config["Schedule"].keys() else None
+    scheduler_config_dict["minutes"] = scheduler_config["Schedule"]["minutes"] if "minutes" in \
+                                           scheduler_config["Schedule"].keys() else None
+    scheduler_config_dict["hours"] = scheduler_config["Schedule"]["hours"] if "hours" in \
+                                         scheduler_config["Schedule"].keys() else None
+    scheduler_config_dict["start_time"] = scheduler_config["Schedule"]["start_time"] if "start_time" in \
+                                             scheduler_config["Schedule"].keys() else None
+
+    # Logging Configuration
+    scheduler_config_dict["log_path"] = None
+    scheduler_config_dict["verbose"] = False
+    scheduler_config_dict["quiet"] = False
+    if "Log" in scheduler_config.keys():
+        scheduler_config_dict["log_path"] = scheduler_config["Log"]["path"] if "verbose" in \
+                                                scheduler_config["Log"].keys() else None
+        scheduler_config_dict["verbose"] = bool(scheduler_config["Log"]["verbose"]) if "verbose" in \
+                                               scheduler_config["Log"].keys() else False
+        scheduler_config_dict["quiet"] = bool(scheduler_config["Log"]["quiet"]) if "quiet" in \
+                                             scheduler_config["Log"].keys() else False
+
+    # Checks
+    # Check only have hours, minutes or seconds
+    intervals = [scheduler_config_dict["seconds"], scheduler_config_dict["minutes"], scheduler_config_dict["hours"]]
+    if intervals.count(None) != 2:
+        raise ValueError("Scheduled job repeat interval must be defined as 1 of seconds, minutes or hours")
+
+    return scheduler_config_dict
+
+
+def read_jobs_list(fname):
+    """
+    Return job config paths from jobs list file
+
+    :type fname: str
+    :param fname: path of jobs list file
+
+    :return: job config paths
+    :rtype: list
+    """
+
+    # Read lines for file
+    with open(fname) as f:
+        jobs = [relative_path(line.rstrip(), os.path.dirname(fname)) for line in f]
+
+    return jobs
 
 
 if __name__ == "__main__":
