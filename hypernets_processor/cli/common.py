@@ -159,6 +159,7 @@ def read_scheduler_config_file(fname):
     * minutes (int) - Scheduled job repeat interval in minutes, default None (if not None seconds and hours are None)
     * hours (int) - Scheduled job repeat interval in hour, default None (if not None seconds and minutes are None)
     * start_time (datetime.datetime) - Scheduled time to start running tasks, default None (means start now)
+    * parallel (bool) - Switch to run scheduled jobs on different threads, default False
     * log_path (str) - Path to write log to, default None (means log goes to stdout)
     * verbose (bool) - Switch for verbose output, default False
     * quiet (bool) - Switch for quiet output, default False
@@ -178,6 +179,8 @@ def read_scheduler_config_file(fname):
                                          scheduler_config["Schedule"].keys() else None
     scheduler_config_dict["start_time"] = scheduler_config["Schedule"]["start_time"] if "start_time" in \
                                              scheduler_config["Schedule"].keys() else None
+    scheduler_config_dict["parallel"] = scheduler_config["Schedule"]["parallel"] if "parallel" in \
+                                            scheduler_config["Schedule"].keys() else False
 
     # Checks
     # Check only have hours, minutes or seconds
