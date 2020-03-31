@@ -20,6 +20,8 @@ __status__ = "Development"
 class TestPaths(unittest.TestCase):
     def test_relative_path_in_directory(self):
 
+        cwd = os.getcwd()
+
         # Use data directory for tests
         data_directory = "../../../data/tests/cli"
         fname = "jobs1.config"
@@ -27,8 +29,12 @@ class TestPaths(unittest.TestCase):
         full_path = relative_path(fname, data_directory)
 
         self.assertEqual(full_path, os.path.abspath("../../../data/tests/cli/jobs1.config"))
+        self.assertEqual(cwd, os.getcwd())
+
 
     def test_relative_path_in_subdirectory(self):
+
+        cwd = os.getcwd()
 
         # Use data directory for tests
         data_directory = "../../../data"
@@ -37,8 +43,11 @@ class TestPaths(unittest.TestCase):
         full_path = relative_path(fname, data_directory)
 
         self.assertEqual(full_path, os.path.abspath("../../../data/tests/cli/jobs1.config"))
+        self.assertEqual(cwd, os.getcwd())
 
     def test_relative_path_in_relative_directory(self):
+
+        cwd = os.getcwd()
 
         # Use data directory for tests
         data_directory = "../../../data/tests/reader"
@@ -47,6 +56,7 @@ class TestPaths(unittest.TestCase):
         full_path = relative_path(fname, data_directory)
 
         self.assertEqual(full_path, os.path.abspath("../../../data/tests/cli/jobs1.config"))
+        self.assertEqual(cwd, os.getcwd())
 
 
 if __name__ == "__main__":
