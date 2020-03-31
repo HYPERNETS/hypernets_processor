@@ -169,6 +169,50 @@ def read_scheduler_config(fname):
     return scheduler_config_dict
 
 
+def read_processor_config(fname):
+    """
+    Returns information from processor configuration file
+
+    :type fname: str
+    :param fname: path of configuration file
+
+    :rtype: dict
+    :return: processor configuration information, with entries (defaults occur if entry omitted from config file):
+
+    * ...
+    """
+
+    processor_config = read_config(fname)
+
+    processor_config_dict = dict()
+
+    # todo - read processor config information
+
+    return processor_config_dict
+
+
+def read_job_config(fname):
+    """
+    Returns information from job configuration file
+
+    :type fname: str
+    :param fname: path of configuration file
+
+    :rtype: dict
+    :return: job configuration information, with entries (defaults occur if entry omitted from config file):
+
+    * ...
+    """
+
+    job_config = read_config(fname)
+
+    job_config_dict = dict()
+
+    # todo - read job config information
+
+    return job_config_dict
+
+
 def read_jobs_list(fname):
     """
     Return job config paths from jobs list file
