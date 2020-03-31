@@ -67,6 +67,7 @@ class TestCommon(unittest.TestCase):
         d["minutes"] = None
         d["hours"] = None
         d["start_time"] = "now"
+        d["parallel"] = True
 
     def test_read_schedule_config_file_defaults(self):
         d = read_scheduler_config_file(scheduler_config_default_fname)
@@ -77,6 +78,7 @@ class TestCommon(unittest.TestCase):
         d["minutes"] = 12
         d["hours"] = None
         d["start_time"] = None
+        d["parallel"] = False
 
     def test_read_schedule_config_file_empty(self):
         with self.assertRaises(ValueError):
