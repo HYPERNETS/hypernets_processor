@@ -97,7 +97,7 @@ def configure_std_parser(description=None):
     return parser
 
 
-def read_config(fname):
+def read_config_file(fname):
     """
     Returns information from configuration file
 
@@ -115,7 +115,37 @@ def read_config(fname):
     return config
 
 
-def read_scheduler_config(fname):
+def read_std_config(config):
+    """
+    Returns standard configuration information from configuration file
+
+    :type config: config.RawConfig
+    :param config: path of configuration file
+
+    :rtype: dict
+    :return: standard configuration information, with entries (defaults occur if entry omitted from config file):
+
+    * log_path (str) - Path to write log to, default None (means log goes to stdout)
+    * verbose (bool) - Switch for verbose output, default False
+    * quiet (bool) - Switch for quiet output, default False
+
+    """
+
+    config_dict = dict()
+
+    # Logging Configuration
+    config_dict["log_path"] = None
+    config_dict["verbose"] = False
+    config_dict["quiet"] = False
+    if "Log" in config.keys():
+        config_dict["log_path"] = config["Log"]["path"] if "verbose" in config["Log"].keys() else None
+        config_dict["verbose"] = bool(config["Log"]["verbose"]) if "verbose" in config["Log"].keys() else False
+        config_dict["quiet"] = bool(config["Log"]["quiet"]) if "quiet" in config["Log"].keys() else False
+
+    return config_dict
+
+
+def read_scheduler_config_file(fname):
     """
     Returns information from scheduler configuration file
 
@@ -132,11 +162,12 @@ def read_scheduler_config(fname):
     * log_path (str) - Path to write log to, default None (means log goes to stdout)
     * verbose (bool) - Switch for verbose output, default False
     * quiet (bool) - Switch for quiet output, default False
+
     """
 
-    scheduler_config = read_config(fname)
+    scheduler_config = read_config_file(fname)
 
-    scheduler_config_dict = dict()
+    scheduler_config_dict = read_std_config(scheduler_config)
 
     # Schedule Configuration
     scheduler_config_dict["seconds"] = scheduler_config["Schedule"]["seconds"] if "seconds" in \
@@ -148,18 +179,6 @@ def read_scheduler_config(fname):
     scheduler_config_dict["start_time"] = scheduler_config["Schedule"]["start_time"] if "start_time" in \
                                              scheduler_config["Schedule"].keys() else None
 
-    # Logging Configuration
-    scheduler_config_dict["log_path"] = None
-    scheduler_config_dict["verbose"] = False
-    scheduler_config_dict["quiet"] = False
-    if "Log" in scheduler_config.keys():
-        scheduler_config_dict["log_path"] = scheduler_config["Log"]["path"] if "verbose" in \
-                                                scheduler_config["Log"].keys() else None
-        scheduler_config_dict["verbose"] = bool(scheduler_config["Log"]["verbose"]) if "verbose" in \
-                                               scheduler_config["Log"].keys() else False
-        scheduler_config_dict["quiet"] = bool(scheduler_config["Log"]["quiet"]) if "quiet" in \
-                                             scheduler_config["Log"].keys() else False
-
     # Checks
     # Check only have hours, minutes or seconds
     intervals = [scheduler_config_dict["seconds"], scheduler_config_dict["minutes"], scheduler_config_dict["hours"]]
@@ -169,7 +188,7 @@ def read_scheduler_config(fname):
     return scheduler_config_dict
 
 
-def read_processor_config(fname):
+def read_processor_config_file(fname):
     """
     Returns information from processor configuration file
 
@@ -180,10 +199,10 @@ def read_processor_config(fname):
     :return: processor configuration information, with entries (defaults occur if entry omitted from config file):
 
     * ...
+
     """
 
-    processor_config = read_config(fname)
-
+    processor_config = read_config_file(fname)
     processor_config_dict = dict()
 
     # todo - read processor config information
@@ -191,7 +210,7 @@ def read_processor_config(fname):
     return processor_config_dict
 
 
-def read_job_config(fname):
+def read_job_config_file(fname):
     """
     Returns information from job configuration file
 
@@ -201,12 +220,14 @@ def read_job_config(fname):
     :rtype: dict
     :return: job configuration information, with entries (defaults occur if entry omitted from config file):
 
-    * ...
+    * log_path (str) - Path to write log to, default None (means log goes to stdout)
+    * verbose (bool) - Switch for verbose output, default False
+    * quiet (bool) - Switch for quiet output, default False
+
     """
 
-    job_config = read_config(fname)
-
-    job_config_dict = dict()
+    job_config = read_config_file(fname)
+    job_config_dict = read_std_config(job_config)
 
     # todo - read job config information
 
