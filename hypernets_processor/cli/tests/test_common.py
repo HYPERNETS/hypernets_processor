@@ -29,6 +29,7 @@ processor_config_default_fname = "../../../data/tests/cli/scheduler_defaults.con
 
 job_config_fname = "../../../data/tests/cli/job1.config"
 job_config_default_fname = "../../../data/tests/cli/job1_defaults.config"
+job_config_empty_fname = "../../../data/tests/cli/job1_empty.config"
 
 jobs_list_fname = "../../../data/tests/cli/jobs.list"
 
@@ -99,10 +100,21 @@ class TestCommon(unittest.TestCase):
         self.assertEqual(type(d), dict)
         self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
 
+        d["name"] = "test_job_name"
+
     def test_read_job_config_file_defaults(self):
         d = read_job_config_file(job_config_default_fname)
         self.assertEqual(type(d), dict)
         self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
+
+        d["name"] = job_config_default_fname
+
+    def test_read_job_config_file_empty(self):
+        d = read_job_config_file(job_config_empty_fname)
+        self.assertEqual(type(d), dict)
+        self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
+
+        d["name"] = job_config_empty_fname
 
     def test_read_jobs_list(self):
         jobs = read_jobs_list(jobs_list_fname)
