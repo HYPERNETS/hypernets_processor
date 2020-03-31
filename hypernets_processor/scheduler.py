@@ -35,8 +35,8 @@ class Scheduler:
         :type job: func
         :param job: job function
 
-        :type job_config: dict
-        :param job_config: configuration parameters for job, entries may be:
+        :type scheduler_job_config: dict
+        :param scheduler_job_config: configuration parameters for job, entries may be:
 
         * seconds (*int*) - seconds between job repeats
         * minutes (*int*) - minutes between job repeats
@@ -49,18 +49,20 @@ class Scheduler:
         :param kwargs: kwargs for job
         """
 
-        job_config = kwargs.pop("job_config")
+        scheduler_job_config = kwargs.pop("scheduler_job_config")
 
-        seconds = job_config["seconds"] if "seconds" in job_config.keys() else None
-        minutes = job_config["minutes"] if "minutes" in job_config.keys() else None
-        parallel = job_config["parallel"] if "parallel" in job_config.keys() else None
-        logger = job_config["logger"] if "logger" in job_config.keys() else None
-        name = job_config["name"] if "name" in job_config.keys() else None
+        seconds = scheduler_job_config["seconds"] if "seconds" in scheduler_job_config.keys() else None
+        minutes = scheduler_job_config["minutes"] if "minutes" in scheduler_job_config.keys() else None
+        parallel = scheduler_job_config["parallel"] if "parallel" in scheduler_job_config.keys() else None
+        logger = scheduler_job_config["logger"] if "logger" in scheduler_job_config.keys() else None
+        name = scheduler_job_config["name"] if "name" in scheduler_job_config.keys() else None
 
         if seconds is not None:
             self.scheduler.every(seconds).seconds.do(self.job_wrapper, job, parallel, logger, name, *args, **kwargs)
         elif minutes is not None:
             self.scheduler.every(minutes).minutes.do(self.job_wrapper, job, parallel, logger, name, *args, **kwargs)
+
+        # todo - add hours
 
     def get_scheduled_jobs(self):
         """
@@ -109,10 +111,15 @@ class Scheduler:
         else:
             return job(*args, **kwargs)
 
-    def run(self):
+    def run(self, start_time=None):
         """
         Run scheduled jobs
+
+        :type start_time: datetime.datetime
+        :param start_time: time to delay starting running pending jobs too
         """
+
+        # todo - implement start_time feature
 
         while True:
             self.scheduler.run_pending()
