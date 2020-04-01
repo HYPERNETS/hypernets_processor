@@ -22,9 +22,9 @@ jobs_list = "../../../data/tests/cli/jobs.list"
 
 
 class TestHypernetsSchedulerCLI(unittest.TestCase):
-    def test_entrypoint(self):
-        exit_status = os.system('hypernets_processor --help')
-        self.assertEqual(exit_status, 0)
+    # def test_entrypoint(self):
+    #     exit_status = os.system('hypernets_processor --help')
+    #     self.assertEqual(exit_status, 0)
 
     def test_main(self):
         pass
