@@ -19,19 +19,21 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
+this_directory = os.path.dirname(__file__)
+
 # Test file paths
-scheduler_config_fname = "../../../data/tests/cli/scheduler.config"
-scheduler_config_default_fname = "../../../data/tests/cli/scheduler_defaults.config"
-scheduler_config_empty_fname = "../../../data/tests/cli/scheduler_empty.config"
+scheduler_config_fname = os.path.join(this_directory, "config_files", "scheduler.config")
+scheduler_config_default_fname = os.path.join(this_directory, "config_files", "scheduler_defaults.config")
+scheduler_config_empty_fname = os.path.join(this_directory, "config_files", "scheduler_empty.config")
 
-processor_config_fname = "../../../data/tests/cli/processor.config"
-processor_config_default_fname = "../../../data/tests/cli/scheduler_defaults.config"
+processor_config_fname = os.path.join(this_directory, "config_files", "processor.config")
+processor_config_default_fname = os.path.join(this_directory, "config_files", "processor_defaults.config")
 
-job_config_fname = "../../../data/tests/cli/job1.config"
-job_config_default_fname = "../../../data/tests/cli/job1_defaults.config"
-job_config_empty_fname = "../../../data/tests/cli/job1_empty.config"
+job_config_fname = os.path.join(this_directory, "config_files", "job1.config")
+job_config_default_fname = os.path.join(this_directory, "config_files", "job1_defaults.config")
+job_config_empty_fname = os.path.join(this_directory, "config_files", "job1_empty.config")
 
-jobs_list_fname = "../../../data/tests/cli/jobs.list"
+jobs_list_fname = os.path.join(this_directory, "config_files", "jobs.list")
 
 
 class TestCommon(unittest.TestCase):
@@ -119,11 +121,10 @@ class TestCommon(unittest.TestCase):
     def test_read_jobs_list(self):
         jobs = read_jobs_list(jobs_list_fname)
 
-        expected_jobs = [os.path.abspath("../../../data/tests/cli/job1.config"),
-                         os.path.abspath("../../../data/tests/cli/job2.config")]
+        expected_jobs = [os.path.abspath(os.path.join(this_directory, "config_files", "job1.config")),
+                         os.path.abspath(os.path.join(this_directory, "config_files", "job2.config"))]
 
         self.assertCountEqual(jobs, expected_jobs)
-
 
 
 if __name__ == "__main__":
