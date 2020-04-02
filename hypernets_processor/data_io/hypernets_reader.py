@@ -4,6 +4,12 @@ Module with functions and classes to read Hypernets data
 
 from hypernets_processor.version import __version__
 import xarray as xr
+from os import listdir, mkdir, path
+from struct import unpack
+from datetime import date # noqa
+from sys import exit, version_info # noqa
+from optparse import OptionParser
+import matplotlib.pyplot as plt
 
 
 '''___Authorship___'''
@@ -23,7 +29,261 @@ def read_hypernets_data(filename):
 
 
 class HypernetsReader:
-    pass
+
+    # READ METADATA
+    # CG - 20200331
+    # includes gen2dict, extract_metadata, read_metadata
+    # convert generator to dictionary 
+
+    def gen2dict(self,lst):
+        dic = {}
+        for i in range(1,len(lst)):
+            m=lst[i].split("=")
+            dic[m[0]] = m[1]
+        return(dic)
+
+    # extract metadata from metadata and record as generator
+    def extract_metadata(self,path_to_file):
+        with open(path_to_file) as f:
+            values = []
+            for idx, line in enumerate(f):
+                #if idx < 6:
+                    # Ignore header lines, currently not required 31/03/2020
+                #    continue
+                if line.strip():
+                    # Add the values in this line to the current
+                    # values list.
+                    line = line.strip()
+                    values.extend(line.split('\t'))
+                    #values.extend(xr.Dataset(line))
+                else:
+                    # Blank line, so output values and
+                    # clear the list.
+                    yield values
+                    del values[:]
+            # Yield the final set of values, assuming
+            # the last line of the file is not blank.
+            yield values
+
+    # read metadata as a dictionnary 
+    def read_metadata(self,path_to_file):
+        gen=self.extract_metadata(path_to_file)
+        metadic = {}
+        for x in gen:
+            metadic[x[0]] = self.gen2dict(x)
+        return(metadic)
+
+    # READ RAW SPE data
+    # CG - 20200331
+    # includes read_spectra, plot_spectra (author: A. Corrozi)
+    # convert generator to dictionary      
+
+    def read_spectra(self,spectra,FOLDER_NAME): # noqa
+        with open(FOLDER_NAME+spectra, "rb") as f:
+            print("="*80)
+            print("Spectra name : %s" % spectra)
+            print("_".join(spectra.split("_")[:5]))
+            print("-"*80)
+
+            # Header definition with length, description and decoding format
+            headerDef = [(2, "Total Dataset Length", '<H'),
+                         (1, "Spectrum Type Information", '<c'),
+                         (8, "Timestamp", '<Q'),
+                         (2, "Exposure Time", '<H'),
+                         (4, "Temperature", '<f'),
+                         (2, "Pixel Count", '<H')]
+
+            for headLen, headName, headFormat in headerDef:
+
+                print(headName)
+
+                data = f.read(headLen)
+
+                if version_info > (3, 0):
+                    print("%02X " * headLen % (tuple([b for b in data])))
+                else:
+                    print("%02X " * headLen % (tuple([ord(b) for b in data])))
+
+                unpackData, = unpack(headFormat, data)
+
+                print(unpackData)
+
+                if headName == "Spectrum Type Information":
+
+                    specInfo = format(ord(data), '#010b')
+                    specInfo = ['1' == a for a in reversed(specInfo[2:])]
+
+                    # bit 7 for VIS radiometer,
+                    # bit 6 for SWIR,
+                    # bit 4 for radiance,
+                    # bit 3 for irradiance,
+                    # bits 4 and 3 for dark;
+
+                    print(specInfo)
+
+                    strInfo = ""
+
+                    if specInfo[7]: strInfo += "VIS " # noqa
+                    if specInfo[6]: strInfo += "SWIR " # noqa
+
+                    if not specInfo[3] and not specInfo[4]: strInfo += "Dark" #noqa
+                    if specInfo[3] and not specInfo[4]: strInfo += "Irr" # noqa
+                    if specInfo[4] and not specInfo[3]: strInfo += "Rad" # noqa
+                    if specInfo[3] and specInfo[4]: strInfo += "Error" # noqa
+
+                    print("Spectrum Type Info : %s " % strInfo)
+
+                print("-"*80)
+
+            print("="*80)
+
+            dataSpectra = []
+            prev = 0
+            print("Reading Data spectra ...")
+            for _ in range(int(unpackData)):  # Last read data is count
+                data = f.read(2)
+
+                if len(data) != 2:
+                    print("Warning : impossible to read 2 bytes")
+                    continue
+
+                if DEBUG:
+                    if version_info > (3, 0):
+                        print("%02X " * 2 % (tuple([b for b in data])))
+                    else:
+                        print("%02X " * 2 % (tuple([ord(b) for b in data])))
+
+                # Read data as unsigned short
+                unpackData, = unpack('<H', data)
+                dataSpectra.append(unpackData)
+
+                # Peak detection for debuggin
+                if DEBUG and abs(prev - unpackData) > 3000:  # and False:
+                    print("df : " + "%i -> %i" % (prev, unpackData))
+                    # Stop if slope is too big
+                    # break
+
+                prev = unpackData
+
+            # Read remaining data and print raw hex
+            end = f.read()
+            if len(end) != 0:
+                print("="*80)
+                print("Remaining %i bytes data)" % len(end))
+
+                if version_info > (3, 0):
+                    print("%02X " * len(end) % (tuple([b for b in end])))
+                else:
+                    print("%02X " * len(end) % (tuple([ord(b) for b in end])))
+
+                print("="*80)
+
+            print("Data Spectra Length %i" % len(dataSpectra))
+
+            # XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX
+            # Faster method but less option
+            # data = f.read(2 * int(unpackData))  # Last read data is count     #
+            # dataSpectra = list(unpack('<' + 'H' * int(unpackData), data))     #
+            # print(dataSpectra)
+            # XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX
+
+            return dataSpectra
+
+
+
+    def plot_spectra(self,spectra,dataSpectra):
+        if PLOT or EXPORT:
+            plt.clf()
+            plt.title(spectra)
+            plt.plot([i for i in range(len(dataSpectra))], dataSpectra)
+
+            if PLOT:
+                plt.show()
+
+            if EXPORT:
+                plt.savefig(OUTPUT_FOLDER+spectra[:-4]+'.png')
+
+
+    # =============================================================================
+    parser = OptionParser()
+    parser.add_option("-i", "--input-dir", dest="FOLDER_NAME",
+                      help="Select an Input \"SEQ\" Directory")
+
+    parser.add_option("-f", "--file-mode", dest="FILE",
+                      help="Single File Mode")
+
+    parser.add_option("-o", "--output-dir", dest="OUTPUT_FOLDER",
+                      help="Output directory")
+
+    (options, args) = parser.parse_args()
+    # =============================================================================
+
+    if options.FOLDER_NAME: # noqa FIXME (C901)
+
+        FOLDER_NAME = options.FOLDER_NAME
+
+        VERBOSE = False
+        PLOT = False
+        EXPORT = True
+
+        if not FOLDER_NAME.endswith("/"):
+            FOLDER_NAME += '/'
+
+        for subfolder in ['Radiometer/', 'RADIOMETER/']:
+            if path.exists(FOLDER_NAME+subfolder):
+                break
+
+        FOLDER_NAME += subfolder
+
+        try:
+            spectras = sorted(listdir(FOLDER_NAME))
+
+        except OSError:
+            print("No folder named %s" % FOLDER_NAME)
+            exit(1)
+
+        if not options.OUTPUT_FOLDER:
+            OUTPUT_FOLDER = ('/'.join(path.abspath(FOLDER_NAME)
+                                      .split('/')[:-1])+'/PLOTS/')
+        else:
+            OUTPUT_FOLDER = options.OUTPUT_FOLDER
+            if not OUTPUT_FOLDER.endswith("/"):
+                OUTPUT_FOLDER += '/'
+            OUTPUT_FOLDER += 'PLOTS/'
+
+        try:
+            mkdir(OUTPUT_FOLDER)
+
+        except OSError:
+            print("Output directory already exists")  # Could be a warning
+            exit(1)
+
+        for spectra in spectras:
+            # Extension Check
+            if not(spectra.endswith(".spe") or spectra.endswith(".raw")):
+                print("Ignoring %s (wrong extension type)." % spectra)
+                continue
+
+            dataSpectra = self.read_spectra(spectra, FOLDER_NAME)
+            plot(spectra, dataSpectra)
+
+    elif options.FILE:
+        VERBOSE = True
+        PLOT = True
+        EXPORT = False
+        FOLDER_NAME = ""
+        dataSpectra = self.read_spectra(options.FILE, FOLDER_NAME)
+        plot(options.FILE, dataSpectra)
+
+
+    # GUI mode
+    else:
+        VERBOSE = True
+        PLOT = True
+        EXPORT = False
+        FOLDER_NAME = ""
+        # parser.error("You must specify an input sequence directory")
+        # exit(1)
 
 
 if __name__ == '__main__':
