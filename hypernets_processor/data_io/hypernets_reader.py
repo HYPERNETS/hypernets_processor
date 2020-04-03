@@ -8,7 +8,6 @@ from os import listdir, mkdir, path
 from struct import unpack
 from datetime import date # noqa
 from sys import exit, version_info # noqa
-from optparse import OptionParser
 import matplotlib.pyplot as plt
 
 
@@ -192,98 +191,11 @@ class HypernetsReader:
 
 
     def plot_spectra(self,spectra,dataSpectra):
-        if PLOT or EXPORT:
             plt.clf()
             plt.title(spectra)
             plt.plot([i for i in range(len(dataSpectra))], dataSpectra)
+            plt.show()
 
-            if PLOT:
-                plt.show()
-
-            if EXPORT:
-                plt.savefig(OUTPUT_FOLDER+spectra[:-4]+'.png')
-
-
-    # =============================================================================
-    parser = OptionParser()
-    parser.add_option("-i", "--input-dir", dest="FOLDER_NAME",
-                      help="Select an Input \"SEQ\" Directory")
-
-    parser.add_option("-f", "--file-mode", dest="FILE",
-                      help="Single File Mode")
-
-    parser.add_option("-o", "--output-dir", dest="OUTPUT_FOLDER",
-                      help="Output directory")
-
-    (options, args) = parser.parse_args()
-    # =============================================================================
-
-    if options.FOLDER_NAME: # noqa FIXME (C901)
-
-        FOLDER_NAME = options.FOLDER_NAME
-
-        VERBOSE = False
-        PLOT = False
-        EXPORT = True
-
-        if not FOLDER_NAME.endswith("/"):
-            FOLDER_NAME += '/'
-
-        for subfolder in ['Radiometer/', 'RADIOMETER/']:
-            if path.exists(FOLDER_NAME+subfolder):
-                break
-
-        FOLDER_NAME += subfolder
-
-        try:
-            spectras = sorted(listdir(FOLDER_NAME))
-
-        except OSError:
-            print("No folder named %s" % FOLDER_NAME)
-            exit(1)
-
-        if not options.OUTPUT_FOLDER:
-            OUTPUT_FOLDER = ('/'.join(path.abspath(FOLDER_NAME)
-                                      .split('/')[:-1])+'/PLOTS/')
-        else:
-            OUTPUT_FOLDER = options.OUTPUT_FOLDER
-            if not OUTPUT_FOLDER.endswith("/"):
-                OUTPUT_FOLDER += '/'
-            OUTPUT_FOLDER += 'PLOTS/'
-
-        try:
-            mkdir(OUTPUT_FOLDER)
-
-        except OSError:
-            print("Output directory already exists")  # Could be a warning
-            exit(1)
-
-        for spectra in spectras:
-            # Extension Check
-            if not(spectra.endswith(".spe") or spectra.endswith(".raw")):
-                print("Ignoring %s (wrong extension type)." % spectra)
-                continue
-
-            dataSpectra = self.read_spectra(spectra, FOLDER_NAME)
-            plot(spectra, dataSpectra)
-
-    elif options.FILE:
-        VERBOSE = True
-        PLOT = True
-        EXPORT = False
-        FOLDER_NAME = ""
-        dataSpectra = self.read_spectra(options.FILE, FOLDER_NAME)
-        plot(options.FILE, dataSpectra)
-
-
-    # GUI mode
-    else:
-        VERBOSE = True
-        PLOT = True
-        EXPORT = False
-        FOLDER_NAME = ""
-        # parser.error("You must specify an input sequence directory")
-        # exit(1)
 
 
 if __name__ == '__main__':
