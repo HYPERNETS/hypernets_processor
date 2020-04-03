@@ -146,6 +146,10 @@ class HypernetsReader:
                     print("Warning : impossible to read 2 bytes")
                     continue
             
+                # Read data as unsigned short
+                unpackData, = unpack('<H', data)
+                dataSpectra.append(unpackData)
+           
                 prev = unpackData
 
             # Read remaining data and print raw hex
