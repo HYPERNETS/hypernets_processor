@@ -40,7 +40,9 @@ class TestHypernetsReader(unittest.TestCase):
         print(radiometer_dir)
         for spectra in spefiles:
             dataspectra=du.read_spectra(spectra, radiometer_dir)
-#             sp.plot(os.path.join(pathfile, spectra),dataspectra)
+            print(dataspectra)
+            #du.plot_spectra(spectra,dataspectra)
+            
 
 if __name__ == '__main__':
     unittest.main()
