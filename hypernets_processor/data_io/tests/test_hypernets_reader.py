@@ -17,9 +17,9 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-PATH_NAME='../../../data/tests/reader/SEQ20200101T090000/'
-print(PATH_NAME)        
-
+# this_directory=os.path.dirname(__file__) does not work?
+this_directory = os.path.abspath('')
+print(this_directory)
 
 class TestHypernetsReader(unittest.TestCase):
     def test_create_default_vector(self):
@@ -28,20 +28,20 @@ class TestHypernetsReader(unittest.TestCase):
 
     def test_hypernets_reader_metadata(self):
         du = HypernetsReader()
-        file2read=os.path.join(PATH_NAME, "metadata.txt")
+        file2read=os.path.join(this_directory,"reader/SEQ20200101T090000", "metadata.txt")
         md=du.read_metadata(file2read)
         print(md)
         
     def test_hypernets_reader_spe(self):
         du = HypernetsReader()
-        radiometer_dir = os.path.join(PATH_NAME,"RADIOMETER/")
+        radiometer_dir = os.path.join(this_directory,"reader/SEQ20200101T090000","RADIOMETER/")
         spefiles = [os.path.basename(x) for x in glob.glob(os.path.join(radiometer_dir,"*.spe"))]
         print(spefiles)
         print(radiometer_dir)
         for spectra in spefiles:
             dataspectra=du.read_spectra(spectra, radiometer_dir)
-            print(dataspectra)
-            #du.plot_spectra(spectra,dataspectra)
+            #print(dataspectra)
+            du.plot_spectra(spectra,dataspectra)
             
 
 if __name__ == '__main__':
