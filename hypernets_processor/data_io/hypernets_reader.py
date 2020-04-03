@@ -145,23 +145,7 @@ class HypernetsReader:
                 if len(data) != 2:
                     print("Warning : impossible to read 2 bytes")
                     continue
-
-                if DEBUG:
-                    if version_info > (3, 0):
-                        print("%02X " * 2 % (tuple([b for b in data])))
-                    else:
-                        print("%02X " * 2 % (tuple([ord(b) for b in data])))
-
-                # Read data as unsigned short
-                unpackData, = unpack('<H', data)
-                dataSpectra.append(unpackData)
-
-                # Peak detection for debuggin
-                if DEBUG and abs(prev - unpackData) > 3000:  # and False:
-                    print("df : " + "%i -> %i" % (prev, unpackData))
-                    # Stop if slope is too big
-                    # break
-
+            
                 prev = unpackData
 
             # Read remaining data and print raw hex
