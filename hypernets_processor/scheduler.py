@@ -56,6 +56,7 @@ class Scheduler:
 
         seconds = scheduler_job_config["seconds"] if "seconds" in scheduler_job_config.keys() else None
         minutes = scheduler_job_config["minutes"] if "minutes" in scheduler_job_config.keys() else None
+        hours = scheduler_job_config["hours"] if "hours" in scheduler_job_config.keys() else None
         parallel = scheduler_job_config["parallel"] if "parallel" in scheduler_job_config.keys() else None
         name = scheduler_job_config["name"] if "name" in scheduler_job_config.keys() else None
 
@@ -66,7 +67,9 @@ class Scheduler:
             self.scheduler.every(minutes).minutes.do(self.job_wrapper, job, parallel,
                                                      self.logger, name, *args, **kwargs)
 
-        # todo - add hours
+        elif hours is not None:
+            self.scheduler.every(hours).hours.do(self.job_wrapper, job, parallel,
+                                                 self.logger, name, *args, **kwargs)
 
     def get_scheduled_jobs(self):
         """
