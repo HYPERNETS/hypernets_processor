@@ -6,8 +6,7 @@ import unittest
 from unittest.mock import patch, call
 from hypernets_processor.version import __version__
 from hypernets_processor.cli.hypernets_scheduler_main import main
-from hypernets_processor.cli.hypernets_processor_cli import main as hpmain
-from hypernets_processor.cli.common import configure_logging
+from hypernets_processor.cli.hypernets_processor_main import main as hpmain
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
