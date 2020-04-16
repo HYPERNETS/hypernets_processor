@@ -20,13 +20,17 @@ __status__ = "Development"
 class Scheduler:
     """
     Class to schedule recurring jobs (i.e. like cron)
+
+    :param logger: logger (optional)
+    :type logger: logging.logger
     """
 
-    def __init__(self):
+    def __init__(self, logger=None):
         """
         Initialises class
         """
         self.scheduler = Sched()
+        self.logger = logger
 
     def schedule(self, job, *args, **kwargs):
         """
@@ -41,7 +45,6 @@ class Scheduler:
         * seconds (*int*) - seconds between job repeats
         * minutes (*int*) - minutes between job repeats
         * parallel (*bool*) - switch for running jobs on different threads (False if omitted)
-        * logger (*logging.Logger*) - logger (optional)
         * name (*str*) - job name for logging (optional)
 
         :param args: args for job
@@ -54,13 +57,14 @@ class Scheduler:
         seconds = scheduler_job_config["seconds"] if "seconds" in scheduler_job_config.keys() else None
         minutes = scheduler_job_config["minutes"] if "minutes" in scheduler_job_config.keys() else None
         parallel = scheduler_job_config["parallel"] if "parallel" in scheduler_job_config.keys() else None
-        logger = scheduler_job_config["logger"] if "logger" in scheduler_job_config.keys() else None
         name = scheduler_job_config["name"] if "name" in scheduler_job_config.keys() else None
 
         if seconds is not None:
-            self.scheduler.every(seconds).seconds.do(self.job_wrapper, job, parallel, logger, name, *args, **kwargs)
+            self.scheduler.every(seconds).seconds.do(self.job_wrapper, job, parallel,
+                                                     self.logger, name, *args, **kwargs)
         elif minutes is not None:
-            self.scheduler.every(minutes).minutes.do(self.job_wrapper, job, parallel, logger, name, *args, **kwargs)
+            self.scheduler.every(minutes).minutes.do(self.job_wrapper, job, parallel,
+                                                     self.logger, name, *args, **kwargs)
 
         # todo - add hours
 
