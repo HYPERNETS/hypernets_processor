@@ -3,7 +3,7 @@ hypernets_processor cli
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.common import configure_logging, configure_std_parser, read_config
+from hypernets_processor.cli.common import configure_std_parser, read_processor_config_file, read_job_config_file
 from hypernets_processor.cli.hypernets_processor_main import main
 
 
@@ -30,8 +30,12 @@ def configure_parser():
     parser = configure_std_parser(description=description)
 
     # Add specific arguments
-    parser.add_argument("-c", "--config", action="store",
-                        help="Path of configuration file")
+    # Configuration files
+    parser.add_argument("-s", "--processor-config", action="store",
+                        help="Path of processor configuration file")
+
+    parser.add_argument("-j", "--job-config", action="store",
+                        help="Path of job configuration file")
 
     return parser
 
@@ -45,8 +49,13 @@ def cli():
     Command line interface function for hypernets_processor
     """
 
-    logger = configure_logging()
-    main(logger=logger)
+    # unpack parsed_args
+    processor_config = read_processor_config_file(parsed_args.p)
+    job_config = read_job_config_file(parsed_args.j)
+
+    # run main
+    main(processor_config=processor_config,
+         job_config=job_config)
 
     return None
 
