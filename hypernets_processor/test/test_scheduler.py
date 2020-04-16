@@ -107,7 +107,7 @@ class TestScheduler(unittest.TestCase):
         output = out.getvalue().strip()
         self.assertEqual(output, 'Started: Test Job\nFailed: Test Job - ZeroDivisionError: division by zero')
 
-    def test_schedule(self):
+    def test_schedule_seconds(self):
 
         s = Scheduler(logger=return_test_logger())
 
@@ -123,6 +123,54 @@ class TestScheduler(unittest.TestCase):
         job = jobs[0]
         self.assertEqual(job.interval, 2)
         self.assertEqual(job.unit, "seconds")
+        self.assertEqual(job.job_func.__name__, "job_wrapper")
+        self.assertEqual(job.job_func.args[0].__name__, "test_job")
+        self.assertEqual(job.job_func.args[1], False)
+        self.assertEqual(type(job.job_func.args[2]), logging.Logger)
+        self.assertEqual(job.job_func.args[3], "test name")
+        self.assertEqual(job.job_func.args[4], 2)
+        self.assertEqual(job.job_func.args[5], 4)
+
+    def test_schedule_minutes(self):
+
+        s = Scheduler(logger=return_test_logger())
+
+        scheduler_job_config = {"minutes": 2,
+                                "parallel": False,
+                                "name": "test name"}
+
+        s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
+        jobs = s.get_scheduled_jobs()
+
+        self.assertEqual(1, len(jobs))
+
+        job = jobs[0]
+        self.assertEqual(job.interval, 2)
+        self.assertEqual(job.unit, "minutes")
+        self.assertEqual(job.job_func.__name__, "job_wrapper")
+        self.assertEqual(job.job_func.args[0].__name__, "test_job")
+        self.assertEqual(job.job_func.args[1], False)
+        self.assertEqual(type(job.job_func.args[2]), logging.Logger)
+        self.assertEqual(job.job_func.args[3], "test name")
+        self.assertEqual(job.job_func.args[4], 2)
+        self.assertEqual(job.job_func.args[5], 4)
+
+    def test_schedule_hours(self):
+
+        s = Scheduler(logger=return_test_logger())
+
+        scheduler_job_config = {"hours": 2,
+                                "parallel": False,
+                                "name": "test name"}
+
+        s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
+        jobs = s.get_scheduled_jobs()
+
+        self.assertEqual(1, len(jobs))
+
+        job = jobs[0]
+        self.assertEqual(job.interval, 2)
+        self.assertEqual(job.unit, "hours")
         self.assertEqual(job.job_func.__name__, "job_wrapper")
         self.assertEqual(job.job_func.args[0].__name__, "test_job")
         self.assertEqual(job.job_func.args[1], False)
