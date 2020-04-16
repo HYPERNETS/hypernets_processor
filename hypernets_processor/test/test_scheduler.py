@@ -109,11 +109,10 @@ class TestScheduler(unittest.TestCase):
 
     def test_schedule(self):
 
-        s = Scheduler()
+        s = Scheduler(logger=return_test_logger())
 
         scheduler_job_config = {"seconds": 2,
                                 "parallel": False,
-                                "logger": return_test_logger(),
                                 "name": "test name"}
 
         s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
@@ -134,15 +133,14 @@ class TestScheduler(unittest.TestCase):
 
     def test_run(self):
 
-        s = Scheduler()
-
         log_fname = "test.txt"
 
         logger = return_test_logger(log_fname)
 
+        s = Scheduler(logger=logger)
+
         scheduler_job_config = {"seconds": 2,
                                 "parallel": False,
-                                "logger": logger,
                                 "name": "test name"}
 
         s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)

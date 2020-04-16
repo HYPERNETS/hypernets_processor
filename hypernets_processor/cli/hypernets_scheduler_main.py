@@ -49,7 +49,7 @@ def main(jobs_list, processor_config, scheduler_config):
                                quiet=scheduler_config["quiet"])
 
     # schedule jobs
-    s = Scheduler()
+    s = Scheduler(logger=logger)
 
     for job_config_fname in jobs_list:
 
@@ -63,7 +63,6 @@ def main(jobs_list, processor_config, scheduler_config):
         scheduler_job_config["minutes"] = scheduler_config["minutes"]
         scheduler_job_config["hours"] = scheduler_config["hours"]
         scheduler_job_config["parallel"] = scheduler_config["parallel"]
-        scheduler_job_config["logger"] = logger
 
         # schedule job
         s.schedule(processor_main,
