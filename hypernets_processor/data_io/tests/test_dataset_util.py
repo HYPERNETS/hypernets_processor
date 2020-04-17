@@ -232,6 +232,7 @@ class TestDatasetUtil(unittest.TestCase):
     def test_create_flags_vector_variable(self):
 
         meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        meanings_txt = "flag1 flag2 flag3 flag4 flag5 flag6 flag7 flag8"
         masks = "1, 2, 4, 8, 16, 32, 64, 128"
         flags_vector_variable = DatasetUtil.create_flags_vector_variable(5, meanings,
                                                                          standard_name="std",
@@ -243,7 +244,7 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual((5,), flags_vector_variable.shape)
         self.assertEqual(np.uint8, flags_vector_variable.dtype)
         self.assertEqual(flags_vector_variable.attrs['flag_masks'], masks)
-        self.assertEqual(flags_vector_variable.attrs['flag_meanings'], meanings)
+        self.assertEqual(flags_vector_variable.attrs['flag_meanings'], meanings_txt)
         self.assertEqual(0, flags_vector_variable[2])
         self.assertEqual("std", flags_vector_variable.attrs["standard_name"])
         self.assertEqual("long", flags_vector_variable.attrs["long_name"])
@@ -252,6 +253,7 @@ class TestDatasetUtil(unittest.TestCase):
     def test_create_flags_array_variable(self):
 
         meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        meanings_txt = "flag1 flag2 flag3 flag4 flag5 flag6 flag7 flag8"
         masks = "1, 2, 4, 8, 16, 32, 64, 128"
         flags_array_variable = DatasetUtil.create_flags_array_variable(7, 8, meanings,
                                                                        standard_name="std",
@@ -263,7 +265,7 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual((8, 7), flags_array_variable.shape)
         self.assertEqual(np.uint8, flags_array_variable.dtype)
         self.assertEqual(flags_array_variable.attrs['flag_masks'], masks)
-        self.assertEqual(flags_array_variable.attrs['flag_meanings'], meanings)
+        self.assertEqual(flags_array_variable.attrs['flag_meanings'], meanings_txt)
         self.assertEqual(0, flags_array_variable[2, 4])
         self.assertEqual("std", flags_array_variable.attrs["standard_name"])
         self.assertEqual("long", flags_array_variable.attrs["long_name"])
@@ -272,6 +274,7 @@ class TestDatasetUtil(unittest.TestCase):
     def test_create_flags_array3d_variable(self):
 
         meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        meanings_txt = "flag1 flag2 flag3 flag4 flag5 flag6 flag7 flag8"
         masks = "1, 2, 4, 8, 16, 32, 64, 128"
         flags_array3d_variable = DatasetUtil.create_flags_array3d_variable(7, 8, 3, meanings,
                                                                            standard_name="std",
@@ -283,7 +286,7 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual((3, 8, 7), flags_array3d_variable.shape)
         self.assertEqual(np.uint8, flags_array3d_variable.dtype)
         self.assertEqual(flags_array3d_variable.attrs['flag_masks'], masks)
-        self.assertEqual(flags_array3d_variable.attrs['flag_meanings'], meanings)
+        self.assertEqual(flags_array3d_variable.attrs['flag_meanings'], meanings_txt)
         self.assertEqual(0, flags_array3d_variable[2, 4, 3])
         self.assertEqual("std", flags_array3d_variable.attrs["standard_name"])
         self.assertEqual("long", flags_array3d_variable.attrs["long_name"])
