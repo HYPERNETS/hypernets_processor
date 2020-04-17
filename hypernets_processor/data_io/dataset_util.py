@@ -312,7 +312,8 @@ class DatasetUtil:
         variable = DatasetUtil.create_vector_variable(height, data_type, standard_name=standard_name,
                                                       long_name=long_name, dim_name=dim_name, fill_value=0)
 
-        variable.attrs["flag_meanings"] = meanings
+        # add flag attributes
+        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'","").replace(",","")
         variable.attrs["flag_masks"] = str([2**i for i in range(0, n_masks)])[1:-1]
 
         return variable
@@ -351,7 +352,8 @@ class DatasetUtil:
         variable = DatasetUtil.create_array_variable(width, height, data_type, standard_name=standard_name,
                                                      long_name=long_name, dim_names=dim_names, fill_value=0)
 
-        variable.attrs["flag_meanings"] = meanings
+        # add flag attributes
+        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
         variable.attrs["flag_masks"] = str([2 ** i for i in range(0, n_masks)])[1:-1]
 
         return variable
@@ -394,7 +396,8 @@ class DatasetUtil:
         variable = DatasetUtil.create_array3d_variable(length, width, height, data_type, standard_name=standard_name,
                                                        long_name=long_name, dim_names=dim_names, fill_value=0)
 
-        variable.attrs["flag_meanings"] = meanings
+        # add flag attributes
+        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
         variable.attrs["flag_masks"] = str([2 ** i for i in range(0, n_masks)])[1:-1]
 
         return variable
