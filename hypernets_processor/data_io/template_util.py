@@ -6,6 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.metadata import COMMON_METADATA, L1_METADATA, L2_METADATA, \
     LAND_NETWORK_METADATA, WATER_NETWORK_METADATA
+from hypernets_processor.data_io.flags import FLAG_MEANINGS
 import numpy as np
 
 '''___Authorship___'''
@@ -71,6 +72,10 @@ class TemplateUtil:
         sun_angle_zenith = du.create_vector_variable(n_series, dim_name="series", dtype=np.float32)
         du.add_encoding(sun_angle_zenith, dtype=np.uint16, scale_factor=0.1, offset=0.0)
         dataset["sun_angle_zenith"] = sun_angle_zenith
+
+        # Create quality flag variable
+        quality_flags = du.create_flags_vector_variable(n_series, meanings=FLAG_MEANINGS, dim_name="series")
+        dataset["quality_flags"] = quality_flags
 
         # Create time variable
         time = du.create_vector_variable(n_series, dim_name="series", dtype=np.int32)
