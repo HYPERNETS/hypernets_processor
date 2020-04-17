@@ -18,9 +18,6 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-# todo - add flags
-
-
 class TemplateUtil:
     """
     Class to create template Hypernets datasets
