@@ -282,6 +282,148 @@ class DatasetUtil:
         return variable
 
     @staticmethod
+    def create_flags_vector_variable(height, meanings, standard_name=None, long_name=None, dim_name=None):
+        """
+        Return default empty 1d xarray flag Variable
+
+        :type height: int
+        :param height: array length
+
+        :type meanings: list
+        :param meanings: flag meanings
+
+        :type standard_name: str
+        :param standard_name: (optional) variable standard name attribute
+
+        :type long_name: str
+        :param long_name: (optional) variable long name attribute
+
+        :type dim_name: str
+        :param dim_name: (optional) dimension name
+
+        :return: Default empty flag vector variable
+        :rtype: xarray.Variable
+        """
+
+        n_masks = len(meanings)
+
+        data_type = DatasetUtil.return_flags_dtype(n_masks)
+
+        variable = DatasetUtil.create_vector_variable(height, data_type, standard_name=standard_name,
+                                                      long_name=long_name, dim_name=dim_name, fill_value=0)
+
+        # add flag attributes
+        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'","").replace(",","")
+        variable.attrs["flag_masks"] = str([2**i for i in range(0, n_masks)])[1:-1]
+
+        return variable
+
+    @staticmethod
+    def create_flags_array_variable(width, height, meanings, standard_name=None, long_name=None, dim_names=None):
+        """
+        Return default empty 2d xarray flag Variable
+
+        :type width: int
+        :param width: array width
+
+        :type height: int
+        :param height: array height
+
+        :type meanings: list
+        :param meanings: flag meanings
+
+        :type standard_name: str
+        :param standard_name: (optional) variable standard name attribute
+
+        :type long_name: str
+        :param long_name: (optional) variable long name attribute
+
+        :type dim_names: list
+        :param dim_names: (optional) dimension name
+
+        :return: Default empty flag vector variable
+        :rtype: xarray.Variable
+        """
+
+        n_masks = len(meanings)
+
+        data_type = DatasetUtil.return_flags_dtype(n_masks)
+
+        variable = DatasetUtil.create_array_variable(width, height, data_type, standard_name=standard_name,
+                                                     long_name=long_name, dim_names=dim_names, fill_value=0)
+
+        # add flag attributes
+        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
+        variable.attrs["flag_masks"] = str([2 ** i for i in range(0, n_masks)])[1:-1]
+
+        return variable
+
+    @staticmethod
+    def create_flags_array3d_variable(length, width, height, meanings, standard_name=None, long_name=None,
+                                      dim_names=None):
+        """
+        Return default empty 3d xarray flag Variable
+
+        :type length: int
+        :param length: array length
+
+        :type width: int
+        :param width: array width
+
+        :type height: int
+        :param height: array height
+
+        :type meanings: list
+        :param meanings: flag meanings
+
+        :type standard_name: str
+        :param standard_name: (optional) variable standard name attribute
+
+        :type long_name: str
+        :param long_name: (optional) variable long name attribute
+
+        :type dim_names: list
+        :param dim_names: (optional) dimension name
+
+        :return: Default empty flag vector variable
+        :rtype: xarray.Variable
+        """
+
+        n_masks = len(meanings)
+
+        data_type = DatasetUtil.return_flags_dtype(n_masks)
+
+        variable = DatasetUtil.create_array3d_variable(length, width, height, data_type, standard_name=standard_name,
+                                                       long_name=long_name, dim_names=dim_names, fill_value=0)
+
+        # add flag attributes
+        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
+        variable.attrs["flag_masks"] = str([2 ** i for i in range(0, n_masks)])[1:-1]
+
+        return variable
+
+    @staticmethod
+    def return_flags_dtype(n_masks):
+        """
+        Return required flags array data type
+
+        :type n_masks: int
+        :param n_masks: number of masks required in flag array
+
+        :return: data type
+        :rtype: dtype
+        """
+
+        if n_masks <= 8:
+            return np.uint8
+        elif n_masks <= 16:
+            return np.uint16
+        elif n_masks <= 32:
+            return np.uint32
+        else:
+            return np.uint64
+
+    @staticmethod
     def add_encoding(variable, dtype, scale_factor=1.0, offset=0.0, fill_value=None, chunksizes=None):
         """
         Add encoding to xarray Variable to apply when writing netCDF files

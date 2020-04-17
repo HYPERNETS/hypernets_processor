@@ -21,7 +21,7 @@ N_WAVELENGTHS = 271
 
 def create_sample_file(output_directory, n_series, network, site):
     hw = HypernetsWriter()
-    dataset = hw.create_template_dataset_l2a(N_WAVELENGTHS, n_series)
+    dataset = hw.create_template_dataset_l2a(N_WAVELENGTHS, n_series, network=network)
 
     # wavelength data
     dataset["wavelength"].data = np.concatenate((np.arange(400, 1000, 3), np.arange(1000, 1700+10, 10)))

@@ -3,7 +3,11 @@ Tests for HypernetsWriter class
 """
 
 import unittest
+from unittest.mock import patch
+from unittest.mock import MagicMock
 import datetime
+import xarray
+import numpy as np
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.version import __version__
 
@@ -16,117 +20,167 @@ __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
-
-COMMON_VARIABLES = ["wavelength", "bandwidth", "viewing_angle_azimuth", "viewing_angle_zenith", "sun_angle_azimuth",
-                    "sun_angle_zenith", "acquisition_time"]
-L1_VARIABLES = ["u_random_radiance", "u_systematic_radiance", "cov_random_radiance",
-                "cov_systematic_radiance", "radiance"]
-L2A_VARIABLES = ["u_random_reflectance", "u_systematic_reflectance", "cov_random_reflectance",
-                "cov_systematic_reflectance", "reflectance"]
-L2B_VARIABLES = ["u_random_reflectance", "u_systematic_reflectance", "cov_random_reflectance",
-                "cov_systematic_reflectance", "reflectance"]
+# todo - write test for csv writer
+# todo - write test for end to end writer use
 
 
 class TestHypernetsWriter(unittest.TestCase):
-    def test_create_template_dataset_l1_land(self):
-        ds = HypernetsWriter.create_template_dataset_l1(271, 10, network="land")
 
-        self.assertEqual(len(COMMON_VARIABLES) + len(L1_VARIABLES), len(ds.data_vars) + len(ds.coords))
+    def test_write_netcdf(self):
 
-        for var in COMMON_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        ds = MagicMock()
+        path = "test.nc"
 
-        for var in L1_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        HypernetsWriter.write(ds, path)
 
-        self.assertEqual("eng", ds.attrs["metadata_language"])
-        self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
-                         ds.attrs["resource_title"])
-        self.assertEqual("Hunt Sam", ds.attrs["creator_name"])
+        self.assertIsNone(ds.to_netcdf.assert_called_once_with(path, encoding={}, engine='netcdf4', format='netCDF4'))
 
-    def test_create_template_dataset_l1_water(self):
-        ds = HypernetsWriter.create_template_dataset_l1(271, 10, network="water")
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l1_rad_land(self, mock_tu):
 
-        self.assertEqual(len(COMMON_VARIABLES) + len(L1_VARIABLES), len(ds.data_vars) + len(ds.coords))
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l1_rad(n_w, n_s, network="land")
 
-        for var in COMMON_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-        for var in L1_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l1_rad_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l1_rad_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
 
-        self.assertEqual("eng", ds.attrs["metadata_language"])
-        self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
-                         ds.attrs["resource_title"])
-        self.assertEqual("Goyens Clémence", ds.attrs["creator_name"])
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l1_rad_water(self, mock_tu):
 
-    def test_create_template_dataset_l2a_land(self):
-        ds = HypernetsWriter.create_template_dataset_l2a(271, 10, network="land")
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l1_rad(n_w, n_s, network="water")
 
-        self.assertEqual(len(COMMON_VARIABLES) + len(L2A_VARIABLES), len(ds.data_vars) + len(ds.coords))
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-        for var in COMMON_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l1_rad_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l1_rad_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
 
-        for var in L2A_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l1_irr_land(self, mock_tu):
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l1_irr(n_w, n_s, network="land")
 
-        self.assertEqual("eng", ds.attrs["metadata_language"])
-        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
-                         ds.attrs["resource_title"])
-        self.assertEqual("Hunt Sam", ds.attrs["creator_name"])
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-    def test_create_template_dataset_l2a_water(self):
-        ds = HypernetsWriter.create_template_dataset_l2a(271, 10, network="water")
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l1_irr_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l1_irr_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
 
-        self.assertEqual(len(COMMON_VARIABLES) + len(L2A_VARIABLES), len(ds.data_vars) + len(ds.coords))
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l1_irr_water(self, mock_tu):
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l1_irr(n_w, n_s, network="water")
 
-        for var in COMMON_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-        for var in L2A_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l1_irr_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l1_irr_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
 
-        self.assertEqual("eng", ds.attrs["metadata_language"])
-        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
-                         ds.attrs["resource_title"])
-        self.assertEqual("Goyens Clémence", ds.attrs["creator_name"])
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l2a_land(self, mock_tu):
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l2a(n_w, n_s, network="land")
 
-    def test_create_template_dataset_l2b_land(self):
-        ds = HypernetsWriter.create_template_dataset_l2b(271, 10, network="land")
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-        self.assertEqual(len(COMMON_VARIABLES) + len(L2B_VARIABLES), len(ds.data_vars) + len(ds.coords))
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l2a_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
 
-        for var in COMMON_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l2a_water(self, mock_tu):
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l2a(n_w, n_s, network="water")
 
-        for var in L2B_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-        self.assertEqual("eng", ds.attrs["metadata_language"])
-        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
-                         ds.attrs["resource_title"])
-        self.assertEqual("Hunt Sam", ds.attrs["creator_name"])
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l2a_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
 
-    def test_create_template_dataset_l2b_water(self):
-        ds = HypernetsWriter.create_template_dataset_l2b(271, 10, network="water")
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l2b_land(self, mock_tu):
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l2b(n_w, n_s, network="land")
 
-        self.assertEqual(len(COMMON_VARIABLES) + len(L2B_VARIABLES), len(ds.data_vars) + len(ds.coords))
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-        for var in COMMON_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l2b_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
 
-        for var in L2B_VARIABLES:
-            self.assertIsNotNone(ds.variables[var])
+    @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
+    def test_create_template_dataset_l2b_water(self, mock_tu):
+        n_w = 271
+        n_s = 10
+        ds = HypernetsWriter.create_template_dataset_l2b(n_w, n_s, network="water")
 
-        self.assertEqual("eng", ds.attrs["metadata_language"])
-        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
-                         ds.attrs["resource_title"])
-        self.assertEqual("Goyens Clémence", ds.attrs["creator_name"])
+        # test ds
+        self.assertEqual(type(ds), xarray.Dataset)
 
-    def test_create_file_name_l1(self):
+        # test calls to TemplateUtil
+        self.assertTrue(mock_tu.called)
+        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_l2b_variables.assert_called_once_with(ds, n_w, n_s))
+        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
+        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
 
-        fname = HypernetsWriter.create_file_name_l1("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
+    def test_create_file_name_l1_irr(self):
+
+        fname = HypernetsWriter.create_file_name_l1_irr("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
+        self.assertEqual("HYPERNETS_L_GBNA_IRR_201804031100_v0.00.nc", fname)
+
+    def test_create_file_name_l1_rad(self):
+
+        fname = HypernetsWriter.create_file_name_l1_rad("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
         self.assertEqual("HYPERNETS_L_GBNA_RAD_201804031100_v0.00.nc", fname)
 
     def test_create_file_name_l2a(self):
