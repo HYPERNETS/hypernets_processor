@@ -54,7 +54,7 @@ class TestHypernetsSchedulerMain(unittest.TestCase):
         mock_sched.return_value.schedule.assert_has_calls(calls)
 
         # test run call
-        self.assertIsNone(mock_sched.return_value.run.assert_called_once_with(start_time=2))
+        mock_sched.return_value.run.assert_called_once_with(start_time=2)
 
 
 if __name__ == "__main__":

@@ -33,7 +33,7 @@ class TestHypernetsWriter(unittest.TestCase):
 
         HypernetsWriter.write(ds, path)
 
-        self.assertIsNone(ds.to_netcdf.assert_called_once_with(path, encoding={}, engine='netcdf4', format='netCDF4'))
+        ds.to_netcdf.assert_called_once_with(path, encoding={}, engine='netcdf4', format='netCDF4')
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l1_rad_land(self, mock_tu):
@@ -47,11 +47,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l1_rad_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l1_rad_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l1_rad_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l1_rad_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds)
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l1_rad_water(self, mock_tu):
@@ -65,11 +65,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l1_rad_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l1_rad_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l1_rad_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l1_rad_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds)
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l1_irr_land(self, mock_tu):
@@ -82,11 +82,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l1_irr_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l1_irr_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l1_irr_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l1_irr_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds)
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l1_irr_water(self, mock_tu):
@@ -99,11 +99,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l1_irr_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l1_irr_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l1_irr_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l1_irr_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds)
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l2a_land(self, mock_tu):
@@ -116,11 +116,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l2a_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l2a_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds)
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l2a_water(self, mock_tu):
@@ -133,11 +133,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l2a_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l2a_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds)
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l2b_land(self, mock_tu):
@@ -150,11 +150,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l2b_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l2b_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_land_network_metadata.assert_called_once_with(ds)
 
     @patch('hypernets_processor.data_io.hypernets_writer.TemplateUtil')
     def test_create_template_dataset_l2b_water(self, mock_tu):
@@ -167,11 +167,11 @@ class TestHypernetsWriter(unittest.TestCase):
 
         # test calls to TemplateUtil
         self.assertTrue(mock_tu.called)
-        self.assertIsNone(mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_l2b_variables.assert_called_once_with(ds, n_w, n_s))
-        self.assertIsNone(mock_tu.return_value.add_common_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds))
-        self.assertIsNone(mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds))
+        mock_tu.return_value.add_common_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_l2b_variables.assert_called_once_with(ds, n_w, n_s)
+        mock_tu.return_value.add_common_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_l2_metadata.assert_called_once_with(ds)
+        mock_tu.return_value.add_water_network_metadata.assert_called_once_with(ds)
 
     def test_create_file_name_l1_irr(self):
 

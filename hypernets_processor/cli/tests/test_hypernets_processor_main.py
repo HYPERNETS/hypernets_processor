@@ -29,9 +29,7 @@ class TestHypernetsProcessorMain(unittest.TestCase):
         main(processor_config, job_config)
 
         self.assertTrue(mock_hp.called)
-        self.assertIsNone(mock_hp.assert_called_once_with(logger=configure_logging(fname=None,
-                                                                                   verbose=False,
-                                                                                   quiet=True)))
+        mock_hp.assert_called_once_with(logger=configure_logging(fname=None, verbose=False, quiet=True))
         self.assertTrue(mock_hp.return_value.run.called)
 
 
