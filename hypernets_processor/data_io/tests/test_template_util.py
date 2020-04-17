@@ -33,6 +33,14 @@ class TestTemplateUtil(unittest.TestCase):
         self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
                          dataset.attrs["resource_title"])
 
+    def test_add_l1_irr_metadata(self):
+        dataset = xarray.Dataset()
+
+        TemplateUtil.add_l1_irr_metadata(dataset)
+
+        self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
+                         dataset.attrs["resource_title"])
+
     def test_add_l2_metadata(self):
         dataset = xarray.Dataset()
 

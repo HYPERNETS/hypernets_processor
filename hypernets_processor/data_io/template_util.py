@@ -131,6 +131,58 @@ class TemplateUtil:
         dataset["radiance"] = rad
 
     @staticmethod
+    def add_l1_irr_variables(dataset, n_wavelengths, n_series):
+        """
+        Adds additional Level 1 irradiance variables to dataset
+
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
+
+        :type n_wavelengths: int
+        :param n_wavelengths: number of wavelengths
+
+        :type n_series:
+        :param n_series: number of series
+        """
+
+        du = DatasetUtil()
+
+        # Create random irradiance uncertainty variable
+        u_r_irr = du.create_array_variable(n_series, n_wavelengths,
+                                           dim_names=["wavelength", "series"],
+                                           dtype=np.float32)
+        du.add_encoding(u_r_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["u_random_irradiance"] = u_r_irr
+
+        # Create systematic irradiance uncertainty
+        u_s_irr = du.create_array_variable(n_series, n_wavelengths,
+                                           dim_names=["wavelength", "series"],
+                                           dtype=np.float32)
+        du.add_encoding(u_s_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["u_systematic_irradiance"] = u_s_irr
+
+        # Create irradiance wavelength-to-wavelength random covariance matrix variable
+        cov_r_irr = du.create_array_variable(n_wavelengths, n_wavelengths,
+                                             dim_names=["wavelength", "wavelength"],
+                                             dtype=np.float32)
+        du.add_encoding(cov_r_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["cov_random_irradiance"] = cov_r_irr
+
+        # Create radiance wavelength-to-wavelength systematic covariance matrix variable
+        cov_s_irr = du.create_array_variable(n_wavelengths, n_wavelengths,
+                                             dim_names=["wavelength", "wavelength"],
+                                             dtype=np.float32)
+        du.add_encoding(cov_s_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["cov_systematic_irradiance"] = cov_s_irr
+
+        # Create radiance variable
+        irr = du.create_array_variable(n_series, n_wavelengths,
+                                       dim_names=["wavelength", "series"],
+                                       dtype=np.float32)
+        du.add_encoding(irr, dtype=np.uint16, scale_factor=0.001, offset=0.0)
+        dataset["irradiance"] = irr
+
+    @staticmethod
     def add_l2a_variables(dataset, n_wavelengths, n_series):
         """
         Adds additional Level 2a variables to dataset
@@ -287,6 +339,17 @@ class TemplateUtil:
     def add_l1_rad_metadata(dataset):
         """
         Adds Level 1 radiance metadata to dataset
+
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
+        """
+
+        dataset.attrs.update(L1_METADATA)
+
+    @staticmethod
+    def add_l1_irr_metadata(dataset):
+        """
+        Adds Level 1 irradiance metadata to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset

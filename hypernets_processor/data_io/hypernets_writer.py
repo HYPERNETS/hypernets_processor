@@ -115,6 +115,47 @@ class HypernetsWriter:
         return dataset
 
     @staticmethod
+    def create_template_dataset_l1_irr(n_wavelengths, n_series, network):
+        """
+        Returns empty Hypernets Level 1 irradiance
+         dataset to be populated with data
+
+        :type n_wavelengths: int
+        :param n_wavelengths: number of wavelengths
+
+        :type n_series:
+        :param n_series: number of series
+
+        :type network:
+        :param network: Hypernets network, "land" or "water"
+
+        :return: Empty L1 dataset
+        :rtype: xarray.Dataset
+        """
+
+        # Initialise dataset
+        dataset = xr.Dataset()
+
+        tu = TemplateUtil()
+
+        # Add variables from template
+        tu.add_common_variables(dataset, n_wavelengths, n_series)
+        tu.add_l1_irr_variables(dataset, n_wavelengths, n_series)
+
+        # Add metadata from template
+        tu.add_common_metadata(dataset)
+        tu.add_l1_irr_metadata(dataset)
+
+        if network.lower() == 'land':
+            tu.add_land_network_metadata(dataset)
+        elif network.lower() == 'water':
+            tu.add_water_network_metadata(dataset)
+        else:
+            raise NameError("Invalid network name: "+network)
+
+        return dataset
+
+    @staticmethod
     def create_template_dataset_l2a(n_wavelengths, n_series, network):
         """
         Returns empty Hypernets Level 2a dataset to be populated with data
@@ -217,6 +258,30 @@ class HypernetsWriter:
 
         time_string = time.strftime(TIME_FMT_L12A)
         return HypernetsWriter._create_file_name(network, site, "RAD", time_string, version)
+
+    @staticmethod
+    def create_file_name_l1_irr(network, site, time, version):
+        """
+        Return a valid file name for Hypernets Level 1 irradiance file
+
+        :type network: str
+        :param network: abbreviated network name
+
+        :type site: str
+        :param site: abbreviated site name
+
+        :type time: datetime.datetime
+        :param time: acquisition time
+
+        :type version: str
+        :param version: processing version
+
+        :return: Level 1 filename
+        :rtype: str
+        """
+
+        time_string = time.strftime(TIME_FMT_L12A)
+        return HypernetsWriter._create_file_name(network, site, "IRR", time_string, version)
 
     @staticmethod
     def create_file_name_l2a(network, site, time, version):
