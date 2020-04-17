@@ -229,6 +229,90 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual("std", array3d_variable.attrs["standard_name"])
         self.assertEqual("long", array3d_variable.attrs["long_name"])
 
+    def test_create_flags_vector_variable(self):
+
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        masks = "1, 2, 4, 8, 16, 32, 64, 128"
+        flags_vector_variable = DatasetUtil.create_flags_vector_variable(5, meanings,
+                                                                         standard_name="std",
+                                                                         long_name="long",
+                                                                         dim_name="dim1")
+
+        self.assertIsNotNone(flags_vector_variable)
+        self.assertEqual(Variable, type(flags_vector_variable))
+        self.assertEqual((5,), flags_vector_variable.shape)
+        self.assertEqual(np.uint8, flags_vector_variable.dtype)
+        self.assertEqual(flags_vector_variable.attrs['flag_masks'], masks)
+        self.assertEqual(flags_vector_variable.attrs['flag_meanings'], meanings)
+        self.assertEqual(0, flags_vector_variable[2])
+        self.assertEqual("std", flags_vector_variable.attrs["standard_name"])
+        self.assertEqual("long", flags_vector_variable.attrs["long_name"])
+        self.assertEqual(("dim1",), flags_vector_variable.dims)
+
+    def test_create_flags_array_variable(self):
+
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        masks = "1, 2, 4, 8, 16, 32, 64, 128"
+        flags_array_variable = DatasetUtil.create_flags_array_variable(7, 8, meanings,
+                                                                       standard_name="std",
+                                                                       long_name="long",
+                                                                       dim_names=["dim1", "dim2"])
+
+        self.assertIsNotNone(flags_array_variable)
+        self.assertEqual(Variable, type(flags_array_variable))
+        self.assertEqual((8, 7), flags_array_variable.shape)
+        self.assertEqual(np.uint8, flags_array_variable.dtype)
+        self.assertEqual(flags_array_variable.attrs['flag_masks'], masks)
+        self.assertEqual(flags_array_variable.attrs['flag_meanings'], meanings)
+        self.assertEqual(0, flags_array_variable[2, 4])
+        self.assertEqual("std", flags_array_variable.attrs["standard_name"])
+        self.assertEqual("long", flags_array_variable.attrs["long_name"])
+        self.assertEqual(("dim1", "dim2"), flags_array_variable.dims)
+
+    def test_create_flags_array3d_variable(self):
+
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        masks = "1, 2, 4, 8, 16, 32, 64, 128"
+        flags_array3d_variable = DatasetUtil.create_flags_array3d_variable(7, 8, 3, meanings,
+                                                                           standard_name="std",
+                                                                           long_name="long",
+                                                                           dim_names=["dim1", "dim2", "dim3"])
+
+        self.assertIsNotNone(flags_array3d_variable)
+        self.assertEqual(Variable, type(flags_array3d_variable))
+        self.assertEqual((3, 8, 7), flags_array3d_variable.shape)
+        self.assertEqual(np.uint8, flags_array3d_variable.dtype)
+        self.assertEqual(flags_array3d_variable.attrs['flag_masks'], masks)
+        self.assertEqual(flags_array3d_variable.attrs['flag_meanings'], meanings)
+        self.assertEqual(0, flags_array3d_variable[2, 4, 3])
+        self.assertEqual("std", flags_array3d_variable.attrs["standard_name"])
+        self.assertEqual("long", flags_array3d_variable.attrs["long_name"])
+        self.assertEqual(("dim1", "dim2", "dim3"), flags_array3d_variable.dims)
+
+    def test_return_flags_dtype_5(self):
+        data_type = DatasetUtil.return_flags_dtype(5)
+        self.assertEqual(data_type, np.uint8)
+
+    def test_return_flags_dtype_8(self):
+        data_type = DatasetUtil.return_flags_dtype(8)
+        self.assertEqual(data_type, np.uint8)
+
+    def test_return_flags_dtype_15(self):
+        data_type = DatasetUtil.return_flags_dtype(15)
+        self.assertEqual(data_type, np.uint16)
+
+    def test_return_flags_dtype_16(self):
+        data_type = DatasetUtil.return_flags_dtype(16)
+        self.assertEqual(data_type, np.uint16)
+
+    def test_return_flags_dtype_17(self):
+        data_type = DatasetUtil.return_flags_dtype(17)
+        self.assertEqual(data_type, np.uint32)
+
+    def test_return_flags_dtype_32(self):
+        data_type = DatasetUtil.return_flags_dtype(32)
+        self.assertEqual(data_type, np.uint32)
+
     def test_add_encoding(self):
         vector_variable = DatasetUtil.create_vector_variable(5, np.int8)
         DatasetUtil.add_encoding(vector_variable, np.int32, scale_factor=10, offset=23, fill_value=11, chunksizes=12)
