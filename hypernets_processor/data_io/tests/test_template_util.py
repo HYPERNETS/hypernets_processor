@@ -25,6 +25,7 @@ COMMON_VARIABLES = {"wavelength": {},
                     "viewing_angle_zenith": {},
                     "sun_angle_azimuth": {},
                     "sun_angle_zenith": {},
+                    "quality_flags": {},
                     "acquisition_time": {}}
 
 L1_RAD_VARIABLES = {"u_random_radiance": {},
