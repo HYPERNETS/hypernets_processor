@@ -6,6 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.metadata import COMMON_METADATA, L1_METADATA, L2_METADATA, \
     LAND_NETWORK_METADATA, WATER_NETWORK_METADATA
+from hypernets_processor.data_io.flags import FLAG_MEANINGS
 import numpy as np
 
 '''___Authorship___'''
@@ -72,6 +73,10 @@ class TemplateUtil:
         du.add_encoding(sun_angle_zenith, dtype=np.uint16, scale_factor=0.1, offset=0.0)
         dataset["sun_angle_zenith"] = sun_angle_zenith
 
+        # Create quality flag variable
+        quality_flags = du.create_flags_vector_variable(n_series, meanings=FLAG_MEANINGS, dim_name="series")
+        dataset["quality_flags"] = quality_flags
+
         # Create time variable
         time = du.create_vector_variable(n_series, dim_name="series", dtype=np.int32)
         du.add_encoding(time, dtype=np.int32, scale_factor=0.1, offset=0.0)
@@ -79,9 +84,9 @@ class TemplateUtil:
         # todo - Does time have to have a precision better than 1 s?
 
     @staticmethod
-    def add_l1_variables(dataset, n_wavelengths, n_series):
+    def add_l1_rad_variables(dataset, n_wavelengths, n_series):
         """
-        Adds additional Level 1 variables to dataset
+        Adds additional Level 1 radiance variables to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
@@ -129,6 +134,58 @@ class TemplateUtil:
                                        dtype=np.float32)
         du.add_encoding(rad, dtype=np.uint16, scale_factor=0.001, offset=0.0)
         dataset["radiance"] = rad
+
+    @staticmethod
+    def add_l1_irr_variables(dataset, n_wavelengths, n_series):
+        """
+        Adds additional Level 1 irradiance variables to dataset
+
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
+
+        :type n_wavelengths: int
+        :param n_wavelengths: number of wavelengths
+
+        :type n_series:
+        :param n_series: number of series
+        """
+
+        du = DatasetUtil()
+
+        # Create random irradiance uncertainty variable
+        u_r_irr = du.create_array_variable(n_series, n_wavelengths,
+                                           dim_names=["wavelength", "series"],
+                                           dtype=np.float32)
+        du.add_encoding(u_r_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["u_random_irradiance"] = u_r_irr
+
+        # Create systematic irradiance uncertainty
+        u_s_irr = du.create_array_variable(n_series, n_wavelengths,
+                                           dim_names=["wavelength", "series"],
+                                           dtype=np.float32)
+        du.add_encoding(u_s_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["u_systematic_irradiance"] = u_s_irr
+
+        # Create irradiance wavelength-to-wavelength random covariance matrix variable
+        cov_r_irr = du.create_array_variable(n_wavelengths, n_wavelengths,
+                                             dim_names=["wavelength", "wavelength"],
+                                             dtype=np.float32)
+        du.add_encoding(cov_r_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["cov_random_irradiance"] = cov_r_irr
+
+        # Create radiance wavelength-to-wavelength systematic covariance matrix variable
+        cov_s_irr = du.create_array_variable(n_wavelengths, n_wavelengths,
+                                             dim_names=["wavelength", "wavelength"],
+                                             dtype=np.float32)
+        du.add_encoding(cov_s_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
+        dataset["cov_systematic_irradiance"] = cov_s_irr
+
+        # Create radiance variable
+        irr = du.create_array_variable(n_series, n_wavelengths,
+                                       dim_names=["wavelength", "series"],
+                                       dtype=np.float32)
+        du.add_encoding(irr, dtype=np.uint16, scale_factor=0.001, offset=0.0)
+        dataset["irradiance"] = irr
 
     @staticmethod
     def add_l2a_variables(dataset, n_wavelengths, n_series):
@@ -284,9 +341,20 @@ class TemplateUtil:
         dataset.attrs.update(WATER_NETWORK_METADATA)
 
     @staticmethod
-    def add_l1_metadata(dataset):
+    def add_l1_rad_metadata(dataset):
         """
-        Adds Level 1 metadata to dataset
+        Adds Level 1 radiance metadata to dataset
+
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
+        """
+
+        dataset.attrs.update(L1_METADATA)
+
+    @staticmethod
+    def add_l1_irr_metadata(dataset):
+        """
+        Adds Level 1 irradiance metadata to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
