@@ -74,9 +74,10 @@ class HypernetsWriter:
             raise NameError("Invalid fmt: "+fmt)
 
     @staticmethod
-    def create_template_dataset_l1(n_wavelengths, n_series, network):
+    def create_template_dataset_l1_rad(n_wavelengths, n_series, network):
         """
-        Returns empty Hypernets Level 1 dataset to be populated with data
+        Returns empty Hypernets Level 1 radiance
+         dataset to be populated with data
 
         :type n_wavelengths: int
         :param n_wavelengths: number of wavelengths
@@ -98,11 +99,11 @@ class HypernetsWriter:
 
         # Add variables from template
         tu.add_common_variables(dataset, n_wavelengths, n_series)
-        tu.add_l1_variables(dataset, n_wavelengths, n_series)
+        tu.add_l1_rad_variables(dataset, n_wavelengths, n_series)
 
         # Add metadata from template
         tu.add_common_metadata(dataset)
-        tu.add_l1_metadata(dataset)
+        tu.add_l1_rad_metadata(dataset)
 
         if network.lower() == 'land':
             tu.add_land_network_metadata(dataset)
@@ -194,9 +195,9 @@ class HypernetsWriter:
         return dataset
 
     @staticmethod
-    def create_file_name_l1(network, site, time, version):
+    def create_file_name_l1_rad(network, site, time, version):
         """
-        Return a valid file name for Hypernets Level 1 file
+        Return a valid file name for Hypernets Level 1 radiance file
 
         :type network: str
         :param network: abbreviated network name

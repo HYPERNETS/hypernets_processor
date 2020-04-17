@@ -25,10 +25,10 @@ class TestTemplateUtil(unittest.TestCase):
 
         self.assertEqual("eng", dataset.attrs["metadata_language"])
 
-    def test_add_l1_metadata(self):
+    def test_add_l1_rad_metadata(self):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l1_metadata(dataset)
+        TemplateUtil.add_l1_rad_metadata(dataset)
 
         self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
                          dataset.attrs["resource_title"])
