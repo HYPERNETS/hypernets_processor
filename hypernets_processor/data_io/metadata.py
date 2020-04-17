@@ -14,7 +14,7 @@ COMMON_METADATA = {"resource_abstract": "The HYPERNETS project (Horizon 2020 res
                    "lineage": "Dataset is quality assured (ATBD document link)",
                    "unique_resource_code_identifier": "doi.xxxx",
                    "spatial_data_theme": "point",
-                   "data_created": None,  # adds on write
+                   "data_created": "",  # adds on write
                    "project": "HYPERNETS",
                    "acknowledgement": "HYPERNETS project is funded by Horizon 2020 research and innovation programm, "
                                       "grant agreement No 775983. Consortium of HYPERNETS project, PI of hypernets test"
