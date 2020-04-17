@@ -79,9 +79,9 @@ class TemplateUtil:
         # todo - Does time have to have a precision better than 1 s?
 
     @staticmethod
-    def add_l1_variables(dataset, n_wavelengths, n_series):
+    def add_l1_rad_variables(dataset, n_wavelengths, n_series):
         """
-        Adds additional Level 1 variables to dataset
+        Adds additional Level 1 radiance variables to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
@@ -284,9 +284,9 @@ class TemplateUtil:
         dataset.attrs.update(WATER_NETWORK_METADATA)
 
     @staticmethod
-    def add_l1_metadata(dataset):
+    def add_l1_rad_metadata(dataset):
         """
-        Adds Level 1 metadata to dataset
+        Adds Level 1 radiance metadata to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
