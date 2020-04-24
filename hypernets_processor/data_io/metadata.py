@@ -15,11 +15,12 @@ COMMON_METADATA={"type":"dataset",
 		 "conventions":"CFv72, NVS2.0",
 		 "format_version":"v01.0",
 		 "netcdf_version":"1.6",
-                 "data_created": "29302838",  # adds on write
+		 "processor_name":"hypernets_processor",
+		 "processor_version":"v001",
+                 "data_created": "20200423",  # adds on write not working currently
 		 "references":"https://hypernets-processor.readthedocs.io/en/latest/",
 		 "source":"surface observation",
 		 "comment":"Any free-format text is appropriate.",
-		 "locator":"www.hypernets.eu, www.waterhypernet.org",
 		 "area":"Global",
 		 "easting":"longitude",
 		 "northing":"latitude",
@@ -37,26 +38,148 @@ COMMON_METADATA={"type":"dataset",
 		 "limitations":"no limitations to public access",
 		 "licence":"Attribution-NonCommercial-NoDerivs CC BY-NC-ND",
 		 "conformity":"notEvaluated",
-		 "lineage":"Quality assured following www.hypernets.eu/docs/QC/"
-}
-LAND_NETWORK_METADATA = {"responsible_party": "National Physical Laboratory, UK",
-                         "creator_name": "Hunt Sam",
-                         "creator_email": "sam.hunt@npl.co.uk",
-                         "topic_category": "land, environment, geoscientific information"
-			 "keyword":"Environmental monitoring Facilities (INSPIRE Spatial Data Theme)," 
-			 "reflectance (http://aims.fao.org/aos/agrovoc/c_28538), optical properties"
-			 "(http://aims.fao.org/aos/agrovoc/c_5371), vegetation (http://www.eionet.europa.eu/gemet/concept/8922)"
+		 "lineage":"Quality assured following www.hypernets.eu/docs/QC/",
+		 "instrument_configuration_file":"data_io/tests/reader/SEQ20200312T135926/config.txt",
+		"spectral_range_vnir":"400-1000",
+		"spectral_resolution_vnir":"3",
+		"solar_azimuth_angle_min":"190.123",
+		"solar_zenith_angle_min":"52.000",
+		"solar_azimuth_angle_max":"190.123",
+		"solar_zenith_angle_max":"52.000",
+		"system_id":"HYPSTAR001234", # key metadata
+
 }
 
-WATER_NETWORK_METADATA = {"responsible_party": "Royal Belgian Institute for Natural Sciences, "
-                                               "Directorate Natural Environment, REMSEM",
-                          "creator_name": "Goyens Clémence",
-                          "creator_email": "cgoyens@naturalsciences.be",
-                          "topic_category": "oceans, environment, inland waters, geoscientific information"
+
+L1_RAD_METADATA = {"title": "HYPSTAR dataset of radiance", # example of irradiance file
+  		"product_name":"HYPSTAR_W_BSBE_L1A_RAD_202002041130_v01.0.nc",
+		"product_version":"01.0",
+		"history":"2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
+		"processor_configuration_file":"tree/master/examples/config_files/config.txt",
+		"processor_atbd":"atbd/L1A/RAD",
+		"sequence_id":"SEQ20200312T135926",
+		"sequence_file":"data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+		"inputfile_directory":"data_io/tests/reader/SEQ20200312T135926/RADIOMETER/",
+		"viewing_zenith_angle_average":"140.000",
+		"viewing_zenith_angle_min":"139.000",
+		"viewing_zenith_angle_max":"141.000",
+		"viewing_azimuth_angle_average":"330.000",
+		"viewing_azimuth_angle_min":"330.000",
+		"viewing_azimuth_angle_max":"330.000",
+		"relative_azimuth_angle_average":"030.000",
+		"relative_azimuth_angle_min":"030.000",
+		"relative_azimuth_angle_max":"030.000"
+}
+
+
+L1_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance", # example of irradiance file
+  		"product_name":"HYPSTAR_W_BSBE_L1A_IRR_202002041130_v01.0.nc",
+		"product_version":"01.0",
+		"history":"2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
+		"processor_configuration_file":"tree/master/examples/config_files/config.txt",
+		"processor_atbd":"atbd/L1A/IRR",
+		"sequence_id":"SEQ20200312T135926",
+		"sequence_file":"data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+		"inputfile_directory":"data_io/tests/reader/SEQ20200312T135926/RADIOMETER/"
+}
+
+
+W_L1B_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling radiance and water leaving radiance", # example of irradiance file
+  		"product_name":"HYPSTAR_W_BSBE_L1B_WLR_202002041130_v01.0.nc",
+		"product_version":"01.0",
+		"history":"2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
+		"processor_configuration_file":"examples/config_files/config.txt",
+		"processor_atbd":"atbd/L1B/",
+		"sequence_id":"SEQ20200312T135926",
+		"system_id":"HYPSTAR001234", # key metadata
+		"sequence_file":"data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+		"inputfile_directory":"data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_180_8_01_0000.spe, data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_180_16_01_0000.spe",
+		"viewing_zenith_angle_average":"140.000",
+		"viewing_zenith_angle_min":"139.000",
+		"viewing_zenith_angle_max":"141.000",
+		"viewing_azimuth_angle_average":"330.000",
+		"viewing_azimuth_angle_min":"330.000",
+		"viewing_azimuth_angle_max":"330.000",
+		"relative_azimuth_angle_average":"030.000",
+		"relative_azimuth_angle_min":"030.000",
+		"relative_azimuth_angle_max":"030.000"
+		"fresnel_type":"Mobley2015"
+}
+
+
+L_L1B_RAD_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradiance", # example of irradiance file
+  		"product_name":"HYPSTAR_L_GBNA_L1B_RAD_202002041130_v01.0.nc",
+		"product_version":"01.0",
+		"history":"2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
+		"processor_configuration_file":"hypernets_processor/examples/config_files/config.txt",
+		"processor_atbd":"atbd/L1B/",
+		"sequence_id":"SEQ20200312T135926",
+		"system_id":"HYPSTAR001234", # key metadata
+		"instrument_config_file":"data_io/tests/reader/SEQ20200312T135926/config.txt",
+		"sequence_file":"data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+		"inputfile":"data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_140_16_01_0000.spe, data_io/tests/reader/SEQ20200312T135926/RADIOMETER/	01_002_-030_2_180_08_01_0000.spe",
+		"viewing_zenith_angle_average":"140.000",
+		"viewing_zenith_angle_min":"139.000",
+		"viewing_zenith_angle_max":"141.000",
+		"viewing_azimuth_angle_average":"330.000",
+		"viewing_azimuth_angle_min":"330.000",
+		"viewing_azimuth_angle_max":"330.000",
+		"relative_azimuth_angle_average":"030.000",
+		"relative_azimuth_angle_min":"030.000",
+		"relative_azimuth_angle_max":"030.000"
+}
+
+
+W_L2A_REF_METADATA = {"title": "HYPSTAR Water network dataset of spectral surface reflectance",
+  		"product_name":"HYPSTAR_W_BSBE_L2A_REF_202002041130_v01.0.nc",
+		"product_version":"HYPSTAR_W_BSBE_L2A_REF_202002041130_v01.0.nc",
+		"history":"2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration, 2028-03-23T11:56:12Z :Processed",
+		"processor_configuration_file":"examples/config_files/config.txt",
+		"processor_atbd":"atbd/L2A/",
+		"sequence_id":"SEQ20200312T135926",
+		"system_id":"HYPSTAR001234", # key metadata
+		"instrument_config_file":"data_io/tests/reader/SEQ20200312T135926/config.txt",
+		"sequence_file":"data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+		"inputfile_directory":"data_io/tests/reader/SEQ20200312T135926/RADIOMETER",
+		"viewing_zenith_angle_average":"140.000",
+		"viewing_zenith_angle_min":"139.000",
+		"viewing_zenith_angle_max":"141.000",
+		"viewing_azimuth_angle_average":"330.000",
+		"viewing_azimuth_angle_min":"330.000",
+		"viewing_azimuth_angle_max":"330.000",
+		"relative_azimuth_angle_average":"030.000",
+		"relative_azimuth_angle_min":"030.000",
+		"relative_azimuth_angle_max":"030.000",
+		"Wavelen1":"720",
+		"Wavelen2":"780",
+		"epsave":"0.662967",
+		"epmin":"0.603160",
+		"epmax":"0.762356",
+		"epstd":"0.057877"
+}
+
+
+LAND_NETWORK_METADATA = {"topic_category": "land, environment, geoscientific information"
+			 "keyword":"Environmental monitoring Facilities (INSPIRE Spatial Data Theme)," 
+			 "reflectance (http://aims.fao.org/aos/agrovoc/c_28538), optical properties"
+			 "(http://aims.fao.org/aos/agrovoc/c_5371), vegetation (http://www.eionet.europa.eu/gemet/concept/8922)",
+			 "locator":"https://github.com/HYPERNETS/hypernets_processor/", 
+			 "responsible_party": "National Physical Laboratory, UK",
+                         "creator_name": "Hunt Sam",
+                         "creator_email": "sam.hunt@npl.co.uk",
+}
+
+WATER_NETWORK_METADATA = { "topic_category": "oceans, environment, inland waters, geoscientific information"
 			  "keyword":"Environmental monitoring Facilities (INSPIRE Spatial Data Theme)," 
 			  "reflectance (http://aims.fao.org/aos/agrovoc/c_28538), optical properties"
 			  "(http://aims.fao.org/aos/agrovoc/c_5371),inland waters (http://www.eionet.europa.eu/gemet/concept/4333),"
-			  "sea (http://www.eionet.europa.eu/gemet/concept/7495)"
+			  "sea (http://www.eionet.europa.eu/gemet/concept/7495)",
+		   	  "locator":"https://github.com/HYPERNETS/hypernets_processor/",
+			  "responsible_party": "Royal Belgian Institute for Natural Sciences, "
+                                               "Directorate Natural Environment, REMSEM",
+                          "creator_name": "Goyens Clémence",
+                          "creator_email": "cgoyens@naturalsciences.be",
+                         
 }
 
 
@@ -82,7 +205,9 @@ SYSTEM_METADATA={"system_id":"HYPSTAR001234",
 		"system_logfile":"www.waterhypernet/01_GBNA/logfile.txt",
 		"system_documentation_references":"www.hypernets.eu/system_documentation",
 		"system_deployment_date":"2028-03-23",
+		"system_deployment_height":"1",
 		"system_calibration_file":"HYPSTAR_L_BSBE_CDB_202001041130.nc",
+		"system_comment": "system below bird nest, bad luck"
 		"instrument_id":"001", # key metadata
 		"pointing_system_id":"MAD01234", # key metadata
 		"calibration_device_id":"CALspars01234", # key metadata
@@ -99,19 +224,22 @@ PAN_TILT_METADATA={"pointing_system_id":"MAD01234",
 			"pointing_system_model":"Bowler-RX",
 			"pointing_system_date_manufacture":"20180101",
 			"pointing_system_version":"RX001",
+			"pointing_accuracy":"1",
+			"pointing_range_azimuth":"0-359",
+			"pointing_range_zenith":"2-180",	
 			"pointing_system_documentation_directory":"https://www.willburt.com/mad/pan-and-tilt-heads/light-duty",
-			"pointing_system_description":"pan and tilt with custom azimuth to 359°"
+			"pointing_system_description":"custom azimuth to 359°"
 }
 
-CALIBRATION_DEVICE_METADATA={"calibration_device_id":"CALspars01234",
+CALIBRATION_DEVICE_METADATA={"calibration_device_id":"CALSPARS01234",
 				"calibration_device_manufacturer":"Tartu University",
-				"calibration_device_model":"Calspars01",
+				"calibration_device_model":"CALSPARS01",
 				"calibration_device_date_manufacture":"20200101",
 				"calibration_device_version":"v01",
 				"Calibration_device_LED_ID":"LOLTW01234",
 				"Calibration_device_LED_model":"LTW-2S3D7",
 				"Calibration_device_LED_manufacturer":"Lite-On",
-				"calibration_device_documentation_directory":"https://www.hypernets/eu/Calspars_CalibrationDevice",
+				"calibration_device_documentation_directory":"https://www.hypernets/eu/calspars_calibration_dev",
 				"calibration_device_description":"Nothing to add"
 }
 
@@ -121,9 +249,8 @@ IRR_HEAD_METADATA={"irr_vis_head_id":"SJ1002SMA001234",
 			"irr_vis_head_manufacture":"20190120",
 			"irr_vis_head_version":"1002",
 			"irr_vis_head_firmware_version":"v001",
-			"irr_vis_head_ documentation_reference":"https://hypernets.to.ee/documentation",
-			"irr_vis_head_description":"or will we have an in-house designed irradiance head",
-			"irr_vis_head_cosine_documentation_reference":"www.waterhypernet.org/calibration/SJ1002SMA001234"
+			"irr_vis_head_ documentation_reference":"www.waterhypernet.org/calibration/SJ1002SMA001234",
+			"irr_vis_head_description":"or will we have an in-house designed irradiance head"
 }
 
 RAD_HEAD_METADATA={"rad_vis_head_id":"IBSENUVNIR001",
@@ -164,43 +291,4 @@ SITE_METADATA={"site_id":"BSBE",
 		"site_documentation reference":"www.waterhypernet.org/sites/deBlankaart/South",
 		"system_id":"HYPSTAR001234" # key metadata
 }
-
-L1_METADATA = {"title": "HYPERNETS network dataset of downwelling irradiance",
-  		"product_name":"HYPSTAR_W_BSBE_RAD_202002041130_v01.0.nc",
-		"product_version":"HYPSTAR_W_BSBE_RAD_202002041130_v01.0.nc",
-		"processor_name":"hypernets_processor",
-		"processor_version":"v001",
-		"processor_configuration_file":"https://github.com/HYPERNETS/hypernets_processor/tree/master/examples/config_files/config.txt",
-		"processor_atbd":"https://github.com/HYPERNETS/hypernets_processor/atbd/L1",
-		"history":"2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
-		"sequence_id":"SEQ20200312T135926",
-		"series_id":"01_002_-030_2_057_8_01_0000",
-		"system_id":"HYPSTAR001234",
-		"sequence_config_file":"https://github.com/HYPERNETS/hypernets_processor/blob/metareader/hypernets_processor/data_io/tests/reader/SEQ20200312T135926/config.txt",
-		"sequence_file":"https://github.com/HYPERNETS/hypernets_processor/blob/metareader/hypernets_processor/data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
-		"inputfile":"https://github.com/HYPERNETS/hypernets_processor/blob/metareader/hypernets_processor/data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_180_8_01_0000.spe",
-		"scans_total":"1",
-		"units":"Wm-2m-1",
-		"vza_average":"180.000",
-		"saa_average":"190.123",
-		"raa_average":"330.000",
-		"sza_average":"52.000",
-		"vza_min":"180.000",
-		"saa_min":"190.123",
-		"raa_min":"330.000",
-		"sza_min":"52.000",
-		"vza_max":"180.000"
-		"saa_max":"190.123",
-		"raa_max":"330.000",
-		"sza_max":"52.000"
-}
-
-L2_METADATA = {"title": "HYPERNETS network dataset of spectral surface reflectance"}
-
-L2_L_METADATA = {"resource_title": "HYPERNETS network dataset of spectral surface reflectance"}
-
-L2_W_METADATA = {"resource_title": "HYPERNETS network dataset of spectral surface reflectance"}
-
-
-
 
