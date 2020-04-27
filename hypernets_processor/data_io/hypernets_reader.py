@@ -12,11 +12,10 @@ import matplotlib.pyplot as plt
 
 
 '''___Authorship___'''
-__author__ = "Sam Hunt"
+__author__ = "Clémence Goyens"
 __created__ = "12/2/2020"
 __version__ = __version__
-__maintainer__ = "Sam Hunt"
-__email__ = "sam.hunt@npl.co.uk"
+__maintainer__ = "Clémence Goyens"
 __status__ = "Development"
 
 
