@@ -4,8 +4,15 @@ TemplateUtil class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
-from hypernets_processor.data_io.metadata import COMMON_METADATA, L1_METADATA, L2_METADATA, \
-    LAND_NETWORK_METADATA, WATER_NETWORK_METADATA
+from hypernets_processor.data_io.metadata import COMMON_METADATA,\
+                                                 SYSTEM_METADATA, INSTRUMENT_METADATA, \
+                                                 RAD_HEAD_METADATA, IRR_HEAD_METADATA, CALIBRATION_DEVICE_METADATA, \
+                                                 RAIN_SENSOR_METADATA, RGB_CAMERA_METADATA, PAN_TILT_METADATA, \
+                                                 LAND_NETWORK_METADATA, WATER_NETWORK_METADATA,\
+                                                 SITE_METADATA, \
+                                                 L1_IRR_METADATA, L1_RAD_METADATA, \
+                                                 L_L1B_RAD_METADATA, W_L1B_WLR_METADATA,\
+                                                 L_L2A_REF_METADATA, W_L2A_REF_METADATA
 from hypernets_processor.data_io.flags import FLAG_MEANINGS
 import numpy as np
 
@@ -314,6 +321,14 @@ class TemplateUtil:
         """
 
         dataset.attrs.update(COMMON_METADATA)
+        dataset.attrs.update(SYSTEM_METADATA)
+        dataset.attrs.update(INSTRUMENT_METADATA)
+        dataset.attrs.update(RAD_HEAD_METADATA)
+        dataset.attrs.update(IRR_HEAD_METADATA)
+        dataset.attrs.update(CALIBRATION_DEVICE_METADATA)
+        dataset.attrs.update(RAIN_SENSOR_METADATA)
+        dataset.attrs.update(RGB_CAMERA_METADATA)
+        dataset.attrs.update(PAN_TILT_METADATA)
 
     @staticmethod
     def add_land_network_metadata(dataset):
@@ -338,37 +353,70 @@ class TemplateUtil:
         dataset.attrs.update(WATER_NETWORK_METADATA)
 
     @staticmethod
-    def add_l1_rad_metadata(dataset):
+    def add_l1a_rad_metadata(dataset):
         """
-        Adds Level 1 radiance metadata to dataset
+        Adds Level 1a radiance metadata to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
         """
 
-        dataset.attrs.update(L1_METADATA)
+        dataset.attrs.update(L1_RAD_METADATA)
 
     @staticmethod
-    def add_l1_irr_metadata(dataset):
+    def add_l1a_irr_metadata(dataset):
         """
-        Adds Level 1 irradiance metadata to dataset
+        Adds Level 1a irradiance metadata to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
         """
 
-        dataset.attrs.update(L1_METADATA)
+        dataset.attrs.update(L1_IRR_METADATA)
 
     @staticmethod
-    def add_l2_metadata(dataset):
+    def add_l_l1b_metadata(dataset):
         """
-        Adds Level 2 metadata to dataset
+        Adds land network Level 1b metadata to dataset
 
         :type dataset: xarray.Dataset
         :param dataset: dataset
         """
 
-        dataset.attrs.update(L2_METADATA)
+        dataset.attrs.update(L_L1B_RAD_METADATA)
+
+    @staticmethod
+    def add_w_l1b_metadata(dataset):
+        """
+        Adds water network Level 1b metadata to dataset
+
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
+        """
+
+        dataset.attrs.update(W_L1B_WLR_METADATA)
+
+    @staticmethod
+    def add_l_l2a_metadata(dataset):
+        """
+        Adds land network Level 2a metadata to dataset
+
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
+        """
+
+        dataset.attrs.update(L_L2A_REF_METADATA)
+
+    @staticmethod
+    def add_w_l2a_metadata(dataset):
+        """
+        Adds land network Level 2a metadata to dataset
+
+        :type dataset: xarray.Dataset
+        :param dataset: dataset
+        """
+
+        dataset.attrs.update(W_L2A_REF_METADATA)
 
 
 if __name__ == '__main__':
