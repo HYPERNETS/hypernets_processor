@@ -159,6 +159,35 @@ W_L2A_REF_METADATA = {"title": "HYPSTAR Water network dataset of spectral surfac
                       "epstd": "0.057877"
                       }
 
+L_L2A_REF_METADATA = {"title": "HYPSTAR Land network dataset of spectral surface reflectance",
+                      "product_name": "HYPSTAR_W_BSBE_L2A_REF_202002041130_v01.0.nc",
+                      "product_version": "HYPSTAR_W_BSBE_L2A_REF_202002041130_v01.0.nc",
+                      "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration, "
+                                 "2028-03-23T11:56:12Z :Processed",
+                      "processor_configuration_file": "examples/config_files/config.txt",
+                      "processor_atbd": "atbd/L2A/",
+                      "sequence_id": "SEQ20200312T135926",
+                      "system_id": "HYPSTAR001234",  # key metadata
+                      "instrument_config_file": "data_io/tests/reader/SEQ20200312T135926/config.txt",
+                      "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+                      "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER",
+                      "viewing_zenith_angle_average": "140.000",
+                      "viewing_zenith_angle_min": "139.000",
+                      "viewing_zenith_angle_max": "141.000",
+                      "viewing_azimuth_angle_average": "330.000",
+                      "viewing_azimuth_angle_min": "330.000",
+                      "viewing_azimuth_angle_max": "330.000",
+                      "relative_azimuth_angle_average": "030.000",
+                      "relative_azimuth_angle_min": "030.000",
+                      "relative_azimuth_angle_max": "030.000",
+                      "Wavelen1": "720",
+                      "Wavelen2": "780",
+                      "epsave": "0.662967",
+                      "epmin": "0.603160",
+                      "epmax": "0.762356",
+                      "epstd": "0.057877"
+                      }
+
 LAND_NETWORK_METADATA = {"topic_category": "land, environment, geoscientific information",
                          "keyword": "Environmental monitoring Facilities (INSPIRE Spatial Data Theme), "
                                     "reflectance (http://aims.fao.org/aos/agrovoc/c_28538), optical properties"
