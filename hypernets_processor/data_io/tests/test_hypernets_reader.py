@@ -17,14 +17,12 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-# this_directory=os.path.dirname(__file__) does not work?
-this_directory = os.path.abspath('')
-print(this_directory)
+this_directory = os.path.dirname(__file__)
+
 
 class TestHypernetsReader(unittest.TestCase):
     def test_create_default_vector(self):
         du = HypernetsReader()
-
 
     def test_hypernets_reader_metadata(self):
         du = HypernetsReader()
