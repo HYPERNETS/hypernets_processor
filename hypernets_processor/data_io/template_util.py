@@ -88,7 +88,7 @@ class TemplateUtil:
         # todo - Does time have to have a precision better than 1 s?
 
     @staticmethod
-    def add_l1_rad_variables(dataset, n_wavelengths, n_series):
+    def add_l1a_rad_variables(dataset, n_wavelengths, n_series):
         """
         Adds additional Level 1 radiance variables to dataset
 
@@ -140,7 +140,7 @@ class TemplateUtil:
         dataset["radiance"] = rad
 
     @staticmethod
-    def add_l1_irr_variables(dataset, n_wavelengths, n_series):
+    def add_l1a_irr_variables(dataset, n_wavelengths, n_series):
         """
         Adds additional Level 1 irradiance variables to dataset
 
