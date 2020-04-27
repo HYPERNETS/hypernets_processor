@@ -102,31 +102,56 @@ class TestTemplateUtil(unittest.TestCase):
 
         TemplateUtil.add_common_metadata(dataset)
 
-        self.assertEqual("eng", dataset.attrs["metadata_language"])
+        self.assertEqual("English", dataset.attrs["language"])
 
-    def test_add_l1_rad_metadata(self):
+    def test_add_l1a_rad_metadata(self):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l1_rad_metadata(dataset)
+        TemplateUtil.add_l1a_rad_metadata(dataset)
 
-        self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
-                         dataset.attrs["resource_title"])
+        self.assertEqual("HYPSTAR dataset of radiance",
+                         dataset.attrs["title"])
 
     def test_add_l1_irr_metadata(self):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l1_irr_metadata(dataset)
+        TemplateUtil.add_l1a_irr_metadata(dataset)
 
-        self.assertEqual("HYPERNETS network dataset of downwelling irradiance and upwelling and downwelling radiance",
-                         dataset.attrs["resource_title"])
+        self.assertEqual("HYPSTAR dataset of irradiance",
+                         dataset.attrs["title"])
 
-    def test_add_l2_metadata(self):
+    def test_add_l_l1b_metadata(self):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l2_metadata(dataset)
+        TemplateUtil.add_l_l1b_metadata(dataset)
 
-        self.assertEqual("HYPERNETS network dataset of spectral surface reflectance",
-                         dataset.attrs["resource_title"])
+        self.assertEqual("HYPSTAR Land network dataset of radiance and irradiance",
+                         dataset.attrs["title"])
+
+    def test_add_w_l1b_metadata(self):
+        dataset = xarray.Dataset()
+
+        TemplateUtil.add_w_l1b_metadata(dataset)
+
+        self.assertEqual("HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
+                         " radiance and water leaving radiance",
+                         dataset.attrs["title"])
+
+    def test_add_l_l2a_metadata(self):
+        dataset = xarray.Dataset()
+
+        TemplateUtil.add_l_l2a_metadata(dataset)
+
+        self.assertEqual("HYPSTAR Land network dataset of spectral surface reflectance",
+                         dataset.attrs["title"])
+
+    def test_add_w_l2a_metadata(self):
+        dataset = xarray.Dataset()
+
+        TemplateUtil.add_w_l2a_metadata(dataset)
+
+        self.assertEqual("HYPSTAR Water network dataset of spectral surface reflectance",
+                         dataset.attrs["title"])
 
     def test_add_land_network_metadata(self):
         dataset = xarray.Dataset()
