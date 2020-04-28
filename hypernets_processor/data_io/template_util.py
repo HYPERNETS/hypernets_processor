@@ -4,16 +4,15 @@ TemplateUtil class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
-from hypernets_processor.data_io.metadata import COMMON_METADATA,\
+from hypernets_processor.data_io.format.metadata import COMMON_METADATA,\
                                                  SYSTEM_METADATA, INSTRUMENT_METADATA, \
                                                  RAD_HEAD_METADATA, IRR_HEAD_METADATA, CALIBRATION_DEVICE_METADATA, \
                                                  RAIN_SENSOR_METADATA, RGB_CAMERA_METADATA, PAN_TILT_METADATA, \
-                                                 LAND_NETWORK_METADATA, WATER_NETWORK_METADATA,\
-                                                 SITE_METADATA, \
-                                                 L1_IRR_METADATA, L1_RAD_METADATA, \
+                                                 LAND_NETWORK_METADATA, WATER_NETWORK_METADATA, \
+    L1_IRR_METADATA, L1_RAD_METADATA, \
                                                  L_L1B_RAD_METADATA, W_L1B_WLR_METADATA,\
                                                  L_L2A_REF_METADATA, W_L2A_REF_METADATA
-from hypernets_processor.data_io.flags import FLAG_MEANINGS
+from hypernets_processor.data_io.format.flags import FLAG_MEANINGS
 import numpy as np
 
 '''___Authorship___'''
@@ -184,7 +183,7 @@ class TemplateUtil:
         du.add_encoding(cov_s_irr, dtype=np.uint8, scale_factor=0.1, offset=0.0)
         dataset["cov_systematic_irradiance"] = cov_s_irr
 
-        # Create radiance variable
+        # Create irradiance variable
         irr = du.create_array_variable(n_series, n_wavelengths,
                                        dim_names=["wavelength", "series"],
                                        dtype=np.float32)
