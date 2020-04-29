@@ -3,8 +3,8 @@ Measurement function object creator
 '''
 
 from hypernets_processor.version import __version__
-from hypernets_processor.measurement_functions.standard_measurement_function import StandardMeasurementFunction
-from hypernets_processor.measurement_functions.template_measurement_function import TemplateMeasurementFunction
+from hypernets_processor.calibration.measurement_functions.standard_measurement_function import StandardMeasurementFunction
+from hypernets_processor.calibration.measurement_functions.template_measurement_function import TemplateMeasurementFunction
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"

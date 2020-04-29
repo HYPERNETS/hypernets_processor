@@ -1,10 +1,10 @@
 """
-Calibration class
+Interpolation class
 """
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
-from hypernets_processor.calibration.measurement_functions.measurement_function_factory import MeasurementFunctionFactory
+from hypernets_processor.interpolation.measurement_functions.interpolation_factory import InterpolationFactory
 import punpy
 
 '''___Authorship___'''
@@ -17,10 +17,10 @@ __status__ = "Development"
 
 class Calibrate:
     def __init__(self,MCsteps=10000):
-        self._measurement_function_factory = MeasurementFunctionFactory()
+        self._measurement_function_factory = InterpolationFactory()
         self.prop= punpy.MCPropagation(MCsteps)
 
-    def calibrate(self,dataset_l0,calibration_data,measurement_function='StandardMeasurementFunction'):
+    def calibrate(self,dataset_l0,calibration_data,measurement_function):
         dataset_l0 = self.preprocess_l0(dataset_l0)
         calibrate_function = self._measurement_function_factory.get_measurement_function(measurement_function)
         input_vars=calibrate_function.get_argument_names()
