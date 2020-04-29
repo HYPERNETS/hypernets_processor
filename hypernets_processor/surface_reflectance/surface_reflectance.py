@@ -1,10 +1,10 @@
 """
-Calibration class
+Surface reflectance class
 """
 
 from hypernets_processor.version import __version__
 
-from hypernets_processor.measurement_functions.measurement_function_factory import MeasurementFunctionFactory
+from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import ProtocolFactory
 import punpy
 
 '''___Authorship___'''
@@ -18,10 +18,10 @@ __status__ = "Development"
 
 class SurfaceReflectance:
     def __init__(self,MCsteps=10000):
-        self._measurement_function_factory = MeasurementFunctionFactory()
+        self._measurement_function_factory = ProtocolFactory()
         self.prop = punpy.MCPropagation(MCsteps)
 
-    def Process(self,dataset_l1,protocol_data,measurement_function='LandProtocol'):
+    def Process(self,dataset_l1,protocol_data,measurement_function):
         dataset_l1 = self.perform_checks(dataset_l1)
         l1tol2_function = self._measurement_function_factory.get_measurement_function(measurement_function)
         input_vars = l1tol2_function.get_argument_names()
