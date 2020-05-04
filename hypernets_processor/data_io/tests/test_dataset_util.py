@@ -140,8 +140,8 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(np.int8, vector_variable.dtype)
         self.assertEqual(1, vector_variable[2])
 
-    def test_create_vector_variable_int_names(self):
-        vector_variable = DatasetUtil.create_vector_variable(5, np.int8, standard_name="std", long_name="long")
+    def test_create_vector_variable_int_attributes(self):
+        vector_variable = DatasetUtil.create_vector_variable(5, np.int8, attributes={"standard_name": "std"})
 
         self.assertIsNotNone(vector_variable)
         self.assertEqual(Variable, type(vector_variable))
@@ -149,7 +149,6 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(np.int8, vector_variable.dtype)
         self.assertEqual(-127, vector_variable[2])
         self.assertEqual("std", vector_variable.attrs["standard_name"])
-        self.assertEqual("long", vector_variable.attrs["long_name"])
 
     def test_create_array_variable_int(self):
         array_variable = DatasetUtil.create_array_variable(7, 8, np.int8)
@@ -179,8 +178,8 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(np.int8, array_variable.dtype)
         self.assertEqual(1, array_variable[2, 4])
 
-    def test_create_array_variable_int_names(self):
-        array_variable = DatasetUtil.create_array_variable(7, 8, np.int8, standard_name="std", long_name="long")
+    def test_create_array_variable_int_attributes(self):
+        array_variable = DatasetUtil.create_array_variable(7, 8, np.int8, attributes={"standard_name": "std"})
 
         self.assertIsNotNone(array_variable)
         self.assertEqual(Variable, type(array_variable))
@@ -188,7 +187,6 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(np.int8, array_variable.dtype)
         self.assertEqual(-127, array_variable[2, 4])
         self.assertEqual("std", array_variable.attrs["standard_name"])
-        self.assertEqual("long", array_variable.attrs["long_name"])
 
     def test_create_array3d_variable_int(self):
         array3d_variable = DatasetUtil.create_array3d_variable(7, 8, 3, np.int8)
@@ -218,8 +216,8 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(np.int8, array3d_variable.dtype)
         self.assertEqual(1, array3d_variable[2, 4, 3])
 
-    def test_create_array3d_variable_int_names(self):
-        array3d_variable = DatasetUtil.create_array3d_variable(7, 8, 3, np.int8, standard_name="std", long_name="long")
+    def test_create_array3d_variable_int_attributes(self):
+        array3d_variable = DatasetUtil.create_array3d_variable(7, 8, 3, np.int8, attributes={"standard_name": "std"})
 
         self.assertIsNotNone(array3d_variable)
         self.assertEqual(Variable, type(array3d_variable))
@@ -227,17 +225,14 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(np.int8, array3d_variable.dtype)
         self.assertEqual(-127, array3d_variable[2, 4, 3])
         self.assertEqual("std", array3d_variable.attrs["standard_name"])
-        self.assertEqual("long", array3d_variable.attrs["long_name"])
 
     def test_create_flags_vector_variable(self):
 
         meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
         meanings_txt = "flag1 flag2 flag3 flag4 flag5 flag6 flag7 flag8"
         masks = "1, 2, 4, 8, 16, 32, 64, 128"
-        flags_vector_variable = DatasetUtil.create_flags_vector_variable(5, meanings,
-                                                                         standard_name="std",
-                                                                         long_name="long",
-                                                                         dim_name="dim1")
+        flags_vector_variable = DatasetUtil.create_flags_vector_variable(5, meanings, dim_name="dim1",
+                                                                         attributes={"standard_name": "std"})
 
         self.assertIsNotNone(flags_vector_variable)
         self.assertEqual(Variable, type(flags_vector_variable))
@@ -247,7 +242,6 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(flags_vector_variable.attrs['flag_meanings'], meanings_txt)
         self.assertEqual(0, flags_vector_variable[2])
         self.assertEqual("std", flags_vector_variable.attrs["standard_name"])
-        self.assertEqual("long", flags_vector_variable.attrs["long_name"])
         self.assertEqual(("dim1",), flags_vector_variable.dims)
 
     def test_create_flags_array_variable(self):
@@ -255,10 +249,8 @@ class TestDatasetUtil(unittest.TestCase):
         meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
         meanings_txt = "flag1 flag2 flag3 flag4 flag5 flag6 flag7 flag8"
         masks = "1, 2, 4, 8, 16, 32, 64, 128"
-        flags_array_variable = DatasetUtil.create_flags_array_variable(7, 8, meanings,
-                                                                       standard_name="std",
-                                                                       long_name="long",
-                                                                       dim_names=["dim1", "dim2"])
+        flags_array_variable = DatasetUtil.create_flags_array_variable(7, 8, meanings, dim_names=["dim1", "dim2"],
+                                                                       attributes={"standard_name": "std"})
 
         self.assertIsNotNone(flags_array_variable)
         self.assertEqual(Variable, type(flags_array_variable))
@@ -268,7 +260,6 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(flags_array_variable.attrs['flag_meanings'], meanings_txt)
         self.assertEqual(0, flags_array_variable[2, 4])
         self.assertEqual("std", flags_array_variable.attrs["standard_name"])
-        self.assertEqual("long", flags_array_variable.attrs["long_name"])
         self.assertEqual(("dim1", "dim2"), flags_array_variable.dims)
 
     def test_create_flags_array3d_variable(self):
@@ -277,9 +268,8 @@ class TestDatasetUtil(unittest.TestCase):
         meanings_txt = "flag1 flag2 flag3 flag4 flag5 flag6 flag7 flag8"
         masks = "1, 2, 4, 8, 16, 32, 64, 128"
         flags_array3d_variable = DatasetUtil.create_flags_array3d_variable(7, 8, 3, meanings,
-                                                                           standard_name="std",
-                                                                           long_name="long",
-                                                                           dim_names=["dim1", "dim2", "dim3"])
+                                                                           dim_names=["dim1", "dim2", "dim3"],
+                                                                           attributes={"standard_name": "std"})
 
         self.assertIsNotNone(flags_array3d_variable)
         self.assertEqual(Variable, type(flags_array3d_variable))
@@ -289,7 +279,6 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(flags_array3d_variable.attrs['flag_meanings'], meanings_txt)
         self.assertEqual(0, flags_array3d_variable[2, 4, 3])
         self.assertEqual("std", flags_array3d_variable.attrs["standard_name"])
-        self.assertEqual("long", flags_array3d_variable.attrs["long_name"])
         self.assertEqual(("dim1", "dim2", "dim3"), flags_array3d_variable.dims)
 
     def test_return_flags_dtype_5(self):
@@ -331,18 +320,6 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(23, vector_variable.encoding["add_offset"])
         self.assertEqual(11, vector_variable.encoding["_FillValue"])
         self.assertEqual(12, vector_variable.encoding["chunksizes"])
-
-    def test_add_units(self):
-        vector_variable = DatasetUtil.create_vector_variable(5, np.int8)
-        DatasetUtil.add_units(vector_variable, "m")
-
-        self.assertIsNotNone(vector_variable)
-        self.assertEqual(Variable, type(vector_variable))
-        self.assertEqual((5,), vector_variable.shape)
-        self.assertEqual(np.int8, vector_variable.dtype)
-        self.assertEqual(-127, vector_variable[2])
-
-        self.assertEqual("m", vector_variable.attrs["units"])
         
     def test_get_default_fill_value(self):
 
