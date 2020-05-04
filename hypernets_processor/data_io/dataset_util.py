@@ -130,7 +130,7 @@ class DatasetUtil:
         return default_array
 
     @staticmethod
-    def create_vector_variable(height, dtype, standard_name=None, long_name=None, dim_name=None, fill_value=None):
+    def create_vector_variable(height, dtype, dim_name=None, fill_value=None, attributes=None):
         """
         Return default empty 1d xarray Variable
 
@@ -140,11 +140,8 @@ class DatasetUtil:
         :type dtype: type
         :param dtype: numpy data type
         
-        :type standard_name: str
-        :param standard_name: (optional) variable standard name attribute
-        
-        :type long_name: str
-        :param long_name: (optional) variable long name attribute
+        :type attributes: dict
+        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type dim_name: str
         :param dim_name: (optional) dimension name
@@ -168,17 +165,13 @@ class DatasetUtil:
 
         variable.attrs["_FillValue"] = fill_value
 
-        if standard_name is not None:
-            variable.attrs["standard_name"] = standard_name
-
-        if long_name is not None:
-            variable.attrs["long_name"] = long_name
+        if attributes is not None:
+            variable.attrs = {**variable.attrs, **attributes}
 
         return variable
 
     @staticmethod
-    def create_array_variable(width, height, dtype, standard_name=None, long_name=None, dim_names=None,
-                              fill_value=None):
+    def create_array_variable(width, height, dtype, dim_names=None, fill_value=None, attributes=None):
         """
         Return default empty 2d xarray Variable
 
@@ -191,11 +184,8 @@ class DatasetUtil:
         :type dtype: type
         :param dtype: numpy data type
 
-        :type standard_name: str
-        :param standard_name: (optional) variable standard name attribute
-
-        :type long_name: str
-        :param long_name: (optional) variable long name attribute
+        :type attributes: dict
+        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type dim_names: list
         :param dim_names: (optional) dimension names
@@ -219,17 +209,13 @@ class DatasetUtil:
 
         variable.attrs["_FillValue"] = fill_value
 
-        if standard_name is not None:
-            variable.attrs["standard_name"] = standard_name
-
-        if long_name is not None:
-            variable.attrs["long_name"] = long_name
+        if attributes is not None:
+            variable.attrs = {**variable.attrs, **attributes}
 
         return variable
 
     @staticmethod
-    def create_array3d_variable(length, width, height, dtype, standard_name=None, long_name=None, dim_names=None,
-                                fill_value=None):
+    def create_array3d_variable(length, width, height, dtype, dim_names=None, fill_value=None, attributes=None):
         """
         Return default empty 3d xarray Variable
 
@@ -245,11 +231,8 @@ class DatasetUtil:
         :type dtype: type
         :param dtype: numpy data type
 
-        :type standard_name: str
-        :param standard_name: (optional) variable standard name attribute
-
-        :type long_name: str
-        :param long_name: (optional) variable long name attribute
+        :type attributes: dict
+        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type dim_names: list
         :param dim_names: (optional) dimension names
@@ -273,16 +256,13 @@ class DatasetUtil:
 
         variable.attrs["_FillValue"] = fill_value
 
-        if standard_name is not None:
-            variable.attrs["standard_name"] = standard_name
-
-        if long_name is not None:
-            variable.attrs["long_name"] = long_name
+        if attributes is not None:
+            variable.attrs = {**variable.attrs, **attributes}
 
         return variable
 
     @staticmethod
-    def create_flags_vector_variable(height, meanings, standard_name=None, long_name=None, dim_name=None):
+    def create_flags_vector_variable(height, meanings, dim_name=None, attributes=None):
         """
         Return default empty 1d xarray flag Variable
 
@@ -292,11 +272,8 @@ class DatasetUtil:
         :type meanings: list
         :param meanings: flag meanings
 
-        :type standard_name: str
-        :param standard_name: (optional) variable standard name attribute
-
-        :type long_name: str
-        :param long_name: (optional) variable long name attribute
+        :type attributes: dict
+        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type dim_name: str
         :param dim_name: (optional) dimension name
@@ -309,8 +286,8 @@ class DatasetUtil:
 
         data_type = DatasetUtil.return_flags_dtype(n_masks)
 
-        variable = DatasetUtil.create_vector_variable(height, data_type, standard_name=standard_name,
-                                                      long_name=long_name, dim_name=dim_name, fill_value=0)
+        variable = DatasetUtil.create_vector_variable(height, data_type, dim_name=dim_name, fill_value=0,
+                                                      attributes=attributes)
 
         # add flag attributes
         variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'","").replace(",","")
@@ -319,7 +296,7 @@ class DatasetUtil:
         return variable
 
     @staticmethod
-    def create_flags_array_variable(width, height, meanings, standard_name=None, long_name=None, dim_names=None):
+    def create_flags_array_variable(width, height, meanings, dim_names=None, attributes=None):
         """
         Return default empty 2d xarray flag Variable
 
@@ -332,11 +309,8 @@ class DatasetUtil:
         :type meanings: list
         :param meanings: flag meanings
 
-        :type standard_name: str
-        :param standard_name: (optional) variable standard name attribute
-
-        :type long_name: str
-        :param long_name: (optional) variable long name attribute
+        :type attributes: dict
+        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type dim_names: list
         :param dim_names: (optional) dimension name
@@ -349,8 +323,8 @@ class DatasetUtil:
 
         data_type = DatasetUtil.return_flags_dtype(n_masks)
 
-        variable = DatasetUtil.create_array_variable(width, height, data_type, standard_name=standard_name,
-                                                     long_name=long_name, dim_names=dim_names, fill_value=0)
+        variable = DatasetUtil.create_array_variable(width, height, data_type, dim_names=dim_names, fill_value=0,
+                                                     attributes=attributes)
 
         # add flag attributes
         variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
@@ -359,8 +333,7 @@ class DatasetUtil:
         return variable
 
     @staticmethod
-    def create_flags_array3d_variable(length, width, height, meanings, standard_name=None, long_name=None,
-                                      dim_names=None):
+    def create_flags_array3d_variable(length, width, height, meanings, dim_names=None, attributes=None):
         """
         Return default empty 3d xarray flag Variable
 
@@ -376,11 +349,8 @@ class DatasetUtil:
         :type meanings: list
         :param meanings: flag meanings
 
-        :type standard_name: str
-        :param standard_name: (optional) variable standard name attribute
-
-        :type long_name: str
-        :param long_name: (optional) variable long name attribute
+        :type attributes: dict
+        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type dim_names: list
         :param dim_names: (optional) dimension name
@@ -393,8 +363,8 @@ class DatasetUtil:
 
         data_type = DatasetUtil.return_flags_dtype(n_masks)
 
-        variable = DatasetUtil.create_array3d_variable(length, width, height, data_type, standard_name=standard_name,
-                                                       long_name=long_name, dim_names=dim_names, fill_value=0)
+        variable = DatasetUtil.create_array3d_variable(length, width, height, data_type, dim_names=dim_names,
+                                                       fill_value=0, attributes=attributes)
 
         # add flag attributes
         variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
@@ -456,20 +426,6 @@ class DatasetUtil:
             encoding_dict.update({'_FillValue': fill_value})
 
         variable.encoding = encoding_dict
-
-    @staticmethod
-    def add_units(variable, units):
-        """
-        Add units attributes to xarray Variable
-
-        :type variable: xarray.Variable
-        :param variable: data variable
-
-        :type units: str
-        :param units: variable units
-        """
-
-        variable.attrs["units"] = units
 
     @staticmethod
     def get_default_fill_value(dtype):
