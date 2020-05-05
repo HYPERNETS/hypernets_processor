@@ -4,6 +4,7 @@ TemplateUtil class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
+import xarray
 
 
 '''___Authorship___'''
@@ -13,6 +14,36 @@ __version__ = __version__
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
+
+
+def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None):
+    """
+    Returns template dataset
+
+    :type variables_dict: dict
+    :type variables_dict: dictionary defining variables
+
+    :type dim_sizes_dict: dict
+    :param dim_sizes_dict: entry per dataset dimension with value of size as int
+
+    :type metadata: dict
+    :param metadata: (optional) dictionary of dataset metadata
+
+    :return ds: template dataset
+    :rtype: xarray.Dataset
+    """
+
+    # Create dataset
+    ds = xarray.Dataset()
+
+    # Add variables
+    ds = TemplateUtil.add_variables(ds, variables_dict, dim_sizes_dict)
+
+    # Add metadata
+    if metadata is not None:
+        ds = TemplateUtil.add_metadata(ds, metadata)
+
+    return ds
 
 
 class TemplateUtil:
@@ -108,18 +139,23 @@ class TemplateUtil:
         return [dim_sizes_dict[dim_name] for dim_name in dim_names]
 
     @staticmethod
-    def add_metadata(dataset, metadata):
+    def add_metadata(ds, metadata):
         """
         Adds metadata to dataset
 
-        :type dataset: xarray.Dataset
-        :param dataset: dataset
+        :type ds: xarray.Dataset
+        :param ds: dataset
 
         :type metadata: dict
         :param metadata: dictionary of dataset metadata
+
+        :return ds: dataset with updated metadata
+        :rtype: xarray.Dataset
         """
 
-        dataset.attrs.update(metadata)
+        ds.attrs.update(metadata)
+
+        return ds
 
 
 if __name__ == '__main__':
