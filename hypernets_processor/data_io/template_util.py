@@ -81,7 +81,7 @@ class TemplateUtil:
             # Unpack variable attributes
             dtype = variable_attrs["dtype"]
             dim_names = variable_attrs["dim"]
-            attributes = variable_attrs["attributes"]
+            attributes = variable_attrs["attributes"] if "attributes" in variable_attrs else None
 
             # Determine variable shape from dims
             dim_sizes = TemplateUtil._return_variable_shape(dim_names, dim_sizes_dict)
@@ -96,8 +96,8 @@ class TemplateUtil:
                 variable = du.create_variable(dim_sizes, dim_names=dim_names,
                                               dtype=dtype, attributes=attributes)
 
-                encoding = variable_attrs["encoding"]
-                du.add_encoding(variable, **encoding)
+                if "encoding" in variable_attrs:
+                    du.add_encoding(variable, **variable_attrs["encoding"])
 
             ds[variable_name] = variable
 
