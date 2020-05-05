@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch, call
 import numpy as np
 import xarray
-from hypernets_processor.data_io.template_util import TemplateUtil
+from hypernets_processor.data_io.template_util import TemplateUtil, create_template_dataset
 from hypernets_processor.version import __version__
 
 
@@ -176,6 +176,24 @@ class TestTemplateUtil(unittest.TestCase):
 
         self.assertEqual("value", dataset.attrs["metadata1"])
 
+    def test_create_template_dataset(self):
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
+
+        test_variables = {"array_variable": {"dim": ["dim1", "dim2"],
+                                             "dtype": np.float32,
+                                             "attributes": {"standard_name": "array_variable_std_name",
+                                                            "long_name": "array_variable_long_name",
+                                                            "units": "units",
+                                                            "preferred_symbol": "av"},
+                                             "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}}}
+
+        test_metadata = {"metadata1": "value"}
+
+        ds = create_template_dataset(test_variables, dim_sizes, test_metadata)
+
+        self.assertEqual(type(ds), xarray.Dataset)
+        self.assertEqual(type(ds["array_variable"]), xarray.DataArray)
+        self.assertEqual("value", ds.attrs["metadata1"])
 
 if __name__ == '__main__':
     unittest.main()
