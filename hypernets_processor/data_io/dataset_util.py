@@ -3,6 +3,7 @@ DatasetUtil class
 """
 
 from hypernets_processor.version import __version__
+import string
 from xarray import Variable, DataArray
 import numpy as np
 
@@ -15,103 +16,31 @@ __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
+DEFAULT_DIM_NAMES = list(string.ascii_lowercase[-3:]) + list(string.ascii_lowercase[:-3])
+DEFAULT_DIM_NAMES.reverse()
+
 
 class DatasetUtil:
     """
-    Class to provide utilities for generating standard xarray DataArrays
+    Class to provide utilities for generating standard xarray DataArrays and Variables
     """
 
     @staticmethod
-    def create_default_vector(size, dtype, dim_name=None, fill_value=None):
+    def create_default_array(dim_sizes, dtype, dim_names=None, fill_value=None):
         """
-        Return default empty 1d DataArray
+        Return default empty xarray DataArray
 
-        :type size: int
-        :param size: array length
-
-        :type dtype: type
-        :param dtype: numpy data type
-
-        :type dim_name: str
-        :param dim_name: (optional) dimension name
-
-        :type fill_value: int/float
-        :param fill_value: (optional) fill value
-
-        :return: Default empty vector
-        :rtype: xarray.DataArray
-        """
-
-        if fill_value is None:
-            fill_value = DatasetUtil.get_default_fill_value(dtype)
-
-        empty_array = np.full(size, fill_value, dtype)
-
-        if dim_name is not None:
-            default_array = DataArray(empty_array, dims=dim_name)
-        else:
-            default_array = DataArray(empty_array, dims=['x'])
-
-        return default_array
-
-    @staticmethod
-    def create_default_array(dim1_size, dim2_size, dtype, dim_names=None, fill_value=None):
-        """
-        Return default empty 2d DataArray
-
-        :type dim1_size: int
-        :param dim1_size: array width
-
-        :type dim2_size: int
-        :param dim2_size: array height
+        :type dim_sizes: list
+        :param dim_sizes: dimension sizes as ints, i.e. [dim1_size, dim2_size, dim3_size] (e.g. [2,3,5])
 
         :type dtype: type
         :param dtype: numpy data type
 
         :type dim_names: list
-        :param dim_names: (optional) dimension name, as ["dim1_name", "dim2_name"]
+        :param dim_names: (optional) dimension names as strings, i.e. ["dim1_name", "dim2_name", "dim3_size"]
 
         :type fill_value: int/float
-        :param fill_value: (optional) fill value
-
-        :return: Default empty array
-        :rtype: xarray.DataArray
-        """
-
-        if fill_value is None:
-            fill_value = DatasetUtil.get_default_fill_value(dtype)
-
-        empty_array = np.full([dim1_size, dim2_size], fill_value, dtype)
-
-        if dim_names is not None:
-            default_array = DataArray(empty_array, dims=dim_names)
-        else:
-            default_array = DataArray(empty_array, dims=['y', 'x'])
-
-        return default_array
-
-    @staticmethod
-    def create_default_array3d(dim1_size, dim2_size, dim3_size, dtype, dim_names=None, fill_value=None):
-        """
-        Return default empty 3d DataArray
-
-        :type dim1_size: int
-        :param dim1_size: array length
-
-        :type dim2_size: int
-        :param dim2_size: array width
-
-        :type dim3_size: int
-        :param dim3_size: array height
-
-        :type dtype: type
-        :param dtype: numpy data type
-
-        :type dim_names: list
-        :param dim_names: (optional) dimension name, as ["dim1_name", "dim2_name", "dim3_size"]
-
-        :type fill_value: int/float
-        :param fill_value: (optional) fill value
+        :param fill_value: (optional) fill value (if None CF compliant value used)
 
         :return: Default empty 3D array
         :rtype: xarray.DataArray
@@ -120,90 +49,46 @@ class DatasetUtil:
         if fill_value is None:
             fill_value = DatasetUtil.get_default_fill_value(dtype)
 
-        empty_array = np.full([dim1_size, dim2_size, dim3_size], fill_value, dtype)
+        empty_array = np.full(dim_sizes, fill_value, dtype)
 
         if dim_names is not None:
             default_array = DataArray(empty_array, dims=dim_names)
         else:
-            default_array = DataArray(empty_array, dims=['z', 'y', 'x'])
+            default_array = DataArray(empty_array, dims=DEFAULT_DIM_NAMES[-len(dim_sizes):])
 
         return default_array
 
     @staticmethod
-    def create_vector_variable(dim1_size, dtype, dim_name=None, fill_value=None, attributes=None):
+    def create_variable(dim_sizes, dtype, dim_names=None, attributes=None, fill_value=None):
         """
-        Return default empty 1d xarray Variable
+        Return default empty xarray Variable
 
-        :type dim1_size: int
-        :param dim1_size: array length
+        :type dim_sizes: list
+        :param dim_sizes: dimension sizes as ints, i.e. [dim1_size, dim2_size, dim3_size] (e.g. [2,3,5])
 
         :type dtype: type
         :param dtype: numpy data type
-        
-        :type attributes: dict
-        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
-
-        :type dim_name: str
-        :param dim_name: (optional) dimension name
-
-        :type fill_value: int/float
-        :param fill_value: (optional) fill value
-
-        :return: Default empty vector variable
-        :rtype: xarray.Variable
-        """
-        
-        if fill_value is None:
-            fill_value = DatasetUtil.get_default_fill_value(dtype)
-        
-        default_vector = DatasetUtil.create_default_vector(dim1_size, dtype, fill_value=fill_value)
-
-        if dim_name is None:
-            variable = Variable(["x"], default_vector)
-        else:
-            variable = Variable(dim_name, default_vector)
-
-        variable.attrs["_FillValue"] = fill_value
-
-        if attributes is not None:
-            variable.attrs = {**variable.attrs, **attributes}
-
-        return variable
-
-    @staticmethod
-    def create_array_variable(dim1_size, dim2_size, dtype, dim_names=None, fill_value=None, attributes=None):
-        """
-        Return default empty 2d xarray Variable
-
-        :type dim1_size: int
-        :param dim1_size: array width
-
-        :type dim2_size: int
-        :param dim2_size: array height
-
-        :type dtype: type
-        :param dtype: numpy data type
-
-        :type attributes: dict
-        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type dim_names: list
-        :param dim_names: (optional) dimension names
+        :param dim_names: (optional) dimension names as strings, i.e. ["dim1_name", "dim2_name", "dim3_size"]
+
+        :type attributes: dict
+        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type fill_value: int/float
-        :param fill_value: (optional) fill value
+        :param fill_value: (optional) fill value (if None CF compliant value used)
 
-        :return: Default empty array variable
+        :return: Default empty variable
         :rtype: xarray.Variable
         """
         
         if fill_value is None:
             fill_value = DatasetUtil.get_default_fill_value(dtype)
-
-        default_array = DatasetUtil.create_default_array(dim1_size, dim2_size, dtype, fill_value=fill_value)
+        
+        default_array = DatasetUtil.create_default_array(dim_sizes, dtype, fill_value=fill_value)
 
         if dim_names is None:
-            variable = Variable(['y', 'x'], default_array)
+            variable = Variable(DEFAULT_DIM_NAMES[-len(dim_sizes):], default_array)
         else:
             variable = Variable(dim_names, default_array)
 
@@ -215,67 +100,18 @@ class DatasetUtil:
         return variable
 
     @staticmethod
-    def create_array3d_variable(dim1_size, dim2_size, dim3_size, dtype, dim_names=None, fill_value=None,
-                                attributes=None):
-        """
-        Return default empty 3d xarray Variable
-
-        :type dim1_size: int
-        :param dim1_size: array width
-
-        :type dim2_size: int
-        :param dim2_size: array width
-
-        :type dim3_size: int
-        :param dim3_size: array height
-
-        :type dtype: type
-        :param dtype: numpy data type
-
-        :type attributes: dict
-        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
-
-        :type dim_names: list
-        :param dim_names: (optional) dimension names
-
-        :type fill_value: int/float
-        :param fill_value: (optional) fill value
-
-        :return: Default empty 3D array variable
-        :rtype: xarray.Variable
-        """
-        
-        if fill_value is None:
-            fill_value = DatasetUtil.get_default_fill_value(dtype)
-        
-        default_array = DatasetUtil.create_default_array3d(dim1_size, dim2_size, dim3_size, dtype,
-                                                           fill_value=fill_value)
-
-        if dim_names is None:
-            variable = Variable(['z', 'y', 'x'], default_array)
-        else:
-            variable = Variable(dim_names, default_array)
-
-        variable.attrs["_FillValue"] = fill_value
-
-        if attributes is not None:
-            variable.attrs = {**variable.attrs, **attributes}
-
-        return variable
-
-    @staticmethod
-    def create_flags_vector_variable(dim1_size, meanings, dim_name=None, attributes=None):
+    def create_flags_variable(dim_sizes, meanings, dim_names=None, attributes=None):
         """
         Return default empty 1d xarray flag Variable
 
-        :type dim1_size: int
-        :param dim1_size: array width
+        :type dim_sizes: list
+        :param dim_sizes: dimension sizes as ints, i.e. [dim1_size, dim2_size, dim3_size] (e.g. [2,3,5])
 
         :type attributes: dict
         :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
-        :type dim_name: str
-        :param dim_name: (optional) dimension name
+        :type dim_names: list
+        :param dim_names: (optional) dimension names as strings, i.e. ["dim1_name", "dim2_name", "dim3_size"]
 
         :return: Default empty flag vector variable
         :rtype: xarray.Variable
@@ -285,89 +121,12 @@ class DatasetUtil:
 
         data_type = DatasetUtil.return_flags_dtype(n_masks)
 
-        variable = DatasetUtil.create_vector_variable(dim1_size, data_type, dim_name=dim_name, fill_value=0,
-                                                      attributes=attributes)
+        variable = DatasetUtil.create_variable(dim_sizes, data_type, dim_names=dim_names, fill_value=0,
+                                               attributes=attributes)
 
         # add flag attributes
         variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'","").replace(",","")
         variable.attrs["flag_masks"] = str([2**i for i in range(0, n_masks)])[1:-1]
-
-        return variable
-
-    @staticmethod
-    def create_flags_array_variable(dim1_size, dim2_size, meanings, dim_names=None, attributes=None):
-        """
-        Return default empty 2d xarray flag Variable
-
-        :type dim1_size: int
-        :param dim1_size: array width
-
-        :type dim2_size: int
-        :param dim2_size: array height
-
-        :type meanings: list
-        :param meanings: flag meanings
-
-        :type attributes: dict
-        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
-
-        :type dim_names: list
-        :param dim_names: (optional) dimension name
-
-        :return: Default empty flag vector variable
-        :rtype: xarray.Variable
-        """
-
-        n_masks = len(meanings)
-
-        data_type = DatasetUtil.return_flags_dtype(n_masks)
-
-        variable = DatasetUtil.create_array_variable(dim1_size, dim2_size, data_type, dim_names=dim_names, fill_value=0,
-                                                     attributes=attributes)
-
-        # add flag attributes
-        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
-        variable.attrs["flag_masks"] = str([2 ** i for i in range(0, n_masks)])[1:-1]
-
-        return variable
-
-    @staticmethod
-    def create_flags_array3d_variable(dim1_size, dim2_size, dim3_size, meanings, dim_names=None, attributes=None):
-        """
-        Return default empty 3d xarray flag Variable
-
-        :type dim1_size: int
-        :param dim1_size: array length
-
-        :type dim2_size: int
-        :param dim2_size: array width
-
-        :type dim3_size: int
-        :param dim3_size: array height
-
-        :type meanings: list
-        :param meanings: flag meanings
-
-        :type attributes: dict
-        :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
-
-        :type dim_names: list
-        :param dim_names: (optional) dimension name
-
-        :return: Default empty flag vector variable
-        :rtype: xarray.Variable
-        """
-
-        n_masks = len(meanings)
-
-        data_type = DatasetUtil.return_flags_dtype(n_masks)
-
-        variable = DatasetUtil.create_array3d_variable(dim1_size, dim2_size, dim3_size, data_type, dim_names=dim_names,
-                                                       fill_value=0, attributes=attributes)
-
-        # add flag attributes
-        variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'", "").replace(",", "")
-        variable.attrs["flag_masks"] = str([2 ** i for i in range(0, n_masks)])[1:-1]
 
         return variable
 
