@@ -52,7 +52,7 @@ class TestDatasetUtil(unittest.TestCase):
 
     def test_create_default_array_int(self):
 
-        default_array = DatasetUtil.create_default_array(7, 8, np.int8)
+        default_array = DatasetUtil.create_default_array(8, 7, np.int8)
 
         self.assertIsNotNone(default_array)
         self.assertEqual(DataArray, type(default_array))
@@ -62,7 +62,7 @@ class TestDatasetUtil(unittest.TestCase):
 
     def test_create_default_array_int_dims(self):
 
-        default_array = DatasetUtil.create_default_array(7, 8, np.int8, dim_names=["dim1", "dim2"])
+        default_array = DatasetUtil.create_default_array(8, 7, np.int8, dim_names=["dim1", "dim2"])
 
         self.assertIsNotNone(default_array)
         self.assertEqual(DataArray, type(default_array))
@@ -73,7 +73,7 @@ class TestDatasetUtil(unittest.TestCase):
 
     def test_create_default_array_int_fill_value(self):
 
-        default_array = DatasetUtil.create_default_array(7, 8, np.int8, fill_value=1)
+        default_array = DatasetUtil.create_default_array(8, 7, np.int8, fill_value=1)
 
         self.assertIsNotNone(default_array)
         self.assertEqual(DataArray, type(default_array))
@@ -83,13 +83,13 @@ class TestDatasetUtil(unittest.TestCase):
 
     def test_create_default_array3d_int(self):
 
-        default_array = DatasetUtil.create_default_array3d(7, 8, 3, np.int8)
+        default_array = DatasetUtil.create_default_array3d(3, 8, 7, np.int8)
 
         self.assertIsNotNone(default_array)
         self.assertEqual(DataArray, type(default_array))
         self.assertEqual((3, 8, 7), default_array.shape)
         self.assertEqual(np.int8, default_array.dtype)
-        self.assertEqual(-127, default_array[2, 4, 3])
+        self.assertEqual(-127, default_array[2, 4, 2])
 
     def test_create_default_array3d_int_dims(self):
         
@@ -97,9 +97,9 @@ class TestDatasetUtil(unittest.TestCase):
 
         self.assertIsNotNone(default_array)
         self.assertEqual(DataArray, type(default_array))
-        self.assertEqual((3, 8, 7), default_array.shape)
+        self.assertEqual((7, 8, 3), default_array.shape)
         self.assertEqual(np.int8, default_array.dtype)
-        self.assertEqual(-127, default_array[2, 4, 3])
+        self.assertEqual(-127, default_array[2, 4, 2])
         self.assertEqual(("dim1", "dim2", "dim3"), default_array.dims)
 
     def test_create_default_array3d_int_fill_value(self):
@@ -108,9 +108,9 @@ class TestDatasetUtil(unittest.TestCase):
 
         self.assertIsNotNone(default_array)
         self.assertEqual(DataArray, type(default_array))
-        self.assertEqual((3, 8, 7), default_array.shape)
+        self.assertEqual((7, 8, 3), default_array.shape)
         self.assertEqual(np.int8, default_array.dtype)
-        self.assertEqual(1, default_array[2, 4, 3])
+        self.assertEqual(1, default_array[2, 4, 2])
 
     def test_create_vector_variable_int(self):
         vector_variable = DatasetUtil.create_vector_variable(5, np.int8)
@@ -151,7 +151,7 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual("std", vector_variable.attrs["standard_name"])
 
     def test_create_array_variable_int(self):
-        array_variable = DatasetUtil.create_array_variable(7, 8, np.int8)
+        array_variable = DatasetUtil.create_array_variable(8, 7, np.int8)
 
         self.assertIsNotNone(array_variable)
         self.assertEqual(Variable, type(array_variable))
@@ -160,7 +160,7 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(-127, array_variable[2, 4])
 
     def test_create_array_variable_int_dims(self):
-        array_variable = DatasetUtil.create_array_variable(7, 8, np.int8, dim_names=["dim1", "dim2"])
+        array_variable = DatasetUtil.create_array_variable(8, 7, np.int8, dim_names=["dim1", "dim2"])
 
         self.assertIsNotNone(array_variable)
         self.assertEqual(Variable, type(array_variable))
@@ -170,7 +170,7 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(("dim1", "dim2"), array_variable.dims)
 
     def test_create_array_variable_int_fill_value(self):
-        array_variable = DatasetUtil.create_array_variable(7, 8, np.int8, fill_value=1)
+        array_variable = DatasetUtil.create_array_variable(8, 7, np.int8, fill_value=1)
 
         self.assertIsNotNone(array_variable)
         self.assertEqual(Variable, type(array_variable))
@@ -179,7 +179,7 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(1, array_variable[2, 4])
 
     def test_create_array_variable_int_attributes(self):
-        array_variable = DatasetUtil.create_array_variable(7, 8, np.int8, attributes={"standard_name": "std"})
+        array_variable = DatasetUtil.create_array_variable(8, 7, np.int8, attributes={"standard_name": "std"})
 
         self.assertIsNotNone(array_variable)
         self.assertEqual(Variable, type(array_variable))
@@ -193,18 +193,18 @@ class TestDatasetUtil(unittest.TestCase):
 
         self.assertIsNotNone(array3d_variable)
         self.assertEqual(Variable, type(array3d_variable))
-        self.assertEqual((3, 8, 7), array3d_variable.shape)
+        self.assertEqual((7, 8, 3), array3d_variable.shape)
         self.assertEqual(np.int8, array3d_variable.dtype)
-        self.assertEqual(-127, array3d_variable[2, 4, 3])
+        self.assertEqual(-127, array3d_variable[2, 4, 2])
 
     def test_create_array3d_variable_int_dims(self):
         array3d_variable = DatasetUtil.create_array3d_variable(7, 8, 3, np.int8, dim_names=["dim1", "dim2", "dim3"])
 
         self.assertIsNotNone(array3d_variable)
         self.assertEqual(Variable, type(array3d_variable))
-        self.assertEqual((3, 8, 7), array3d_variable.shape)
+        self.assertEqual((7, 8, 3), array3d_variable.shape)
         self.assertEqual(np.int8, array3d_variable.dtype)
-        self.assertEqual(-127, array3d_variable[2, 4, 3])
+        self.assertEqual(-127, array3d_variable[2, 4, 2])
         self.assertEqual(("dim1", "dim2", "dim3"), array3d_variable.dims)
 
     def test_create_array3d_variable_int_fill_value(self):
@@ -212,18 +212,18 @@ class TestDatasetUtil(unittest.TestCase):
 
         self.assertIsNotNone(array3d_variable)
         self.assertEqual(Variable, type(array3d_variable))
-        self.assertEqual((3, 8, 7), array3d_variable.shape)
+        self.assertEqual((7, 8, 3), array3d_variable.shape)
         self.assertEqual(np.int8, array3d_variable.dtype)
-        self.assertEqual(1, array3d_variable[2, 4, 3])
+        self.assertEqual(1, array3d_variable[2, 4, 2])
 
     def test_create_array3d_variable_int_attributes(self):
         array3d_variable = DatasetUtil.create_array3d_variable(7, 8, 3, np.int8, attributes={"standard_name": "std"})
 
         self.assertIsNotNone(array3d_variable)
         self.assertEqual(Variable, type(array3d_variable))
-        self.assertEqual((3, 8, 7), array3d_variable.shape)
+        self.assertEqual((7, 8, 3), array3d_variable.shape)
         self.assertEqual(np.int8, array3d_variable.dtype)
-        self.assertEqual(-127, array3d_variable[2, 4, 3])
+        self.assertEqual(-127, array3d_variable[2, 4, 2])
         self.assertEqual("std", array3d_variable.attrs["standard_name"])
 
     def test_create_flags_vector_variable(self):
@@ -254,7 +254,7 @@ class TestDatasetUtil(unittest.TestCase):
 
         self.assertIsNotNone(flags_array_variable)
         self.assertEqual(Variable, type(flags_array_variable))
-        self.assertEqual((8, 7), flags_array_variable.shape)
+        self.assertEqual((7, 8), flags_array_variable.shape)
         self.assertEqual(np.uint8, flags_array_variable.dtype)
         self.assertEqual(flags_array_variable.attrs['flag_masks'], masks)
         self.assertEqual(flags_array_variable.attrs['flag_meanings'], meanings_txt)
@@ -273,11 +273,11 @@ class TestDatasetUtil(unittest.TestCase):
 
         self.assertIsNotNone(flags_array3d_variable)
         self.assertEqual(Variable, type(flags_array3d_variable))
-        self.assertEqual((3, 8, 7), flags_array3d_variable.shape)
+        self.assertEqual((7, 8, 3), flags_array3d_variable.shape)
         self.assertEqual(np.uint8, flags_array3d_variable.dtype)
         self.assertEqual(flags_array3d_variable.attrs['flag_masks'], masks)
         self.assertEqual(flags_array3d_variable.attrs['flag_meanings'], meanings_txt)
-        self.assertEqual(0, flags_array3d_variable[2, 4, 3])
+        self.assertEqual(0, flags_array3d_variable[2, 4, 2])
         self.assertEqual("std", flags_array3d_variable.attrs["standard_name"])
         self.assertEqual(("dim1", "dim2", "dim3"), flags_array3d_variable.dims)
 
