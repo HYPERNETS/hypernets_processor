@@ -128,6 +128,8 @@ class DatasetUtil:
         variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'","").replace(",","")
         variable.attrs["flag_masks"] = str([2**i for i in range(0, n_masks)])[1:-1]
 
+        # todo - make sure flags can't have units
+
         return variable
 
     @staticmethod
@@ -174,6 +176,8 @@ class DatasetUtil:
         :type chunksizes: float
         :param chunksizes: (optional) chucksizes
         """
+
+        # todo - make sure flags can't have encoding added
 
         encoding_dict = {'dtype': dtype, 'scale_factor': scale_factor, 'add_offset': offset}
 
