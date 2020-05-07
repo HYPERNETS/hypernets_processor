@@ -3,11 +3,7 @@ Tests for HypernetsWriter class
 """
 
 import unittest
-from unittest.mock import patch
 from unittest.mock import MagicMock
-import datetime
-import xarray
-import numpy as np
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.version import __version__
 
@@ -34,26 +30,6 @@ class TestHypernetsWriter(unittest.TestCase):
         HypernetsWriter.write(ds, path)
 
         ds.to_netcdf.assert_called_once_with(path, encoding={}, engine='netcdf4', format='netCDF4')
-
-    def test_create_file_name_l1a_irr(self):
-
-        fname = HypernetsWriter.create_file_name_l1a_irr("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_IRR_201804031100_v0.00.nc", fname)
-
-    def test_create_file_name_l1a_rad(self):
-
-        fname = HypernetsWriter.create_file_name_l1a_rad("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_RAD_201804031100_v0.00.nc", fname)
-
-    def test_create_file_name_l2a(self):
-
-        fname = HypernetsWriter.create_file_name_l2a("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_REF_201804031100_v0.00.nc", fname)
-
-    def test_create_file_name_l2b(self):
-
-        fname = HypernetsWriter.create_file_name_l2b("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_REFD_20180403_v0.00.nc", fname)
 
 
 if __name__ == '__main__':
