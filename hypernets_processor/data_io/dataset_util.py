@@ -42,7 +42,7 @@ class DatasetUtil:
         :type fill_value: int/float
         :param fill_value: (optional) fill value (if None CF compliant value used)
 
-        :return: Default empty 3D array
+        :return: Default empty array
         :rtype: xarray.DataArray
         """
 
