@@ -3,7 +3,6 @@ FilenameUtil class
 """
 
 from hypernets_processor.version import __version__
-import os
 
 
 '''___Authorship___'''
