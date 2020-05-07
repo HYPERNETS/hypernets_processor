@@ -283,8 +283,10 @@ W_L2B_REFLECTANCE_VARIABLES = {}
 # -------------------------
 
 VARIABLES_DICT_DEFS = {"L0": {**COMMON_VARIABLES, **L0_VARIABLES},
-                       "L1A_RAD": {**COMMON_VARIABLES, **L1A_RAD_VARIABLES},
-                       "L1A_IRR": {**COMMON_VARIABLES, **L1A_IRR_VARIABLES},
+                       "L_L1A_RAD": {**COMMON_VARIABLES, **L1A_RAD_VARIABLES},
+                       "W_L1A_RAD": {**COMMON_VARIABLES, **L1A_RAD_VARIABLES},
+                       "L_L1A_IRR": {**COMMON_VARIABLES, **L1A_IRR_VARIABLES},
+                       "W_L1A_IRR": {**COMMON_VARIABLES, **L1A_IRR_VARIABLES},
                        "L_L1B": {**COMMON_VARIABLES, **L1A_RAD_VARIABLES, **L1A_IRR_VARIABLES},
                        "W_L1B": {**COMMON_VARIABLES, **L1B_WATER_VARIABLES},
                        "L_L2A": {**COMMON_VARIABLES, **L_L2A_REFLECTANCE_VARIABLES},
