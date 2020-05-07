@@ -72,6 +72,30 @@ class FilenameUtil:
         return FilenameUtil._create_file_name(network, site, "IRR", time_string, version)
 
     @staticmethod
+    def create_file_name_l1b(network, site, time, version):
+        """
+        Return a valid file name for Hypernets Level 1a irradiance file
+
+        :type network: str
+        :param network: abbreviated network name
+
+        :type site: str
+        :param site: abbreviated site name
+
+        :type time: datetime.datetime
+        :param time: acquisition time
+
+        :type version: str
+        :param version: processing version
+
+        :return: Level 1 filename
+        :rtype: str
+        """
+
+        time_string = time.strftime(TIME_FMT_L12A)
+        return FilenameUtil._create_file_name(network, site, "L1B", time_string, version)
+
+    @staticmethod
     def create_file_name_l2a(network, site, time, version):
         """
         Return a valid file name for Hypernets Level 2a file

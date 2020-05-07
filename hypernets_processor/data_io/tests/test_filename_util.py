@@ -29,6 +29,12 @@ class TestFilenameUtil(unittest.TestCase):
         fname = FilenameUtil.create_file_name_l1a_rad("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
         self.assertEqual("HYPERNETS_L_GBNA_RAD_201804031100_v0.00.nc", fname)
 
+    def test_create_file_name_l1b(self):
+
+        fname = FilenameUtil.create_file_name_l1b("W", "BSBE", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
+        self.assertEqual("HYPERNETS_W_BSBE_L1B_201804031100_v0.00.nc", fname)
+
+
     def test_create_file_name_l2a(self):
 
         fname = FilenameUtil.create_file_name_l2a("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
