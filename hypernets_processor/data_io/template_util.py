@@ -65,7 +65,7 @@ class TemplateUtil:
         :type dim_sizes_dict: dict
         :param dim_sizes_dict: entry per dataset dimension with value of size as int
 
-        :return ds: dataset with defined variables
+        :return: dataset with defined variables
         :rtype: xarray.Dataset
         """
 
@@ -132,8 +132,8 @@ class TemplateUtil:
         :type dim_sizes_dict: dict
         :param dim_sizes_dict: entry per dataset dimension with value of size as int
 
-        :return dim_sizes: dimension sizes as ints, i.e. [dim1_size, dim2_size, dim3_size] (e.g. [2,3,5])
-        :rtype dim_sizes: list
+        :return: dimension sizes as ints, i.e. [dim1_size, dim2_size, dim3_size] (e.g. [2,3,5])
+        :rtype: list
         """
 
         return [dim_sizes_dict[dim_name] for dim_name in dim_names]
@@ -149,7 +149,7 @@ class TemplateUtil:
         :type metadata: dict
         :param metadata: dictionary of dataset metadata
 
-        :return ds: dataset with updated metadata
+        :return: dataset with updated metadata
         :rtype: xarray.Dataset
         """
 
