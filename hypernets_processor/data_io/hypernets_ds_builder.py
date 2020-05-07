@@ -5,7 +5,7 @@ HypernetsDSBuilder class
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.template_util import create_template_dataset
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
-from hypernets_processor.data_io.format.variables import WL_DIM, SERIES_DIM, VARIABLES_DICT_DEFS
+from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 
 
 '''___Authorship___'''
@@ -24,16 +24,13 @@ class HypernetsDSBuilder:
     """
 
     @staticmethod
-    def create_ds_template(n_wavelengths, n_series, ds_format, variables_dict_defs=VARIABLES_DICT_DEFS,
+    def create_ds_template(dim_sizes_dict, ds_format, variables_dict_defs=VARIABLES_DICT_DEFS,
                            metadata_defs=METADATA_DEFS):
         """
         Returns empty Hypernets dataset
 
-        :type n_wavelengths: int
-        :param n_wavelengths: number of wavelengths
-
-        :type n_series:
-        :param n_series: number of series
+        :type dim_sizes_dict: dict
+        :param dim_sizes_dict: entry per dataset dimension with value of size as int
 
         :type ds_format: str
         :param ds_format: product format string
@@ -47,8 +44,6 @@ class HypernetsDSBuilder:
         :return: Empty dataset
         :rtype: xarray.Dataset
         """
-
-        dim_sizes_dict = {WL_DIM: n_wavelengths, SERIES_DIM: n_series}
 
         # Find variables
         if ds_format in variables_dict_defs.keys():
@@ -64,6 +59,8 @@ class HypernetsDSBuilder:
             raise RuntimeWarning("No metadata found for file type " + str(ds_format))
 
         return create_template_dataset(variables_dict, dim_sizes_dict, metadata)
+
+    # todo - add method to return available ds_formats
 
 
 if __name__ == '__main__':
