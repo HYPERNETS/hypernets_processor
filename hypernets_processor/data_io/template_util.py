@@ -84,7 +84,10 @@ class TemplateUtil:
             attributes = variable_attrs["attributes"] if "attributes" in variable_attrs else None
 
             # Determine variable shape from dims
-            dim_sizes = TemplateUtil._return_variable_shape(dim_names, dim_sizes_dict)
+            try:
+                dim_sizes = TemplateUtil._return_variable_shape(dim_names, dim_sizes_dict)
+            except KeyError:
+                raise KeyError("Dim Name Error - Variable " + variable_name + " defined with dim not in dim_sizes_dict")
 
             # Create variable and add to dataset
             if dtype == "flag":
