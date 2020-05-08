@@ -289,7 +289,7 @@ L1B_WATER_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, SEQ_DIM],
 L_L2A_REFLECTANCE_VARIABLES = {}
 
 # W_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A water data product
-W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_DIM, SEQUENCE_DIM],
+W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_DIM, SEQ_DIM],
                                                                      "dtype": np.float32,
                                                                      "attributes": {
                                                                          "standard_name":
@@ -304,7 +304,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                                          "preferred_symbol": "nlw"},
                                                                      "encoding": {'dtype': np.uint16,
                                                                                   "scale_factor": 0.1, "offset": 0.0}},
-                               "reflectance": {"dim": [WL_DIM, SEQUENCE_DIM],
+                               "reflectance": {"dim": [WL_DIM, SEQ_DIM],
                                                "dtype": np.float32,
                                                "attributes": {"standard_name": "water_leaving_reflectance",
                                                               "long_name": "Reflectance of the water column at the "
@@ -313,7 +313,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                               "units": "-",
                                                               "preferred_symbol": "rhow"},
                                                "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
-                               "reflectance_nosc": {"dim": [WL_DIM, SEQUENCE_DIM],
+                               "reflectance_nosc": {"dim": [WL_DIM, SEQ_DIM],
                                                     "dtype": np.float32,
                                                     "attributes": {"standard_name": "water_leaving_reflectance_nosc",
                                                                    "long_name": "Reflectance of the water column at the "
@@ -324,7 +324,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                                    "preferred_symbol": "rhow_nosc"},
                                                     "encoding": {'dtype': np.uint16, "scale_factor": 0.1,
                                                                  "offset": 0.0}},
-                               "u_random_nlw": {"dim": [WL_DIM, SERIES_DIM],
+                               "u_random_nlw": {"dim": [WL_DIM, SEQ_DIM],
                                                 "dtype": np.float32,
                                                 "attributes": {
                                                     "standard_name": "u_random_normalized_water_leaving_radiance",
@@ -332,7 +332,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                                  "uncertainty",
                                                     "units": "%"},
                                                 "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-                               "u_systematic_nlw": {"dim": [WL_DIM, SERIES_DIM],
+                               "u_systematic_nlw": {"dim": [WL_DIM, SEQ_DIM],
                                                     "dtype": np.float32,
                                                     "attributes": {
                                                         "standard_name": "u_systematic_normalized_water_leaving_radiance",
@@ -341,7 +341,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                         "units": "%"},
                                                     "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                  "offset": 0.0}},
-                               "cov_random_nlw": {"dim": [WL_DIM, SERIES_DIM],
+                               "cov_random_nlw": {"dim": [WL_DIM, SEQ_DIM],
                                                   "dtype": np.float32,
                                                   "attributes": {
                                                       "standard_name": "cov_random_normalized_water_leaving_radiance",
@@ -350,7 +350,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                       "units": "-"},
                                                   "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                "offset": 0.0}},
-                               "cov_systematic_nlw": {"dim": [WL_DIM, SERIES_DIM],
+                               "cov_systematic_nlw": {"dim": [WL_DIM, SEQ_DIM],
                                                       "dtype": np.float32,
                                                       "attributes": {
                                                           "standard_name":
@@ -361,14 +361,14 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                           "units": "-"},
                                                       "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                    "offset": 0.0}},
-                               "u_random_rhow": {"dim": [WL_DIM, SERIES_DIM],
+                               "u_random_rhow": {"dim": [WL_DIM, SEQ_DIM],
                                                  "dtype": np.float32,
                                                  "attributes": {"standard_name": "u_random_water_leaving_reflectance",
                                                                 "long_name": "Random water leaving reflectance "
                                                                              "uncertainty",
                                                                 "units": "%"},
                                                  "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-                               "u_systematic_rhow": {"dim": [WL_DIM, SERIES_DIM],
+                               "u_systematic_rhow": {"dim": [WL_DIM, SEQ_DIM],
                                                      "dtype": np.float32,
                                                      "attributes": {
                                                          "standard_name": "u_systematic_water_leaving_reflectance",
@@ -376,7 +376,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                          "units": "%"},
                                                      "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                   "offset": 0.0}},
-                               "cov_random_rhow": {"dim": [WL_DIM, SERIES_DIM],
+                               "cov_random_rhow": {"dim": [WL_DIM, SEQ_DIM],
                                                    "dtype": np.float32,
                                                    "attributes": {
                                                        "standard_name": "cov_random_water_leaving_reflectance",
@@ -385,7 +385,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                        "units": "-"},
                                                    "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                 "offset": 0.0}},
-                               "cov_systematic_rhow": {"dim": [WL_DIM, SERIES_DIM],
+                               "cov_systematic_rhow": {"dim": [WL_DIM, SEQ_DIM],
                                                        "dtype": np.float32,
                                                        "attributes": {
                                                            "standard_name": "cov_systematic_water_leaving_reflectance",
@@ -394,7 +394,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                            "units": "-"},
                                                        "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                     "offset": 0.0}},
-                               "u_random_rhow_nosc": {"dim": [WL_DIM, SERIES_DIM],
+                               "u_random_rhow_nosc": {"dim": [WL_DIM, SEQ_DIM],
                                                       "dtype": np.float32,
                                                       "attributes": {
                                                           "standard_name": "u_random_water_leaving_reflectance_nosc",
@@ -403,7 +403,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                           "units": "%"},
                                                       "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                    "offset": 0.0}},
-                               "u_systematic_rhow_nosc": {"dim": [WL_DIM, SERIES_DIM],
+                               "u_systematic_rhow_nosc": {"dim": [WL_DIM, SEQ_DIM],
                                                           "dtype": np.float32,
                                                           "attributes": {
                                                               "standard_name":
@@ -414,7 +414,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                               "units": "%"},
                                                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                        "offset": 0.0}},
-                               "cov_random_rhow_nosc": {"dim": [WL_DIM, SERIES_DIM],
+                               "cov_random_rhow_nosc": {"dim": [WL_DIM, SEQ_DIM],
                                                         "dtype": np.float32,
                                                         "attributes": {
                                                             "standard_name": "cov_random_water_leaving_reflectance_nosc",
@@ -424,7 +424,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                             "units": "-"},
                                                         "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                      "offset": 0.0}},
-                               "cov_systematic_rhow_nosc": {"dim": [WL_DIM, SERIES_DIM],
+                               "cov_systematic_rhow_nosc": {"dim": [WL_DIM, SEQ_DIM],
                                                             "dtype": np.float32,
                                                             "attributes": {
                                                                 "standard_name":
