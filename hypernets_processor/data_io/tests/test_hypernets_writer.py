@@ -22,12 +22,12 @@ __status__ = "Development"
 
 class TestHypernetsWriter(unittest.TestCase):
 
-    def test_write_netcdf(self):
+    def test__write_netcdf(self):
 
         ds = MagicMock()
         path = "test.nc"
 
-        HypernetsWriter.write(ds, path)
+        HypernetsWriter._write_netcdf(ds, path)
 
         ds.to_netcdf.assert_called_once_with(path, encoding={}, engine='netcdf4', format='netCDF4')
 
