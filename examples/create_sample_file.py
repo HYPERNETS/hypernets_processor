@@ -27,6 +27,7 @@ def create_sample_W_L1B_file(output_directory, n_sequence, site):
     dataset = dsb.create_ds_template({"wavelength": N_WAVELENGTHS, "sequence": n_sequence}, "W_L1B")
 
     # wavelength data
+    # todo - fix issue with wavelength assignment as coordinate
     dataset["wavelength"].data = np.concatenate((np.arange(400, 1000, 3), np.arange(1000, 1700+10, 10)))
     dataset["bandwidth"].data = np.random.normal(1.0, 0.5, N_WAVELENGTHS)
 
