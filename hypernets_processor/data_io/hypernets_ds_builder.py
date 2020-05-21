@@ -24,7 +24,7 @@ class HypernetsDSBuilder:
     """
 
     @staticmethod
-    def create_ds_template(dim_sizes_dict, ds_format, variables_dict_defs=VARIABLES_DICT_DEFS,
+    def create_ds_template(dim_sizes_dict, ds_format, propagate_ds=None, variables_dict_defs=VARIABLES_DICT_DEFS,
                            metadata_defs=METADATA_DEFS):
         """
         Returns empty Hypernets dataset
@@ -34,6 +34,13 @@ class HypernetsDSBuilder:
 
         :type ds_format: str
         :param ds_format: product format string
+
+        :type propagate_ds: xarray.Dataset
+        :param propagate_ds: (optional) template dataset is populated with data from propagate_ds for their variables
+        with common names and dimensions. Useful for transferring common data between datasets at different processing
+        levels (e.g. times, etc.).
+
+        N.B. propagates data only, not variables as a whole with attributes etc.
 
         :type variables_dict_defs: dict
         :param variables_dict_defs: dictionary of variables_dict for each product format (default is Hypernets formats)
@@ -58,7 +65,7 @@ class HypernetsDSBuilder:
         else:
             raise RuntimeWarning("No metadata found for file type " + str(ds_format))
 
-        return create_template_dataset(variables_dict, dim_sizes_dict, metadata)
+        return create_template_dataset(variables_dict, dim_sizes_dict, metadata, propagate_ds=propagate_ds)
 
     # todo - add method to return available ds_formats
 

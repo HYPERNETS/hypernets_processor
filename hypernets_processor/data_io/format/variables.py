@@ -299,7 +299,7 @@ W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_
                                                                                       "(unspecified single wavelength)"
                                                                                       " from the water body by "
                                                                                       "cosine-collector radiometer",
-                                                                         "reference": [SYSTEM_HEIGHT_DEPLOYEMENT],
+                                                                         "reference": "",
                                                                          "units": "mW m^-2 nm^-1 sr^-1",
                                                                          "preferred_symbol": "nlw"},
                                                                      "encoding": {'dtype': np.uint16,
