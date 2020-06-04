@@ -1,0 +1,16 @@
+azimuth,move(abs/nor/sun),zenith,mode(vis,swi,bot,non),action(irr/rad/bot/bla/cal/pic/non),int_time(ms,0:ins),repeat_mea(or mea_time), mea_time(sec, or repeat_mea)
+090.0, sun, 180.0, vis, irr, 0, 3, 0
+090.0, sun, 180.0, bot, bla, 0, 3, 0
+090.0, sun, 180.0, non, pic, 0, 1, 0
+090.0, sun, 140.0, vis, rad, 0, 3, 0
+090.0, sun, 180.0, bot, bla, 0, 3, 0
+090.0, sun, 140.0, non, pic, 0, 1, 0
+090.0, sun, 040.0, vis, rad, 0, 6, 0
+090.0, sun, 180.0, bot, bla, 0, 3, 0
+090.0, sun, 040.0, non, pic, 0, 1, 0
+090.0, sun, 140.0, vis, rad, 0, 3, 0
+090.0, sun, 180.0, bot, bla, 0, 3, 0
+090.0, sun, 140.0, non, pic, 0, 1, 0
+090.0, sun, 180.0, vis, irr, 0, 3, 0
+090.0, sun, 180.0, bot, bla, 0, 3, 0
+090.0, sun, 180.0, non, pic, 0, 1, 0
