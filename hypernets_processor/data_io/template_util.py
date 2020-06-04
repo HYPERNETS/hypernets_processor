@@ -16,7 +16,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None):
+def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propagate_ds=None):
     """
     Returns template dataset
 
@@ -28,6 +28,13 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None):
 
     :type metadata: dict
     :param metadata: (optional) dictionary of dataset metadata
+
+    :type propagate_ds: xarray.Dataset
+    :param propagate_ds: (optional) template dataset is populated with data from propagate_ds for their variables with
+    common names and dimensions. Useful for transferring common data between datasets at different processing levels
+    (e.g. times, etc.).
+
+    N.B. propagates data only, not variables as a whole with attributes etc.
 
     :return ds: template dataset
     :rtype: xarray.Dataset
@@ -42,6 +49,10 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None):
     # Add metadata
     if metadata is not None:
         ds = TemplateUtil.add_metadata(ds, metadata)
+
+    # Propagate variable data
+    if propagate_ds is not None:
+        TemplateUtil.propagate_values(ds, propagate_ds)
 
     return ds
 
@@ -159,6 +170,36 @@ class TemplateUtil:
         ds.attrs.update(metadata)
 
         return ds
+
+    @staticmethod
+    def propagate_values(target_ds, source_ds, exclude=None):
+        """
+        Populates target_ds in-place with data from source_ds for their variables with common names and dimensions.
+        Useful for transferring common data between datasets at different processing levels (e.g. times, etc.).
+
+        N.B. propagates data only, not variables as a whole with attributes etc.
+
+        :type target_ds: xarray.Dataset
+        :param target_ds: ds to populate (perhaps data at new processing level)
+
+        :type source_ds: xarray.Dataset
+        :param source_ds: ds to take data from (perhaps data at previous processing level)
+        """
+
+        # Find variable names common to target_ds and source_ds, excluding specified exclude variables
+        common_variable_names = list(set(target_ds.variables).intersection(source_ds.variables))
+
+        if exclude is not None:
+            common_variable_names = [name for name in common_variable_names if name not in exclude]
+
+        # Remove any common variables that have different dimensions in target_ds and source_ds
+        common_variable_names = [name for name in common_variable_names if target_ds[name].dims == source_ds[name].dims]
+
+        # Propagate data
+        for common_variable_name in common_variable_names:
+            target_ds[common_variable_name].values = source_ds[common_variable_name].values
+
+    # todo - add method to propagate common unpopulated metadata
 
 
 if __name__ == '__main__':
