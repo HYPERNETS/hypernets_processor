@@ -127,7 +127,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                             "encoding": {}},
 
                            "acquisition_time": {"dim": [SERIES_DIM],
-                                                "dtype": np.int32,
+                                                "dtype": np.uint32,
                                                 "attributes": {"standard_name": "time",
                                                                "long_name": "Acquisition time in seconds since "
                                                                             "1970-01-01 "
@@ -141,7 +141,18 @@ for variable in COMMON_VARIABLES_SEQ.keys():
                                              for d in COMMON_VARIABLES_SERIES[variable]["dim"]]
 
 # > L0_VARIABLES - Variables required for the L0 dataset
-L0_VARIABLES = {}
+L0_RAD_VARIABLES = {"digital_number": {"dim": [SERIES_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "digital_number",
+                                                     "long_name": "Digital number, raw data",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+L0_IRR_VARIABLES = {"digital_number": {"dim": [SERIES_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "digital_number",
+                                                     "long_name": "Digital number, raw data",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
 
 # > L1A_RAD_VARIABLES - Radiance Variables required for L1 data products (except water L1B)
 L1A_RAD_VARIABLES = {"u_random_radiance": {},
@@ -494,7 +505,8 @@ W_L2B_REFLECTANCE_VARIABLES = {}
 # File format variable defs
 # -------------------------
 
-VARIABLES_DICT_DEFS = {"L0": {**COMMON_VARIABLES_SERIES, **L0_VARIABLES},
+VARIABLES_DICT_DEFS = {"L0_RAD": {**COMMON_VARIABLES_SERIES, **L0_RAD_VARIABLES},
+                       "L0_IRR": {**COMMON_VARIABLES_SERIES, **L0_IRR_VARIABLES},
                        "L_L1A_RAD": {**COMMON_VARIABLES_SERIES, **L1A_RAD_VARIABLES},
                        "W_L1A_RAD": {**COMMON_VARIABLES_SERIES, **L1A_RAD_VARIABLES},
                        "L_L1A_IRR": {**COMMON_VARIABLES_SERIES, **L1A_IRR_VARIABLES},
