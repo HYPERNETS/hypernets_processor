@@ -248,6 +248,7 @@ class HypernetsReader:
 
     def read_header(self, f, headerDef):
 
+        header = {}
         for headLen, headName, headFormat in headerDef:
             print(headName)
             data = f.read(headLen)
@@ -255,9 +256,9 @@ class HypernetsReader:
                 print("%02X " * headLen % (tuple([b for b in data])))
             else:
                 print("%02X " * headLen % (tuple([ord(b) for b in data])))
-            data_len, = unpack(headFormat, data)
-            print(data_len)
-            if headName == "Pixel Count": pixel_count = data_len
+            var, = unpack(headFormat, data)
+            print(var)
+            if headName == "Pixel Count": pixel_count = var
             if headName == "Spectrum Type Information":
                 specInfo = format(ord(data), '#010b')
                 specInfo = ['1' == a for a in reversed(specInfo[2:])]
@@ -281,7 +282,9 @@ class HypernetsReader:
                 if specInfo[3] and specInfo[4]: strInfo += "Error"  # noqa
 
                 print("Spectrum Type Info : %s " % strInfo)
-        return (pixel_count)
+
+            header[headName] = var
+        return (header)
 
     def read_footer(self, f, datalength):
         # print(f)
