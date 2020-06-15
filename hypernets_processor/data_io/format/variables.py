@@ -138,12 +138,16 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
 
 COMMON_VARIABLES_SEQ = deepcopy(COMMON_VARIABLES_SERIES)
 COMMON_VARIABLES_SCAN = deepcopy(COMMON_VARIABLES_SERIES)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8dfe4ec5d10827d2e6f7429437dbe843426e46a1
 for variable in COMMON_VARIABLES_SEQ.keys():
     COMMON_VARIABLES_SEQ[variable]["dim"] = [d if d != SERIES_DIM else SEQ_DIM
                                              for d in COMMON_VARIABLES_SERIES[variable]["dim"]]
 for variable in COMMON_VARIABLES_SCAN.keys():
     COMMON_VARIABLES_SCAN[variable]["dim"] = [d if d != SERIES_DIM else SCAN_DIM
+<<<<<<< HEAD
                                               for d in COMMON_VARIABLES_SERIES[variable]["dim"]]
 
 # > L0_VARIABLES - Variables required for the L0 dataset
@@ -214,6 +218,73 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
 
 L0_IRR_VARIABLES = L0_RAD_VARIABLES
 L0_BLA_VARIABLES = L0_RAD_VARIABLES
+=======
+                                             for d in COMMON_VARIABLES_SERIES[variable]["dim"]]
+
+# > L0_VARIABLES - Variables required for the L0 dataset
+L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "integration_time",
+                                                      "long_name": "Integration time during measurement",
+                                                      "units": "s"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "temperature": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "temperature",
+                                                     "long_name": "temperature of instrument",
+                                                     "units": "degrees"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "acceleration_x_mean": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "acceleration_x_mean",
+                                                     "long_name": "Time during measurement",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "acceleration_x_std": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "acceleration_x_std",
+                                                     "long_name": "",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "acceleration_y_mean": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "acceleration_y_mean",
+                                                     "long_name": "",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "acceleration_y_std": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "acceleration_y_std",
+                                                     "long_name": "",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "acceleration_z_mean": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "acceleration_z_mean",
+                                                     "long_name": "",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "acceleration_z_std": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "acceleration_z_std",
+                                                     "long_name": "",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "digital_number": {"dim": [WL_DIM, SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "digital_number",
+                                                     "long_name": "Digital number, raw data",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}
+                    }
+
+L0_IRR_VARIABLES = {"digital_number": {"dim": [SCAN_DIM],
+                                      "dtype": np.uint32,
+                                      "attributes": {"standard_name": "digital_number",
+                                                     "long_name": "Digital number, raw data",
+                                                     "units": "-"},
+                                      "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+>>>>>>> 8dfe4ec5d10827d2e6f7429437dbe843426e46a1
 
 # > L1A_RAD_VARIABLES - Radiance Variables required for L1 data products (except water L1B)
 L1A_RAD_VARIABLES = {"u_random_radiance": {},
