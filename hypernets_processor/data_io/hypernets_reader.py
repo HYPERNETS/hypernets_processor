@@ -261,7 +261,6 @@ class HypernetsReader:
                 if specInfo[3] and specInfo[4]: strInfo += "Error"  # noqa
 
                 print("Spectrum Type Info : %s " % strInfo)
-<<<<<<< HEAD
 
             header[headName] = var
         return header
@@ -286,9 +285,6 @@ class HypernetsReader:
             prev = unpackData
         # print(dataSpectra)
         return dataSpectra
-=======
-        return (pixel_count)
->>>>>>> 8dfe4ec5d10827d2e6f7429437dbe843426e46a1
 
     def read_footer(self, f, datalength):
         # print(f)
