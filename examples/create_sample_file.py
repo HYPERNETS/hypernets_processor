@@ -5,7 +5,10 @@ Testing for Hypernets file writer
 import numpy as np
 import datetime
 from os.path import join as pjoin
+from hypernets_processor import HypernetsDSBuilder
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
+from hypernets_processor.data_io.filename_util import FilenameUtil
+
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -19,34 +22,39 @@ __status__ = "Development"
 N_WAVELENGTHS = 271
 
 
-def create_sample_file(output_directory, n_series, network, site):
-    hw = HypernetsWriter()
-    dataset = hw.create_template_dataset_l2a(N_WAVELENGTHS, n_series, network=network)
+def create_sample_W_L1B_file(output_directory, n_sequence, site):
+    dsb = HypernetsDSBuilder()
+    dataset = dsb.create_ds_template({"wavelength": N_WAVELENGTHS, "sequence": n_sequence}, "W_L1B")
 
     # wavelength data
+    # todo - fix issue with wavelength assignment as coordinate
     dataset["wavelength"].data = np.concatenate((np.arange(400, 1000, 3), np.arange(1000, 1700+10, 10)))
     dataset["bandwidth"].data = np.random.normal(1.0, 0.5, N_WAVELENGTHS)
 
     # geometry data
-    dataset["viewing_angle_azimuth"].data = np.linspace(30, 60, n_series)
-    dataset["viewing_angle_zenith"].data = np.linspace(30, 60, n_series)
-    dataset["sun_angle_azimuth"].data = np.linspace(30, 60, n_series)
-    dataset["sun_angle_zenith"].data = np.linspace(30, 60, n_series)
+    dataset["viewing_azimuth_angle"].data = np.linspace(30, 60, n_sequence)
+    dataset["viewing_zenith_angle"].data = np.linspace(30, 60, n_sequence)
+    dataset["solar_azimuth_angle"].data = np.linspace(30, 60, n_sequence)
+    dataset["solar_zenith_angle"].data = np.linspace(30, 60, n_sequence)
 
-    # reflectance data
-    dataset["reflectance"].data = np.round(np.random.rand(N_WAVELENGTHS, n_series), 3)
-    dataset["u_random_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS, n_series))
-    dataset["u_systematic_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS, n_series))
-    dataset["cov_random_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS, N_WAVELENGTHS))
-    dataset["cov_systematic_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS, N_WAVELENGTHS))
+    # observation data
+    dataset["upwelling_radiance"].data = np.round(np.random.rand(N_WAVELENGTHS, n_sequence), 3)
+    # dataset["u_random_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS, n_sequence))
+    # dataset["u_systematic_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS,n_sequence))
+    # dataset["cov_random_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS, N_WAVELENGTHS))
+    # dataset["cov_systematic_reflectance"].data = np.random.normal(1.0, 0.5, (N_WAVELENGTHS, N_WAVELENGTHS))
 
     # time data
-    dataset["acquisition_time"].data = np.arange(10000, 10000+n_series, dtype=int)
+    dataset["acquisition_time"].data = np.arange(10000, 10000+n_sequence, dtype=int)
+
+    # make file name
+    fu = FilenameUtil()
+    filename = fu.create_file_name_l1b("w", site, datetime.datetime.today(), "0.00")
 
     # write file
-    filename = hw.create_file_name_l2a(network, site, datetime.datetime.today(), "0.00")
+    hw = HypernetsWriter()
     hw.write(dataset, pjoin(output_directory, filename))
 
 
 if __name__ == '__main__':
-    create_sample_file(".", 26, "land", "gbna")
+    create_sample_W_L1B_file(".", 26,  "BSBE")
