@@ -1,86 +1,101 @@
 """
 Standard metadata for Hypernets L1, L2a and L2b files, for the land a water network
-20200420 CG : Updated metadata according to Hyperents_Data_format_v0.5.docx" 
 """
 
-COMMON_METADATA = {"type": "dataset",
-                   "abstract": "The HYPERNETS project (Horizon 2020 research and innovation, grant agreement "
-                               "No 775983) has the overall aim to provide high quality in situ measurements to"
-                               "support the (visible/SWIR) optical Copernicus products. Therefore a new "
-                               "multi-head hyperspectral spectroradiometer dedicated to land and water surface"
-                               " reflectance validation with instrument pointing capabilities and embedded "
-                               "calibration device has been established. The instrument has been deployed at "
-                               "24 sites covering a range of water and land types and a range of climatic and"
-                               "logistic conditions (www.hypernets.eu).",
-                   "conventions": "CFv72, NVS2.0",
-                   "format_version": "v01.0",
-                   "netcdf_version": "1.6",
-                   "processor_name": "hypernets_processor",
-                   "processor_version": "v001",
-                   "data_created": "20200423",  # adds on write not working currently
-                   "references": "https://hypernets-processor.readthedocs.io/en/latest/",
-                   "source": "surface observation",
-                   "comment": "Any free-format text is appropriate.",
-                   "area": "Global",
-                   "easting": "longitude",
-                   "northing": "latitude",
-                   "southermost_latitude": "-90.00",
-                   "northernmost_latitude": "90.00",
-                   "westernmost_longitude": "-180.00",
-                   "easternmost_longitude": "180.00",
-                   "time_coverage_start": "2020-04-01T00:02:00Z",
-                   "time_coverage_end": "2020-04-01T00:02:00Z",
-                   "acknowledgement": "HYPERNETS project is funded by Horizon 2020 research and innovation program, "
-                                      "Grand Agreement No 775993. Consortium of project  of the Hypernets test sites, "
-                                      ".... are greatly acknowledged.",
-                   "project_name": "H2020 HYPERNETS GN 775993",
-                   "language": "English",
-                   "operational_status": "operational",
-                   "limitations": "no limitations to public access",
-                   "licence": "Attribution-NonCommercial-NoDerivs CC BY-NC-ND",
-                   "conformity": "notEvaluated",
-                   "lineage": "Quality assured following www.hypernets.eu/docs/QC/",
-                   "instrument_configuration_file": "data_io/tests/reader/SEQ20200312T135926/config.txt",
-                   "spectral_range_vnir": "400-1000",
-                   "spectral_resolution_vnir": "3",
-                   "solar_azimuth_angle_min": "190.123",
-                   "solar_zenith_angle_min": "52.000",
-                   "solar_azimuth_angle_max": "190.123",
-                   "solar_zenith_angle_max": "52.000",
-                   "system_id": "HYPSTAR001234",  # key metadata
-                   }
-
-L1_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file
-                   "product_name": "HYPSTAR_W_BSBE_L1A_RAD_202002041130_v01.0.nc",
-                   "product_version": "01.0",
-                   "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
-                   "processor_configuration_file": "tree/master/examples/config_files/config.txt",
-                   "processor_atbd": "atbd/L1A/RAD",
-                   "sequence_id": "SEQ20200312T135926",
-                   "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
-                   "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/",
-                   "viewing_zenith_angle_average": "140.000",
-                   "viewing_zenith_angle_min": "139.000",
-                   "viewing_zenith_angle_max": "141.000",
-                   "viewing_azimuth_angle_average": "330.000",
-                   "viewing_azimuth_angle_min": "330.000",
-                   "viewing_azimuth_angle_max": "330.000",
-                   "relative_azimuth_angle_average": "030.000",
-                   "relative_azimuth_angle_min": "030.000",
-                   "relative_azimuth_angle_max": "030.000"
-                   }
+# Sets of metadata are defined in the below dictionaries. Each entry in a dictionary defines one metadata with entry of
+# its required value if applicable.
+#
+# Following the metadata set definitions a dictionary of is built with an entry for each Hypernets product type, with
+# entry of its metadata built by combining the metadata from the metadata sets. This is called METADATA_DEFS
+#
+# Product metadata is defined following the specification defined in:
+# Hypernets Team, Product Data Format Specification, v0.5 (2020)
 
 
-L1_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance",  # example of irradiance file
-                   "product_name": "HYPSTAR_W_BSBE_L1A_IRR_202002041130_v01.0.nc",
-                   "product_version": "01.0",
-                   "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
-                   "processor_configuration_file": "tree/master/examples/config_files/config.txt",
-                   "processor_atbd": "atbd/L1A/IRR",
-                   "sequence_id": "SEQ20200312T135926",
-                   "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
-                   "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/"
-                   }
+# todo - update metadata so only required values are included
+
+
+# Contributing metadata sets
+# --------------------------
+
+STANDARD_METADATA = {"type": "dataset",
+                     "abstract": "The HYPERNETS project (Horizon 2020 research and innovation, grant agreement "
+                                 "No 775983) has the overall aim to provide high quality in situ measurements to"
+                                 "support the (visible/SWIR) optical Copernicus products. Therefore a new "
+                                 "multi-head hyperspectral spectroradiometer dedicated to land and water surface"
+                                 " reflectance validation with instrument pointing capabilities and embedded "
+                                 "calibration device has been established. The instrument has been deployed at "
+                                 "24 sites covering a range of water and land types and a range of climatic and"
+                                 "logistic conditions (www.hypernets.eu).",
+                     "conventions": "CFv72, NVS2.0",
+                     "format_version": "v01.0",
+                     "netcdf_version": "1.6",
+                     "processor_name": "hypernets_processor",
+                     "processor_version": "v001",
+                     "data_created": "20200423",  # adds on write not working currently
+                     "references": "https://hypernets-processor.readthedocs.io/en/latest/",
+                     "source": "surface observation",
+                     "comment": "Any free-format text is appropriate.",
+                     "area": "Global",
+                     "easting": "longitude",
+                     "northing": "latitude",
+                     "southermost_latitude": "-90.00",
+                     "northernmost_latitude": "90.00",
+                     "westernmost_longitude": "-180.00",
+                     "easternmost_longitude": "180.00",
+                     "time_coverage_start": "2020-04-01T00:02:00Z",
+                     "time_coverage_end": "2020-04-01T00:02:00Z",
+                     "acknowledgement": "HYPERNETS project is funded by Horizon 2020 research and innovation program, "
+                                        "Grand Agreement No 775993. Consortium of project  of the Hypernets test sites,"
+                                        " .... are greatly acknowledged.",
+                     "project_name": "H2020 HYPERNETS GN 775993",
+                     "language": "English",
+                     "operational_status": "operational",
+                     "limitations": "no limitations to public access",
+                     "licence": "Attribution-NonCommercial-NoDerivs CC BY-NC-ND",
+                     "conformity": "notEvaluated",
+                     "lineage": "Quality assured following www.hypernets.eu/docs/QC/",
+                     "instrument_configuration_file": "data_io/tests/reader/SEQ20200312T135926/config.txt",
+                     "spectral_range_vnir": "400-1000",
+                     "spectral_resolution_vnir": "3",
+                     "solar_azimuth_angle_min": "190.123",
+                     "solar_zenith_angle_min": "52.000",
+                     "solar_azimuth_angle_max": "190.123",
+                     "solar_zenith_angle_max": "52.000",
+                     "system_id": "HYPSTAR001234",  # key metadata
+                     }
+
+L1A_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file
+                    "product_name": "HYPSTAR_W_BSBE_L1A_RAD_202002041130_v01.0.nc",
+                    "product_version": "01.0",
+                    "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
+                    "processor_configuration_file": "tree/master/examples/config_files/config.txt",
+                    "processor_atbd": "atbd/L1A/RAD",
+                    "sequence_id": "SEQ20200312T135926",
+                    "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+                    "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/",
+                    "viewing_zenith_angle_average": "140.000",
+                    "viewing_zenith_angle_min": "139.000",
+                    "viewing_zenith_angle_max": "141.000",
+                    "viewing_azimuth_angle_average": "330.000",
+                    "viewing_azimuth_angle_min": "330.000",
+                    "viewing_azimuth_angle_max": "330.000",
+                    "relative_azimuth_angle_average": "030.000",
+                    "relative_azimuth_angle_min": "030.000",
+                    "relative_azimuth_angle_max": "030.000"
+                    }
+
+
+L1A_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance",  # example of irradiance file
+                    "product_name": "HYPSTAR_W_BSBE_L1A_IRR_202002041130_v01.0.nc",
+                    "product_version": "01.0",
+                    "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
+                    "processor_configuration_file": "tree/master/examples/config_files/config.txt",
+                    "processor_atbd": "atbd/L1A/IRR",
+                    "sequence_id": "SEQ20200312T135926",
+                    "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+                    "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/"
+                    }
 
 W_L1B_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
                                " radiance and water leaving radiance",  # example of irradiance file
@@ -92,8 +107,10 @@ W_L1B_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irr
                       "sequence_id": "SEQ20200312T135926",
                       "system_id": "HYPSTAR001234",  # key metadata
                       "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
-                      "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_180_8_01_0000.spe, "
-                                             "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_180_16_01_0000.spe",
+                      "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/"
+                                             "01_002_-030_2_180_8_01_0000.spe, "
+                                             "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/"
+                                             "01_002_-030_2_180_16_01_0000.spe",
                       "viewing_zenith_angle_average": "140.000",
                       "viewing_zenith_angle_min": "139.000",
                       "viewing_zenith_angle_max": "141.000",
@@ -107,28 +124,28 @@ W_L1B_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irr
                       }
 
 
-L_L1B_RAD_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradiance",  # example of irradiance file
-                      "product_name": "HYPSTAR_L_GBNA_L1B_RAD_202002041130_v01.0.nc",
-                      "product_version": "01.0",
-                      "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
-                      "processor_configuration_file": "hypernets_processor/examples/config_files/config.txt",
-                      "processor_atbd": "atbd/L1B/",
-                      "sequence_id": "SEQ20200312T135926",
-                      "system_id": "HYPSTAR001234",  # key metadata
-                      "instrument_config_file": "data_io/tests/reader/SEQ20200312T135926/config.txt",
-                      "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
-                      "inputfile": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_140_16_01_0000.spe, "
-                                   "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_180_08_01_0000.spe",
-                      "viewing_zenith_angle_average": "140.000",
-                      "viewing_zenith_angle_min": "139.000",
-                      "viewing_zenith_angle_max": "141.000",
-                      "viewing_azimuth_angle_average": "330.000",
-                      "viewing_azimuth_angle_min": "330.000",
-                      "viewing_azimuth_angle_max": "330.000",
-                      "relative_azimuth_angle_average": "030.000",
-                      "relative_azimuth_angle_min": "030.000",
-                      "relative_azimuth_angle_max": "030.000"
-                      }
+L_L1B_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradiance",  # example of irradiance file
+                  "product_name": "HYPSTAR_L_GBNA_L1B_RAD_202002041130_v01.0.nc",
+                  "product_version": "01.0",
+                  "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
+                  "processor_configuration_file": "hypernets_processor/examples/config_files/config.txt",
+                  "processor_atbd": "atbd/L1B/",
+                  "sequence_id": "SEQ20200312T135926",
+                  "system_id": "HYPSTAR001234",  # key metadata
+                  "instrument_config_file": "data_io/tests/reader/SEQ20200312T135926/config.txt",
+                  "sequence_file": "data_io/tests/reader/SEQ20200312T135926/test_STD.csv",
+                  "inputfile": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_140_16_01_0000.spe, "
+                               "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/01_002_-030_2_180_08_01_0000.spe",
+                  "viewing_zenith_angle_average": "140.000",
+                  "viewing_zenith_angle_min": "139.000",
+                  "viewing_zenith_angle_max": "141.000",
+                  "viewing_azimuth_angle_average": "330.000",
+                  "viewing_azimuth_angle_min": "330.000",
+                  "viewing_azimuth_angle_max": "330.000",
+                  "relative_azimuth_angle_average": "030.000",
+                  "relative_azimuth_angle_min": "030.000",
+                  "relative_azimuth_angle_max": "030.000"
+                  }
 
 W_L2A_REF_METADATA = {"title": "HYPSTAR Water network dataset of spectral surface reflectance",
                       "product_name": "HYPSTAR_W_BSBE_L2A_REF_202002041130_v01.0.nc",
@@ -220,7 +237,8 @@ INSTRUMENT_METADATA = {"instrument_id": "HYDERv01001234",
                        "instrument_firmware": "Firmware4",
                        "instrument_firmware_version": "v001",
                        "instrument_documentation_references": "www.hypernets/firmware4/",
-                       "instrument_history": "2020-04-01T00:02:00Z :Creation,2028-03-23T11:56:12Z :Radiance head replaced",
+                       "instrument_history": "2020-04-01T00:02:00Z :Creation,2028-03-23T11:56:12Z :Radiance head "
+                                             "replaced",
                        "instrument_deployment_date": "2020-04-25",
                        "system_id": "HYPSTAR001234",  # key metadata
                        }
@@ -324,3 +342,27 @@ SITE_METADATA = {"site_id": "BSBE",
                  "site_documentation reference": "www.waterhypernet.org/sites/deBlankaart/South",
                  "system_id": "HYPSTAR001234"  # key metadata
                  }
+
+# File format metadata defs
+# -------------------------
+
+COMMON_METADATA = {**STANDARD_METADATA,
+                   **SYSTEM_METADATA, **INSTRUMENT_METADATA, **RAD_HEAD_METADATA, **IRR_HEAD_METADATA,
+                   **CALIBRATION_DEVICE_METADATA,
+                   **RAIN_SENSOR_METADATA, **RGB_CAMERA_METADATA, **PAN_TILT_METADATA,
+                   **SITE_METADATA}
+
+METADATA_DEFS = {"L0_RAD": {**COMMON_METADATA},
+                 "L0_IRR": {**COMMON_METADATA},
+                 "L_L1A_RAD": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L1A_RAD_METADATA},
+                 "W_L1A_RAD": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **L1A_RAD_METADATA},
+                 "L_L1A_IRR": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA},
+                 "W_L1A_IRR": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **L1A_IRR_METADATA},
+                 "L_L1B": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L_L1B_METADATA},
+                 "W_L1B": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **W_L1B_WLR_METADATA},
+                 "L_L2A": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L_L2A_REF_METADATA},
+                 "W_L2A": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **W_L2A_REF_METADATA},
+                 "L_L2B": {**COMMON_METADATA, **LAND_NETWORK_METADATA},
+                 "W_L2B": {**COMMON_METADATA, **WATER_NETWORK_METADATA}
+                 }
+
