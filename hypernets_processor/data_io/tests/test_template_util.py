@@ -3,8 +3,10 @@ Tests for TemplateUtil class
 """
 
 import unittest
+from unittest.mock import patch, call
+import numpy as np
 import xarray
-from hypernets_processor.data_io.template_util import TemplateUtil
+from hypernets_processor.data_io.template_util import TemplateUtil, create_template_dataset
 from hypernets_processor.version import __version__
 
 
@@ -16,156 +18,284 @@ __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
-# todo - add variable properties to dictionaries and test
-# todo - improve metadata tests to fully check metadata
-
-COMMON_VARIABLES = {"wavelength": {},
-                    "bandwidth": {},
-                    "viewing_angle_azimuth": {},
-                    "viewing_angle_zenith": {},
-                    "sun_angle_azimuth": {},
-                    "sun_angle_zenith": {},
-                    "quality_flags": {},
-                    "acquisition_time": {}}
-
-L1A_RAD_VARIABLES = {"u_random_radiance": {},
-                    "u_systematic_radiance": {},
-                    "cov_random_radiance": {},
-                    "cov_systematic_radiance": {},
-                    "radiance": {}}
-
-L1A_IRR_VARIABLES = {"u_random_irradiance": {},
-                    "u_systematic_irradiance": {},
-                    "cov_random_irradiance": {},
-                    "cov_systematic_irradiance": {},
-                    "irradiance": {}}
-
-L2A_VARIABLES = {"u_random_reflectance": {},
-                 "u_systematic_reflectance": {},
-                 "cov_random_reflectance": {},
-                 "cov_systematic_reflectance": {},
-                 "reflectance": {}}
-
-L2B_VARIABLES = {"u_random_reflectance": {},
-                 "u_systematic_reflectance": {},
-                 "cov_random_reflectance": {},
-                 "cov_systematic_reflectance": {},
-                 "reflectance": {}}
-
-
-def test_dataset(self, ds, variables):
-    self.assertEqual(len(variables.keys()), len(ds.data_vars) + len(ds.coords))
-
-    for var in variables.keys():
-        self.assertIsNotNone(ds.variables[var])
-
 
 class TestTemplateUtil(unittest.TestCase):
 
-    def test_add_common_variables(self):
+    @patch("hypernets_processor.data_io.template_util.DatasetUtil")
+    def test_add_variables_1var(self, mock_du):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_common_variables(dataset, 271, 10)
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-        test_dataset(self, dataset, COMMON_VARIABLES)
+        test_variables = {"array_variable": {"dim": ["dim1", "dim2"],
+                                             "dtype": np.float32,
+                                             "attributes": {"standard_name": "array_variable_std_name",
+                                                            "long_name": "array_variable_long_name",
+                                                            "units": "units",
+                                                            "preferred_symbol": "av"},
+                                             "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}}}
 
-    def test_add_l1a_rad_variables(self):
+        # run method
+        dataset = TemplateUtil.add_variables(dataset, test_variables, dim_sizes)
+
+        # test results
+        mock_du.return_value.create_variable.assert_called_once_with([25, 30],
+                                                                     dim_names=["dim1", "dim2"],
+                                                                     dtype=np.float32,
+                                                                     attributes={"standard_name":
+                                                                                     "array_variable_std_name",
+                                                                                 "long_name":
+                                                                                     "array_variable_long_name",
+                                                                                 "units": "units",
+                                                                                 "preferred_symbol": "av"})
+        mock_du.return_value.add_encoding.assert_called_once_with(mock_du.return_value.create_variable.return_value,
+                                                                  dtype=np.uint16,
+                                                                  scale_factor=1.0,
+                                                                  offset=0.0)
+
+    @patch("hypernets_processor.data_io.template_util.DatasetUtil")
+    def test_add_variables_1flag(self, mock_du):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l1a_rad_variables(dataset, 271, 10)
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-        test_dataset(self, dataset, L1A_RAD_VARIABLES)
+        test_variables = {"array_variable": {"dim": ["dim1", "dim2"],
+                                             "dtype": "flag",
+                                             "attributes": {"standard_name": "array_variable_std_name",
+                                                            "long_name": "array_variable_long_name",
+                                                            "preferred_symbol": "av",
+                                                            "flag_meanings": ["flag1"]}
+                                             }
+                          }
 
-    def test_add_l1a_irr_variables(self):
+        # run method
+        dataset = TemplateUtil.add_variables(dataset, test_variables, dim_sizes)
+
+        # test results
+        mock_du.return_value.create_flags_variable.assert_called_once_with([25, 30],
+                                                                           dim_names=["dim1", "dim2"],
+                                                                           meanings=["flag1"],
+                                                                           attributes={"standard_name":
+                                                                                           "array_variable_std_name",
+                                                                                       "long_name":
+                                                                                           "array_variable_long_name",
+                                                                                       "preferred_symbol": "av"})
+
+    @patch("hypernets_processor.data_io.template_util.DatasetUtil")
+    def test_add_variables_2var(self, mock_du):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l1a_irr_variables(dataset, 271, 10)
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-        test_dataset(self, dataset, L1A_IRR_VARIABLES)
+        test_variables = {"array_variable1": {"dim": ["dim1", "dim2"],
+                                              "dtype": np.float32,
+                                              "attributes": {"standard_name": "array_variable_std_name1",
+                                                             "long_name": "array_variable_long_name1",
+                                                             "units": "units",
+                                                             "preferred_symbol": "av"},
+                                              "encoding": {'dtype': np.uint16, "scale_factor": 1.0,
+                                                           "offset": 0.0}},
+                          "array_variable2": {"dim": ["dim3", "dim4"],
+                                              "dtype": np.float32,
+                                              "attributes": {"standard_name": "array_variable_std_name2",
+                                                             "long_name": "array_variable_long_name2",
+                                                             "units": "units",
+                                                             "preferred_symbol": "av"},
+                                              "encoding": {'dtype': np.uint16, "scale_factor": 1.0,
+                                                           "offset": 0.0}},
+                          }
 
-    def test_add_l2a_variables(self):
+        # run method
+        dataset = TemplateUtil.add_variables(dataset, test_variables, dim_sizes)
+
+        # test results
+        # define expected calls to DatasetUtil methods
+        calls = [call([25, 30],
+                      dim_names=["dim1", "dim2"],
+                      dtype=np.float32,
+                      attributes={"standard_name": "array_variable_std_name1",
+                                  "long_name": "array_variable_long_name1",
+                                  "units": "units",
+                                  "preferred_symbol": "av"}),
+                 call([10, 15],
+                      dim_names=["dim3", "dim4"],
+                      dtype=np.float32,
+                      attributes={"standard_name": "array_variable_std_name2",
+                                  "long_name": "array_variable_long_name2",
+                                  "units": "units",
+                                  "preferred_symbol": "av"})]
+
+        mock_du.return_value.create_variable.assert_has_calls(calls, any_order=True)
+
+    def test_add_variables_1var_ds(self):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l2a_variables(dataset, 271, 10)
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-        test_dataset(self, dataset, L2A_VARIABLES)
+        test_variables = {"array_variable": {"dim": ["dim1", "dim2"],
+                                             "dtype": np.float32,
+                                             "attributes": {"standard_name": "array_variable_std_name",
+                                                            "long_name": "array_variable_long_name",
+                                                            "units": "units",
+                                                            "preferred_symbol": "av"},
+                                             "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}}}
 
-    def test_add_l2b_variables(self):
+        # run method
+        dataset = TemplateUtil.add_variables(dataset, test_variables, dim_sizes)
+
+        # assert dataset with variables
+        self.assertEqual(type(dataset), xarray.Dataset)
+        self.assertEqual(type(dataset["array_variable"]), xarray.DataArray)
+
+    def test__return_variable_shape(self):
+        dim_sizes_dict = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
+        dim_names = ["dim2", "dim1"]
+
+        dim_sizes = TemplateUtil._return_variable_shape(dim_names=dim_names, dim_sizes_dict=dim_sizes_dict)
+
+        self.assertCountEqual([30, 25], dim_sizes)
+
+    def test__check_variable_definition_bad_name(self):
+        test_variable_name = 23
+        test_variable_attrs = {"dim": ["dim1", "dim2"],
+                               "dtype": np.float32,
+                               "attributes": {"standard_name": "array_variable_std_name",
+                                              "long_name": "array_variable_long_name",
+                                              "units": "units",
+                                              "preferred_symbol": "av"},
+                               "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}}
+
+        self.assertRaises(TypeError, TemplateUtil._check_variable_definition, test_variable_name, test_variable_attrs)
+
+    def test_add_metadata(self):
         dataset = xarray.Dataset()
 
-        TemplateUtil.add_l2b_variables(dataset, 271, 10)
+        test_metadata = {"metadata1": "value"}
 
-        test_dataset(self, dataset, L2B_VARIABLES)
+        TemplateUtil.add_metadata(dataset, test_metadata)
 
-    def test_add_common_metadata(self):
-        dataset = xarray.Dataset()
+        self.assertEqual("value", dataset.attrs["metadata1"])
 
-        TemplateUtil.add_common_metadata(dataset)
+    def test_propagate_variable_values(self):
 
-        self.assertEqual("English", dataset.attrs["language"])
+        # Create template datasets
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-    def test_add_l1a_rad_metadata(self):
-        dataset = xarray.Dataset()
+        test_source_variables = {"common_variable1": {"dim": ["dim1", "dim2"], "dtype": np.float32},
+                                 "common_variable2": {"dim": ["dim3", "dim4"], "dtype": np.float32},
+                                 "source_variable": {"dim": ["dim1", "dim2"], "dtype": np.float32}}
 
-        TemplateUtil.add_l1a_rad_metadata(dataset)
+        test_target_variables = {"common_variable1": {"dim": ["dim1", "dim2"], "dtype": np.float32},
+                                 "common_variable2": {"dim": ["dim3", "dim4"], "dtype": np.float32},
+                                 "target_variable": {"dim": ["dim1", "dim2"], "dtype": np.float32}}
 
-        self.assertEqual("HYPSTAR dataset of radiance",
-                         dataset.attrs["title"])
+        source_ds = create_template_dataset(test_source_variables, dim_sizes)
+        target_ds = create_template_dataset(test_target_variables, dim_sizes)
 
-    def test_add_l1_irr_metadata(self):
-        dataset = xarray.Dataset()
+        # Populate source_ds
+        source_ds["common_variable1"].values.fill(1)
+        source_ds["common_variable2"].values.fill(2)
 
-        TemplateUtil.add_l1a_irr_metadata(dataset)
+        # Run propagation
+        TemplateUtil.propagate_values(target_ds, source_ds)
 
-        self.assertEqual("HYPSTAR dataset of irradiance",
-                         dataset.attrs["title"])
+        # Test output
+        self.assertEqual(target_ds["common_variable1"].values[0, 0], 1)
+        self.assertEqual(target_ds["common_variable2"].values[0, 0], 2)
+        self.assertAlmostEqual(target_ds["target_variable"].values[0, 0]/(10**36), 9.96921, places=5)
 
-    def test_add_l_l1b_metadata(self):
-        dataset = xarray.Dataset()
+    def test_propagate_variable_values_different_dims(self):
 
-        TemplateUtil.add_l_l1b_metadata(dataset)
+        # Create template datasets
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-        self.assertEqual("HYPSTAR Land network dataset of radiance and irradiance",
-                         dataset.attrs["title"])
+        test_source_variables = {"common_variable1": {"dim": ["dim1", "dim2"], "dtype": np.float32},
+                                 "common_variable2": {"dim": ["dim3", "dim4"], "dtype": np.float32},
+                                 "source_variable": {"dim": ["dim1", "dim2"], "dtype": np.float32}}
 
-    def test_add_w_l1b_metadata(self):
-        dataset = xarray.Dataset()
+        test_target_variables = {"common_variable1": {"dim": ["dim1", "dim2"], "dtype": np.float32},
+                                 "common_variable2": {"dim": ["dim3", "dim2"], "dtype": np.float32},
+                                 "target_variable": {"dim": ["dim1", "dim2"], "dtype": np.float32}}
 
-        TemplateUtil.add_w_l1b_metadata(dataset)
+        source_ds = create_template_dataset(test_source_variables, dim_sizes)
+        target_ds = create_template_dataset(test_target_variables, dim_sizes)
 
-        self.assertEqual("HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
-                         " radiance and water leaving radiance",
-                         dataset.attrs["title"])
+        # Populate source_ds
+        source_ds["common_variable1"].values.fill(1)
+        source_ds["common_variable2"].values.fill(2)
 
-    def test_add_l_l2a_metadata(self):
-        dataset = xarray.Dataset()
+        # Run propagation
+        TemplateUtil.propagate_values(target_ds, source_ds)
 
-        TemplateUtil.add_l_l2a_metadata(dataset)
+        # Test output
+        self.assertEqual(target_ds["common_variable1"].values[0, 0], 1)
+        self.assertAlmostEqual(target_ds["common_variable2"].values[0, 0]/(10**36), 9.96921, places=5)
+        self.assertAlmostEqual(target_ds["target_variable"].values[0, 0]/(10**36), 9.96921, places=5)
 
-        self.assertEqual("HYPSTAR Land network dataset of spectral surface reflectance",
-                         dataset.attrs["title"])
+    def test_propagate_variable_values_exclude(self):
 
-    def test_add_w_l2a_metadata(self):
-        dataset = xarray.Dataset()
+        # Create template datasets
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-        TemplateUtil.add_w_l2a_metadata(dataset)
+        test_source_variables = {"common_variable1": {"dim": ["dim1", "dim2"], "dtype": np.float32},
+                                 "common_variable2": {"dim": ["dim3", "dim4"], "dtype": np.float32},
+                                 "source_variable": {"dim": ["dim1", "dim2"], "dtype": np.float32}}
 
-        self.assertEqual("HYPSTAR Water network dataset of spectral surface reflectance",
-                         dataset.attrs["title"])
+        test_target_variables = {"common_variable1": {"dim": ["dim1", "dim2"], "dtype": np.float32},
+                                 "common_variable2": {"dim": ["dim3", "dim4"], "dtype": np.float32},
+                                 "target_variable": {"dim": ["dim1", "dim2"], "dtype": np.float32}}
 
-    def test_add_land_network_metadata(self):
-        dataset = xarray.Dataset()
+        source_ds = create_template_dataset(test_source_variables, dim_sizes)
+        target_ds = create_template_dataset(test_target_variables, dim_sizes)
 
-        TemplateUtil.add_land_network_metadata(dataset)
+        # Populate source_ds
+        source_ds["common_variable1"].values.fill(1)
+        source_ds["common_variable2"].values.fill(2)
 
-        self.assertEqual("Hunt Sam", dataset.attrs["creator_name"])
+        # Run propagation
+        TemplateUtil.propagate_values(target_ds, source_ds, exclude=['common_variable2'])
 
-    def test_add_water_network_metadata(self):
-        dataset = xarray.Dataset()
+        # Test output
+        self.assertEqual(target_ds["common_variable1"].values[0, 0], 1)
+        self.assertAlmostEqual(target_ds["common_variable2"].values[0, 0]/(10**36), 9.96921, places=5)
+        self.assertAlmostEqual(target_ds["target_variable"].values[0, 0]/(10**36), 9.96921, places=5)
 
-        TemplateUtil.add_water_network_metadata(dataset)
+    def test_create_template_dataset(self):
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
 
-        self.assertEqual("Goyens Clémence", dataset.attrs["creator_name"])
+        test_variables = {"array_variable": {"dim": ["dim1", "dim2"],
+                                             "dtype": np.float32,
+                                             "attributes": {"standard_name": "array_variable_std_name",
+                                                            "long_name": "array_variable_long_name",
+                                                            "units": "units",
+                                                            "preferred_symbol": "av"},
+                                             "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}}}
+
+        test_metadata = {"metadata1": "value"}
+
+        ds = create_template_dataset(test_variables, dim_sizes, test_metadata)
+
+        self.assertEqual(type(ds), xarray.Dataset)
+        self.assertEqual(type(ds["array_variable"]), xarray.DataArray)
+        self.assertEqual("value", ds.attrs["metadata1"])
+
+    @patch('hypernets_processor.data_io.template_util.TemplateUtil.propagate_values')
+    def test_create_template_dataset_propagate_ds(self, mock_propagate_values):
+        dim_sizes = {"dim1": 25, "dim2": 30, "dim3": 10, "dim4": 15}
+
+        test_variables = {"array_variable": {"dim": ["dim1", "dim2"],
+                                             "dtype": np.float32,
+                                             "attributes": {"standard_name": "array_variable_std_name",
+                                                            "long_name": "array_variable_long_name",
+                                                            "units": "units",
+                                                            "preferred_symbol": "av"},
+                                             "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}}}
+
+        test_metadata = {"metadata1": "value"}
+
+        ds = create_template_dataset(test_variables, dim_sizes, test_metadata, propagate_ds="propagate_ds")
+
+        mock_propagate_values.assert_called_once_with(ds, "propagate_ds")
 
 
 if __name__ == '__main__':
