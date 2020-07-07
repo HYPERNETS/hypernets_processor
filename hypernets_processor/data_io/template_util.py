@@ -1,7 +1,7 @@
 """
 TemplateUtil class
 """
-
+from hypernets_processor.data_io.format.flags import FLAG_MEANINGS
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 import xarray
@@ -83,6 +83,7 @@ class TemplateUtil:
         du = DatasetUtil()
 
         for variable_name in variables_dict.keys():
+            print(variable_name)
 
             variable_attrs = variables_dict[variable_name]
 
@@ -102,11 +103,14 @@ class TemplateUtil:
 
             # Create variable and add to dataset
             if dtype == "flag":
-                flag_meanings = attributes.pop("flag_meanings")
+                #print(attributes)
+                # why does the flag_meanings does not appear in the attributes????
+                flag_meanings = FLAG_MEANINGS #attributes.pop("flag_meanings")
                 variable = du.create_flags_variable(dim_sizes, meanings=flag_meanings,
                                                     dim_names=dim_names, attributes=attributes)
 
             else:
+                #print(attributes)
                 variable = du.create_variable(dim_sizes, dim_names=dim_names,
                                               dtype=dtype, attributes=attributes)
 

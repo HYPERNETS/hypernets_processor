@@ -60,7 +60,7 @@ class HypernetsDSBuilder:
                             str(variables_dict_defs.keys()))
 
         # Find metadata
-        if ds_format in metadata_defs:
+        if ds_format in metadata_defs.keys():
             metadata = metadata_defs[ds_format]
         else:
             raise RuntimeWarning("No metadata found for file type " + str(ds_format))

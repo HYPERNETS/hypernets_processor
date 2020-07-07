@@ -35,7 +35,7 @@ class DatasetUtil:
 
         :type dtype: type
         :param dtype: numpy data type
-
+dekrie
         :type dim_names: list
         :param dim_names: (optional) dimension names as strings, i.e. ["dim1_name", "dim2_name", "dim3_size"]
 
