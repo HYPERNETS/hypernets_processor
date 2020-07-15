@@ -46,7 +46,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                          "attributes": {},
                                          "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}},
 
-                           "viewing_azimuth_angle": {"dim": [SERIES_DIM],
+                           "viewing_azimuth_angle": {"dim": [SCAN_DIM],
                                                      "dtype": np.float32,
                                                      "attributes": {"standard_name": "sensor_azimuth_angle",
                                                                     "long_name": "sensor_azimuth_angle is the "
@@ -67,7 +67,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                      "encoding": {'dtype': np.uint16, "scale_factor": 0.1,
                                                                   "offset": 0.0}},
 
-                           "viewing_zenith_angle": {"dim": [SERIES_DIM],
+                           "viewing_zenith_angle": {"dim": [SCAN_DIM],
                                                     "dtype": np.float32,
                                                     "attributes": {"standard_name": "sensor_zenith_angle",
                                                                    "long_name": "sensor_zenith_angle is the angle "
@@ -89,7 +89,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                     "encoding": {'dtype': np.uint16, "scale_factor": 0.1,
                                                                  "offset": 0.0}},
 
-                           "solar_azimuth_angle": {"dim": [SERIES_DIM],
+                           "solar_azimuth_angle": {"dim": [SCAN_DIM],
                                                    "dtype": np.float32,
                                                    "attributes": {"standard_name": "solar_azimuth_angle",
                                                                   "long_name": "Solar azimuth angle is the horizontal "
@@ -103,7 +103,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                    "encoding": {'dtype': np.uint16, "scale_factor": 0.1,
                                                                 "offset": 0.0}},
 
-                           "solar_zenith_angle": {"dim": [SERIES_DIM],
+                           "solar_zenith_angle": {"dim": [SCAN_DIM],
                                                   "dtype": np.float32,
                                                   "attributes": {"standard_name": "solar_zenith_angle",
                                                                  "long_name": "Solar zenith angle is the the angle "
@@ -114,7 +114,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                   "encoding": {'dtype': np.uint16, "scale_factor": 0.1,
                                                                "offset": 0.0}},
 
-                           "quality_flag": {"dim": [SERIES_DIM],
+                           "quality_flag": {"dim": [SCAN_DIM],
                                             "dtype": "flag",
                                             "attributes": {"standard_name": "quality_flag",
                                                            "long_name": "A variable with the standard name of quality_"
@@ -127,7 +127,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                            "flag_meanings": FLAG_MEANINGS},
                                             "encoding": {}},
 
-                           "acquisition_time": {"dim": [SERIES_DIM],
+                           "acquisition_time": {"dim": [SCAN_DIM],
                                                 "dtype": np.uint32,
                                                 "attributes": {"standard_name": "time",
                                                                "long_name": "Acquisition time in seconds since "
@@ -216,11 +216,36 @@ L0_IRR_VARIABLES = L0_RAD_VARIABLES
 L0_BLA_VARIABLES = L0_RAD_VARIABLES
 
 # > L1A_RAD_VARIABLES - Radiance Variables required for L1 data products (except water L1B)
-L1A_RAD_VARIABLES = {"u_random_radiance": {},
-                     "u_systematic_radiance": {},
-                     "cov_random_radiance": {},
-                     "cov_systematic_radiance": {},
-                     "radiance": {}}
+L1A_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "random uncertainty on radiance",
+                                                      "long_name": "random uncertainty on upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "u_systematic_radiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "systematic uncertainty on radiance",
+                                                      "long_name": "systematic uncertainty on upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_random_radiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of random error on radiance",
+                                                      "long_name": "covariance between wavelengths for the random errors on radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_systematic_radiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of systematic error on radiance",
+                                                      "long_name": "covariance bewtween wavelengths for systematic error on radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "radiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "radiance",
+                                                      "long_name": "upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
 
 # > L1A_IRR_VARIABLES - Irradiance Variables required for L1 data products (except water L1B)
 L1A_IRR_VARIABLES = {"u_random_irradiance": {},
