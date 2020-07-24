@@ -210,6 +210,11 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                                                       "long_name": "Digital number, raw data",
                                                       "units": "-"},
                                        "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}
+                    # "series_id": {"dim": [SCAN_DIM],
+                    #                "dtype": np.chararray,
+                    #                "attributes": {"standard_name": "series_id",
+                    #                               "long_name": "series_id",
+                    #                               "units": "-"}}
                     }
 
 L0_IRR_VARIABLES = L0_RAD_VARIABLES
@@ -568,6 +573,7 @@ W_L2B_REFLECTANCE_VARIABLES = {}
 
 VARIABLES_DICT_DEFS = {"L0_RAD": {**COMMON_VARIABLES_SCAN, **L0_RAD_VARIABLES},
                        "L0_IRR": {**COMMON_VARIABLES_SCAN, **L0_IRR_VARIABLES},
+                       "L0_BLA": {**COMMON_VARIABLES_SCAN, **L0_BLA_VARIABLES},
                        "L_L1A_RAD": {**COMMON_VARIABLES_SERIES, **L1A_RAD_VARIABLES},
                        "W_L1A_RAD": {**COMMON_VARIABLES_SERIES, **L1A_RAD_VARIABLES},
                        "L_L1A_IRR": {**COMMON_VARIABLES_SERIES, **L1A_IRR_VARIABLES},
