@@ -15,7 +15,8 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propagate_ds=None):
+def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propagate_ds=None,
+                            metadata_db=None, metadata_db_query=None):
     """
     Returns template dataset
 
@@ -47,6 +48,11 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
 
     # Add metadata
     if metadata is not None:
+
+        # Populate metadata from db
+        if metadata_db is not None:
+            metadata = TemplateUtil.find_metadata(metadata, metadata_db, metadata_db_query)
+
         ds = TemplateUtil.add_metadata(ds, metadata)
 
     # Propagate variable data
@@ -58,7 +64,7 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
 
 class TemplateUtil:
     """
-    Class to create template Hypernets datasets by interfacing with the format subpackage
+    Class to create template datasets
     """
 
     @staticmethod
@@ -200,6 +206,25 @@ class TemplateUtil:
             target_ds[common_variable_name].values = source_ds[common_variable_name].values
 
     # todo - add method to propagate common unpopulated metadata
+
+    @staticmethod
+    def find_metadata(metadata, db, query):
+
+        # todo - query should define table name
+        # todo - run multiple queries
+        row = db["table"].find_one(**query)
+
+        if row is None:
+            raise LookupError("query does not find unique metadata value")
+
+        not_required_keys = [key for key in row.keys() if key not in metadata.keys()]
+
+        for key in not_required_keys:
+            row.pop(key)
+
+        metadata.update(row)
+
+        return metadata
 
 
 if __name__ == '__main__':
