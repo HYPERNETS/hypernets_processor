@@ -3,6 +3,7 @@ Tests for DatasetUtil class
 """
 
 import unittest
+from unittest.mock import patch
 import string
 import random
 from datetime import date, datetime
@@ -11,7 +12,7 @@ from copy import deepcopy
 from sqlalchemy import UnicodeText, Float, BigInteger, Boolean, Date, \
     DateTime, JSON
 from sqlalchemy_utils import drop_database
-from hypernets_processor.data_io.database_util import DatabaseUtil
+from hypernets_processor.data_io.database_util import DatabaseUtil, create_template_db
 from hypernets_processor.version import __version__
 
 
@@ -78,6 +79,48 @@ def test_db_schema(self, db):
 
 
 class TestDatabaseUtil(unittest.TestCase):
+
+    @patch("hypernets_processor.data_io.database_util.DatabaseUtil")
+    def test_create_template_db(self, mock_dbu):
+
+        db = create_template_db("test")
+
+        mock_dbu.assert_called()
+        mock_dbu.return_value.create_db.assert_called_once_with("test")
+
+        mock_db = mock_dbu.return_value.create_db.return_value
+        self.assertEqual(db, mock_db)
+
+        mock_dbu.return_value.apply_schema_dict.assert_not_called()
+        mock_db.query.assert_not_called()
+
+    @patch("hypernets_processor.data_io.database_util.DatabaseUtil")
+    def test_create_template_db_schema_dict(self, mock_dbu):
+
+        db = create_template_db("test", schema_dict={})
+
+        mock_dbu.assert_called()
+        mock_dbu.return_value.create_db.assert_called_once_with("test")
+
+        mock_db = mock_dbu.return_value.create_db.return_value
+        self.assertEqual(db, mock_db)
+
+        mock_dbu.return_value.apply_schema_dict.assert_called_once_with(mock_db, {})
+        mock_db.query.assert_not_called()
+
+    @patch("hypernets_processor.data_io.database_util.DatabaseUtil")
+    def test_create_template_db_schema_sql(self, mock_dbu):
+
+        db = create_template_db("test", schema_sql="test_schema")
+
+        mock_dbu.assert_called()
+        mock_dbu.return_value.create_db.assert_called_once_with("test")
+
+        mock_db = mock_dbu.return_value.create_db.return_value
+        self.assertEqual(db, mock_db)
+
+        mock_dbu.return_value.apply_schema_dict.assert_not_called()
+        mock_db.query.assert_called_once_with("test_schema")
 
     def test_create_db_sqlite(self):
         temp_name = ''.join(random.choices(string.ascii_lowercase, k=6)) + ".db"
