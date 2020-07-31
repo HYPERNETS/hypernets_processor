@@ -4,6 +4,7 @@ HypernetsDSBuilder class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.template_util import create_template_dataset
+from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 
@@ -20,12 +21,13 @@ __status__ = "Development"
 class HypernetsDSBuilder:
     """
     Class to generate xarray Datasets in the Hypernets file format specification, handling the library of defined file
-    formats and interfacing with the TemplateUtil tool.
+    formats, metadata database and interfacing with the TemplateUtil tool.
     """
 
     @staticmethod
-    def create_ds_template(dim_sizes_dict, ds_format, propagate_ds=None, variables_dict_defs=VARIABLES_DICT_DEFS,
-                           metadata_defs=METADATA_DEFS):
+    def create_ds_template(dim_sizes_dict, ds_format, site=None, time=None, propagate_ds=None,
+                           metadata_db=None, metadata_db_query=None,
+                           variables_dict_defs=VARIABLES_DICT_DEFS, metadata_defs=METADATA_DEFS):
         """
         Returns empty Hypernets dataset
 
@@ -59,13 +61,21 @@ class HypernetsDSBuilder:
             raise NameError("Invalid format name: " + ds_format + " - must be one of " +
                             str(variables_dict_defs.keys()))
 
-        # Find metadata
+        # Find metadata def
         if ds_format in metadata_defs.keys():
             metadata = metadata_defs[ds_format]
+
         else:
             raise RuntimeWarning("No metadata found for file type " + str(ds_format))
 
-        return create_template_dataset(variables_dict, dim_sizes_dict, metadata, propagate_ds=propagate_ds)
+        # todo - should get metadata_db and build query from context
+
+        # # Set product_name metadata
+        # pu = ProductNameUtil
+        # metadata["product_name"] = pu.create_file_name_l1a_rad(network, site, time, version)
+
+        return create_template_dataset(variables_dict, dim_sizes_dict, metadata=metadata, propagate_ds=propagate_ds,
+                                       metadata_db=metadata_db, metadata_db_query=metadata_db_query)
 
     # todo - add method to return available ds_formats
 

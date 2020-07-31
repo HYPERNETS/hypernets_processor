@@ -34,8 +34,11 @@ class TestHypernetsDSBuilder(unittest.TestCase):
                                                    metadata_defs=metadata_defs)
 
         # test calls to create_template_dataset
-        mock_create_template_dataset.assert_called_once_with("vars1", dim_sizes_dict, "meta1",
-                                                             propagate_ds="propagate_ds")
+        mock_create_template_dataset.assert_called_once_with("vars1", dim_sizes_dict,
+                                                             metadata="meta1",
+                                                             propagate_ds="propagate_ds",
+                                                             metadata_db=None,
+                                                             metadata_db_query=None)
 
     @patch('hypernets_processor.data_io.hypernets_ds_builder.create_template_dataset')
     def test_create_ds_template_no_var(self, mock_create_template_dataset):
