@@ -30,8 +30,28 @@ def create_template_db(url, schema_dict=None, schema_sql=None):
     :type schema_dict: dict
     :param schema_dict: dictionary defining database schema
 
+    Each entry in the dictionary is the name of a table to be defined, the value of each entry is a dictionary that
+    defines the table, it has the following entries:
+
+    * "columns" - defines the table columns
+
+       each entry in the dictionary is the name of a column to be defined, the value of each entry is a dictionary that
+       defines the column, this has entries:
+
+       - "type" - defines the column type, value should be python type
+       - "foreign_key" (optional) - defines if column is foreign key to reference table. Value is dictionary structured
+         as: `{"reference_table": "<table_name>", "reference_column": "column_name"}`.
+         NB: This is not supported for defining sqlite databases. If this is required, please define as SQL command
+         (option b)
+       - other entries may be kwargs supported by dataset.table.Table.create_column
+
+    * "primary_key" - defines the tables primary key, value is the column name.
+    * other entries may be kwargs supported by dataset.database.Database.create_table
+
     :type schema_sql: str
     :param schema_sql: sql command to create database schema
+
+    Databases may be defined with SQL commands as strings
 
     :return: Initialised database
     :rtype: dataset.Database
@@ -106,6 +126,24 @@ class DatabaseUtil:
 
         :type schema_dict: dict
         :param schema_dict: dictionary defining database schema
+
+        Each entry in the dictionary is the name of a table to be defined, the value of each entry is a dictionary that
+        defines the table, it has the following entries:
+
+        * "columns" - defines the table columns
+
+           each entry in the dictionary is the name of a column to be defined, the value of each entry is a dictionary
+           that defines the column, this has entries:
+
+           - "type" - defines the column type, value should be python type
+           - "foreign_key" (optional) - defines if column is foreign key to reference table. Value is dictionary
+             structured as: `{"reference_table": "<table_name>", "reference_column": "column_name"}`.
+             NB: This is not supported for defining sqlite databases. If this is required, please define as SQL command
+             (option b)
+           - other entries may be kwargs supported by dataset.table.Table.create_column
+        
+        * "primary_key" - defines the tables primary key, value is the column name.
+        * other entries may be kwargs supported by dataset.database.Database.create_table
         """
 
         db.begin()
