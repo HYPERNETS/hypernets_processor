@@ -97,7 +97,7 @@ L1A_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance",  # example of irra
                     "inputfile_directory": "data_io/tests/reader/SEQ20200312T135926/RADIOMETER/"
                     }
 
-W_L1B_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
+W_L1C_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
                                " radiance and water leaving radiance",  # example of irradiance file
                       "product_name": "HYPSTAR_W_BSBE_L1B_WLR_202002041130_v01.0.nc",
                       "product_version": "01.0",
@@ -124,7 +124,7 @@ W_L1B_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irr
                       }
 
 
-L_L1B_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradiance",  # example of irradiance file
+L_L1C_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradiance",  # example of irradiance file
                   "product_name": "HYPSTAR_L_GBNA_L1B_RAD_202002041130_v01.0.nc",
                   "product_version": "01.0",
                   "history": "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
@@ -358,8 +358,12 @@ METADATA_DEFS = {"L0_RAD": {**COMMON_METADATA},
                  "W_L1A_RAD": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **L1A_RAD_METADATA},
                  "L_L1A_IRR": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA},
                  "W_L1A_IRR": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **L1A_IRR_METADATA},
-                 "L_L1B": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L_L1B_METADATA},
-                 "W_L1B": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **W_L1B_WLR_METADATA},
+                 "L_L1B_RAD": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L1A_RAD_METADATA},
+                 "W_L1B_RAD": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **L1A_RAD_METADATA},
+                 "L_L1B_IRR": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA},
+                 "W_L1B_IRR": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **L1A_IRR_METADATA},
+                 "L_L1C": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L_L1C_METADATA},
+                 "W_L1C": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **W_L1C_WLR_METADATA},
                  "L_L2A": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L_L2A_REF_METADATA},
                  "W_L2A": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **W_L2A_REF_METADATA},
                  "L_L2B": {**COMMON_METADATA, **LAND_NETWORK_METADATA},
