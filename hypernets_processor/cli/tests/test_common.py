@@ -4,10 +4,10 @@ Tests for common module
 
 import unittest
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.common import read_config_file, read_std_config, read_scheduler_config_file, \
-    read_processor_config_file, read_job_config_file, read_jobs_list
+from hypernets_processor.cli.common import read_config_file, read_jobs_list
 from configparser import RawConfigParser
 import os
+import shutil
 
 
 '''___Authorship___'''
@@ -21,110 +21,54 @@ __status__ = "Development"
 
 this_directory = os.path.dirname(__file__)
 
-# Test file paths
-scheduler_config_fname = os.path.join(this_directory, "config_files", "scheduler.config")
-scheduler_config_default_fname = os.path.join(this_directory, "config_files", "scheduler_defaults.config")
-scheduler_config_empty_fname = os.path.join(this_directory, "config_files", "scheduler_empty.config")
 
-processor_config_fname = os.path.join(this_directory, "config_files", "processor.config")
-processor_config_default_fname = os.path.join(this_directory, "config_files", "processor_defaults.config")
+def create_config_file(fname):
+    text = "[Section]\nentry: value"
 
-job_config_fname = os.path.join(this_directory, "config_files", "job1.config")
-job_config_default_fname = os.path.join(this_directory, "config_files", "job1_defaults.config")
-job_config_empty_fname = os.path.join(this_directory, "config_files", "job1_empty.config")
+    with open(fname, "w") as f:
+        f.write(text)
+    return None
 
-jobs_list_fname = os.path.join(this_directory, "config_files", "jobs.list")
+
+def create_jobs_list_file(fname):
+    os.mkdir("config_test")
+    with open("config_test/job1.config", "w") as f:
+        f.write(" ")
+    with open("config_test/job2.config", "w") as f:
+        f.write(" ")
+
+    text = "job1.config\njob2.config"
+
+    with open(fname, "w") as f:
+        f.write(text)
+    return None
 
 
 class TestCommon(unittest.TestCase):
     def test_read_config_file(self):
-        c = read_config_file(scheduler_config_fname)
-        self.assertEqual(type(c), RawConfigParser)
+        fname = "file.config"
+        create_config_file(fname)
 
-    def test_std_config(self):
-        c = read_config_file(scheduler_config_fname)
-        d = read_std_config(c)
-        self.assertEqual(type(d), dict)
-        self.assertCountEqual(["log_path", "verbose", "quiet"], d.keys())
+        config = read_config_file(fname)
 
-        d["log_path"] = "test.log"
-        d["verbose"] = True
-        d["quiet"] = True
+        self.assertEqual(type(config), RawConfigParser)
+        self.assertEqual(config["Section"]["entry"], "value")
 
-    def test_std_config_defaults(self):
-        c = read_config_file(scheduler_config_empty_fname)
-        d = read_std_config(c)
-        self.assertEqual(type(d), dict)
-        self.assertCountEqual(["log_path", "verbose", "quiet"], d.keys())
-
-        d["log_path"] = None
-        d["verbose"] = False
-        d["quiet"] = False
-
-    def test_read_schedule_config_file(self):
-        d = read_scheduler_config_file(scheduler_config_fname)
-        self.assertEqual(type(d), dict)
-        self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
-
-        d["seconds"] = 10
-        d["minutes"] = None
-        d["hours"] = None
-        d["start_time"] = "now"
-        d["parallel"] = True
-
-    def test_read_schedule_config_file_defaults(self):
-        d = read_scheduler_config_file(scheduler_config_default_fname)
-        self.assertEqual(type(d), dict)
-        self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
-
-        d["seconds"] = None
-        d["minutes"] = 12
-        d["hours"] = None
-        d["start_time"] = None
-        d["parallel"] = False
-
-    def test_read_schedule_config_file_empty(self):
-        with self.assertRaises(ValueError):
-            read_scheduler_config_file(scheduler_config_empty_fname)
-
-    def test_read_processor_file_config(self):
-        d = read_processor_config_file(processor_config_fname)
-        self.assertEqual(type(d), dict)
-        self.assertEqual(len(d.keys()), 0)
-
-    def test_read_processor_config_file_defaults(self):
-        d = read_processor_config_file(processor_config_default_fname)
-        self.assertEqual(type(d), dict)
-        self.assertCountEqual([], d.keys())
-
-    def test_read_job_config_file(self):
-        d = read_job_config_file(job_config_fname)
-        self.assertEqual(type(d), dict)
-        self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
-
-        d["name"] = "test_job_name"
-
-    def test_read_job_config_file_defaults(self):
-        d = read_job_config_file(job_config_default_fname)
-        self.assertEqual(type(d), dict)
-        self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
-
-        d["name"] = job_config_default_fname
-
-    def test_read_job_config_file_empty(self):
-        d = read_job_config_file(job_config_empty_fname)
-        self.assertEqual(type(d), dict)
-        self.assertTrue({"log_path", "verbose", "quiet"} <= set(d.keys()))
-
-        d["name"] = job_config_empty_fname
+        os.remove(fname)
 
     def test_read_jobs_list(self):
-        jobs = read_jobs_list(jobs_list_fname)
 
-        expected_jobs = [os.path.abspath(os.path.join(this_directory, "config_files", "job1.config")),
-                         os.path.abspath(os.path.join(this_directory, "config_files", "job2.config"))]
+        fname = "config_test/file.config"
+        create_jobs_list_file(fname)
+
+        jobs = read_jobs_list(fname)
+
+        expected_jobs = [os.path.abspath(os.path.join(this_directory, "config_test", "job1.config")),
+                         os.path.abspath(os.path.join(this_directory, "config_test", "job2.config"))]
 
         self.assertCountEqual(jobs, expected_jobs)
+
+        shutil.rmtree("config_test")
 
 
 if __name__ == "__main__":

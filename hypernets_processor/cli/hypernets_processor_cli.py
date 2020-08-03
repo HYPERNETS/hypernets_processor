@@ -3,7 +3,7 @@ hypernets_processor cli
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.common import configure_std_parser, read_processor_config_file, read_job_config_file
+from hypernets_processor.cli.common import configure_std_parser, read_config_file
 from hypernets_processor.cli.hypernets_processor_main import main
 
 
@@ -50,8 +50,8 @@ def cli():
     """
 
     # unpack parsed_args
-    processor_config = read_processor_config_file(parsed_args.p)
-    job_config = read_job_config_file(parsed_args.j)
+    processor_config = read_config_file(parsed_args.p)
+    job_config = read_config_file(parsed_args.j)
 
     # run main
     main(processor_config=processor_config,

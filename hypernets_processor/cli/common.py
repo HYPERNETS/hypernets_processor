@@ -20,7 +20,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def configure_logging(fname=None, verbose=False, quiet=False):
+def configure_logging(fname=None, verbose=None, quiet=None, config=None):
     """
     Configure logger
 
@@ -33,9 +33,18 @@ def configure_logging(fname=None, verbose=False, quiet=False):
     :type quiet: bool
     :param quiet: Option for quiet log output (WARNING level)
 
+    :type config: configparser.RawConfigParser
+    :param config: Config file with logging configuration information. This finds fname, verbose and quiet if not
+    specifed as arguments
+
     :return: logger
     :rtype: logging.logger
     """
+
+    if config is not None:
+        fname = config["Log"]["path"] if ("path" in config["Log"].keys()) and (fname is None) else None
+        verbose = bool(config["Log"]["verbose"]) if ("verbose" in config["Log"].keys()) and (verbose is None) else False
+        quiet = bool(config["Log"]["quiet"]) if ("quiet" in config["Log"].keys()) and (quiet is None) else False
 
     # Configure logger
     logger = logging.getLogger(__name__)
@@ -115,132 +124,6 @@ def read_config_file(fname):
     return config
 
 
-def read_std_config(config):
-    """
-    Returns standard configuration information from configuration file
-
-    :type config: config.RawConfig
-    :param config: path of configuration file
-
-    :rtype: dict
-    :return: standard configuration information, with entries (defaults occur if entry omitted from config file):
-
-    * log_path (str) - Path to write log to, default None (means log goes to stdout)
-    * verbose (bool) - Switch for verbose output, default False
-    * quiet (bool) - Switch for quiet output, default False
-
-    """
-
-    config_dict = dict()
-
-    # Logging Configuration
-    config_dict["log_path"] = None
-    config_dict["verbose"] = False
-    config_dict["quiet"] = False
-    if "Log" in config.keys():
-        config_dict["log_path"] = config["Log"]["path"] if "verbose" in config["Log"].keys() else None
-        config_dict["verbose"] = bool(config["Log"]["verbose"]) if "verbose" in config["Log"].keys() else False
-        config_dict["quiet"] = bool(config["Log"]["quiet"]) if "quiet" in config["Log"].keys() else False
-
-    return config_dict
-
-
-def read_scheduler_config_file(fname):
-    """
-    Returns information from scheduler configuration file
-
-    :type fname: str
-    :param fname: path of configuration file
-
-    :rtype: dict
-    :return: scheduler configuration information, with entries (defaults occur if entry omitted from config file):
-
-    * seconds (int) - Scheduled job repeat interval in seconds, default None (if not None minutes and hours are None)
-    * minutes (int) - Scheduled job repeat interval in minutes, default None (if not None seconds and hours are None)
-    * hours (int) - Scheduled job repeat interval in hour, default None (if not None seconds and minutes are None)
-    * start_time (datetime.datetime) - Scheduled time to start running tasks, default None (means start now)
-    * parallel (bool) - Switch to run scheduled jobs on different threads, default False
-    * log_path (str) - Path to write log to, default None (means log goes to stdout)
-    * verbose (bool) - Switch for verbose output, default False
-    * quiet (bool) - Switch for quiet output, default False
-
-    """
-
-    scheduler_config = read_config_file(fname)
-
-    scheduler_config_dict = read_std_config(scheduler_config)
-
-    # Schedule Configuration
-    scheduler_config_dict["seconds"] = scheduler_config["Schedule"]["seconds"] if "seconds" in \
-                                           scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["minutes"] = scheduler_config["Schedule"]["minutes"] if "minutes" in \
-                                           scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["hours"] = scheduler_config["Schedule"]["hours"] if "hours" in \
-                                         scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["start_time"] = scheduler_config["Schedule"]["start_time"] if "start_time" in \
-                                             scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["parallel"] = scheduler_config["Schedule"]["parallel"] if "parallel" in \
-                                            scheduler_config["Schedule"].keys() else False
-
-    # Checks
-    # Check only have hours, minutes or seconds
-    intervals = [scheduler_config_dict["seconds"], scheduler_config_dict["minutes"], scheduler_config_dict["hours"]]
-    if intervals.count(None) != 2:
-        raise ValueError("Scheduled job repeat interval must be defined as 1 of seconds, minutes or hours")
-
-    return scheduler_config_dict
-
-
-def read_processor_config_file(fname):
-    """
-    Returns information from processor configuration file
-
-    :type fname: str
-    :param fname: path of configuration file
-
-    :rtype: dict
-    :return: processor configuration information, with entries (defaults occur if entry omitted from config file):
-
-    * ...
-
-    """
-
-    processor_config = read_config_file(fname)
-    processor_config_dict = dict()
-
-    # todo - read processor config information
-
-    return processor_config_dict
-
-
-def read_job_config_file(fname):
-    """
-    Returns information from job configuration file
-
-    :type fname: str
-    :param fname: path of configuration file
-
-    :rtype: dict
-    :return: job configuration information, with entries (defaults occur if entry omitted from config file):
-
-    * name (str) - Job name, default path of job config file
-    * log_path (str) - Path to write log to, default None (means log goes to stdout)
-    * verbose (bool) - Switch for verbose output, default False
-    * quiet (bool) - Switch for quiet output, default False
-
-    """
-
-    job_config = read_config_file(fname)
-    job_config_dict = read_std_config(job_config)
-
-    # Job Configuration
-    job_config_dict["name"] = fname
-    if "Job" in job_config.keys():
-        job_config_dict["name"] = job_config["Job"]["name"] if "name" in job_config["Job"].keys() else fname
-
-    return job_config_dict
-
-
 def read_jobs_list(fname):
     """
     Return job config paths from jobs list file
@@ -253,8 +136,9 @@ def read_jobs_list(fname):
     """
 
     # Read lines for file
-    with open(fname) as f:
-        jobs = [relative_path(line.rstrip(), os.path.dirname(fname)) for line in f]
+    with open(fname, "r") as f:
+        #lines = [line.rstrip() for line in f.readlines()]
+        jobs = [relative_path(line.rstrip(), os.path.dirname(fname)) for line in f.readlines()]
 
     return jobs
 

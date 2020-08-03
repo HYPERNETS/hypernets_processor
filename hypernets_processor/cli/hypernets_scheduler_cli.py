@@ -4,7 +4,7 @@ scheduler for hypernets_processor jobs cli
 
 from hypernets_processor.version import __version__
 from hypernets_processor.cli.hypernets_scheduler_main import main
-from hypernets_processor.cli.common import read_jobs_list, read_scheduler_config_file, read_processor_config_file
+from hypernets_processor.cli.common import read_jobs_list, read_config_file
 import argparse
 
 
@@ -57,8 +57,8 @@ def cli():
 
     # unpack parsed_args
     jobs_list = read_jobs_list(parsed_args.l)
-    processor_config = read_processor_config_file(parsed_args.p)
-    scheduler_config = read_scheduler_config_file(parsed_args.s)
+    processor_config = read_config_file(parsed_args.p)
+    scheduler_config = read_config_file(parsed_args.s)
 
     # run main
     main(jobs_list=jobs_list,
