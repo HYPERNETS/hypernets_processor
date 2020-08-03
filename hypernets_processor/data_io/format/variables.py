@@ -210,6 +210,11 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                                                       "long_name": "Digital number, raw data",
                                                       "units": "-"},
                                        "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}
+                    # "series_id": {"dim": [SCAN_DIM],
+                    #                "dtype": np.chararray,
+                    #                "attributes": {"standard_name": "series_id",
+                    #                               "long_name": "series_id",
+                    #                               "units": "-"}}
                     }
 
 L0_IRR_VARIABLES = L0_RAD_VARIABLES
