@@ -19,8 +19,8 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 SCHEDULE_CONFIG_DICT = {"minutes": 3,
-                        "seconds": None,
-                        "hours": None,
+                        "seconds": "",
+                        "hours": "",
                         "start_time": "2",
                         "parallel": False}
 
@@ -74,7 +74,12 @@ class TestHypernetsSchedulerMain(unittest.TestCase):
         d = unpack_scheduler_config(schedule_config)
         self.assertEqual(type(d), dict)
 
-        self.assertDictEqual(SCHEDULE_CONFIG_DICT, d)
+        expected_d = {"minutes": 3,
+                      "seconds": None,
+                      "hours": None,
+                      "start_time": "2",
+                      "parallel": False}
+        self.assertDictEqual(expected_d, d)
 
 
 if __name__ == "__main__":

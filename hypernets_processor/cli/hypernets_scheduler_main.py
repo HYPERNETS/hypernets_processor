@@ -4,6 +4,7 @@ Main function for hypernets_scheduler_cli to run
 
 from hypernets_processor.version import __version__
 from hypernets_processor.cli.common import configure_logging, read_config_file
+from hypernets_processor.utils.config import get_config_value
 from hypernets_processor import Scheduler
 from hypernets_processor.cli.hypernets_processor_main import main as processor_main
 
@@ -38,30 +39,11 @@ def unpack_scheduler_config(scheduler_config):
     scheduler_config_dict = dict()
 
     # Schedule Configuration
-    scheduler_config_dict["seconds"] = scheduler_config["Schedule"]["seconds"] if "seconds" in \
-                                           scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["minutes"] = scheduler_config["Schedule"]["minutes"] if "minutes" in \
-                                           scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["hours"] = scheduler_config["Schedule"]["hours"] if "hours" in \
-                                         scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["start_time"] = scheduler_config["Schedule"]["start_time"] if "start_time" in \
-                                             scheduler_config["Schedule"].keys() else None
-    scheduler_config_dict["parallel"] = scheduler_config["Schedule"]["parallel"] if "parallel" in \
-                                            scheduler_config["Schedule"].keys() else False
-
-    # Sort out types
-    if scheduler_config_dict["seconds"] is not None:
-        scheduler_config_dict["seconds"] = int(scheduler_config_dict["seconds"])
-    if scheduler_config_dict["minutes"] is not None:
-        scheduler_config_dict["minutes"] = int(scheduler_config_dict["minutes"])
-    if scheduler_config_dict["hours"] is not None:
-        scheduler_config_dict["hours"] = int(scheduler_config_dict["hours"])
-
-    if scheduler_config_dict["parallel"] == "False":
-        scheduler_config_dict["parallel"] = False
-
-    if scheduler_config_dict["parallel"] == "True":
-        scheduler_config_dict["parallel"] = True
+    scheduler_config_dict["seconds"] = get_config_value(scheduler_config, "Schedule", "seconds", dtype=int)
+    scheduler_config_dict["minutes"] = get_config_value(scheduler_config, "Schedule", "minutes", dtype=int)
+    scheduler_config_dict["hours"] = get_config_value(scheduler_config, "Schedule", "hours", dtype=int)
+    scheduler_config_dict["start_time"] = get_config_value(scheduler_config, "Schedule", "start_time", dtype=str)
+    scheduler_config_dict["parallel"] = get_config_value(scheduler_config, "Schedule", "seconds", dtype=bool)
 
     # todo - sort out start time format
 
