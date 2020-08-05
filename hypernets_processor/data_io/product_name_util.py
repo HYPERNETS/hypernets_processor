@@ -18,7 +18,7 @@ TIME_FMT_L12A = "%Y%m%d%H%M"
 TIME_FMT_L2B = "%Y%m%d"
 
 
-class FilenameUtil:
+class ProductNameUtil:
     """
     Class to generate Hypernets product filenames
     """
@@ -45,7 +45,7 @@ class FilenameUtil:
         """
 
         time_string = time.strftime(TIME_FMT_L12A)
-        return FilenameUtil._create_file_name(network, site, "RAD", time_string, version)
+        return ProductNameUtil._create_file_name(network, site, "RAD", time_string, version)
 
     @staticmethod
     def create_file_name_l1a_irr(network, site, time, version):
@@ -69,7 +69,7 @@ class FilenameUtil:
         """
 
         time_string = time.strftime(TIME_FMT_L12A)
-        return FilenameUtil._create_file_name(network, site, "IRR", time_string, version)
+        return ProductNameUtil._create_file_name(network, site, "IRR", time_string, version)
 
     @staticmethod
     def create_file_name_l1b(network, site, time, version):
@@ -93,7 +93,7 @@ class FilenameUtil:
         """
 
         time_string = time.strftime(TIME_FMT_L12A)
-        return FilenameUtil._create_file_name(network, site, "L1B", time_string, version)
+        return ProductNameUtil._create_file_name(network, site, "L1B", time_string, version)
 
     @staticmethod
     def create_file_name_l2a(network, site, time, version):
@@ -117,7 +117,7 @@ class FilenameUtil:
         """
 
         time_string = time.strftime(TIME_FMT_L12A)
-        return FilenameUtil._create_file_name(network, site, "REF", time_string, version)
+        return ProductNameUtil._create_file_name(network, site, "REF", time_string, version)
 
     @staticmethod
     def create_file_name_l2b(network, site, time, version):
@@ -141,7 +141,7 @@ class FilenameUtil:
         """
 
         time_string = time.strftime(TIME_FMT_L2B)
-        return FilenameUtil._create_file_name(network, site, "REFD", time_string, version)
+        return ProductNameUtil._create_file_name(network, site, "REFD", time_string, version)
 
     @staticmethod
     def _create_file_name(network, site, ptype, time_string, version):
