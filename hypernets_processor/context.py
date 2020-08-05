@@ -27,6 +27,9 @@ class Context:
         self.metadata_db = None
         self.anomoly_db = None
 
+        # File attributes
+        self.time = None
+
         # Processor Attributes
         # Processor
         self.version = None
