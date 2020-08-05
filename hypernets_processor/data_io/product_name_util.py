@@ -1,5 +1,5 @@
 """
-FilenameUtil class
+ProductNameUtil class
 """
 
 from hypernets_processor.version import __version__
@@ -18,134 +18,71 @@ TIME_FMT_L12A = "%Y%m%d%H%M"
 TIME_FMT_L2B = "%Y%m%d"
 
 
+DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
+                    "L0_IRR": "L0_IRR",
+                    "L_L1A_RAD": "L1A_RAD",
+                    "W_L1A_RAD": "L1A_RAD",
+                    "L_L1A_IRR": "L1A_IRR",
+                    "W_L1A_IRR": "L1A_IRR",
+                    "L_L1B": "L1B",
+                    "W_L1B": "L1B",
+                    "L_L2A": "L2A_REF",
+                    "W_L2A": "L2A_REF",
+                    "L_L2B": "L2B_REF",
+                    "W_L2B": "L2B_REF"}
+
+
 class ProductNameUtil:
     """
-    Class to generate Hypernets product filenames
+    Class to generate Hypernets product product names
     """
 
     @staticmethod
-    def create_file_name_l1a_rad(network, site, time, version):
+    def create_product_name(ds_format, context=None, network=None, site=None, time=None, version=None):
         """
-        Return a valid file name for Hypernets Level 1a radiance file
+        Return a valid product name for Hypernets file
+
+        :type ds_format: str
+        :param ds_format: data product format
+
+        :type context: hypernets_process.context.Context
+        :param context: processor context
 
         :type network: str
-        :param network: abbreviated network name
+        :param network: (optional, overrides value in context) abbreviated network name
 
         :type site: str
-        :param site: abbreviated site name
+        :param site: (optional, overrides value in context) abbreviated site name
 
         :type time: datetime.datetime
-        :param time: acquisition time
+        :param time: (optional, overrides value in context) acquisition time
 
         :type version: str
-        :param version: processing version
+        :param version: (optional, overrides value in context) processing version
 
-        :return: Level 1 filename
+        :return: product name
         :rtype: str
         """
 
-        time_string = time.strftime(TIME_FMT_L12A)
-        return ProductNameUtil._create_file_name(network, site, "RAD", time_string, version)
+        # Unpack params
+        network = context.network if (network is None) and (context is not None) else network
+        site = context.site if (site is None) and (context is not None) else site
+        time = context.time if (time is None) and (context is not None) else time
+        version = context.version if (version is None) and (context is not None) else version
 
-    @staticmethod
-    def create_file_name_l1a_irr(network, site, time, version):
-        """
-        Return a valid file name for Hypernets Level 1a irradiance file
+        # Prepare product name parts
+        ptype = DS_FORMAT_FNAMES[ds_format]
 
-        :type network: str
-        :param network: abbreviated network name
+        time_string = time.strftime(TIME_FMT_L12A) if time is not None else None
+        network = network.upper() if network is not None else None
+        site = site.upper() if network is not None else None
+        version = "v" + version if version is not None else None
 
-        :type site: str
-        :param site: abbreviated site name
+        # Assemble parts
+        product_name_parts = ["HYPERNETS", network, site, ptype, time_string, version]
+        product_name_parts = filter(None, product_name_parts)
 
-        :type time: datetime.datetime
-        :param time: acquisition time
-
-        :type version: str
-        :param version: processing version
-
-        :return: Level 1 filename
-        :rtype: str
-        """
-
-        time_string = time.strftime(TIME_FMT_L12A)
-        return ProductNameUtil._create_file_name(network, site, "IRR", time_string, version)
-
-    @staticmethod
-    def create_file_name_l1b(network, site, time, version):
-        """
-        Return a valid file name for Hypernets Level 1a irradiance file
-
-        :type network: str
-        :param network: abbreviated network name
-
-        :type site: str
-        :param site: abbreviated site name
-
-        :type time: datetime.datetime
-        :param time: acquisition time
-
-        :type version: str
-        :param version: processing version
-
-        :return: Level 1 filename
-        :rtype: str
-        """
-
-        time_string = time.strftime(TIME_FMT_L12A)
-        return ProductNameUtil._create_file_name(network, site, "L1B", time_string, version)
-
-    @staticmethod
-    def create_file_name_l2a(network, site, time, version):
-        """
-        Return a valid file name for Hypernets Level 2a file
-
-        :type network: str
-        :param network: abbreviated network name
-
-        :type site: str
-        :param site: abbreviated site name
-
-        :type time: datetime.datetime
-        :param time: acquisition time
-
-        :type version: str
-        :param version: processing version
-
-        :return: Level 2a filename
-        :rtype: str
-        """
-
-        time_string = time.strftime(TIME_FMT_L12A)
-        return ProductNameUtil._create_file_name(network, site, "REF", time_string, version)
-
-    @staticmethod
-    def create_file_name_l2b(network, site, time, version):
-        """
-        Return a valid file name for Hypernets Level 2b file
-
-        :type network: str
-        :param network: abbreviated network name
-
-        :type site: str
-        :param site: abbreviated site name
-
-        :type time: datetime.datetime
-        :param time: acquisition time
-
-        :type version: str
-        :param version: processing version
-
-        :return: Level 2b filename
-        :rtype: str
-        """
-
-        time_string = time.strftime(TIME_FMT_L2B)
-        return ProductNameUtil._create_file_name(network, site, "REFD", time_string, version)
-
-    @staticmethod
-    def _create_file_name(network, site, ptype, time_string, version):
-        return "_".join(["HYPERNETS", network.upper(), site.upper(), ptype, time_string, "v"+version]) + ".nc"
+        return "_".join(product_name_parts) + ".nc"
 
 
 if __name__ == '__main__':

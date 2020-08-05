@@ -6,6 +6,7 @@ import unittest
 import datetime
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.version import __version__
+from hypernets_processor.test.test_functions import setup_test_context
 
 
 '''___Authorship___'''
@@ -19,31 +20,26 @@ __status__ = "Development"
 
 class TestProductNameUtil(unittest.TestCase):
 
-    def test_create_file_name_l1a_irr(self):
+    def test_create_product_name_context(self):
 
-        fname = ProductNameUtil.create_file_name_l1a_irr("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_IRR_201804031100_v0.00.nc", fname)
+        context = setup_test_context()
+        context.time = datetime.datetime(2018, 4, 3, 11, 0, 0)
+        pnu = ProductNameUtil()
+        pname = pnu.create_product_name("L_L1A_RAD", context=context)
+        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0.nc", pname)
 
-    def test_create_file_name_l1a_rad(self):
+    def test_create_product_name_params(self):
 
-        fname = ProductNameUtil.create_file_name_l1a_rad("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_RAD_201804031100_v0.00.nc", fname)
+        pnu = ProductNameUtil()
+        pname = pnu.create_product_name("L_L1A_RAD", network="land", site="site", version="0.0",
+                                        time=datetime.datetime(2018, 4, 3, 11, 0, 0))
+        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0.nc", pname)
 
-    def test_create_file_name_l1b(self):
+    def test_create_product_name_none(self):
 
-        fname = ProductNameUtil.create_file_name_l1b("W", "BSBE", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_W_BSBE_L1B_201804031100_v0.00.nc", fname)
-
-
-    def test_create_file_name_l2a(self):
-
-        fname = ProductNameUtil.create_file_name_l2a("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_REF_201804031100_v0.00.nc", fname)
-
-    def test_create_file_name_l2b(self):
-
-        fname = ProductNameUtil.create_file_name_l2b("L", "GBNA", datetime.datetime(2018, 4, 3, 11, 00, 00), "0.00")
-        self.assertEqual("HYPERNETS_L_GBNA_REFD_20180403_v0.00.nc", fname)
+        pnu = ProductNameUtil()
+        pname = pnu.create_product_name("L_L1A_RAD")
+        self.assertEqual("HYPERNETS_L1A_RAD.nc", pname)
 
 
 if __name__ == '__main__':
