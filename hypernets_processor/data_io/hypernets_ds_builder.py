@@ -25,8 +25,7 @@ class HypernetsDSBuilder:
     """
 
     @staticmethod
-    def create_ds_template(dim_sizes_dict, ds_format, site=None, time=None, propagate_ds=None,
-                           metadata_db=None, metadata_db_query=None,
+    def create_ds_template(dim_sizes_dict, ds_format, context=None, propagate_ds=None,
                            variables_dict_defs=VARIABLES_DICT_DEFS, metadata_defs=METADATA_DEFS):
         """
         Returns empty Hypernets dataset
@@ -36,6 +35,9 @@ class HypernetsDSBuilder:
 
         :type ds_format: str
         :param ds_format: product format string
+
+        :type context: hypernets_processor.context.Context
+        :param context: processor context
 
         :type propagate_ds: xarray.Dataset
         :param propagate_ds: (optional) template dataset is populated with data from propagate_ds for their variables
@@ -62,17 +64,28 @@ class HypernetsDSBuilder:
                             str(variables_dict_defs.keys()))
 
         # Find metadata def
+        metadata = {}
         if ds_format in metadata_defs.keys():
             metadata = metadata_defs[ds_format]
 
         else:
             raise RuntimeWarning("No metadata found for file type " + str(ds_format))
 
-        # todo - should get metadata_db and build query from context
+        metadata_db = None
+        metadata_db_query = None
 
-        # # Set product_name metadata
-        # pu = ProductNameUtil
-        # metadata["product_name"] = pu.create_file_name_l1a_rad(network, site, time, version)
+        if context is not None:
+
+            metadata_db = context.metadata_db
+
+            # Evaluate queries for metadata_db to populate product metadata
+            metadata_db_query = None
+            if context.metadata_db is not None:
+                metadata_db_query = {}
+
+        # Set product_name metadata
+        pu = ProductNameUtil()
+        metadata["product_name"] = pu.create_product_name(ds_format, context=context)
 
         return create_template_dataset(variables_dict, dim_sizes_dict, metadata=metadata, propagate_ds=propagate_ds,
                                        metadata_db=metadata_db, metadata_db_query=metadata_db_query)
