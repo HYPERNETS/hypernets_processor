@@ -6,6 +6,7 @@ from hypernets_processor.data_io.hypernets_db_builder import HypernetsDBBuilder
 from hypernets_processor.context import Context
 from hypernets_processor.cli.common import read_config_file, configure_logging
 from hypernets_processor.utils.paths import relative_path
+import datetime
 import os
 import shutil
 
@@ -167,6 +168,8 @@ def setup_test_context(raw_data_directory=None, archive_directory=None, anomoly_
 
         del context.anomoly_db
         context.anomoly_db = None
+    
+    context.time = datetime.datetime(2021, 4, 3, 11, 21, 15)
 
     return context
 
