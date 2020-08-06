@@ -161,6 +161,13 @@ def setup_test_context(raw_data_directory=None, archive_directory=None, anomoly_
 
     context = Context(processor_config=processor_config, job_config=job_config, logger=logger)
 
+    if not create_dbs:
+        del context.metadata_db
+        context.metadata_db = None
+
+        del context.anomoly_db
+        context.anomoly_db = None
+
     return context
 
 
