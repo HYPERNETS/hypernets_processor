@@ -24,8 +24,10 @@ class HypernetsDSBuilder:
     formats, metadata database and interfacing with the TemplateUtil tool.
     """
 
-    @staticmethod
-    def create_ds_template(dim_sizes_dict, ds_format, context=None, propagate_ds=None,
+    def __init__(self, context=None):
+        self.context = context
+
+    def create_ds_template(self, dim_sizes_dict, ds_format, propagate_ds=None,
                            variables_dict_defs=VARIABLES_DICT_DEFS, metadata_defs=METADATA_DEFS):
         """
         Returns empty Hypernets dataset
@@ -35,9 +37,6 @@ class HypernetsDSBuilder:
 
         :type ds_format: str
         :param ds_format: product format string
-
-        :type context: hypernets_processor.context.Context
-        :param context: processor context
 
         :type propagate_ds: xarray.Dataset
         :param propagate_ds: (optional) template dataset is populated with data from propagate_ds for their variables
@@ -74,18 +73,18 @@ class HypernetsDSBuilder:
         metadata_db = None
         metadata_db_query = None
 
-        if context is not None:
+        if self.context is not None:
 
-            metadata_db = context.metadata_db
+            metadata_db = self.context.metadata_db
 
             # Evaluate queries for metadata_db to populate product metadata
             metadata_db_query = None
-            if context.metadata_db is not None:
+            if self.context.metadata_db is not None:
                 metadata_db_query = {}
 
         # Set product_name metadata
         pu = ProductNameUtil()
-        metadata["product_name"] = pu.create_product_name(ds_format, context=context)
+        metadata["product_name"] = pu.create_product_name(ds_format, context=self.context)
 
         return create_template_dataset(variables_dict, dim_sizes_dict, metadata=metadata, propagate_ds=propagate_ds,
                                        metadata_db=metadata_db, metadata_db_query=metadata_db_query)
