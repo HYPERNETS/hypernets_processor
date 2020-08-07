@@ -18,6 +18,7 @@ dependencies:
   - pysolar >= 0.8
   - dataset
   - sqlalchemy-utils
+  - psycopg2
   #
   # for testing only
   #
