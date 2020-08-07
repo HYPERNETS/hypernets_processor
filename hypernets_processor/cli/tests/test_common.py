@@ -30,16 +30,17 @@ def create_config_file(fname):
     return None
 
 
-def create_jobs_list_file(fname):
-    os.mkdir("config_test")
-    with open("config_test/job1.config", "w") as f:
+def create_jobs_list_file(directory, fname):
+
+    os.mkdir(directory)
+    with open(os.path.join(directory, "job1.config"), "w") as f:
         f.write(" ")
-    with open("config_test/job2.config", "w") as f:
+    with open(os.path.join(directory, "job2.config"), "w") as f:
         f.write(" ")
 
     text = "job1.config\njob2.config"
 
-    with open(fname, "w") as f:
+    with open(os.path.join(directory, fname), "w") as f:
         f.write(text)
     return None
 
@@ -57,18 +58,18 @@ class TestCommon(unittest.TestCase):
         os.remove(fname)
 
     def test_read_jobs_list(self):
+        test_dir = os.path.join(this_directory, "config_test")
+        fname = "file.config"
+        create_jobs_list_file(test_dir, fname)
 
-        fname = "config_test/file.config"
-        create_jobs_list_file(fname)
+        jobs = read_jobs_list(os.path.abspath(os.path.join(test_dir, "file.config")))
 
-        jobs = read_jobs_list(fname)
-
-        expected_jobs = [os.path.abspath(os.path.join(this_directory, "config_test", "job1.config")),
-                         os.path.abspath(os.path.join(this_directory, "config_test", "job2.config"))]
+        expected_jobs = [os.path.abspath(os.path.join(test_dir, "job1.config")),
+                         os.path.abspath(os.path.join(test_dir, "job2.config"))]
 
         self.assertCountEqual(jobs, expected_jobs)
 
-        shutil.rmtree("config_test")
+        shutil.rmtree(test_dir)
 
 
 if __name__ == "__main__":
