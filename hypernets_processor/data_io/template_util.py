@@ -1,6 +1,7 @@
 """
 TemplateUtil class
 """
+from copy import deepcopy
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 import xarray
@@ -35,6 +36,12 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
     (e.g. times, etc.).
 
     N.B. propagates data only, not variables as a whole with attributes etc.
+
+    :type metadata_db: dataset.Database
+    :param metadata_db: metadata database
+
+    :type metadata_db_query: dict
+    :param metadata_db_query: database query, must find unique value
 
     :return ds: template dataset
     :rtype: xarray.Dataset
@@ -88,7 +95,6 @@ class TemplateUtil:
         du = DatasetUtil()
 
         for variable_name in variables_dict.keys():
-            print(variable_name)
 
             variable_attrs = variables_dict[variable_name]
 
@@ -98,7 +104,7 @@ class TemplateUtil:
             # Unpack variable attributes
             dtype = variable_attrs["dtype"]
             dim_names = variable_attrs["dim"]
-            attributes = variable_attrs["attributes"] if "attributes" in variable_attrs else None
+            attributes = deepcopy(variable_attrs["attributes"]) if "attributes" in variable_attrs else None
 
             # Determine variable shape from dims
             try:
@@ -209,20 +215,37 @@ class TemplateUtil:
 
     @staticmethod
     def find_metadata(metadata, db, query):
+        """
+        Populate metadata dictionary with values from database query
 
-        # todo - query should define table name
-        # todo - run multiple queries
-        row = db["table"].find_one(**query)
+        :type metadata: dict
+        :param metadata: dictionary of dataset metadata
 
-        if row is None:
-            raise LookupError("query does not find unique metadata value")
+        :type db: dataset.Database
+        :param db: metadata database
 
-        not_required_keys = [key for key in row.keys() if key not in metadata.keys()]
+        :type query: dict/list
+        :param query: database query, defined as {"table_name": query_dict} where query_dict defines. Can be a list of
+        such database queries
+        """
 
-        for key in not_required_keys:
-            row.pop(key)
+        if isinstance(query, dict):
+            query = [query]
 
-        metadata.update(row)
+        for q in query:
+            table_name = list(q.keys())[0]
+
+            row = deepcopy(db[table_name].find_one(**q[table_name]))
+
+            if row is None:
+                raise LookupError("query does not find unique metadata value")
+
+            not_required_keys = [key for key in row.keys() if key not in metadata.keys()]
+
+            for key in not_required_keys:
+                row.pop(key)
+
+            metadata.update(row)
 
         return metadata
 
