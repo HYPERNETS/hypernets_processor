@@ -27,7 +27,12 @@ TEST_SCHEMA = {"table": {"columns": {"lookup": {"type": str},
                                      "metadata": {"type": str}
                                      },
                          },
+               "table2": {"columns": {"search": {"type": str},
+                                      "datameta": {"type": str}
+                                      },
+                          }
                }
+
 
 def create_test_db(url):
 
@@ -39,8 +44,11 @@ def create_test_db(url):
         tx['table'].insert(dict(lookup='lookup_value2', metadata='metadata_value2'))
         tx['table'].insert(dict(lookup='lookup_value3', metadata='metadata_value3'))
 
-    return db
+        tx['table2'].insert(dict(search='search_value1', datameta='datameta_value1'))
+        tx['table2'].insert(dict(search='search_value2', datameta='datameta_value2'))
+        tx['table2'].insert(dict(search='search_value3', datameta='datameta_value3'))
 
+    return db
 
 
 class TestTemplateUtil(unittest.TestCase):
@@ -291,11 +299,27 @@ class TestTemplateUtil(unittest.TestCase):
 
         metadata = {"metadata": None, "other": None}
 
-        query = {"lookup": "lookup_value2"}
+        query = {"table": {"lookup": "lookup_value2"}}
 
         metadata = TemplateUtil.find_metadata(metadata, db, query)
 
         self.assertDictEqual(metadata, {"metadata": "metadata_value2", "other": None})
+
+        del db
+        os.remove(temp_name)
+
+    def test_create_ds_template_metadata_db_list_query(self):
+        temp_name = ''.join(random.choices(string.ascii_lowercase, k=6)) + ".db"
+        url = "sqlite:///" + temp_name
+        db = create_test_db(url)
+
+        metadata = {"metadata": None, "datameta": None, "other": None}
+
+        query = [{"table": {"lookup": "lookup_value2"}}, {"table2": {"search": "search_value1"}}]
+
+        metadata = TemplateUtil.find_metadata(metadata, db, query)
+
+        self.assertDictEqual(metadata, {"metadata": "metadata_value2", "datameta": "datameta_value1", "other": None})
 
         del db
         os.remove(temp_name)
