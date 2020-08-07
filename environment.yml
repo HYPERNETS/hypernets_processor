@@ -3,6 +3,7 @@ name: hypernets_processor
 channels:
   - conda-forge
   - defaults
+  - coecms
 dependencies:
   - python=3.7*
   #
@@ -15,7 +16,7 @@ dependencies:
   - schedule>=0.6.0
   - matplotlib >= 3.1.3
   - pysolar >= 0.8
-  - dataset >= 1.3.2
+  - dataset
   #
   # for testing only
   #
