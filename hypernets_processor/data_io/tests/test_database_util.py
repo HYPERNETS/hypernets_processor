@@ -163,7 +163,6 @@ class TestDatabaseUtil(unittest.TestCase):
         self.assertEqual(dbu.get_db_type(str), UnicodeText)
         self.assertEqual(dbu.get_db_type(date), Date)
         self.assertEqual(dbu.get_db_type(datetime), DateTime)
-        self.assertEqual(dbu.get_db_type(dict), JSON)
 
     def test_apply_schema_dict_sqlite(self):
         temp_name = ''.join(random.choices(string.ascii_lowercase, k=6)) + ".db"

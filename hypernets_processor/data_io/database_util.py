@@ -260,8 +260,6 @@ class DatabaseUtil:
             return db_types.datetime
         elif python_type == date:
             return db_types.date
-        elif python_type == dict:
-            return db_types.json
         else:
             return db_types.text
 
