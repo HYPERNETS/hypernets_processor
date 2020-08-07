@@ -5,7 +5,7 @@ DatabaseUtil class
 from hypernets_processor.version import __version__
 import dataset
 from dataset.types import Types
-from copy import copy
+from copy import copy, deepcopy
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import make_url
 from sqlalchemy_utils import drop_database
@@ -147,6 +147,8 @@ class DatabaseUtil:
         """
 
         db.begin()
+
+        schema_dict = deepcopy(schema_dict)
 
         table_names = schema_dict.keys()
 
