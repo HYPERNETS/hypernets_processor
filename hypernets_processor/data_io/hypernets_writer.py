@@ -20,16 +20,19 @@ class HypernetsWriter:
     Class to write Hypernets output files
     """
 
-    @staticmethod
-    def write(ds, path, overwrite=False, fmt='netCDF4', compression_level=None):
+    def __init__(self, context=None):
+        self.context = context
+
+    def write(self, ds, directory=None, overwrite=False, fmt='netcdf4', compression_level=None):
         """
         Write xarray dataset to file
 
         :type ds: xarray.Dataset
         :param ds: dataset
 
-        :type path: str
-        :param path: file path
+        :type directory: str
+        :param directory: (optional, required if self.context is None) directory to write to.
+        overwrites directory determined from self.context
 
         :type overwrite: bool
         :param overwrite: set to true to overwrite existing file
@@ -41,13 +44,25 @@ class HypernetsWriter:
         :param compression_level: the file compression level if 'netCDF4' fmt, 0 - 9 (default is 5)
         """
 
+        if (fmt.lower() == 'netcdf4') or (fmt.lower() == 'netcdf'):
+            fmt = "nc"
+
+        if directory is None:
+            if self.context is None:
+                raise ValueError("cannot write without either the self.context or directory parameters specified")
+
+            directory = os.path.join(self.context.archive_directory, self.context.site, str(self.context.time.year),
+                                     str(self.context.time.month), str(self.context.time.day))
+
+        path = os.path.join(directory, ds.attrs["product_name"]) + "." + fmt
+
         if os.path.isfile(path):
             if overwrite is True:
                 os.remove(path)
             else:
                 raise IOError("The file already exists: " + path)
 
-        if (fmt.lower() == 'netcdf4') or (fmt.lower() == 'netcdf'):
+        if fmt == 'nc':
             HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
 
         elif fmt == 'csv':
