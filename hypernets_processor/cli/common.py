@@ -20,6 +20,12 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
+this_directory = os.path.dirname(__file__)
+etc_directory = os.path.join(os.path.dirname(this_directory), "etc")
+PROCESSOR_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
+SCHEDULER_CONFIG_PATH = os.path.join(etc_directory, "scheduler.config")
+
+
 def configure_logging(fname=None, verbose=None, quiet=None, config=None):
     """
     Configure logger
