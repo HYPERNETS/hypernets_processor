@@ -6,6 +6,9 @@ python:
   # - "3.5"
   - "3.7"
 
+services:
+  - postgresql
+
 install:
   - sudo apt-get update
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
