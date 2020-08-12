@@ -1,4 +1,4 @@
-<img alt="Hypernets Processor" align="left" src="https://www.hypernets.eu/assets/logos/hypernets-logo-f0f74651c5223716ecfefd1b53ba9410e1d93b5f8b0c95c1e91e952585c96405.png" width=130 />
+<img alt="Hypernets Processor" align="left" src="docs/images/hypernets-logo.png" width=110 />
 
 # hypernets_processor
 [![Build Status](https://travis-ci.org/HYPERNETS/hypernets_processor.svg?branch=master)](https://travis-ci.org/HYPERNETS/hypernets_processor) [![codecov](https://codecov.io/gh/HYPERNETS/hypernets_processor/branch/master/graph/badge.svg)](https://codecov.io/gh/HYPERNETS/hypernets_processor) [![Documentation Status](https://readthedocs.org/projects/hypernets-processor/badge/?version=latest)](https://hypernets-processor.readthedocs.io/en/latest/?badge=latest)
