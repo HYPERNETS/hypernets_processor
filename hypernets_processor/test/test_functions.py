@@ -20,7 +20,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 this_directory = os.path.dirname(__file__)
-TEMPLATE_PROCESSOR_CONFIG_PATH = relative_path("../cli/config_templates/processor.config", this_directory)
+TEMPLATE_PROCESSOR_CONFIG_PATH = relative_path("../etc/processor.config", this_directory)
 TEMPLATE_JOB_CONFIG_PATH = relative_path("../cli/config_templates/job.config", this_directory)
 
 

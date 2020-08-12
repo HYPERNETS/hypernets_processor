@@ -4,7 +4,7 @@ scheduler for hypernets_processor jobs cli
 
 from hypernets_processor.version import __version__
 from hypernets_processor.cli.hypernets_scheduler_main import main
-from hypernets_processor.cli.common import read_jobs_list, read_config_file
+from hypernets_processor.cli.common import SCHEDULER_CONFIG_PATH
 import argparse
 
 
@@ -32,17 +32,6 @@ def configure_parser():
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    # Add specific arguments
-    # Configuration files
-    parser.add_argument("-s", "--scheduler-config", action="store",
-                        help="Path of scheduler configuration file")
-
-    parser.add_argument("-p", "--processor-config", action="store",
-                        help="Path of processor configuration file")
-
-    parser.add_argument("-l", "--jobs-list", action="store",
-                        help="Path of jobs list")
-
     return parser
 
 
@@ -55,15 +44,8 @@ def cli():
     Command line interface function for hypernets_scheduler_main
     """
 
-    # unpack parsed_args
-    jobs_list = read_jobs_list(parsed_args.l)
-    processor_config = read_config_file(parsed_args.p)
-    scheduler_config = read_config_file(parsed_args.s)
-
     # run main
-    main(jobs_list=jobs_list,
-         processor_config=processor_config,
-         scheduler_config=scheduler_config)
+    main(scheduler_config_path=SCHEDULER_CONFIG_PATH)
 
     return None
 

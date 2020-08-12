@@ -3,7 +3,7 @@ Main function for hypernets_scheduler_cli to run
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.common import configure_logging, read_config_file
+from hypernets_processor.cli.common import configure_logging, read_config_file, read_jobs_list
 from hypernets_processor.utils.config import get_config_value
 from hypernets_processor import Scheduler
 from hypernets_processor.cli.hypernets_processor_main import main as processor_main
@@ -33,77 +33,84 @@ def unpack_scheduler_config(scheduler_config):
     * hours (int) - Scheduled job repeat interval in hour, default None (if not None seconds and minutes are None)
     * start_time (datetime.datetime) - Scheduled time to start running tasks, default None (means start now)
     * parallel (bool) - Switch to run scheduled jobs on different threads, default False
+    * jobs_list (str) - Path of jobs list file, to run on schedule
 
     """
 
     scheduler_config_dict = dict()
 
-    # Schedule Configuration
-    scheduler_config_dict["seconds"] = get_config_value(scheduler_config, "Schedule", "seconds", dtype=int)
-    scheduler_config_dict["minutes"] = get_config_value(scheduler_config, "Schedule", "minutes", dtype=int)
-    scheduler_config_dict["hours"] = get_config_value(scheduler_config, "Schedule", "hours", dtype=int)
-    scheduler_config_dict["start_time"] = get_config_value(scheduler_config, "Schedule", "start_time", dtype=str)
-    scheduler_config_dict["parallel"] = get_config_value(scheduler_config, "Schedule", "seconds", dtype=bool)
+    sections = [sch for sch in scheduler_config.sections()]
+    sections.remove("Log")
 
-    # todo - sort out start time format
+    for sch in sections:
 
-    # Checks
-    # Check only have hours, minutes or seconds
-    intervals = [scheduler_config_dict["seconds"], scheduler_config_dict["minutes"], scheduler_config_dict["hours"]]
-    if intervals.count(None) != 2:
-        raise ValueError("Scheduled job repeat interval must be defined as 1 of seconds, minutes or hours")
+        scheduler_config_dict[sch] = {}
+
+        # Schedule Configuration
+        scheduler_config_dict[sch]["seconds"] = get_config_value(scheduler_config, sch, "seconds", dtype=int)
+        scheduler_config_dict[sch]["minutes"] = get_config_value(scheduler_config, sch, "minutes", dtype=int)
+        scheduler_config_dict[sch]["hours"] = get_config_value(scheduler_config, sch, "hours", dtype=int)
+        scheduler_config_dict[sch]["start_time"] = get_config_value(scheduler_config, sch, "start_time", dtype=str)
+        scheduler_config_dict[sch]["parallel"] = get_config_value(scheduler_config, sch, "seconds", dtype=bool)
+        scheduler_config_dict[sch]["jobs_list"] = get_config_value(scheduler_config, sch, "jobs_list", dtype=str)
+
+        # todo - sort out start time format
+
+        # Checks
+        # Check only have hours, minutes or seconds
+        intervals = [scheduler_config_dict[sch]["seconds"], scheduler_config_dict[sch]["minutes"],
+                     scheduler_config_dict[sch]["hours"]]
+        if intervals.count(None) != 2:
+            raise ValueError("job repeat interval must be defined as 1 of seconds, minutes or hours for " + sch)
 
     return scheduler_config_dict
 
 
-def main(jobs_list, processor_config, scheduler_config):
+def main(scheduler_config_path):
     """
     Main function to schedule automated hypernets_processor jobs
 
-    :type jobs_list: list
-    :param jobs_list: job config fnames
-
-    :type processor_config: configparser.RawConfigParser
-    :param processor_config: processor configuration information
-
-    :type scheduler_config: configparser.RawConfigParser
-    :param scheduler_config: scheduler configuration information
-
+    :type scheduler_config_path: str
+    :param scheduler_config_path: path of scheduler config file
     """
 
-    # Configure logging
+    scheduler_config = read_config_file(scheduler_config_path)
+
     logger = configure_logging(config=scheduler_config)
+
     scheduler_config = unpack_scheduler_config(scheduler_config)
 
+    jobs_list = read_jobs_list(scheduler_config["Processor Schedule"]["jobs_list"])
+
     # schedule jobs
-    s = Scheduler(logger=logger)
+    processor_sch = Scheduler(logger=logger)
 
-    for job_config_fname in jobs_list:
-
-        # read job config file
-        job_config = read_config_file(job_config_fname)
+    for job_config_path in jobs_list:
 
         # define scheduler job config
         scheduler_job_config = dict()
 
+        # read job config file to set job name
+        job_config = read_config_file(job_config_path)
         if ("Job" in job_config.keys()) and ("name" in job_config["name"].keys()):
             scheduler_job_config["name"] = job_config["Job"]["name"]
         else:
-            scheduler_job_config["name"] = job_config_fname
+            scheduler_job_config["name"] = job_config_path
 
-        scheduler_job_config["seconds"] = scheduler_config["seconds"]
-        scheduler_job_config["minutes"] = scheduler_config["minutes"]
-        scheduler_job_config["hours"] = scheduler_config["hours"]
-        scheduler_job_config["parallel"] = scheduler_config["parallel"]
+        del job_config
+
+        scheduler_job_config["seconds"] = scheduler_config["Processor Schedule"]["seconds"]
+        scheduler_job_config["minutes"] = scheduler_config["Processor Schedule"]["minutes"]
+        scheduler_job_config["hours"] = scheduler_config["Processor Schedule"]["hours"]
+        scheduler_job_config["parallel"] = scheduler_config["Processor Schedule"]["parallel"]
 
         # schedule job
-        s.schedule(processor_main,
-                   scheduler_job_config=scheduler_job_config,
-                   job_config=job_config,
-                   processor_config=processor_config)
+        processor_sch.schedule(processor_main,
+                               scheduler_job_config=scheduler_job_config,
+                               job_config_path=job_config_path)
 
     # run scheduled jobs
-    s.run(start_time=scheduler_config["start_time"])
+    processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
 
     return None
 

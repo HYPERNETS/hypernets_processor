@@ -3,6 +3,7 @@ Contains main class for orchestrating hypernets data processing jobs
 """
 
 from hypernets_processor.version import __version__
+from hypernets_processor.context import Context
 
 
 '''___Authorship___'''
@@ -22,12 +23,12 @@ class HypernetsProcessor:
     :param logger: logger
     """
 
-    def __init__(self, logger=None):
+    def __init__(self, job_config=None, processor_config=None, logger=None):
         """
         Constructor method
         """
 
-        self.logger = logger
+        self.context = Context(job_config, processor_config, logger)
 
     def run(self):
         """

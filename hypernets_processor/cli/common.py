@@ -4,6 +4,7 @@ Common functions for command line interfaces
 
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.paths import relative_path
+from hypernets_processor.utils.config import get_config_value
 import logging
 import sys
 import os
@@ -48,9 +49,9 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None):
     """
 
     if config is not None:
-        fname = config["Log"]["path"] if ("path" in config["Log"].keys()) and (fname is None) else None
-        verbose = bool(config["Log"]["verbose"]) if ("verbose" in config["Log"].keys()) and (verbose is None) else False
-        quiet = bool(config["Log"]["quiet"]) if ("quiet" in config["Log"].keys()) and (quiet is None) else False
+        fname = get_config_value(config, "Log", "path", dtype=str)
+        verbose = get_config_value(config, "Log", "verbose", dtype=bool)
+        quiet = get_config_value(config, "Log", "quiet", dtype=bool)
 
     # Configure logger
     logger = logging.getLogger(__name__)
