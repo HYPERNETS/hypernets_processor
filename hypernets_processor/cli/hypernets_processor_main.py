@@ -4,8 +4,7 @@ Main function for hypernets_processor_cli to run
 
 from hypernets_processor.version import __version__
 from hypernets_processor.hypernets_processor import HypernetsProcessor
-from hypernets_processor.cli.common import configure_logging
-
+from hypernets_processor.cli.common import configure_logging, read_config_file
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -16,17 +15,19 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def main(processor_config, job_config):
+def main(processor_config_path, job_config_path):
     """
-    Main function to run hypernets_processor
+    Main function to run hypernets_processor file processing chain
 
-    :type processor_config: configparser.RawConfigParser
-    :param processor_config: processor configuration information
+    :type processor_config_path: str
+    :param processor_config_path: processor configuration file path
 
-    :type job_config: configparser.RawConfigParser
-    :param job_config: job configuration information
-
+    :type job_config_path: str
+    :param job_config_path: job configuration file path
     """
+
+    processor_config = read_config_file(processor_config_path)
+    job_config = read_config_file(job_config_path)
 
     # Configure logging
     logger = configure_logging(config=job_config)
