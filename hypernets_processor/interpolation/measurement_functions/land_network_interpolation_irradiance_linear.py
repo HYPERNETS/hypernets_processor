@@ -3,12 +3,12 @@
 import scipy.interpolate
 
 class LandNetworkInterpolationIrradianceLinear:
-    def function(self,output_time,times,irradiances):
+    def function(self,output_time,times_irr,irradiances):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
-        irradiance_intfunc=scipy.interpolate.interp1d(times,radiances)
+        irradiance_intfunc=scipy.interpolate.interp1d(times_irr,irradiances)
 
         return irradiance_intfunc(output_time)
 

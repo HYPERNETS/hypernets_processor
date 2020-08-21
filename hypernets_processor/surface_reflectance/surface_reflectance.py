@@ -3,9 +3,10 @@ Surface reflectance class
 """
 
 from hypernets_processor.version import __version__
-
+from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import ProtocolFactory
 import punpy
+import numpy as np
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -17,23 +18,23 @@ __status__ = "Development"
 
 
 class SurfaceReflectance:
-    def __init__(self,MCsteps=10000):
+    def __init__(self,MCsteps=1000,parallel_cores=1):
         self._measurement_function_factory = ProtocolFactory()
-        self.prop = punpy.MCPropagation(MCsteps)
+        self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
 
-    def Process(self,dataset_l1,protocol_data,measurement_function):
-        dataset_l1 = self.perform_checks(dataset_l1)
+    def process(self,dataset_l1c,measurement_function):
+        dataset_l1c = self.perform_checks(dataset_l1c)
         l1tol2_function = self._measurement_function_factory.get_measurement_function(measurement_function)
         input_vars = l1tol2_function.get_argument_names()
-        input_qty = self.find_input(input_vars,dataset_l1,protocol_data)
-        u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1,protocol_data)
-        u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1,protocol_data)
-        dataset_l2 = self.l2_from_l1_dataset(dataset_l1)
-        dataset_l2 = self.process_measurement_function(dataset_l2,l1tol2_function.function(),input_qty,
+        input_qty = self.find_input(input_vars,dataset_l1c)
+        u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1c)
+        u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1c)
+        dataset_l2 = self.l2_from_l1c_dataset(dataset_l1c)
+        dataset_l2 = self.process_measurement_function("reflectance",dataset_l2,l1tol2_function.function,input_qty,
                                                        u_random_input_qty,u_systematic_input_qty)
         return dataset_l2
 
-    def find_input(self,variables,dataset,ancillary_dataset):
+    def find_input(self,variables,dataset):
         """
         returns a list of the data for a given list of input variables
 
@@ -45,14 +46,11 @@ class SurfaceReflectance:
         :rtype:
         """
         inputs = []
-        for var in range(variables):
-            try:
-                inputs.append(dataset[var])
-            except:
-                inputs.append(ancillary_dataset[var])
+        for var in variables:
+            inputs.append(dataset[var].values)
         return inputs
 
-    def find_u_random_input(self,variables,dataset,ancillary_dataset):
+    def find_u_random_input(self,variables,dataset):
         """
         returns a list of the random uncertainties on the data for a given list of input variables
 
@@ -64,14 +62,11 @@ class SurfaceReflectance:
         :rtype:
         """
         inputs = []
-        for var in range(variables):
-            try:
-                inputs.append(dataset["u_random_"+var])
-            except:
-                inputs.append(ancillary_dataset["u_random_"+var])
+        for var in variables:
+            inputs.append(dataset["u_random_"+var].values)
         return inputs
 
-    def find_u_systematic_input(self,variables,dataset,ancillary_dataset):
+    def find_u_systematic_input(self,variables,dataset):
         """
         returns a list of the systematic uncertainties on the data for a given list of input variables
 
@@ -83,12 +78,8 @@ class SurfaceReflectance:
         :rtype:
         """
         inputs = []
-        for var in range(variables):
-            try:
-                inputs.append(dataset["u_systematic_"+var])
-            except:
-                inputs.append(ancillary_dataset["u_systematic_"+var])
-
+        for var in variables:
+            inputs.append(dataset["u_systematic_"+var].values)
         return inputs
 
     def perform_checks(self,dataset_l1):
@@ -102,7 +93,7 @@ class SurfaceReflectance:
         """
         return dataset_l1
 
-    def l2_from_l1_dataset(self,datasetl0):
+    def l2_from_l1c_dataset(self,datasetl1c):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
 
@@ -111,28 +102,27 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
-        hw = HypernetsWriter()
-        dataset = hw.create_template_dataset_l2a()
+        l2a_dim_sizes_dict = {"wavelength":len(datasetl1c["wavelength"]),
+                              "series":len(datasetl1c['series'])}
+        l2a = HypernetsDSBuilder.create_ds_template(l2a_dim_sizes_dict,"L_L2A")
 
-        return dataset
+        return l2a
 
-    def process_measurement_function(self,dataset_l2,measurement_function,input_quantities,u_random_input_quantities,
+    def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
                                      u_systematic_input_quantities):
         measurand = measurement_function(*input_quantities)
         u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities)
-        u_systematic_measurand = self.prop.propagate_systematic(measurement_function,input_quantities,
-                                                                u_systematic_input_quantities)
-        u_tot_measurand,cov_measurand = self.prop.propagate_both(measurement_function,input_quantities,
-                                                                 u_random_input_quantities,
-                                                                 u_systematic_input_quantities)
+        u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
+                                                                                          input_quantities,
+                                                                                          u_systematic_input_quantities,
+                                                                                          return_corr=True,corr_axis=0)
+        dataset[measurandstring].values = measurand
+        dataset["u_random_"+measurandstring].values = u_random_measurand
+        dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
+        dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
+        dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand
 
-        dataset_l2["reflectance"] = measurand
-        dataset_l2["u_random_reflectance"] = u_random_measurand
-        dataset_l2["u_systematic_reflectance"] = u_systematic_measurand
-        dataset_l2["cov_reflectance"] = cov_measurand
-
-        return dataset_l2
-
+        return dataset
 
 
 
