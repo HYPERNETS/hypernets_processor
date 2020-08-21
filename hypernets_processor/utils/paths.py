@@ -30,6 +30,9 @@ def relative_path(path, directory):
     :rtype: str
     """
 
+    if directory == "":
+        directory = "."
+
     cwd = os.getcwd()
     os.chdir(directory)
     full_path = os.path.abspath(path)
