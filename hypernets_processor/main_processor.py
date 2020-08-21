@@ -76,7 +76,7 @@ class HypernetsProcessor:
         HypernetsWriter.write(L1b_rad,"../examples/test_L1b_rad.nc",overwrite=True)
         HypernetsWriter.write(L1b_irr,"../examples/test_L1b_irr.nc",overwrite=True)
         HypernetsWriter.write(L1c,"../examples/test_L1c.nc",overwrite=True)
-        HypernetsWriter.write(L2a,"../examples/test_L1c.nc",overwrite=True)
+        HypernetsWriter.write(L2a,"../examples/test_L2a.nc",overwrite=True)
         return None
 
 
