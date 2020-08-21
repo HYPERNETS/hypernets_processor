@@ -1,7 +1,7 @@
 """
 TemplateUtil class
 """
-from hypernets_processor.data_io.format.flags import FLAG_MEANINGS
+from copy import deepcopy
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 import xarray
@@ -16,7 +16,8 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propagate_ds=None):
+def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propagate_ds=None,
+                            metadata_db=None, metadata_db_query=None):
     """
     Returns template dataset
 
@@ -36,6 +37,12 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
 
     N.B. propagates data only, not variables as a whole with attributes etc.
 
+    :type metadata_db: dataset.Database
+    :param metadata_db: metadata database
+
+    :type metadata_db_query: dict
+    :param metadata_db_query: database query, must find unique value
+
     :return ds: template dataset
     :rtype: xarray.Dataset
     """
@@ -48,6 +55,11 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
 
     # Add metadata
     if metadata is not None:
+
+        # Populate metadata from db
+        if metadata_db is not None:
+            metadata = TemplateUtil.find_metadata(metadata, metadata_db, metadata_db_query)
+
         ds = TemplateUtil.add_metadata(ds, metadata)
 
     # Propagate variable data
@@ -59,7 +71,7 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
 
 class TemplateUtil:
     """
-    Class to create template Hypernets datasets by interfacing with the format subpackage
+    Class to create template datasets
     """
 
     @staticmethod
@@ -83,7 +95,6 @@ class TemplateUtil:
         du = DatasetUtil()
 
         for variable_name in variables_dict.keys():
-            print(variable_name)
 
             variable_attrs = variables_dict[variable_name]
 
@@ -93,7 +104,7 @@ class TemplateUtil:
             # Unpack variable attributes
             dtype = variable_attrs["dtype"]
             dim_names = variable_attrs["dim"]
-            attributes = variable_attrs["attributes"] if "attributes" in variable_attrs else None
+            attributes = deepcopy(variable_attrs["attributes"]) if "attributes" in variable_attrs else None
 
             # Determine variable shape from dims
             try:
@@ -103,14 +114,11 @@ class TemplateUtil:
 
             # Create variable and add to dataset
             if dtype == "flag":
-                #print(attributes)
-                # why does the flag_meanings does not appear in the attributes????
-                flag_meanings = FLAG_MEANINGS #attributes.pop("flag_meanings")
+                flag_meanings = attributes.pop("flag_meanings")
                 variable = du.create_flags_variable(dim_sizes, meanings=flag_meanings,
                                                     dim_names=dim_names, attributes=attributes)
 
             else:
-                #print(attributes)
                 variable = du.create_variable(dim_sizes, dim_names=dim_names,
                                               dtype=dtype, attributes=attributes)
 
@@ -204,6 +212,42 @@ class TemplateUtil:
             target_ds[common_variable_name].values = source_ds[common_variable_name].values
 
     # todo - add method to propagate common unpopulated metadata
+
+    @staticmethod
+    def find_metadata(metadata, db, query):
+        """
+        Populate metadata dictionary with values from database query
+
+        :type metadata: dict
+        :param metadata: dictionary of dataset metadata
+
+        :type db: dataset.Database
+        :param db: metadata database
+
+        :type query: dict/list
+        :param query: database query, defined as {"table_name": query_dict} where query_dict defines. Can be a list of
+        such database queries
+        """
+
+        if isinstance(query, dict):
+            query = [query]
+
+        for q in query:
+            table_name = list(q.keys())[0]
+
+            row = deepcopy(db[table_name].find_one(**q[table_name]))
+
+            if row is None:
+                raise LookupError("query does not find unique metadata value")
+
+            not_required_keys = [key for key in row.keys() if key not in metadata.keys()]
+
+            for key in not_required_keys:
+                row.pop(key)
+
+            metadata.update(row)
+
+        return metadata
 
 
 if __name__ == '__main__':
