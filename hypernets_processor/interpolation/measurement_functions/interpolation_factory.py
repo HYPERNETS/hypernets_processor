@@ -3,7 +3,7 @@ Measurement function object creator
 '''
 
 from hypernets_processor.version import __version__
-from hypernets_processor.interpolation.measurement_functions.land_network_interpolation_radiance_linear import LandNetworkInterpolationRadianceLinear
+from hypernets_processor.interpolation.measurement_functions.water_network_interpolation import WaterNetworkInterpolationIrradianceLinear
 from hypernets_processor.interpolation.measurement_functions.land_network_interpolation_irradiance_linear import LandNetworkInterpolationIrradianceLinear
 
 '''___Authorship___'''
@@ -15,9 +15,9 @@ __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
 
-class MeasurementFunctionFactory:
+class InterpolationFactory:
     def __init__(self):
-        self.measurement_functions = dict([(LandNetworkInterpolationRadianceLinear.get_name(),LandNetworkInterpolationRadianceLinear()),
+        self.measurement_functions = dict([(WaterNetworkInterpolationIrradianceLinear.get_name(),WaterNetworkInterpolationIrradianceLinear()),
                                 (LandNetworkInterpolationIrradianceLinear.get_name(),LandNetworkInterpolationIrradianceLinear())])
 
     def get_names(self):

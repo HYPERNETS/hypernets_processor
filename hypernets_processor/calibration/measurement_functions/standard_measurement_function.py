@@ -9,7 +9,6 @@ class StandardMeasurementFunction:
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
-
         return gains*(digital_number-dark_signal)*temp**0
 
     @staticmethod

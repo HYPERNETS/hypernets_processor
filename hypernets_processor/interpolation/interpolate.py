@@ -3,9 +3,10 @@ Interpolation class
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
+from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.interpolation.measurement_functions.interpolation_factory import InterpolationFactory
 import punpy
+import numpy as np
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -15,127 +16,56 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
-class Calibrate:
-    def __init__(self,MCsteps=10000):
+class InterpolateL1c:
+    def __init__(self,MCsteps=1000,parallel_cores=1):
         self._measurement_function_factory = InterpolationFactory()
-        self.prop= punpy.MCPropagation(MCsteps)
+        self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
 
-    def calibrate(self,dataset_l0,calibration_data,measurement_function):
-        dataset_l0 = self.preprocess_l0(dataset_l0)
-        calibrate_function = self._measurement_function_factory.get_measurement_function(measurement_function)
-        input_vars=calibrate_function.get_argument_names()
-        input_qty=self.find_input(input_vars,dataset_l0,calibration_data)
-        u_random_input_qty=self.find_u_random_input(input_vars,dataset_l0,calibration_data)
-        u_systematic_input_qty=self.find_u_systematic_input(input_vars,dataset_l0,calibration_data
-        dataset_l1 = self.l1_from_l0_dataset(dataset_l0)
-        dataset_l1 = self.process_measurement_function(dataset_l1,calibrate_function.function(),input_qty,u_random_input_qty,u_systematic_input_qty)
-        return dataset_l1
+    def interpolate_l1c(self,dataset_l1b_rad,dataset_l1b_irr,measurement_function):
+        l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b_rad["wavelength"]),
+                              "series":len(dataset_l1b_rad['series'])}
 
-    def find_input(self,variables,dataset,ancillary_dataset):
-        """
-        returns a list of the data for a given list of input variables
+        dataset_l1c = HypernetsDSBuilder.create_ds_template(l1c_dim_sizes_dict,"L_L1C")
+        dataset_l1c["wavelength"] = dataset_l1b_rad["wavelength"]
+        dataset_l1c["acquisition_time"] = dataset_l1b_rad["acquisition_time"]
 
-        :param variables:
-        :type variables:
-        :param dataset:
-        :type dataset:
-        :return:
-        :rtype:
-        """
-        inputs = []
-        for var in range(variables):
-            try:
-                inputs.append(dataset[var])
-            except:
-                inputs.append(ancillary_dataset[var])
-        return inputs
+        dataset_l1c["radiance"] = dataset_l1b_rad["radiance"]
+        dataset_l1c["u_random_radiance"] = dataset_l1b_rad["u_random_radiance"]
+        dataset_l1c["u_systematic_radiance"] = dataset_l1b_rad["u_systematic_radiance"]
+        dataset_l1c["corr_random_radiance"] = dataset_l1b_rad["corr_random_radiance"]
+        dataset_l1c["corr_systematic_radiance"] = dataset_l1b_rad["corr_systematic_radiance"]
 
-    def find_u_random_input(self,variables,dataset,ancillary_dataset):
-        """
-        returns a list of the random uncertainties on the data for a given list of input variables
+        dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr,measurement_function)
 
-        :param variables:
-        :type variables:
-        :param dataset:
-        :type dataset:
-        :return:
-        :rtype:
-        """
-        inputs = []
-        for var in range(variables):
-            try:
-                inputs.append(dataset["u_random_"+var])
-            except:
-                inputs.append(ancillary_dataset["u_random_"+var])
-        return inputs
+        return dataset_l1c
 
-    def find_u_systematic_input(self,variables,dataset,ancillary_dataset):
-        """
-        returns a list of the systematic uncertainties on the data for a given list of input variables
+    def interpolate_irradiance(self,dataset_l1c,dataset_l1b_irr,measurement_function):
+        interpolation_function = self._measurement_function_factory.get_measurement_function(measurement_function)
 
-        :param variables:
-        :type variables:
-        :param dataset:
-        :type dataset:
-        :return:
-        :rtype:
-        """
-        inputs = []
-        for var in range(variables):
-            try:
-                inputs.append(dataset["u_systematic_"+var])
-            except:
-                inputs.append(ancillary_dataset["u_systematic_"+var])
-
-        return inputs
+        acqui_irr = dataset_l1b_irr['acquisition_time'].values
+        acqui_rad = dataset_l1c['acquisition_time'].values
+        dataset_l1c = self.process_measurement_function("irradiance",dataset_l1c,interpolation_function.function,
+                                                        [acqui_rad,acqui_irr,dataset_l1b_irr['irradiance'].values],
+                                                        [None,None,dataset_l1b_irr['u_random_irradiance'].values],
+                                                        [None,None,dataset_l1b_irr['u_systematic_irradiance'].values])
+        return dataset_l1c
 
 
-    def preprocess_l0(self,dataset_l0):
-        """
-        Identifies and removes faulty measurements (e.g. due to cloud cover).
-
-        :param dataset_l0:
-        :type dataset_l0:
-        :return:
-        :rtype:
-        """
-        return dataset_l0
-    
-    def l1_from_l0_dataset(self,datasetl0):
-        """
-        Makes a L1 template of the data, and propagates the appropriate keywords from L0.
-
-        :param datasetl0:
-        :type datasetl0:
-        :return:
-        :rtype:
-        """
-        hw = HypernetsWriter()
-        dataset = hw.create_template_dataset_l1_rad()
-
-        return dataset
-
-    def process_measurement_function(self,dataset_l1,measurement_function,input_quantities,u_random_input_quantities,u_systematic_input_quantities):
+    def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
+                                     u_systematic_input_quantities):
         measurand = measurement_function(*input_quantities)
         u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities)
-        u_systematic_measurand = self.prop.propagate_systematic(measurement_function,input_quantities,u_systematic_input_quantities)
-        u_tot_measurand, cov_measurand = self.prop.propagate_both(measurement_function,input_quantities,u_random_input_quantities,u_systematic_input_quantities)
+        u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
+                                                                                          input_quantities,
+                                                                                          u_systematic_input_quantities,
+                                                                                          return_corr=True,corr_axis=0)
+        dataset[measurandstring].values = measurand
+        dataset["u_random_"+measurandstring].values = u_random_measurand
+        dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
+        dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
+        dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand
 
-        dataset_l1["radiance"]=measurand
-        dataset_l1["u_random_radiance"]=u_random_measurand
-        dataset_l1["u_systematic_radiance"]=u_systematic_measurand
-        dataset_l1["cov_radiance"]=cov_measurand
-
-        return dataset_l1
-
-
-
-
-
-
-
-
-
+        return dataset
 
 
 

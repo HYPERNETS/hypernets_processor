@@ -250,7 +250,7 @@ L1A_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SCAN_DIM],
                                        "attributes": {"standard_name": "radiance",
                                                       "long_name": "upwelling radiance",
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
-                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+                                       "encoding": {'dtype': np.int32, "scale_factor": 0.1, "offset": 0.0}}}
 
 L1A_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SCAN_DIM],
                                        "dtype": np.uint32,
@@ -474,7 +474,56 @@ L1C_WATER_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, SEQ_DIM],
                        }
 
 # L_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A land data product
-L_L2A_REFLECTANCE_VARIABLES = {}
+L_L2A_REFLECTANCE_VARIABLES =  {"u_random_reflectance": {"dim": [WL_DIM, SERIES_DIM],
+                                                        "dtype": np.float32,
+                                                        "attributes": {"standard_name": "u_random_reflectance",
+                                                                       "long_name": "Random reflectance uncertainty",
+                                                                       "units": "%"},
+                                                        "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                     "offset": 0.0}},
+                               "u_systematic_reflectance": {"dim": [WL_DIM, SERIES_DIM],
+                                                            "dtype": np.float32,
+                                                            "attributes": {"standard_name": "u_systematic_reflectance",
+                                                                           "long_name": "Systematic reflectance "
+                                                                                        "uncertainty",
+                                                                           "units": "%"},
+                                                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                         "offset": 0.0}},
+                               "corr_random_reflectance": {"dim": [WL_DIM, WL_DIM],
+                                                          "dtype": np.float32,
+                                                          "attributes": {"standard_name": "corr_random_reflectance",
+                                                                         "long_name": "Correlation matrix of random "
+                                                                                      "reflectance "
+                                                                                      "uncertainty",
+                                                                         "units": "-"},
+                                                          "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                       "offset": 0.0}},
+                               "corr_systematic_reflectance": {"dim": [WL_DIM, WL_DIM],
+                                                              "dtype": np.float32,
+                                                              "attributes": {
+                                                                  "standard_name": "corr_systematic_reflectance",
+                                                                  "long_name": "Correlation matrix of systematic "
+                                                                               "reflectance "
+                                                                               "uncertainty",
+                                                                  "units": "-"},
+                                                              "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                           "offset": 0.0}},
+                               "reflectance": {"dim": [WL_DIM, SERIES_DIM],
+                                               "dtype": np.float32,
+                                               "attributes": {"standard_name": "reflectance",
+                                                              "long_name": "The surface called surface means the lower "
+                                                                           "boundary of the atmosphere. "
+                                                                           "Bidirectional_reflectance depends on"
+                                                                           "the angles of incident and measured"
+                                                                           "radiation.Reflectance is the ratio of the "
+                                                                           "energy of the reflected to the incident "
+                                                                           "radiation. A coordinate variable of "
+                                                                           "radiation_wavelength or radiation_frequency "
+                                                                           "can be used to specify the wavelength or "
+                                                                           "frequency, respectively, of the radiation.",
+                                                              "units": "-"},
+                                               "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}}}
+
 
 # W_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A water data product
 W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_DIM, SEQ_DIM],
