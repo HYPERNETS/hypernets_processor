@@ -4,7 +4,8 @@ Calibration class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.measurement_functions.measurement_function_factory import MeasurementFunctionFactory
-import punpy
+#import punpy
+from hypernets_processor.mc_propagation import MCPropagation
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 import numpy as np
@@ -20,7 +21,8 @@ __status__ = "Development"
 class Calibrate:
     def __init__(self,MCsteps=1000,parallel_cores=0):
         self._measurement_function_factory = MeasurementFunctionFactory()
-        self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        #self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        self.prop= MCPropagation(MCsteps,parallel_cores=parallel_cores)
 
     def calibrate_l1a(self,measurandstring,dataset_l0,dataset_l0_bla,calibration_data,measurement_function='StandardMeasurementFunction'):
 
@@ -46,10 +48,10 @@ class Calibrate:
         l1b_dim_sizes_dict = {"wavelength":len(dataset_l1a["wavelength"]),
                               "series":len(np.unique(dataset_l1a['acquisition_time']))}
         if measurandstring == "radiance":
-            dataset_l1b = HypernetsDSBuilder.create_ds_template(l1b_dim_sizes_dict,"L_L1B_RAD")
+            dataset_l1b = HypernetsDSBuilder().create_ds_template(l1b_dim_sizes_dict,"L_L1B_RAD")
             dataset_l1b["wavelength"] = dataset_l1a["wavelength"]
         elif measurandstring == "irradiance":
-            dataset_l1b = HypernetsDSBuilder.create_ds_template(l1b_dim_sizes_dict,"L_L1B_IRR")
+            dataset_l1b = HypernetsDSBuilder().create_ds_template(l1b_dim_sizes_dict,"L_L1B_IRR")
             dataset_l1b["wavelength"] = dataset_l1a["wavelength"]
 
 
@@ -259,11 +261,11 @@ class Calibrate:
 
         l1a_dim_sizes_dict = {"wavelength":len(datasetl0["wavelength"]),"scan":len(datasetl0["scan"])}
         if measurandstring=="radiance":
-            l1a = HypernetsDSBuilder.create_ds_template(l1a_dim_sizes_dict,"L_L1A_RAD")
+            l1a = HypernetsDSBuilder().create_ds_template(l1a_dim_sizes_dict,"L_L1A_RAD")
             l1a["wavelength"] = datasetl0["wavelength"]
             l1a["acquisition_time"] = datasetl0["acquisition_time"]
         elif measurandstring=="irradiance":
-            l1a = HypernetsDSBuilder.create_ds_template(l1a_dim_sizes_dict,"L_L1A_IRR")
+            l1a = HypernetsDSBuilder().create_ds_template(l1a_dim_sizes_dict,"L_L1A_IRR")
             l1a["wavelength"] = datasetl0["wavelength"]
             l1a["acquisition_time"] = datasetl0["acquisition_time"]
 
