@@ -5,7 +5,8 @@ Surface reflectance class
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import ProtocolFactory
-import punpy
+#import punpy
+from hypernets_processor.mc_propagation import MCPropagation
 import numpy as np
 
 '''___Authorship___'''
@@ -20,7 +21,8 @@ __status__ = "Development"
 class SurfaceReflectance:
     def __init__(self,MCsteps=1000,parallel_cores=1):
         self._measurement_function_factory = ProtocolFactory()
-        self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        #self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        self.prop= MCPropagation(MCsteps,parallel_cores=parallel_cores)
 
     def process(self,dataset_l1c,measurement_function):
         dataset_l1c = self.perform_checks(dataset_l1c)
@@ -104,9 +106,10 @@ class SurfaceReflectance:
         """
         l2a_dim_sizes_dict = {"wavelength":len(datasetl1c["wavelength"]),
                               "series":len(datasetl1c['series'])}
-        l2a = HypernetsDSBuilder.create_ds_template(l2a_dim_sizes_dict,"L_L2A")
+        l2a = HypernetsDSBuilder().create_ds_template(l2a_dim_sizes_dict,"L_L2A")
 
         return l2a
+
 
     def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
                                      u_systematic_input_quantities):
