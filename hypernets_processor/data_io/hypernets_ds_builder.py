@@ -23,7 +23,6 @@ class HypernetsDSBuilder:
     Class to generate xarray Datasets in the Hypernets file format specification, handling the library of defined file
     formats, metadata database and interfacing with the TemplateUtil tool.
     """
-
     def __init__(self, context=None):
         self.context = context
 
