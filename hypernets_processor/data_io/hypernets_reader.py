@@ -1,7 +1,7 @@
 """
 Module with functions and classes to read Hypernets data
 """
-from datetime import timezone, datetime
+from datetime import datetime, timezone
 import os
 import re  # for re.split
 from configparser import ConfigParser
@@ -168,8 +168,13 @@ class HypernetsReader:
 
         header = {}
         for headLen, headName, headFormat in headerDef:
-            print(headName)
+            print('this is headLen', headLen)
             data = f.read(headLen)
+            print(data)
+            if len(data) != headLen:
+                print("Data length not silimar to headlength")
+                break
+                continue
             if version_info > (3, 0):
                 print("%02X " * headLen % (tuple([b for b in data])))
             else:
@@ -244,36 +249,37 @@ class HypernetsReader:
 
         model_name, geoattr, cc_def = self.read_setting(settings_file)
 
-
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
         # ----------------------------------------
 
         # scan dimension - to have total number of dimensions
         index_scan_total = model_name.index("scan_total")
-
-        # scanDim=sum([int(re.split('_|\.', i)[index_scan_total]) for i in series])
+        # series id
+        # ------------------------------------------
+        # added to consider concanated files
+        scanDim=sum([int(re.split('_|\.', i)[index_scan_total]) for i in series])
 
         # ------------------------------------------
         # added to consider non concanated files
-        scanDims = [int(re.split('_|\.', i)[index_scan_total]) for i in series]
-        scanDim = sum(scanDims)
+        #scanDims = [int(re.split('_|\.', i)[index_scan_total]) for i in series]
+        #scanDim = sum(scanDims)
 
-        # rewrite series
+        ## rewrite series
         # baseName=["_".join(seriesname.split("_", 7)[:7]) for seriesname in series]
         # print(baseName)
-        newSeries = []
-        for i in series:
-            # create dictionary from filename
-            seriesAttr = re.split('_|\.', i)[:-1]  # remove spe extension
-            model = dict(zip(model_name, seriesAttr))
-            baseName = '_'.join(seriesAttr)
-            nbrScans = int(model["scan_total"])
-            n = 1
-            while n <= nbrScans:
-                new_fname = "{}_{}{}".format(baseName, n, '.spe')
-                newSeries.append(new_fname)
-                n += 1
-        series = newSeries
+        # newSeries = []
+        # for i in series:
+        #     # create dictionary from filename
+        #     seriesAttr = re.split('_|\.', i)[:-1]  # remove spe extension
+        #     model = dict(zip(model_name, seriesAttr))
+        #     baseName = '_'.join(seriesAttr)
+        #     nbrScans = int(model["scan_total"])
+        #     n = 1
+        #     while n <= nbrScans:
+        #         new_fname = "{}_{}{}".format(baseName, n, '.spe')
+        #         newSeries.append(new_fname)
+        #         n += 1
+        # series = newSeries
         # -----------------------------------------
 
         # wvl dimensions
@@ -282,6 +288,11 @@ class HypernetsReader:
         # Header definition with length, description and decoding format
 
         header = self.read_header(f, HEADER_DEF)
+
+        # if bool(header) == False:
+        #     print("Data corrupt go to next line")
+        #     header = self.read_header(f, HEADER_DEF)
+
         pix = np.linspace(0, header['Pixel Count'], header['Pixel Count'])
         wvl = self.read_wavelength(cc, pix)
 
@@ -296,7 +307,9 @@ class HypernetsReader:
 
         print("Wvl and Scan Dimensions:", len(wvl), scanDim)
         # use template from variables and metadata in format
-        ds = HypernetsDSBuilder.create_ds_template(dim_sizes_dict, fileformat)
+        ds = HypernetsDSBuilder()
+        ds=ds.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
+
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
         ds["scan"] = np.linspace(1, scanDim, scanDim)
@@ -305,28 +318,28 @@ class HypernetsReader:
         scan_number = 0
 
         # read all spectra (== spe files with concanated files) in a series
-
         for spectra in series:
             model = dict(zip(model_name, spectra.split('_')[:-1]))
-            specBlock = model['seq_rep'] + '_' + model['seq_line'] + '_' + model['vaa'] + '_' + model[
+            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + model[
                 'azimuth_ref'] + '_' + model['vza']
             print(specBlock)
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
             # name of spectra file
-            # acquisitionTime = specattr[spectra]
-            # acquisitionTime = datetime.strptime(acquisitionTime, '%Y%m%dT%H%M%S')
+            acquisitionTime = specattr[spectra]
+            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+            acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
 
             # -------------------------------------
-            # account for non concanated files
-            spec = "_".join(spectra.split('_')[:-1]) + ".spe"
-            acquisitionTime = specattr[spec]
-            print(acquisitionTime)
-            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
-
-            acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
-            model = dict(zip(model_name, str.split(spectra, "_")))
+            # # account for non concanated files
+            # spec = "_".join(spectra.split('_')[:-1]) + ".spe"
+            # acquisitionTime = specattr[spec]
+            # print(acquisitionTime)
+            # acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+            #
+            # acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
+            # model = dict(zip(model_name, str.split(spectra, "_")))
             # ________________________________________
 
             # -----------------------
@@ -337,15 +350,21 @@ class HypernetsReader:
             nextLine = True
             while nextLine:
                 header = self.read_header(f, HEADER_DEF)
+                print(header)
+                if bool(header) == False:
+                    print("Data corrupt go to next line")
+                    break
+                    continue
                 scan = self.read_data(f, header['Pixel Count'])
-                crc32 = self.read_footer(f, 4)
+                # should include this back again when crc32 is in the headers!
+                #crc32 = self.read_footer(f, 4)
 
                 HypernetsReader().plot_spectra(spectra, scan)
 
                 # fill in dataset
                 # maybe xarray has a better way to do - check merge, concat, ...
-
-                # ds["series_id"][scan_number] = spectra.split(".", 1)[1]
+                series_id = model['series_id']
+                ds["series_id"][scan_number] = series_id
                 ds["viewing_azimuth_angle"][scan_number] = model['vaa']
                 ds["viewing_zenith_angle"][scan_number] = model['vza']
 
@@ -492,7 +511,6 @@ class HypernetsReader:
         for i in series_all:
             seriesattr = dict(metadata[i])
             seriesName.extend(list(name for name in seriesattr if '.spe' in name))
-
         # ----------------
         # Remove pictures from list of series
         # ----------------
@@ -511,9 +529,7 @@ class HypernetsReader:
         #     ACTION_CAL   : 0x01   (01)
         #     ACTION_PIC   : 0x02   (02) - NOT IN THE FILENAME!
         #     ACTION_NONE  : 0x03   (03)
-        print(model_name.index("action"))
         index_action = model_name.index("action")
-        print(index_action)
         action = [re.split('_|\.', i)[index_action] for i in seriesName]
         print(action)
 
