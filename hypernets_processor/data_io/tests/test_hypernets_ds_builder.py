@@ -139,6 +139,16 @@ class TestHypernetsDSBuilder(unittest.TestCase):
         # test calls to create_template_dataset
         mock_create_template_dataset.assert_called()
 
+    def test_return_ds_formats(self):
+
+        variables_dict_defs = {"def1": "vars1", "def2": "vars2"}
+        metadata_defs = {"def2": "meta1"}
+
+        hdsb = HypernetsDSBuilder(variables_dict_defs=variables_dict_defs, metadata_defs=metadata_defs)
+        ds_formats = hdsb.return_ds_formats()
+
+        self.assertCountEqual(ds_formats, ["def1", "def2"])
+
 
 if __name__ == '__main__':
     unittest.main()
