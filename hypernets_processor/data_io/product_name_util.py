@@ -3,7 +3,7 @@ ProductNameUtil class
 """
 
 from hypernets_processor.version import __version__
-
+from datetime import datetime
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -19,13 +19,16 @@ TIME_FMT_L2B = "%Y%m%d"
 
 
 DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
+                    "L0_BLA": "L0_BLA",
                     "L0_IRR": "L0_IRR",
                     "L_L1A_RAD": "L1A_RAD",
                     "W_L1A_RAD": "L1A_RAD",
                     "L_L1A_IRR": "L1A_IRR",
                     "W_L1A_IRR": "L1A_IRR",
-                    "L_L1B": "L1B",
-                    "W_L1B": "L1B",
+                    "L_L1B_RAD": "L1B",
+                    "W_L1B_RAD": "L1B",
+                    "L_L1B_IRR": "L1B",
+                    "W_L1B_IRR": "L1B",
                     "L_L2A": "L2A_REF",
                     "W_L2A": "L2A_REF",
                     "L_L2B": "L2B_REF",
@@ -71,8 +74,11 @@ class ProductNameUtil:
         version = context.version if (version is None) and (context is not None) else version
 
         # Prepare product name parts
+        print(DS_FORMAT_FNAMES)
         ptype = DS_FORMAT_FNAMES[ds_format]
 
+        if type(time) is not datetime and time is not None:
+            time = datetime.strptime(time, '%Y%m%dT%H%M%S')
         time_string = time.strftime(TIME_FMT_L12A) if time is not None else None
         network = network.upper() if network is not None else None
         site = site.upper() if network is not None else None
