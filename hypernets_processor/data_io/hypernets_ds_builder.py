@@ -60,7 +60,7 @@ class HypernetsDSBuilder:
         """
 
         # Find variables
-        if ds_format in self.variables_dict_defs.keys():
+        if ds_format in self.return_ds_formats():
             variables_dict = self.variables_dict_defs[ds_format]
         else:
             raise NameError("Invalid format name: " + ds_format + " - must be one of " +
@@ -95,15 +95,79 @@ class HypernetsDSBuilder:
 
     def return_ds_formats(self):
         """
-        Returns available
+        Returns available ds format names
 
-        :return: Empty dataset
-        :rtype: xarray.Dataset
+        :return: ds formats
+        :rtype: list
         """
 
         return list(self.variables_dict_defs.keys())
 
-    # todo - add method to return available ds_formats
+    def return_ds_format_variable_names(self, ds_format):
+        """
+        Returns variables for specified ds format
+
+        :type ds_format: str
+        :param ds_format: product format string
+
+        :return: ds format variables
+        :rtype: list
+        """
+
+        return list(self.variables_dict_defs[ds_format].keys())
+
+    def return_ds_format_variable_dict(self, ds_format, variable_name):
+        """
+        Returns variable definition info for specified ds format
+
+        :type ds_format: str
+        :param ds_format: product format string
+
+        :type variable_name: str
+        :param variable_name: variable name
+
+        :return: variable definition info
+        :rtype: dict
+        """
+
+        return self.variables_dict_defs[ds_format][variable_name]
+
+    def return_ds_format_dim_names(self, ds_format):
+        """
+        Returns dims required for specified ds format
+
+        :type ds_format: str
+        :param ds_format: product format string
+
+        :return: ds format dims
+        :rtype: list
+        """
+
+        ds_format_def = self.variables_dict_defs[ds_format]
+
+        ds_format_dims = set()
+
+        for var_name in ds_format_def.keys():
+            ds_format_dims.update(ds_format_def[var_name]["dim"])
+
+        return list(ds_format_dims)
+
+    def create_empty_dim_sizes_dict(self, ds_format):
+        """
+        Returns empty dim_size_dict for specified ds format
+
+        :type ds_format: str
+        :param ds_format: product format string
+
+        :return: empty dim_size_dict
+        :rtype: dict
+        """
+
+        dim_sizes_dict = dict()
+        for dim in self.return_ds_format_dim_names(ds_format):
+            dim_sizes_dict[dim] = None
+
+        return dim_sizes_dict
 
 
 if __name__ == '__main__':

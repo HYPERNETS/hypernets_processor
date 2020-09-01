@@ -149,6 +149,47 @@ class TestHypernetsDSBuilder(unittest.TestCase):
 
         self.assertCountEqual(ds_formats, ["def1", "def2"])
 
+    def test_return_ds_format_variable_names(self):
+
+        variables_dict_defs = {"def1": {"var1": {"dim": ["dim1", "dim2"]},
+                                        "var2": {"dim": ["dim2", "dim3", "dim4"]}},
+                               "def2": {"var3": {"dim": ["dim10"]},
+                                        "var4": {"dim": ["dim12"]}}}
+        metadata_defs = {"def2": "meta1"}
+
+        hdsb = HypernetsDSBuilder(variables_dict_defs=variables_dict_defs, metadata_defs=metadata_defs)
+        ds_format_vars = hdsb.return_ds_format_variable_names("def1")
+
+        self.assertCountEqual(ds_format_vars, ["var1", "var2"])
+
+    def test_return_ds_format_dim_names(self):
+
+        variables_dict_defs = {"def1": {"var1": {"dim": ["dim1", "dim2"]},
+                                        "var2": {"dim": ["dim2", "dim3", "dim4"]}},
+                               "def2": {"var3": {"dim": ["dim10"]},
+                                        "var4": {"dim": ["dim12"]}}}
+        metadata_defs = {"def2": "meta1"}
+
+        hdsb = HypernetsDSBuilder(variables_dict_defs=variables_dict_defs, metadata_defs=metadata_defs)
+        ds_format_dims = hdsb.return_ds_format_dim_names("def1")
+
+        self.assertCountEqual(ds_format_dims, ["dim1", "dim2", "dim3", "dim4"])
+
+    def test_create_empty_dim_sizes_dict(self):
+
+        variables_dict_defs = {"def1": {"var1": {"dim": ["dim1", "dim2"]},
+                                        "var2": {"dim": ["dim2", "dim3", "dim4"]}},
+                               "def2": {"var3": {"dim": ["dim10"]},
+                                        "var4": {"dim": ["dim12"]}}}
+        metadata_defs = {"def2": "meta1"}
+
+        hdsb = HypernetsDSBuilder(variables_dict_defs=variables_dict_defs, metadata_defs=metadata_defs)
+        dim_sizes_dict = hdsb.create_empty_dim_sizes_dict("def1")
+
+        expect_dim_sizes_dict = {"dim1": None, "dim2": None, "dim3": None, "dim4": None}
+
+        self.assertDictEqual(dim_sizes_dict, expect_dim_sizes_dict)
+
 
 if __name__ == '__main__':
     unittest.main()
