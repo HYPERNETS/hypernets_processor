@@ -35,12 +35,12 @@ class TestHypernetsDSBuilder(unittest.TestCase):
         variables_dict_defs = {"def1": "vars1", "def2": "vars2"}
         metadata_defs = {"def1": {}, "def2": {}}
 
-        hdsb = HypernetsDSBuilder(context=context)
+        hdsb = HypernetsDSBuilder(context=context,
+                                  variables_dict_defs=variables_dict_defs,
+                                  metadata_defs=metadata_defs)
         ds = hdsb.create_ds_template(dim_sizes_dict,
                                      ds_format="def1",
-                                     propagate_ds="propagate_ds",
-                                     variables_dict_defs=variables_dict_defs,
-                                     metadata_defs=metadata_defs)
+                                     propagate_ds="propagate_ds")
 
         # test calls to create_template_dataset
         mock_pnu.return_value.create_product_name.assert_called_once_with("def1", context=context)
@@ -64,12 +64,12 @@ class TestHypernetsDSBuilder(unittest.TestCase):
         variables_dict_defs = {"def1": "vars1", "def2": "vars2"}
         metadata_defs = {"def1": {}, "def2": {}}
 
-        hdsb = HypernetsDSBuilder(context=context)
+        hdsb = HypernetsDSBuilder(context=context,
+                                  variables_dict_defs=variables_dict_defs,
+                                  metadata_defs=metadata_defs)
         ds = hdsb.create_ds_template(dim_sizes_dict,
                                      ds_format="def1",
-                                     propagate_ds="propagate_ds",
-                                     variables_dict_defs=variables_dict_defs,
-                                     metadata_defs=metadata_defs)
+                                     propagate_ds="propagate_ds")
 
         # test calls to create_template_dataset
         mock_pnu.return_value.create_product_name.assert_called_once_with("def1", context=context)
@@ -89,12 +89,8 @@ class TestHypernetsDSBuilder(unittest.TestCase):
         variables_dict_defs = {"def1": "vars1", "def2": "vars2"}
         metadata_defs = {"def1": {}, "def2": {}}
 
-        hdsb = HypernetsDSBuilder()
-        ds = hdsb.create_ds_template(dim_sizes_dict,
-                                     ds_format="def1",
-                                     propagate_ds="propagate_ds",
-                                     variables_dict_defs=variables_dict_defs,
-                                     metadata_defs=metadata_defs)
+        hdsb = HypernetsDSBuilder(variables_dict_defs=variables_dict_defs, metadata_defs=metadata_defs)
+        ds = hdsb.create_ds_template(dim_sizes_dict, ds_format="def1", propagate_ds="propagate_ds")
 
         # test calls to create_template_dataset
         mock_pnu.return_value.create_product_name.assert_called_once_with("def1", context=None)
@@ -113,13 +109,11 @@ class TestHypernetsDSBuilder(unittest.TestCase):
         variables_dict_defs = {"def2": "vars2"}
         metadata_defs = {"def1": "meta1", "def2": "meta1"}
 
-        hdsb = HypernetsDSBuilder()
+        hdsb = HypernetsDSBuilder(variables_dict_defs=variables_dict_defs, metadata_defs=metadata_defs)
         self.assertRaises(NameError, hdsb.create_ds_template,
                           dim_sizes_dict=dim_sizes_dict,
                           ds_format="def1",
-                          propagate_ds=None,
-                          variables_dict_defs=variables_dict_defs,
-                          metadata_defs=metadata_defs)
+                          propagate_ds=None)
 
     @patch('hypernets_processor.data_io.hypernets_ds_builder.create_template_dataset')
     def test_create_ds_template_no_context_no_meta(self, mock_create_template_dataset):
@@ -129,13 +123,11 @@ class TestHypernetsDSBuilder(unittest.TestCase):
         variables_dict_defs = {"def1": "vars1", "def2": "vars2"}
         metadata_defs = {"def2": "meta1"}
 
-        hdsb = HypernetsDSBuilder()
+        hdsb = HypernetsDSBuilder(variables_dict_defs=variables_dict_defs, metadata_defs=metadata_defs)
         self.assertRaises(RuntimeWarning, hdsb.create_ds_template,
                           dim_sizes_dict=dim_sizes_dict,
                           ds_format="def1",
-                          propagate_ds=None,
-                          variables_dict_defs=variables_dict_defs,
-                          metadata_defs=metadata_defs)
+                          propagate_ds=None)
 
     @patch('hypernets_processor.data_io.hypernets_ds_builder.create_template_dataset')
     def test_create_ds_template_runs_with_default_defs(self, mock_create_template_dataset):
