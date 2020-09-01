@@ -3,12 +3,16 @@ test_functions module - module with functions to help with testing
 """
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_db_builder import HypernetsDBBuilder
+from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 from hypernets_processor.context import Context
 from hypernets_processor.cli.common import read_config_file, configure_logging
 from hypernets_processor.utils.paths import relative_path
 import datetime
 import os
 import shutil
+import numpy as np
+from copy import copy
 
 
 '''___Authorship___'''
@@ -22,6 +26,16 @@ __status__ = "Development"
 this_directory = os.path.dirname(__file__)
 TEMPLATE_PROCESSOR_CONFIG_PATH = relative_path("../etc/processor.config", this_directory)
 TEMPLATE_JOB_CONFIG_PATH = relative_path("../cli/config_templates/job.config", this_directory)
+
+TEST_DS_DIM_SIZES_W = {"wavelength": 271,
+                       "series": 3,
+                       "scan": 10,
+                       "sequence": 1}
+
+TEST_DS_DIM_SIZES_L = {"wavelength": 271,
+                       "series": 20,
+                       "scan": 10,
+                       "sequence": 1}
 
 
 def setup_test_metadata_db(url):
@@ -202,5 +216,87 @@ def teardown_test_context(context, remove_directories=False, remove_dbs=False):
         shutil.rmtree(context.raw_data_directory)
 
 
+def create_test_ds(ds_format):
+    """
+    Returns sample ds with random data
+
+    :type ds_format: str
+    :param ds_format: format string of dataset
+
+    :return: test ds
+    :rtype: xarray.Dataset
+    """
+
+    context = setup_test_context()
+    dsb = HypernetsDSBuilder(context=context)
+
+    dim_sizes_dict = dsb.create_empty_dim_sizes_dict(ds_format)
+    variable_names = dsb.return_ds_format_variable_names(ds_format)
+
+    dim_values = TEST_DS_DIM_SIZES_L
+    if ds_format[0] == "W":
+        dim_values = TEST_DS_DIM_SIZES_W
+
+    for k in dim_sizes_dict.keys():
+        dim_sizes_dict[k] = dim_values[k]
+
+    ds = dsb.create_ds_template(dim_sizes_dict, ds_format)
+
+    remaining_variables = copy(variable_names)
+    for variable_name in variable_names:
+        if variable_name == "wavelength":
+            wavelength_data = np.concatenate((np.arange(400, 1000, 3), np.arange(1000, 1700 + 10, 10)))
+            ds = ds.assign_coords(coords={"wavelength": ds.wavelength.copy(data=wavelength_data).variable})
+
+        elif variable_name == "bandwidth":
+            ds[variable_name].data = np.random.normal(1.0, 0.5, len(ds[variable_name].data))
+
+        elif variable_name == "acquisition_time":
+            ds[variable_name].data = np.arange(10000, 10000 + len(ds[variable_name].data), dtype=int)
+
+        # geometry data
+        elif "angle" in variable_name:
+            ds[variable_name].data = np.linspace(30, 60, len(ds[variable_name].data))
+
+        # geometry data
+        elif "acceleration" in variable_name:
+            ds[variable_name].data = np.random.normal(1.0, 0.5, ds[variable_name].data.shape)
+
+        # observation data
+        elif "reflectance" in variable_name:
+            if variable_name[0] == "u":
+                ds[variable_name].data = np.random.normal(1.0, 0.5, ds[variable_name].data.shape)
+            if variable_name[:3] == "cov":
+                ds[variable_name].data = np.random.normal(1.0, 0.5, ds[variable_name].data.shape)
+            else:
+                ds[variable_name].data = np.round(np.random.rand(*ds[variable_name].data.shape), 3)
+
+        elif "radiance" in variable_name:
+            if variable_name[0] == "u":
+                ds[variable_name].data = np.random.normal(1.0, 0.5, ds[variable_name].data.shape)
+            if variable_name[:3] == "cov":
+                ds[variable_name].data = np.random.normal(1.0, 0.5, ds[variable_name].data.shape)
+            else:
+                ds[variable_name].data = np.round(np.random.rand(*ds[variable_name].data.shape)*100, 3)
+
+        elif "digital_number" in variable_name:
+            if variable_name[0] == "u":
+                ds[variable_name].data = np.random.normal(1.0, 0.5, ds[variable_name].data.shape)
+            if variable_name[:3] == "cov":
+                ds[variable_name].data = np.random.normal(1.0, 0.5, ds[variable_name].data.shape)
+            else:
+                ds[variable_name].data = (np.random.rand(*ds[variable_name].data.shape)*200).astype(int)
+
+        else:
+            continue
+
+        remaining_variables.remove(variable_name)
+
+    remaining_variables.remove("quality_flag")
+
+    return ds
+
+
 if __name__ == '__main__':
+    create_test_ds('W_L1B')
     pass
