@@ -7,7 +7,8 @@ Lat=43.69886
 Lon=7.30720
 
 [MODEL_NAME]
-model=seq_rep,seq_line,vaa,azimuth_ref,vza,mode,action,it,scan_total,series_time
+model=series_rep,series_id,vaa,azimuth_ref,vza,mode,action,it,scan_total,series_time
+#model=seq_rep,seq_line,vaa,azimuth_ref,vza,mode,action,it,scan_total,series_time
 
 [CC]
 mapping_vis_a: +1.6499700E+02
