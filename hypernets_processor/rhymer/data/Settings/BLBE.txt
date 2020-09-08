@@ -1,0 +1,14 @@
+version=20190710-QC
+platform_id=BLANKAART_SOUTH
+platform_description=Blankaart SOUTH end of the railing
+output_plot=True
+output_nc=True
+output_csv=False
+scan_diff_test=True
+## final measurement test
+test_measurement=True
+test_sun_wave=750
+test_sun_threshold=0.05
+test_var_wave=780
+test_var_threshold=0.10
+verbosity=5

@@ -1,0 +1,7 @@
+## Modified settings for rhymer
+## Config for the VLIZ "office" deployment
+version=20190710-NOQC
+scan_diff_test=False
+test_measurement=False
+platform_id=VLIZ_OFFICE 
+platform_description=Inside, Dieter's office

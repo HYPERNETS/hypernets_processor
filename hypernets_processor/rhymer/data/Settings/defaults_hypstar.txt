@@ -1,0 +1,61 @@
+## DEFAULT settings for rhymer
+version=20190710
+
+## platform identification - change these in user settings file
+platform_id=Unknown 
+platform_description=Missing
+
+## output settings
+output_nc=False
+output_csv=True
+output_plot=False
+verbosity=0
+
+## PANTHYR set up
+measurement_order=ed_before,lsky_before,lu,lsky_after,ed_after
+min_lu=9
+min_ed=5
+min_ls=5
+
+## wavelength interpolation
+wave_start=355
+wave_end=945
+wave_step=2.5
+
+## Fresnel correction
+## options Mobley - version M1999 (M2015 not tested yet)
+##         Ruddick2006
+fresnel_option=Mobley
+mobley_version=M1999
+wind_ancillary=False
+wind_default=2.0
+rhof_default=0.0256
+wind_file=None
+wind_max_time_diff=10
+
+## Processing settings
+## scan variability check
+scan_diff_test=True
+scan_diff_wave=550
+scan_diff_threshold=0.25
+## scale ed with cos sun zenith for variability check
+ed_cos_sza=True
+
+## SimSpec settings
+similarity_test=False
+similarity_correct=True
+similarity_wr=670
+similarity_wp=0.05
+similarity_w1=720
+similarity_w2=780
+similarity_alpha=2.35
+
+## final measurement test
+test_measurement=True
+test_sun_wave=750
+test_sun_threshold=0.05
+test_var_wave=780
+test_var_threshold=0.10
+
+
+
