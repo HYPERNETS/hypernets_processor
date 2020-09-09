@@ -40,9 +40,9 @@ class HypernetsProcessor:
         """
         Runs hypernets data processing jobs
         """
-        ds_irr = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_IRR_20200715T133429_v0.0.nc')
-        ds_rad = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_RAD_20200715T133429_v0.0.nc')
-        ds_bla = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_BLA_20200715T133429_v0.0.nc')
+        ds_irr = xr.open_dataset('./hypernets_processor/examples/HYPERNETS_W_VFFR_L0_IRR_202008211547_v0.0.nc')
+        ds_rad = xr.open_dataset('./hypernets_processor/examples/HYPERNETS_W_VFFR_L0_RAD_202008211547_v0.0.nc')
+        ds_bla = xr.open_dataset('./hypernets_processor/examples/HYPERNETS_W_VFFR_L0_BLA_202008211547_v0.0.nc')
         #ds_bla = ds_bla.rename({"digital_number":"dark_signal"})
         ds_bla["digital_number"].values= ds_bla["digital_number"].values/10.
 
@@ -66,17 +66,17 @@ class HypernetsProcessor:
         L1a_irr=cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,measurement_function='StandardMeasurementFunction')
         # L1a_rad=xr.open_dataset("../examples/test_L1a_rad.nc")
         # L1a_irr=xr.open_dataset("../examples/test_L1a_irr.nc")
-        L1b_rad=cal.average_l1b("radiance",L1a_rad)
-        L1b_irr=cal.average_l1b("irradiance",L1a_irr)
-        L1c=intp.interpolate_l1c(L1b_rad,L1b_irr,"LandNetworkInterpolationIrradianceLinear")
-        L2a=surf.process(L1c,"LandNetworkProtocol")
+        # L1b_rad=cal.average_l1b("radiance",L1a_rad)
+        # L1b_irr=cal.average_l1b("irradiance",L1a_irr)
+        # L1c=intp.interpolate_l1c(L1b_rad,L1b_irr,"LandNetworkInterpolationIrradianceLinear")
+        # L2a=surf.process(L1c,"LandNetworkProtocol")
 
-        HypernetsWriter.write(L1a_rad,"../examples/test_L1a_rad.nc",overwrite=True)
-        HypernetsWriter.write(L1a_irr,"../examples/test_L1a_irr.nc",overwrite=True)
-        HypernetsWriter.write(L1b_rad,"../examples/test_L1b_rad.nc",overwrite=True)
-        HypernetsWriter.write(L1b_irr,"../examples/test_L1b_irr.nc",overwrite=True)
-        HypernetsWriter.write(L1c,"../examples/test_L1c.nc",overwrite=True)
-        HypernetsWriter.write(L2a,"../examples/test_L2a.nc",overwrite=True)
+        HypernetsWriter.write(L1a_rad,"./hypernets_processor/examples/test_L1a_rad.nc",overwrite=True)
+        HypernetsWriter.write(L1a_irr,"./hypernets_processor/examples/test_L1a_irr.nc",overwrite=True)
+        # HypernetsWriter.write(L1b_rad,"../examples/test_L1b_rad.nc",overwrite=True)
+        # HypernetsWriter.write(L1b_irr,"../examples/test_L1b_irr.nc",overwrite=True)
+        # HypernetsWriter.write(L1c,"../examples/test_L1c.nc",overwrite=True)
+        # HypernetsWriter.write(L2a,"../examples/test_L2a.nc",overwrite=True)
         return None
 
 
