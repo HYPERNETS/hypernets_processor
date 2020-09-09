@@ -70,6 +70,7 @@ class HypernetsProcessor:
                                     measurement_function='StandardMeasurementFunction')
         L1a_irr = cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,
                                    measurement_function='StandardMeasurementFunction')
+        print(L1a_rad["series_id"])
         # L1a_radb = cal.calibrate_l1a("radiance",ds_rad,ds_bla,calibration_data,
         #                             measurement_function='StandardMeasurementFunction')
         # L1a_irrb = cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,
@@ -78,7 +79,10 @@ class HypernetsProcessor:
         # L1a_irr=xr.open_dataset("../examples/test_L1a_irr.nc")
         L1b_rad=cal.average_l1b("radiance",L1a_rad)
         L1b_irr=cal.average_l1b("irradiance",L1a_irr)
-        # L1c=intp.interpolate_l1c(L1b_rad,L1b_irr,"LandNetworkInterpolationIrradianceLinear")
+        print(L1b_rad)
+
+        L1c=intp.interpolate_l1c(L1b_rad,L1b_irr,"LandNetworkInterpolationIrradianceLinear")
+        print(L1c)
         # L2a=surf.process(L1c,"LandNetworkProtocol")
 
 
