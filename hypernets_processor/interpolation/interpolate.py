@@ -4,6 +4,7 @@ Interpolation class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.interpolation.measurement_functions.interpolation_factory import InterpolationFactory
 import punpy
 import numpy as np
@@ -21,6 +22,7 @@ class InterpolateL1c:
         self._measurement_function_factory = InterpolationFactory()
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
         self.hdsb = HypernetsDSBuilder(context=context)
+        self.writer=HypernetsWriter(context)
         self.context=context
 
     def interpolate_l1c(self,dataset_l1b_rad,dataset_l1b_irr,measurement_function):
@@ -39,6 +41,7 @@ class InterpolateL1c:
 
         dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr,measurement_function)
 
+        self.writer.write(dataset_l1c,overwrite=True)
         return dataset_l1c
 
     def interpolate_irradiance(self,dataset_l1c,dataset_l1b_irr,measurement_function):
