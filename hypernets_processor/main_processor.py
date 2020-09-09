@@ -8,6 +8,8 @@ from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceR
 from hypernets_processor.interpolation.interpolate import InterpolateL1c
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
+from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
+
 import xarray as xr
 import numpy as np
 
@@ -46,9 +48,13 @@ class HypernetsProcessor:
         #ds_bla = ds_bla.rename({"digital_number":"dark_signal"})
         ds_bla["digital_number"].values= ds_bla["digital_number"].values/10.
 
-        cal=Calibrate(MCsteps=100)
-        intp=InterpolateL1c(MCsteps=100)
-        surf=SurfaceReflectance(MCsteps=100)
+        temp_name = 'test01'
+
+        context = setup_test_context()
+
+        cal=Calibrate(context,MCsteps=100)
+        intp=InterpolateL1c(context,MCsteps=10000)
+        surf=SurfaceReflectance(context,MCsteps=10000)
 
 
 
@@ -56,27 +62,35 @@ class HypernetsProcessor:
         calibration_data["gains"] = np.ones(len(ds_rad["wavelength"]))
         calibration_data["temp"] = 20*np.ones(len(ds_rad["wavelength"]))
         calibration_data["u_random_gains"] = 0.1*np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_random_dark_signal"] = np.zeros(len(ds_rad["wavelength"]))
+        calibration_data["u_random_dark_signal"] = np.zeros((len(ds_rad["wavelength"])))
         calibration_data["u_random_temp"] = 1*np.ones(len(ds_rad["wavelength"]))
         calibration_data["u_systematic_gains"] = 0.05*np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_systematic_dark_signal"] = np.zeros(len(ds_rad["wavelength"]))
+        calibration_data["u_systematic_dark_signal"] = np.zeros((len(ds_rad["wavelength"])))
         calibration_data["u_systematic_temp"] = 1*np.ones(len(ds_rad["wavelength"]))
 
-        L1a_rad=cal.calibrate_l1a("radiance",ds_rad,ds_bla,calibration_data,measurement_function='StandardMeasurementFunction')
-        L1a_irr=cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,measurement_function='StandardMeasurementFunction')
+        L1a_rad = cal.calibrate_l1a("radiance",ds_rad,ds_bla,calibration_data,
+                                    measurement_function='StandardMeasurementFunction')
+        L1a_irr = cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,
+                                    measurement_function='StandardMeasurementFunction')
+        L1a_radb = cal.calibrate_l1a("radiance",ds_rad,ds_bla,calibration_data,
+                                    measurement_function='StandardMeasurementFunction')
+        L1a_irrb = cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,
+                                    measurement_function='StandardMeasurementFunction')
         # L1a_rad=xr.open_dataset("../examples/test_L1a_rad.nc")
         # L1a_irr=xr.open_dataset("../examples/test_L1a_irr.nc")
-        L1b_rad=cal.average_l1b("radiance",L1a_rad)
-        L1b_irr=cal.average_l1b("irradiance",L1a_irr)
-        L1c=intp.interpolate_l1c(L1b_rad,L1b_irr,"LandNetworkInterpolationIrradianceLinear")
-        L2a=surf.process(L1c,"LandNetworkProtocol")
+        # L1b_rad=cal.average_l1b("radiance",L1a_rad)
+        # L1b_irr=cal.average_l1b("irradiance",L1a_irr)
+        # L1c=intp.interpolate_l1c(L1b_rad,L1b_irr,"LandNetworkInterpolationIrradianceLinear")
+        # L2a=surf.process(L1c,"LandNetworkProtocol")
 
         HypernetsWriter.write(L1a_rad,"../examples/test_L1a_rad.nc",overwrite=True)
         HypernetsWriter.write(L1a_irr,"../examples/test_L1a_irr.nc",overwrite=True)
-        HypernetsWriter.write(L1b_rad,"../examples/test_L1b_rad.nc",overwrite=True)
-        HypernetsWriter.write(L1b_irr,"../examples/test_L1b_irr.nc",overwrite=True)
-        HypernetsWriter.write(L1c,"../examples/test_L1c.nc",overwrite=True)
-        HypernetsWriter.write(L2a,"../examples/test_L2a.nc",overwrite=True)
+        HypernetsWriter.write(L1a_radb,"../examples/test_L1a_radb.nc",overwrite=True)
+        HypernetsWriter.write(L1a_irrb,"../examples/test_L1a_irrb.nc",overwrite=True)
+        # HypernetsWriter.write(L1b_rad,"../examples/test_L1b_rad.nc",overwrite=True)
+        # HypernetsWriter.write(L1b_irr,"../examples/test_L1b_irr.nc",overwrite=True)
+        # HypernetsWriter.write(L1c,"../examples/test_L1c.nc",overwrite=True)
+        # HypernetsWriter.write(L2a,"../examples/test_L2a.nc",overwrite=True)
         return None
 
 

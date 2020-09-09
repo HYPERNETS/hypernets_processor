@@ -18,9 +18,11 @@ __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
 class Calibrate:
-    def __init__(self,MCsteps=1000,parallel_cores=0):
+    def __init__(self,context,MCsteps=1000,parallel_cores=0):
         self._measurement_function_factory = MeasurementFunctionFactory()
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        self.hdsb = HypernetsDSBuilder(context=context)
+        self.context=context
 
     def calibrate_l1a(self,measurandstring,dataset_l0,dataset_l0_bla,calibration_data,measurement_function='StandardMeasurementFunction'):
 
@@ -46,10 +48,10 @@ class Calibrate:
         l1b_dim_sizes_dict = {"wavelength":len(dataset_l1a["wavelength"]),
                               "series":len(np.unique(dataset_l1a['acquisition_time']))}
         if measurandstring == "radiance":
-            dataset_l1b = HypernetsDSBuilder.create_ds_template(l1b_dim_sizes_dict,"L_L1B_RAD")
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"L_L1B_RAD")
             dataset_l1b["wavelength"] = dataset_l1a["wavelength"]
         elif measurandstring == "irradiance":
-            dataset_l1b = HypernetsDSBuilder.create_ds_template(l1b_dim_sizes_dict,"L_L1B_IRR")
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"L_L1B_IRR")
             dataset_l1b["wavelength"] = dataset_l1a["wavelength"]
 
 
@@ -203,6 +205,7 @@ class Calibrate:
             maski=np.ones_like(intsig)
             maski[np.where(np.abs(intsig-noiseavg)>=k_unc*noisestd)]=2
             mask=np.append(mask,maski)
+
         #check if 10% of pixels are outiers
 
         # mask_wvl = np.zeros((len(datasetl0["wavelength"]),len(datasetl0["scan"])))
@@ -259,11 +262,11 @@ class Calibrate:
 
         l1a_dim_sizes_dict = {"wavelength":len(datasetl0["wavelength"]),"scan":len(datasetl0["scan"])}
         if measurandstring=="radiance":
-            l1a = HypernetsDSBuilder.create_ds_template(l1a_dim_sizes_dict,"L_L1A_RAD")
+            l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,ds_format="L_L1A_RAD",propagate_ds=datasetl0)
             l1a["wavelength"] = datasetl0["wavelength"]
             l1a["acquisition_time"] = datasetl0["acquisition_time"]
         elif measurandstring=="irradiance":
-            l1a = HypernetsDSBuilder.create_ds_template(l1a_dim_sizes_dict,"L_L1A_IRR")
+            l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,"L_L1A_IRR",propagate_ds=datasetl0)
             l1a["wavelength"] = datasetl0["wavelength"]
             l1a["acquisition_time"] = datasetl0["acquisition_time"]
 
