@@ -18,9 +18,11 @@ __status__ = "Development"
 
 
 class SurfaceReflectance:
-    def __init__(self,MCsteps=1000,parallel_cores=1):
+    def __init__(self,context,MCsteps=1000,parallel_cores=1):
         self._measurement_function_factory = ProtocolFactory()
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        self.hdsb = HypernetsDSBuilder(context=context)
+        self.context = context
 
     def process(self,dataset_l1c,measurement_function):
         dataset_l1c = self.perform_checks(dataset_l1c)
@@ -104,7 +106,7 @@ class SurfaceReflectance:
         """
         l2a_dim_sizes_dict = {"wavelength":len(datasetl1c["wavelength"]),
                               "series":len(datasetl1c['series'])}
-        l2a = HypernetsDSBuilder.create_ds_template(l2a_dim_sizes_dict,"L_L2A")
+        l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict,"L_L2A")
 
         return l2a
 
