@@ -4,9 +4,9 @@ Calibration class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.measurement_functions.measurement_function_factory import MeasurementFunctionFactory
-#import punpy
-from hypernets_processor.mc_propagation import MCPropagation
+import punpy
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 import numpy as np
 
@@ -19,10 +19,12 @@ __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
 class Calibrate:
-    def __init__(self,MCsteps=1000,parallel_cores=0):
+    def __init__(self,context,MCsteps=1000,parallel_cores=0):
         self._measurement_function_factory = MeasurementFunctionFactory()
-        #self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
-        self.prop= MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
+        self.hdsb = HypernetsDSBuilder(context=context)
+        self.writer=HypernetsWriter(context)
+        self.context=context
 
     def calibrate_l1a(self,measurandstring,dataset_l0,dataset_l0_bla,calibration_data,measurement_function='StandardMeasurementFunction'):
 
@@ -42,20 +44,16 @@ class Calibrate:
         u_systematic_input_qty_l1a = self.find_u_systematic_input(input_vars,dataset_l0,dataset_l0_bla,calibration_data)
         dataset_l1a = self.process_measurement_function(measurandstring,dataset_l1a,calibrate_function.function,input_qty_l1a,
                                                             u_random_input_qty_l1a,u_systematic_input_qty_l1a)
+        if self.context.write_l1a:
+            self.writer.write(dataset_l1a,overwrite=True)
+            self.writer.write(dataset_l1a,overwrite=True)
+
         return dataset_l1a
 
     def average_l1b(self,measurandstring,dataset_l1a):
-        l1b_dim_sizes_dict = {"wavelength":len(dataset_l1a["wavelength"]),
-                              "series":len(np.unique(dataset_l1a['acquisition_time']))}
-        if measurandstring == "radiance":
-            dataset_l1b = HypernetsDSBuilder().create_ds_template(l1b_dim_sizes_dict,"L_L1B_RAD")
-            dataset_l1b["wavelength"] = dataset_l1a["wavelength"]
-        elif measurandstring == "irradiance":
-            dataset_l1b = HypernetsDSBuilder().create_ds_template(l1b_dim_sizes_dict,"L_L1B_IRR")
-            dataset_l1b["wavelength"] = dataset_l1a["wavelength"]
 
+        dataset_l1b = self.l1b_template_from_l1a_dataset(measurandstring,dataset_l1a)
 
-        dataset_l1b["acquisition_time"].values = np.unique(dataset_l1a['acquisition_time'])
         dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a,measurandstring)
         dataset_l1b["u_random_"+measurandstring].values = self.calc_mean_masked(dataset_l1a,"u_random_"+measurandstring,rand_unc=True)
         dataset_l1b["u_systematic_"+measurandstring].values = self.calc_mean_masked(dataset_l1a,"u_systematic_"+measurandstring)
@@ -64,16 +62,18 @@ class Calibrate:
         print((self.calc_mean_masked(dataset_l1a,"corr_systematic_"+measurandstring,corr=True)).shape)
         dataset_l1b["corr_systematic_"+measurandstring].values = self.calc_mean_masked(dataset_l1a,"corr_systematic_"+measurandstring,corr=True)
 
+        self.writer.write(dataset_l1b,overwrite=True)
+
         return dataset_l1b
 
     def calc_mean_masked(self,dataset,var,rand_unc=False,corr=False):
-        acqui = np.unique(dataset['acquisition_time'])
+        series_id = np.unique(dataset['series_id'])
         if corr:
-            out = np.empty((len(acqui),len(dataset['wavelength']),len(dataset['wavelength'])))
+            out = np.empty((len(series_id),len(dataset['wavelength']),len(dataset['wavelength'])))
         else:
-            out = np.empty((len(acqui),len(dataset['wavelength'])))
-        for i in range(len(acqui)):
-            ids = np.where((dataset['acquisition_time'] == acqui[i]) & (dataset['quality_flag']==1))
+            out = np.empty((len(series_id),len(dataset['wavelength'])))
+        for i in range(len(series_id)):
+            ids = np.where((dataset['series_id'] == series_id[i]) & (dataset['quality_flag']==1))
             out[i] = np.mean(dataset[var].values[:,ids],axis=2)[:,0]
             if rand_unc:
                 out[i]=out[i]/len(ids[0])
@@ -205,6 +205,7 @@ class Calibrate:
             maski=np.ones_like(intsig)
             maski[np.where(np.abs(intsig-noiseavg)>=k_unc*noisestd)]=2
             mask=np.append(mask,maski)
+
         #check if 10% of pixels are outiers
 
         # mask_wvl = np.zeros((len(datasetl0["wavelength"]),len(datasetl0["scan"])))
@@ -249,7 +250,7 @@ class Calibrate:
         return sigma_new,average,values
 
 
-    def l1a_template_from_l0_dataset(self,measurandstring,datasetl0):
+    def l1a_template_from_l0_dataset(self,measurandstring,dataset_l0):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 
@@ -259,17 +260,42 @@ class Calibrate:
         :rtype:
         """
 
-        l1a_dim_sizes_dict = {"wavelength":len(datasetl0["wavelength"]),"scan":len(datasetl0["scan"])}
+        l1a_dim_sizes_dict = {"wavelength":len(dataset_l0["wavelength"]),"scan":len(dataset_l0["scan"])}
         if measurandstring=="radiance":
-            l1a = HypernetsDSBuilder().create_ds_template(l1a_dim_sizes_dict,"L_L1A_RAD")
-            l1a["wavelength"] = datasetl0["wavelength"]
-            l1a["acquisition_time"] = datasetl0["acquisition_time"]
+            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,ds_format="L_L1A_RAD",propagate_ds=dataset_l0)
         elif measurandstring=="irradiance":
-            l1a = HypernetsDSBuilder().create_ds_template(l1a_dim_sizes_dict,"L_L1A_IRR")
-            l1a["wavelength"] = datasetl0["wavelength"]
-            l1a["acquisition_time"] = datasetl0["acquisition_time"]
+            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,"L_L1A_IRR",propagate_ds=dataset_l0)
 
-        return l1a
+        return dataset_l1a
+
+    def l1b_template_from_l1a_dataset(self,measurandstring,dataset_l1a):
+        """
+        Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
+
+        :param datasetl0:
+        :type datasetl0:
+        :return:
+        :rtype:
+        """
+        l1b_dim_sizes_dict = {"wavelength":len(dataset_l1a["wavelength"]),
+                              "series":len(np.unique(dataset_l1a['series_id']))}
+
+        if measurandstring == "radiance":
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"L_L1B_RAD",propagate_ds=dataset_l1a)
+        elif measurandstring == "irradiance":
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"L_L1B_IRR",propagate_ds=dataset_l1a)
+
+        series_id = np.unique(dataset_l1a['series_id'])
+        dataset_l1b["series_id"].values = series_id
+
+        for variablestring in ["acquisition_time","viewing_azimuth_angle","viewing_zenith_angle","solar_azimuth_angle","solar_zenith_angle"]:
+            temp_arr = np.empty(len(series_id))
+            for i in range(len(series_id)):
+                ids = np.where((dataset_l1a['series_id'] == series_id[i]) & (dataset_l1a['quality_flag'] == 1))
+                temp_arr[i] = np.mean(dataset_l1a[variablestring].values[ids])
+            dataset_l1b[variablestring].values=temp_arr
+
+        return dataset_l1b
 
     def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
                                      u_systematic_input_quantities):
