@@ -46,7 +46,6 @@ class Calibrate:
                                                             u_random_input_qty_l1a,u_systematic_input_qty_l1a)
         if self.context.write_l1a:
             self.writer.write(dataset_l1a,overwrite=True)
-            self.writer.write(dataset_l1a,overwrite=True)
 
         return dataset_l1a
 
