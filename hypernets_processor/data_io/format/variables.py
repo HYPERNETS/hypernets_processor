@@ -136,6 +136,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                                             "00:00:00",
                                                                "units": "s"},
                                                 "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+
                            "series_id": {"dim": [SERIES_DIM],
                                                 "dtype": np.uint16,
                                                 "attributes": {"standard_name": "series_id",
@@ -254,7 +255,7 @@ L1A_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SCAN_DIM],
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
                                        "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
                      "radiance": {"dim": [WL_DIM, SCAN_DIM],
-                                       "dtype": np.uint32,
+                                       "dtype": np.int32,
                                        "attributes": {"standard_name": "radiance",
                                                       "long_name": "upwelling radiance",
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
@@ -285,11 +286,11 @@ L1A_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SCAN_DIM],
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
                                        "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
                      "irradiance": {"dim": [WL_DIM, SCAN_DIM],
-                                       "dtype": np.uint32,
+                                       "dtype": np.int32,
                                        "attributes": {"standard_name": "irradiance",
                                                       "long_name": "downwelling irradiance",
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
-                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+                                       "encoding": {'dtype': np.int32, "scale_factor": 1, "offset": 0.0}}}
 
 L1B_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SERIES_DIM],
                                        "dtype": np.uint32,
@@ -316,11 +317,11 @@ L1B_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SERIES_DIM],
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
                                        "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
                      "radiance": {"dim": [WL_DIM, SERIES_DIM],
-                                       "dtype": np.uint32,
+                                       "dtype": np.int32,
                                        "attributes": {"standard_name": "radiance",
                                                       "long_name": "upwelling radiance",
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
-                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+                                       "encoding": {'dtype': np.int32, "scale_factor": 1, "offset": 0.0}}}
 
 L1B_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SERIES_DIM],
                                        "dtype": np.uint32,
@@ -347,11 +348,11 @@ L1B_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SERIES_DIM],
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
                                        "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
                      "irradiance": {"dim": [WL_DIM, SERIES_DIM],
-                                       "dtype": np.uint32,
+                                       "dtype": np.int32,
                                        "attributes": {"standard_name": "irradiance",
                                                       "long_name": "downwelling irradiance",
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
-                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+                                       "encoding": {'dtype': np.int32, "scale_factor": 1, "offset": 0.0}}}
 
 # > L1B_WATER_VARIABLES - Variables required for the water network L1b data product
 L1C_WATER_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, SEQ_DIM],
@@ -530,7 +531,7 @@ L_L2A_REFLECTANCE_VARIABLES =  {"u_random_reflectance": {"dim": [WL_DIM, SERIES_
                                                                            "can be used to specify the wavelength or "
                                                                            "frequency, respectively, of the radiation.",
                                                               "units": "-"},
-                                               "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}}}
+                                               "encoding": {'dtype': np.int16, "scale_factor": 0.1, "offset": 0.0}}}
 
 
 # W_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A water data product
