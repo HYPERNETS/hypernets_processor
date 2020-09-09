@@ -4,6 +4,7 @@ Surface reflectance class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import ProtocolFactory
 import punpy
 import numpy as np
@@ -22,6 +23,7 @@ class SurfaceReflectance:
         self._measurement_function_factory = ProtocolFactory()
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
         self.hdsb = HypernetsDSBuilder(context=context)
+        self.writer=HypernetsWriter(context)
         self.context = context
 
     def process(self,dataset_l1c,measurement_function):
@@ -34,6 +36,7 @@ class SurfaceReflectance:
         dataset_l2 = self.l2_from_l1c_dataset(dataset_l1c)
         dataset_l2 = self.process_measurement_function("reflectance",dataset_l2,l1tol2_function.function,input_qty,
                                                        u_random_input_qty,u_systematic_input_qty)
+        self.writer.write(dataset_l2,overwrite=True)
         return dataset_l2
 
     def find_input(self,variables,dataset):

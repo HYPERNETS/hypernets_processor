@@ -46,15 +46,15 @@ class HypernetsProcessor:
         ds_rad = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_RAD_202008211547_v0.0.nc')
         ds_bla = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_BLA_202008211547_v0.0.nc')
         #ds_bla = ds_bla.rename({"digital_number":"dark_signal"})
-        ds_bla["digital_number"].values= ds_bla["digital_number"].values/10.
+        #ds_bla["digital_number"].values= ds_bla["digital_number"].values/10.
 
         temp_name = 'test01'
 
         context = setup_test_context()
 
         cal=Calibrate(context,MCsteps=100)
-        intp=InterpolateL1c(context,MCsteps=10000)
-        surf=SurfaceReflectance(context,MCsteps=10000)
+        intp=InterpolateL1c(context,MCsteps=1000)
+        surf=SurfaceReflectance(context,MCsteps=1000)
 
         calibration_data={}
         calibration_data["gains"] = np.ones(len(ds_rad["wavelength"]))
@@ -70,7 +70,7 @@ class HypernetsProcessor:
                                     measurement_function='StandardMeasurementFunction')
         L1a_irr = cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,
                                    measurement_function='StandardMeasurementFunction')
-        print(L1a_rad["series_id"])
+        print(L1a_rad["viewing_zenith_angle"])
         # L1a_radb = cal.calibrate_l1a("radiance",ds_rad,ds_bla,calibration_data,
         #                             measurement_function='StandardMeasurementFunction')
         # L1a_irrb = cal.calibrate_l1a("irradiance",ds_irr,ds_bla,calibration_data,
@@ -79,10 +79,7 @@ class HypernetsProcessor:
         # L1a_irr=xr.open_dataset("../examples/test_L1a_irr.nc")
         L1b_rad=cal.average_l1b("radiance",L1a_rad)
         L1b_irr=cal.average_l1b("irradiance",L1a_irr)
-        print(L1b_rad)
-
         L1c=intp.interpolate_l1c(L1b_rad,L1b_irr,"LandNetworkInterpolationIrradianceLinear")
-        print(L1c)
         # L2a=surf.process(L1c,"LandNetworkProtocol")
 
 
