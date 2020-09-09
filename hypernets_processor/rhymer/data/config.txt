@@ -1,0 +1,7 @@
+## config file for rhymer
+data_dir=./data
+met_dir=./data/MET
+calibration_dir=./data/Calibration
+
+panthyr_raw_dir=./data/PANTHYR/RAW
+panthyr_out_dir=./data/PANTHYR/Processed

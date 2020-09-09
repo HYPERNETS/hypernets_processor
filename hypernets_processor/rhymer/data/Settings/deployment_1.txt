@@ -1,0 +1,9 @@
+version=20190710-QC
+platform_id=BLANKAART_NORTH
+scan_diff_test=True
+test_measurement=True
+platform_description=Blankaart NORTH end of the railing
+output_plot=True
+output_nc=True
+output_csv=False
+verbosity=5
