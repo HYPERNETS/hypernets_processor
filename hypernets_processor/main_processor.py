@@ -31,12 +31,12 @@ class HypernetsProcessor:
     :param logger: logger
     """
 
-    def __init__(self, logger=None):
+    def __init__(self,job_config=None,processor_config=None,logger=None):
         """
         Constructor method
         """
 
-        self.logger = logger
+        self.context = Context(job_config,processor_config,logger)
 
     def run(self):
         """
