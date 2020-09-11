@@ -53,6 +53,20 @@ class Context:
         self.l1_mf_name = None
         self.l2_mf_name = None
         self.write_l1a = None
+        self.wind_default=None
+
+        self.wind_default = None
+        self.wind_ancillary = None
+        self.fresnel_option = None
+
+        ## SimSpec settings
+        self.similarity_test = None
+        self.similarity_correct = None
+        self.similarity_wr = None
+        self.similarity_wp = None
+        self.similarity_w1 = None
+        self.similarity_w2 = None
+        self.similarity_alpha = None
 
         # Set logger attribute
         if logger is not None:
@@ -96,6 +110,7 @@ class Context:
         self.l2_mf_name = get_config_value(job_config, "Processing Options", "reflectance_protocol_name")
         self.write_l1a = get_config_value(job_config, "Processing Options", "write_l1a", dtype=bool)
 
+
     def _unpack_processor_config(self, processor_config):
         """
         Unpacks processor_config, sets relevant object attributes
@@ -107,6 +122,19 @@ class Context:
         self.version = get_config_value(processor_config, "Processor", "version")
         self.metadata_db_url = get_config_value(processor_config, "Input", "metadata_db_url")
         self.archive_directory = get_config_value(processor_config, "Output", "archive_directory")
+        self.wind_default= get_config_value(processor_config, "WaterStandardProtocol", "wind_default")
+        self.wind_ancillary= get_config_value(processor_config, "WaterStandardProtocol", "wind_ancillary")
+        self.fresnel_option= get_config_value(processor_config, "WaterStandardProtocol", "fresnel_option")
+        self.rhymer_data_dir=get_config_value(processor_config, "WaterStandardProtocol", "rhymer_data_dir")
+
+        ## SimSpec settings
+        self.similarity_test= get_config_value(processor_config, "WaterStandardProtocol", "similarity_test")
+        self.similarity_correct= get_config_value(processor_config, "WaterStandardProtocol", "similarity_correct")
+        self.similarity_wr= get_config_value(processor_config, "WaterStandardProtocol", "similarity_wr")
+        self.similarity_wp= get_config_value(processor_config, "WaterStandardProtocol", "similarity_wp")
+        self.similarity_w1= get_config_value(processor_config, "WaterStandardProtocol", "similarity_w1")
+        self.similarity_w2= get_config_value(processor_config, "WaterStandardProtocol", "similarity_w2")
+        self.similarity_alpha= get_config_value(processor_config, "WaterStandardProtocol", "similarity_alpha")
 
 
 if __name__ == '__main__':
