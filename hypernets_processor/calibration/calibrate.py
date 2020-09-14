@@ -45,8 +45,8 @@ class Calibrate:
         dataset_l1a = self.process_measurement_function(measurandstring,dataset_l1a,calibrate_function.function,input_qty_l1a,
                                                             u_random_input_qty_l1a,u_systematic_input_qty_l1a)
         if self.context.write_l1a:
-            self.writer.write(dataset_l1a,overwrite=True)
-            self.writer.write(dataset_l1a,overwrite=True)
+            self.writer.write(dataset_l1a)
+            self.writer.write(dataset_l1a)
 
         return dataset_l1a
 
@@ -62,7 +62,8 @@ class Calibrate:
         print((self.calc_mean_masked(dataset_l1a,"corr_systematic_"+measurandstring,corr=True)).shape)
         dataset_l1b["corr_systematic_"+measurandstring].values = self.calc_mean_masked(dataset_l1a,"corr_systematic_"+measurandstring,corr=True)
 
-        self.writer.write(dataset_l1b,overwrite=True)
+        if self.context.write_l1b:
+            self.writer.write(dataset_l1b,overwrite=True)
 
         return dataset_l1b
 

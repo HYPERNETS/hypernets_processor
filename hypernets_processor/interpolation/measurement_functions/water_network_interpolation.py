@@ -8,9 +8,7 @@ class WaterNetworkInterpolationLinear:
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
-        print(output_time)
-        print(times)
-        print(variables)
+
         irradiance_intfunc=scipy.interpolate.interp1d(times,variables)
 
         return irradiance_intfunc(output_time)
