@@ -1,0 +1,106 @@
+# data model segments
+
+- segment: &dmd Data metadata
+- segment: &imd Instrument metadata
+- segment: &smd System metadata
+- segment: &simd Site metadata
+- segment: &comd Components metadata
+- segment: &camd Calibration metadata
+
+# Tables and columns
+
+- table: Global atrtributes
+  segment: *dmd
+  display: accent5
+  columns:
+    system_id: {key: yes}
+    instrument_id: {key: yes}
+    site_id: {key: yes}
+    rad_vnir_id: {key: yes}
+    irrad_vnir_id: {key: yes}
+    latitude_average:
+    latitude_minimum:
+    latitude_maximum:
+    longitude_average:
+    longitude_minimum:
+    longitude_maximum:
+
+- table: sequence_cycle
+  segment: *dmd
+  display: accent5
+  columns:
+    sequence_id: {key: yes}
+    subsequence_id: {key: yes}
+    measurement_configuration_file:
+    measurement_sequence_file:
+    relative_azimuth_angle:
+    timestamp:
+    solar_zenith_angle:
+    lu_datetime_average:
+    lu_datetime_start:
+    lu_datetime_finish:
+    ld_datetime_average:
+    ld_datetime_start:
+    ld_datetime_finish:
+    ed_datetime_average:
+    ed_datetime_start:
+    ed_datetime_finish:
+    lu_units:
+    ld_units:
+    ed_units:
+    lw_units:
+    rhow_units:
+    rhow_nosc_units:
+
+- table: Processing
+  segment: *dmd
+  display: accent5
+  columns:
+    processor_name:
+    processor_version:
+    processor_configuration_file:
+    processor_atbd:
+    processor_input:
+    processor_output:
+    processor_data_level:
+    file_created:
+    inputfile:
+    fresnel_rhof:
+    fresnel_type:
+    fresnel_wind:
+    fresnel_sza:
+    fresnel_vza:
+    fresnel_raa:
+    rad_inclination:
+    irr_inclination:
+    lu_scans_total:
+    lu_scans_temporalvsincomplete:
+    lu_scans_good:
+    ld_scans_total:
+    ld_scans_temporalvsincomplete:
+    ld_scans_good:
+    ed_scans_total:
+    ed_scans_temporalvsincomplete:
+    ed_scans_good:
+    wavelen1:
+    wavelen2:
+    epsave:
+    epsmin:
+    epsmax:
+    epsstd:
+
+- table: Calibration
+  segment: *dmd
+  display: accent5
+  columns:
+    rad_vnir_radcal_filename_1:   	
+    rad_vnir_radcal_filename_2:   	
+    rad_vnir_radcal_date_1:   	
+    rad_vnir_radcal_date_2:
+    rad_vnir_radcal_interp:     
+    irr_vnir_radcal_filename_1:   	
+    irr_vnir_radcal_filename_2:   	
+    irr_vnir_radcal_date_1:   	
+    irr_vnir_radcal_date_2:  
+    irr_vnir_radcal_interp:
+
