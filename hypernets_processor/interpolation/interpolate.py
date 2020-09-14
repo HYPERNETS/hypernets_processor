@@ -47,7 +47,9 @@ class InterpolateL1c:
         dataset_l1b=self.interpolate_skyradiance(dataset_l1b, dataset_l1b_uprad, measurement_function)
         print("interpolate irradiances")
         dataset_l1b=self.interpolate_irradiance(dataset_l1b, dataset_l1b_irr, measurement_function)
-        self.writer.write(dataset_l1b,overwrite=True)
+
+        if self.context.write_l1b:
+            self.writer.write(dataset_l1b,overwrite=True)
         return dataset_l1b
 
     def interpolate_l1c(self,dataset_l1b_rad,dataset_l1b_irr,measurement_function):

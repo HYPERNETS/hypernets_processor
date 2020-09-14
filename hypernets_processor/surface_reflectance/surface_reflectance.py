@@ -96,9 +96,10 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
+
         return dataset_l1
 
-    def l2_from_l1c_dataset(self,datasetl1c):
+    def l2_from_l1c_dataset(self,datasetl1c, measurement_function):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
 
@@ -107,9 +108,14 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
-        l2a_dim_sizes_dict = {"wavelength":len(datasetl1c["wavelength"]),
-                              "series":len(datasetl1c['series'])}
-        l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict,"L_L2A")
+        l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
+                              "series": len(datasetl1c['series'])}
+        if measurement_function =="LandNetworkProtocol":
+            l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "L_L2A")
+        else:
+            l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
+                                  "series": len(datasetl1c['series'])}
+            l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A")
 
         return l2a
 
@@ -128,10 +134,6 @@ class SurfaceReflectance:
         dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand
 
         return dataset
-
-
-
-
 
 
 
