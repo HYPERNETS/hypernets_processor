@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch, call
 from hypernets_processor.version import __version__
 from hypernets_processor.test.test_functions import setup_test_job_config, setup_test_processor_config
 from hypernets_processor.calibration.calibrate import Calibrate
+import xarray as xr
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -16,6 +17,14 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+def setup_test_files():
+    ds_irr = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_IRR_202008211547_v0.0.nc')
+    ds_rad = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_RAD_202008211547_v0.0.nc')
+    ds_bla = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_BLA_202008211547_v0.0.nc')
+
+    ds_rad["digital_number"].values=
+    ds_irr["digital_number"].values=
+    ds_bla["digital_number"].values=np.ones(["digital_number"].values.shape)
 
 class TestCalibrate(unittest.TestCase):
 
