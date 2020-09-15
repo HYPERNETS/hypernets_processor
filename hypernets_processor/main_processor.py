@@ -7,7 +7,7 @@ from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
 from hypernets_processor.interpolation.interpolate import InterpolateL1c
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
-
+from hypernets_processor.context import Context
 from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
 
 import xarray as xr
@@ -47,6 +47,8 @@ class HypernetsProcessor:
         ds_bla = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_BLA_202008211547_v0.0.nc')
         #ds_bla = ds_bla.rename({"digital_number":"dark_signal"})
         #ds_bla["digital_number"].values= ds_bla["digital_number"].values/10.
+
+        #np.save("wavs_hypernets.npy",ds_rad["wavelength"].values)
 
         temp_name = 'test01'
 
