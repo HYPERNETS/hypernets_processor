@@ -26,16 +26,26 @@ class SurfaceReflectance:
         self.writer=HypernetsWriter(context)
         self.context = context
 
-    def process(self,dataset_l1c,measurement_function):
+    def process(self,dataset_l1c):
         dataset_l1c = self.perform_checks(dataset_l1c)
-        l1tol2_function = self._measurement_function_factory.get_measurement_function(measurement_function)
+        l1tol2_function = self._measurement_function_factory.get_measurement_function(self.context.measurement_function_surface_reflectance)
         input_vars = l1tol2_function.get_argument_names()
         input_qty = self.find_input(input_vars,dataset_l1c)
         u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1c)
         u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1c)
         dataset_l2 = self.l2_from_l1c_dataset(dataset_l1c)
-        dataset_l2 = self.process_measurement_function("reflectance",dataset_l2,l1tol2_function.function,input_qty,
-                                                       u_random_input_qty,u_systematic_input_qty)
+
+        if self.context.network=="water":
+            dataset_l2 = self.process_measurement_function(["nlw","rhow_nosc","rhow"],
+                dataset_l2,l1tol2_function.function,input_qty,u_random_input_qty,
+                u_systematic_input_qty)
+
+        elif self.context.network=="land":
+            dataset_l2 = self.process_measurement_function("reflectance",dataset_l2,
+                                                           l1tol2_function.function,
+                                                           input_qty,u_random_input_qty,
+                                                           u_systematic_input_qty)
+
         self.writer.write(dataset_l2,overwrite=True)
         return dataset_l2
 
@@ -68,7 +78,10 @@ class SurfaceReflectance:
         """
         inputs = []
         for var in variables:
-            inputs.append(dataset["u_random_"+var].values)
+            try:
+                inputs.append(dataset["u_random_"+var].values)
+            except:
+                inputs.append(None)
         return inputs
 
     def find_u_systematic_input(self,variables,dataset):
@@ -84,7 +97,10 @@ class SurfaceReflectance:
         """
         inputs = []
         for var in variables:
-            inputs.append(dataset["u_systematic_"+var].values)
+            try:
+                inputs.append(dataset["u_systematic_"+var].values)
+            except:
+                inputs.append(None)
         return inputs
 
     def perform_checks(self,dataset_l1):
@@ -96,6 +112,7 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
+
         return dataset_l1
 
     def l2_from_l1c_dataset(self,datasetl1c):
@@ -107,31 +124,34 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
-        l2a_dim_sizes_dict = {"wavelength":len(datasetl1c["wavelength"]),
-                              "series":len(datasetl1c['series'])}
-        l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict,"L_L2A")
+        if self.context.network == "land":
+            l2a_dim_sizes_dict = {"wavelength":len(datasetl1c["wavelength"]),
+                                  "series":len(datasetl1c['series'])}
+            l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "L_L2A")
+
+        elif self.context.network == "water":
+            l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
+                                  "scan": len(datasetl1c['scan'])}
+            l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A")
 
         return l2a
 
-    def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
+    def process_measurement_function(self,measurandstrings,dataset,measurement_function,input_quantities,u_random_input_quantities,
                                      u_systematic_input_quantities):
         measurand = measurement_function(*input_quantities)
-        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities)
-        u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
+        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,output_vars=len(measurandstrings))
+        u_systematic_measurand,corr_systematic_measurand,corr_between = self.prop.propagate_systematic(measurement_function,
                                                                                           input_quantities,
                                                                                           u_systematic_input_quantities,
-                                                                                          return_corr=True,corr_axis=0)
-        dataset[measurandstring].values = measurand
-        dataset["u_random_"+measurandstring].values = u_random_measurand
-        dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
-        dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
-        dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand
+                                                                                          return_corr=True,corr_axis=0,output_vars=len(measurandstrings))
+        for im, measurandstring in enumerate(measurandstrings):
+            dataset[measurandstring].values = measurand[im]
+            dataset["u_random_"+measurandstring].values = u_random_measurand[im]
+            dataset["u_systematic_"+measurandstring].values = u_systematic_measurand[im]
+            dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand[im]))
+            dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand[im]
 
         return dataset
-
-
-
-
 
 
 

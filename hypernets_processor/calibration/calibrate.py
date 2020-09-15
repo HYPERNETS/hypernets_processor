@@ -26,13 +26,13 @@ class Calibrate:
         self.writer=HypernetsWriter(context)
         self.context=context
 
-    def calibrate_l1a(self,measurandstring,dataset_l0,dataset_l0_bla,calibration_data,measurement_function='StandardMeasurementFunction'):
+    def calibrate_l1a(self,measurandstring,dataset_l0,dataset_l0_bla,calibration_data):
 
         if measurandstring!="radiance" and measurandstring!="irradiance":
             print("the measurandstring needs to be either 'radiance' or 'irradiance")
             exit()
 
-        calibrate_function = self._measurement_function_factory.get_measurement_function(measurement_function)
+        calibrate_function = self._measurement_function_factory.get_measurement_function(self.context.measurement_function_calibrate)
         input_vars=calibrate_function.get_argument_names()
         print("the used variables are:", input_vars)
 

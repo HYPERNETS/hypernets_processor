@@ -21,3 +21,6 @@ mapping_vis_f: +0.0000000E+00
 [MEASPROTOCOL]
 protocol=water_std
 valheader=radiance, irradiance
+nbrlu=6
+nbred=3
+nbrlsky=3
