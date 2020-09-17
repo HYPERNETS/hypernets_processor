@@ -5,7 +5,7 @@ ProductNameUtil class
 from hypernets_processor.version import __version__
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "7/5/2020"
 __version__ = __version__
@@ -18,18 +18,20 @@ TIME_FMT_L12A = "%Y%m%d%H%M"
 TIME_FMT_L2B = "%Y%m%d"
 
 
-DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
-                    "L0_IRR": "L0_IRR",
-                    "L_L1A_RAD": "L1A_RAD",
-                    "W_L1A_RAD": "L1A_RAD",
-                    "L_L1A_IRR": "L1A_IRR",
-                    "W_L1A_IRR": "L1A_IRR",
-                    "L_L1B": "L1B",
-                    "W_L1B": "L1B",
-                    "L_L2A": "L2A_REF",
-                    "W_L2A": "L2A_REF",
-                    "L_L2B": "L2B_REF",
-                    "W_L2B": "L2B_REF"}
+DS_FORMAT_FNAMES = {
+    "L0_RAD": "L0_RAD",
+    "L0_IRR": "L0_IRR",
+    "L_L1A_RAD": "L1A_RAD",
+    "W_L1A_RAD": "L1A_RAD",
+    "L_L1A_IRR": "L1A_IRR",
+    "W_L1A_IRR": "L1A_IRR",
+    "L_L1B": "L1B",
+    "W_L1B": "L1B",
+    "L_L2A": "L2A_REF",
+    "W_L2A": "L2A_REF",
+    "L_L2B": "L2B_REF",
+    "W_L2B": "L2B_REF",
+}
 
 
 class ProductNameUtil:
@@ -37,8 +39,12 @@ class ProductNameUtil:
     Class to generate Hypernets product product names
     """
 
-    @staticmethod
-    def create_product_name(ds_format, context=None, network=None, site=None, time=None, version=None):
+    def __init__(self, context=None):
+        self.context = context
+
+    def create_product_name(
+        self, ds_format, network=None, site=None, time=None, version=None
+    ):
         """
         Return a valid product name for Hypernets file
 
@@ -65,10 +71,17 @@ class ProductNameUtil:
         """
 
         # Unpack params
-        network = context.network if (network is None) and (context is not None) else network
-        site = context.site if (site is None) and (context is not None) else site
-        time = context.time if (time is None) and (context is not None) else time
-        version = context.version if (version is None) and (context is not None) else version
+        if (network is None) and (self.context is not None):
+            network = self.context.get_config_value("network")
+
+        if (site is None) and (self.context is not None):
+            site = self.context.get_config_value("site")
+
+        if (time is None) and (self.context is not None):
+            time = self.context.get_config_value("time")
+
+        if (version is None) and (self.context is not None):
+            version = str(self.context.get_config_value("version"))
 
         # Prepare product name parts
         ptype = DS_FORMAT_FNAMES[ds_format]
@@ -82,8 +95,8 @@ class ProductNameUtil:
         product_name_parts = ["HYPERNETS", network, site, ptype, time_string, version]
         product_name_parts = filter(None, product_name_parts)
 
-        return "_".join(product_name_parts) + ".nc"
+        return "_".join(product_name_parts)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
