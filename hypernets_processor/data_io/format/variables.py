@@ -1,6 +1,7 @@
 """
 Variable definitions for Hypernets land a water network data products
 """
+from typing import Any
 
 from copy import deepcopy
 
@@ -134,7 +135,14 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                                             "1970-01-01 "
                                                                             "00:00:00",
                                                                "units": "s"},
-                                                "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+                                                "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                           "series_id": {"dim": [SERIES_DIM],
+                                                "dtype": np.uint16,
+                                                "attributes": {"standard_name": "series_id",
+                                                               "long_name": "Series id number",
+                                                               "units": "-"},
+                                                "encoding": {'dtype': np.uint16, "scale_factor": 1, "offset": 0.0}}
+                           }
 
 COMMON_VARIABLES_SEQ = deepcopy(COMMON_VARIABLES_SERIES)
 COMMON_VARIABLES_SCAN = deepcopy(COMMON_VARIABLES_SERIES)
@@ -210,27 +218,143 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                                                       "long_name": "Digital number, raw data",
                                                       "units": "-"},
                                        "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}
+                    # "series_id": {"dim": [SCAN_DIM],
+                    #                "dtype": np.chararray,
+                    #                "attributes": {"standard_name": "series_id",
+                    #                               "long_name": "series_id",
+                    #                               "units": "-"}}
                     }
 
 L0_IRR_VARIABLES = L0_RAD_VARIABLES
 L0_BLA_VARIABLES = L0_RAD_VARIABLES
 
 # > L1A_RAD_VARIABLES - Radiance Variables required for L1 data products (except water L1B)
-L1A_RAD_VARIABLES = {"u_random_radiance": {},
-                     "u_systematic_radiance": {},
-                     "cov_random_radiance": {},
-                     "cov_systematic_radiance": {},
-                     "radiance": {}}
+L1A_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "random uncertainty on radiance",
+                                                      "long_name": "random uncertainty on upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "u_systematic_radiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "systematic uncertainty on radiance",
+                                                      "long_name": "systematic uncertainty on upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_random_radiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of random error on radiance",
+                                                      "long_name": "covariance between wavelengths for the random errors on radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_systematic_radiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of systematic error on radiance",
+                                                      "long_name": "covariance bewtween wavelengths for systematic error on radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "radiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "radiance",
+                                                      "long_name": "upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.int32, "scale_factor": 0.1, "offset": 0.0}}}
 
-# > L1A_IRR_VARIABLES - Irradiance Variables required for L1 data products (except water L1B)
-L1A_IRR_VARIABLES = {"u_random_irradiance": {},
-                     "u_systematic_irradiance": {},
-                     "cov_random_irradiance": {},
-                     "cov_systematic_irradiance": {},
-                     "irradiance": {}}
+L1A_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "random uncertainty on irradiance",
+                                                      "long_name": "random uncertainty on downwelling irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "u_systematic_irradiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "systematic uncertainty on irradiance",
+                                                      "long_name": "systematic uncertainty on downwelling irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_random_irradiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of random error on irradiance",
+                                                      "long_name": "covariance between wavelengths for the random errors on irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_systematic_irradiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of systematic error on irradiance",
+                                                      "long_name": "covariance bewtween wavelengths for systematic error on irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "irradiance": {"dim": [WL_DIM, SCAN_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "irradiance",
+                                                      "long_name": "downwelling irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+
+L1B_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SERIES_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "random uncertainty on radiance",
+                                                      "long_name": "random uncertainty on upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "u_systematic_radiance": {"dim": [WL_DIM, SERIES_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "systematic uncertainty on radiance",
+                                                      "long_name": "systematic uncertainty on upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_random_radiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of random error on radiance",
+                                                      "long_name": "covariance between wavelengths for the random errors on radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_systematic_radiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of systematic error on radiance",
+                                                      "long_name": "covariance bewtween wavelengths for systematic error on radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "radiance": {"dim": [WL_DIM, SERIES_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "radiance",
+                                                      "long_name": "upwelling radiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
+
+L1B_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SERIES_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "random uncertainty on irradiance",
+                                                      "long_name": "random uncertainty on downwelling irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "u_systematic_irradiance": {"dim": [WL_DIM, SERIES_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "systematic uncertainty on irradiance",
+                                                      "long_name": "systematic uncertainty on downwelling irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_random_irradiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of random error on irradiance",
+                                                      "long_name": "covariance between wavelengths for the random errors on irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "corr_systematic_irradiance": {"dim": [WL_DIM, WL_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "correlation matrix of systematic error on irradiance",
+                                                      "long_name": "covariance bewtween wavelengths for systematic error on irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                     "irradiance": {"dim": [WL_DIM, SERIES_DIM],
+                                       "dtype": np.uint32,
+                                       "attributes": {"standard_name": "irradiance",
+                                                      "long_name": "downwelling irradiance",
+                                                      "units": "mW m^-2 nm^-1 sr^-1"},
+                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}}
 
 # > L1B_WATER_VARIABLES - Variables required for the water network L1b data product
-L1B_WATER_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, SEQ_DIM],
+L1C_WATER_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, SEQ_DIM],
                                               "dtype": np.float32,
                                               "attributes": {"standard_name": "upwelling_radiance_per_unit_wavelength"
                                                                               "_in_air",
@@ -358,7 +482,56 @@ L1B_WATER_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, SEQ_DIM],
                        }
 
 # L_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A land data product
-L_L2A_REFLECTANCE_VARIABLES = {}
+L_L2A_REFLECTANCE_VARIABLES =  {"u_random_reflectance": {"dim": [WL_DIM, SERIES_DIM],
+                                                        "dtype": np.float32,
+                                                        "attributes": {"standard_name": "u_random_reflectance",
+                                                                       "long_name": "Random reflectance uncertainty",
+                                                                       "units": "%"},
+                                                        "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                     "offset": 0.0}},
+                               "u_systematic_reflectance": {"dim": [WL_DIM, SERIES_DIM],
+                                                            "dtype": np.float32,
+                                                            "attributes": {"standard_name": "u_systematic_reflectance",
+                                                                           "long_name": "Systematic reflectance "
+                                                                                        "uncertainty",
+                                                                           "units": "%"},
+                                                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                         "offset": 0.0}},
+                               "corr_random_reflectance": {"dim": [WL_DIM, WL_DIM],
+                                                          "dtype": np.float32,
+                                                          "attributes": {"standard_name": "corr_random_reflectance",
+                                                                         "long_name": "Correlation matrix of random "
+                                                                                      "reflectance "
+                                                                                      "uncertainty",
+                                                                         "units": "-"},
+                                                          "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                       "offset": 0.0}},
+                               "corr_systematic_reflectance": {"dim": [WL_DIM, WL_DIM],
+                                                              "dtype": np.float32,
+                                                              "attributes": {
+                                                                  "standard_name": "corr_systematic_reflectance",
+                                                                  "long_name": "Correlation matrix of systematic "
+                                                                               "reflectance "
+                                                                               "uncertainty",
+                                                                  "units": "-"},
+                                                              "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
+                                                                           "offset": 0.0}},
+                               "reflectance": {"dim": [WL_DIM, SERIES_DIM],
+                                               "dtype": np.float32,
+                                               "attributes": {"standard_name": "reflectance",
+                                                              "long_name": "The surface called surface means the lower "
+                                                                           "boundary of the atmosphere. "
+                                                                           "Bidirectional_reflectance depends on"
+                                                                           "the angles of incident and measured"
+                                                                           "radiation.Reflectance is the ratio of the "
+                                                                           "energy of the reflected to the incident "
+                                                                           "radiation. A coordinate variable of "
+                                                                           "radiation_wavelength or radiation_frequency "
+                                                                           "can be used to specify the wavelength or "
+                                                                           "frequency, respectively, of the radiation.",
+                                                              "units": "-"},
+                                               "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}}}
+
 
 # W_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A water data product
 W_L2A_REFLECTANCE_VARIABLES = {"normalized_water_leaving_radiance": {"dim": [WL_DIM, SEQ_DIM],
@@ -566,14 +739,19 @@ W_L2B_REFLECTANCE_VARIABLES = {}
 # File format variable defs
 # -------------------------
 
-VARIABLES_DICT_DEFS = {"L0_RAD": {**COMMON_VARIABLES_SCAN, **L0_RAD_VARIABLES},
+VARIABLES_DICT_DEFS: Any = {"L0_RAD": {**COMMON_VARIABLES_SCAN, **L0_RAD_VARIABLES},
                        "L0_IRR": {**COMMON_VARIABLES_SCAN, **L0_IRR_VARIABLES},
-                       "L_L1A_RAD": {**COMMON_VARIABLES_SERIES, **L1A_RAD_VARIABLES},
-                       "W_L1A_RAD": {**COMMON_VARIABLES_SERIES, **L1A_RAD_VARIABLES},
-                       "L_L1A_IRR": {**COMMON_VARIABLES_SERIES, **L1A_IRR_VARIABLES},
-                       "W_L1A_IRR": {**COMMON_VARIABLES_SERIES, **L1A_IRR_VARIABLES},
-                       "L_L1B": {**COMMON_VARIABLES_SERIES, **L1A_RAD_VARIABLES, **L1A_IRR_VARIABLES},
-                       "W_L1B": {**COMMON_VARIABLES_SEQ, **L1B_WATER_VARIABLES},
+                       "L0_BLA": {**COMMON_VARIABLES_SCAN, **L0_BLA_VARIABLES},
+                       "L_L1A_RAD": {**COMMON_VARIABLES_SCAN, **L1A_RAD_VARIABLES},
+                       "W_L1A_RAD": {**COMMON_VARIABLES_SCAN, **L1A_RAD_VARIABLES},
+                       "L_L1A_IRR": {**COMMON_VARIABLES_SCAN, **L1A_IRR_VARIABLES},
+                       "W_L1A_IRR": {**COMMON_VARIABLES_SCAN, **L1A_IRR_VARIABLES},
+                       "L_L1B_RAD": {**COMMON_VARIABLES_SERIES, **L1B_RAD_VARIABLES},
+                       "W_L1B_RAD": {**COMMON_VARIABLES_SERIES, **L1B_RAD_VARIABLES},
+                       "L_L1B_IRR": {**COMMON_VARIABLES_SERIES, **L1B_IRR_VARIABLES},
+                       "W_L1B_IRR": {**COMMON_VARIABLES_SERIES, **L1B_IRR_VARIABLES},
+                       "L_L1C": {**COMMON_VARIABLES_SERIES, **L1B_RAD_VARIABLES, **L1B_IRR_VARIABLES},
+                       "W_L1C": {**COMMON_VARIABLES_SEQ, **L1C_WATER_VARIABLES},
                        "L_L2A": {**COMMON_VARIABLES_SERIES, **L_L2A_REFLECTANCE_VARIABLES},
                        "W_L2A": {**COMMON_VARIABLES_SEQ, **W_L2A_REFLECTANCE_VARIABLES},
                        "L_L2B": {**COMMON_VARIABLES_SERIES, **L_L2B_REFLECTANCE_VARIABLES},
