@@ -1,0 +1,19 @@
+[DEFAULT]
+PyxisVersion=PYXIS_V000.50
+Datetime=20200715T133429
+PI=CPE2
+Site_name=Test
+Lat=43.69886
+Lon=7.30720
+
+[MODEL_NAME]
+model=series_rep,series_id,vaa,azimuth_ref,vza,mode,action,it,scan_total,series_time
+#model=seq_rep,seq_line,vaa,azimuth_ref,vza,mode,action,it,scan_total,series_time
+
+[CC]
+mapping_vis_a: +1.6499700E+02
+mapping_vis_b: +4.3321091E-01
+mapping_vis_c: +3.7714483E-05
+mapping_vis_d: +6.6769395E-10
+mapping_vis_e: -4.0577247E-12
+mapping_vis_f: +0.0000000E+00

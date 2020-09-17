@@ -1,21 +1,20 @@
 """
 Module with functions and classes to read Hypernets data
 """
+from datetime import datetime, timezone
 import os
-from sys import exit, version_info  # noqa
-from struct import unpack
+import re  # for re.split
 from configparser import ConfigParser
+from struct import unpack
+from sys import exit, version_info  # noqa
+
 import matplotlib.pyplot as plt
-import re # for re.split
 import numpy as np
 from pysolar.solar import *
-from datetime import datetime, timezone
 
-
-from hypernets_processor.version import __version__
 from hypernets_processor.data_io.format.header import HEADER_DEF
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
-
+from hypernets_processor.version import __version__
 
 '''___Authorship___'''
 __author__ = "Clémence Goyens"
@@ -24,11 +23,16 @@ __version__ = __version__
 __maintainer__ = "Clémence Goyens"
 __status__ = "Development"
 
+# need to change this!
+
+server_dir = "/home/cgoyens/OneDrive/BackUpThinkpadClem/Projects/HYPERNETS/NetworkDesign_D52/DataProcChain/hypernets_processor/"
+settings_file = server_dir + '/data/settings/default.txt'
 
 def read_hypernets_data(filename):
     dataset = None
 
     return dataset
+
 
 class HypernetsReader:
 
@@ -44,82 +48,6 @@ class HypernetsReader:
             m = lst[i].split("=")
             dic[m[0]] = m[1]
         return (dic)
-
-    # extract metadata from metadata and record as generator
-    def extract_metadata(self, path_to_file):
-        with open(path_to_file) as f:
-            values = []
-            for idx, line in enumerate(f):
-                # if idx < 6:
-                # Ignore header lines, currently not required 31/03/2020
-                # continue
-                if line.strip():
-                    # Add the values in this line to the current
-                    # values list.
-                    line = line.strip()
-                    values.extend(line.split('\t'))
-                    # values.extend(xr.Dataset(line))
-                else:
-                    # Blank line, so output values and
-                    # clear the list.
-                    yield values
-                    del values[:]
-            # Yield the final set of values, assuming
-            # the last line of the file is not blank.
-            yield values
-
-    # read metadata as a dictionnary 
-    def read_metadata(self, path_to_file):
-        gen = self.extract_metadata(path_to_file)
-        metadic = {}
-        for x in gen:
-            metadic[x[0]] = self.gen2dict(x)
-        return (metadic)
-
-    def read_metadata2(self, path_to_file):
-
-        # Create configparser object and open the file
-        metadata = ConfigParser()
-        metadata.read(path_to_file)
-        print(metadata.sections())
-        globalmet = []
-        for field, value in dict(metadata[0]).items():
-            print("%s is %s" % (field, value))
-            globalmet.append([field, value])
-        return (globalmet)
-
-        for i, section in enumerate(metadata.sections()):
-            print("=" * 80)
-            print("Section %i : %s" % (i, section))
-
-            # Same as the case 2:
-            for field, value in dict(metadata[section]).items():
-                print("%s is %s" % (field, value))
-                metarray.append([field, value])
-
-        # ## Case 1 : I already know a section name and a field -------------------------
-        # print("Asked pan-tilt for the image is :")
-        # print(metadata["01_015_0090_2_0180"]["pt_ask"])  # type : str
-        #
-        # ## Case 2 : I already know a section name -------------------------------------
-        # # I make a dict from the parser according to the section name :
-        # headerMetadata = dict(metadata["Metadata"])
-        # # Then I read the dictionary
-        # for field, value in headerMetadata.items():
-        #     print("%s is %s" % (field, value))
-
-        ## Case 3 : I know nothing about the file ------------------------------------
-        # Loop over the section with an iterator
-
-        # create array to save later on in netcdf
-        metarray = []
-
-        return (metarray)
-
-        # READ RAW SPE data
-        # CG - 20200331
-        # includes read_spectra, plot_spectra (author: A. Corrozi)
-        # convert generator to dictionary
 
     def read_spectra(self, spectra, FOLDER_NAME):  # noqa
         with open(FOLDER_NAME + spectra, "rb") as f:
@@ -226,12 +154,27 @@ class HypernetsReader:
         plt.plot([i for i in range(len(dataSpectra))], dataSpectra)
         plt.show()
 
+    def read_setting(self, settings_file):
+
+        defset = ConfigParser()
+        defset.read(settings_file)
+        model = dict(defset['MODEL_NAME'])['model']
+        model=model.split(',')
+        geoattr = dict(defset['DEFAULT'])
+        cc = dict(defset['CC'])
+        return model, geoattr, cc
+
     def read_header(self, f, headerDef):
 
         header = {}
         for headLen, headName, headFormat in headerDef:
-            print(headName)
+            print('this is headLen', headLen)
             data = f.read(headLen)
+            print(data)
+            if len(data) != headLen:
+                print("Data length not silimar to headlength")
+                break
+                continue
             if version_info > (3, 0):
                 print("%02X " * headLen % (tuple([b for b in data])))
             else:
@@ -295,44 +238,48 @@ class HypernetsReader:
         print(unpackData)
 
     def read_wavelength(self, cc, pix):
-        # or rather have it estimated only once for vis and swir?
-        wvl = cc['mapping_vis_a'] + pix * cc['mapping_vis_b'] + pix ** 2 * cc['mapping_vis_c']
-        +pix ** 3 * cc['mapping_vis_d'] + pix ** 4 * cc['mapping_vis_e']
-        +pix ** 5 * cc['mapping_vis_f']
+       # or rather have it estimated only once for vis and swir?
+        wvl = float(cc['mapping_vis_a']) + pix * float(cc['mapping_vis_b']) + pix ** 2 * float(cc['mapping_vis_c'])
+        +pix ** 3 * float(cc['mapping_vis_d']) + pix ** 4 * float(cc['mapping_vis_e'])
+        +pix ** 5 * float(cc['mapping_vis_f'])
         print("Wavelength range:", min(wvl), "-", max(wvl))
-        return (wvl)
+        return wvl
 
-    def read_series(self, seq_dir, series, cc, lat, lon, metadata, fileformat, model_name=None):
-        print(series)
-        if model_name is None:
-            model_name = ["seq_rep", "seq_line", "vaa", "azimuth_ref", "vza", "action", "scan_total"]
+    def read_series(self, seq_dir, series, cc, lat, lon, metadata, fileformat):
+
+        model_name, geoattr, cc_def = self.read_setting(settings_file)
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
         # ----------------------------------------
 
-        # scan dimension
+        # scan dimension - to have total number of dimensions
         index_scan_total = model_name.index("scan_total")
-
-        # scanDim=sum([int(re.split('_|\.', i)[index_scan_total]) for i in series])
+        # series id
+        # ------------------------------------------
+        # added to consider concanated files
+        scanDim=sum([int(re.split('_|\.', i)[index_scan_total]) for i in series])
 
         # ------------------------------------------
         # added to consider non concanated files
-        scanDims = [int(re.split('_|\.', i)[index_scan_total]) for i in series]
-        scanDim = sum(scanDims)
+        #scanDims = [int(re.split('_|\.', i)[index_scan_total]) for i in series]
+        #scanDim = sum(scanDims)
 
-        # rewrite series
+        ## rewrite series
         # baseName=["_".join(seriesname.split("_", 7)[:7]) for seriesname in series]
         # print(baseName)
-        newSeries = []
-        for i in series:
-            nbrScans = int(re.split('_|\.', i)[index_scan_total])
-            baseName = "_".join(re.split("_|\.", i)[:7])
-            n = 1
-            while n <= nbrScans:
-                new_fname = "{}_{}{}".format(baseName, n, '.spe')
-                newSeries.append(new_fname)
-                n += 1
-        series = newSeries
+        # newSeries = []
+        # for i in series:
+        #     # create dictionary from filename
+        #     seriesAttr = re.split('_|\.', i)[:-1]  # remove spe extension
+        #     model = dict(zip(model_name, seriesAttr))
+        #     baseName = '_'.join(seriesAttr)
+        #     nbrScans = int(model["scan_total"])
+        #     n = 1
+        #     while n <= nbrScans:
+        #         new_fname = "{}_{}{}".format(baseName, n, '.spe')
+        #         newSeries.append(new_fname)
+        #         n += 1
+        # series = newSeries
         # -----------------------------------------
 
         # wvl dimensions
@@ -341,6 +288,11 @@ class HypernetsReader:
         # Header definition with length, description and decoding format
 
         header = self.read_header(f, HEADER_DEF)
+
+        # if bool(header) == False:
+        #     print("Data corrupt go to next line")
+        #     header = self.read_header(f, HEADER_DEF)
+
         pix = np.linspace(0, header['Pixel Count'], header['Pixel Count'])
         wvl = self.read_wavelength(cc, pix)
 
@@ -355,7 +307,9 @@ class HypernetsReader:
 
         print("Wvl and Scan Dimensions:", len(wvl), scanDim)
         # use template from variables and metadata in format
-        ds = HypernetsDSBuilder.create_ds_template(dim_sizes_dict, fileformat)
+        ds = HypernetsDSBuilder()
+        ds=ds.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
+
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
         ds["scan"] = np.linspace(1, scanDim, scanDim)
@@ -364,26 +318,28 @@ class HypernetsReader:
         scan_number = 0
 
         # read all spectra (== spe files with concanated files) in a series
-
         for spectra in series:
-
-            specBlock = "_".join(spectra.split("_", 5)[:5])
-
+            model = dict(zip(model_name, spectra.split('_')[:-1]))
+            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + model[
+                'azimuth_ref'] + '_' + model['vza']
+            print(specBlock)
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
             # name of spectra file
-            # acquisitionTime = specattr[spectra]
-            # acquisitionTime = datetime.strptime(acquisitionTime, '%Y%m%dT%H%M%S')
+            acquisitionTime = specattr[spectra]
+            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+            acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
 
             # -------------------------------------
-            # account for non concanated files
-            spec = "_".join(spectra.split("_", 7)[:7]) + ".spe"
-            acquisitionTime = specattr[spec]
-            acquisitionTime = datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
-
-            acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
-            model = dict(zip(model_name, str.split(spectra, "_")))
+            # # account for non concanated files
+            # spec = "_".join(spectra.split('_')[:-1]) + ".spe"
+            # acquisitionTime = specattr[spec]
+            # print(acquisitionTime)
+            # acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+            #
+            # acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
+            # model = dict(zip(model_name, str.split(spectra, "_")))
             # ________________________________________
 
             # -----------------------
@@ -394,20 +350,26 @@ class HypernetsReader:
             nextLine = True
             while nextLine:
                 header = self.read_header(f, HEADER_DEF)
+                print(header)
+                if bool(header) == False:
+                    print("Data corrupt go to next line")
+                    break
+                    continue
                 scan = self.read_data(f, header['Pixel Count'])
-                crc32 = self.read_footer(f, 4)
+                # should include this back again when crc32 is in the headers!
+                #crc32 = self.read_footer(f, 4)
 
                 HypernetsReader().plot_spectra(spectra, scan)
 
                 # fill in dataset
                 # maybe xarray has a better way to do - check merge, concat, ...
-
-                # ds["series_id"][scan_number] = spectra.split(".", 1)[1]
+                series_id = model['series_id']
+                ds["series_id"][scan_number] = series_id
                 ds["viewing_azimuth_angle"][scan_number] = model['vaa']
                 ds["viewing_zenith_angle"][scan_number] = model['vza']
 
                 # estimate time based on timestamp
-                ds["acquisition_time"][scan_number] = datetime.timestamp(acquisitionTime)
+                ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
                 #            #print(datetime.fromtimestamp(acquisitionTime))
 
                 #             # didn't use acquisition time from instrument
@@ -430,7 +392,6 @@ class HypernetsReader:
 
                 ds.attrs["site_latitude"] = lat
                 ds.attrs["site_longitude"] = lon
-
                 ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
                 ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
 
@@ -465,13 +426,46 @@ class HypernetsReader:
 
         return ds
 
-    def read_metadata(self, seq_dir, model_name=None):
-        if model_name is None:
-            model_name = ["seq_rep", "seq_line", "vaa", "azimuth_ref", "vza", "action", "scan_total"]
+    def read_metadata(self, seq_dir):
+
+        print(settings_file)
+        model_name, geoattr, cc_def = self.read_setting(settings_file)
+
+        #     Spectra name : AA_BBB_CCCC_D_EEEE_FFF_GG_HHHH_II_JJJJ.spe
+
+        #     A : iterator over "the sequence repeat time"
+        #     B : Number of the line in the sequence file (csv file)
+        #     C : azimuth pointing angle
+        #     D : reference for the azimuth angle
+        #     E : zenith pointing angle
+        #     F : mode
+        #     G : action
+        #     H : integration time
+        #     I : number of scan in the serie
+        #     J : serie time
+        #     .spe : extension
+
+        #     D (reference) :
+        #     0 = abs
+        #     1 = nor
+        #     2 = sun
+
+        #     F (mode) :
+        #     MODE_NONE  : 0x00 (000)
+        #     MODE_SWIR  : 0X40 (064)
+        #     MODE_VIS   : 0x80 (128)
+        #     MODE_BOTH  : 0xC0 (192)
+
+        #     G (action) :
+        #     ACTION_BLACK : 0x00   (00)
+        #     ACTION_RAD   : 0x10   (16)
+        #     ACTION_IRR   : 0x08   (08)
+        #     ACTION_CAL   : 0x01   (01)
+        #     ACTION_PIC   : 0x02   (02)
+        #     ACTION_NONE  : 0x03   (03)
 
         metadata = ConfigParser()
         metadata.read(os.path.join(seq_dir, "metadata.txt"))
-
         # ------------------------------
         # global attributes + wavelengths -> need to check for swir
         # ----------------------------------
@@ -485,20 +479,29 @@ class HypernetsReader:
         else:
             lat = globalattr['lat']
 
+        if not lat.isdigit():
+            print("Latitude is not given, use default")
+            lat = geoattr['lat']
+
         if 'longitude' in globalattr.keys():
             lon = globalattr['longitude']
         else:
             lon = globalattr['lon']
+
+        if not lon.isdigit():
+            print("Longitude is not given, use default")
+            lon = geoattr['lat']
 
         # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
         # ----------------------
         # from 1 to 14 cause only able to read the visible wavelengths.... how to read the swir once?
         # to change!!!!
 
-        cc = {'mapping_vis_a': +1.6499700E+02, 'mapping_vis_b': +4.3321091E-01, 'mapping_vis_c': +3.7714483E-05,
-              'mapping_vis_d': +6.6769395E-10, 'mapping_vis_e': -4.0577247E-12, 'mapping_vis_f': +0.0000000E+00}
-        # cc=list(str.split(globalattr['cc'], "\n"))
-        # cc={k.strip(): float(v.strip()) for k, v in (i.split(":") for i in cc[1:14])}
+        if 'cc' not in globalattr:
+            cc = cc_def
+        else:
+            cc = list(str.split(globalattr['cc'], "\n"))
+            cc = {k.strip(): float(v.strip()) for k, v in (i.split(":") for i in cc[1:14])}
 
         # 3. Read series
         # ---------------------------
@@ -508,7 +511,6 @@ class HypernetsReader:
         for i in series_all:
             seriesattr = dict(metadata[i])
             seriesName.extend(list(name for name in seriesattr if '.spe' in name))
-
         # ----------------
         # Remove pictures from list of series
         # ----------------
@@ -527,10 +529,9 @@ class HypernetsReader:
         #     ACTION_CAL   : 0x01   (01)
         #     ACTION_PIC   : 0x02   (02) - NOT IN THE FILENAME!
         #     ACTION_NONE  : 0x03   (03)
-
         index_action = model_name.index("action")
-
         action = [re.split('_|\.', i)[index_action] for i in seriesName]
+        print(action)
 
         # this is slow????
         seriesIrr = [x for x, y in zip(seriesName, action) if int(y) == 8]
@@ -539,15 +540,20 @@ class HypernetsReader:
 
         return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict
 
-    def read_sequence(self, seq_dir):
+    def read_sequence(self, seq_dir, setfile=None):
+
+        if setfile is not None:
+            global settings_file
+            settings_file = setfile
+
 
         # define data to return none at end of method if does not exist
         L0_IRR = None
         L0_RAD = None
         L0_BLA = None
 
-        seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict = self.read_metadata(seq_dir)
-
+        seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict = self.read_metadata(
+            seq_dir)
 
         if seriesIrr:
             L0_IRR = self.read_series(seq_dir, seriesIrr, cc, lat, lon, metadata, "L0_IRR")
@@ -561,7 +567,7 @@ class HypernetsReader:
             print("No irradiance data for this sequence")
 
         if seriesRad:
-            L0_RAD = self.read_series(seq_dir,seriesRad, cc, lat, lon, metadata, "L0_RAD")
+            L0_RAD = self.read_series(seq_dir, seriesRad, cc, lat, lon, metadata, "L0_RAD")
         #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
         #             L0_RAD=read_series(seriesRad,cc, lat, lon, metadata, "L0_RAD")
         #         else:
@@ -569,13 +575,12 @@ class HypernetsReader:
         else:
             print("No radiance data for this sequence")
 
-            #     if seriesBlack:
-        #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesBlack]):
-        #             L0_BLA=read_series(seq_dir,seriesBlack,cc,lat, lon,metadata, "L0_BLA")
-        #         else:
-        #             print("Black files listed but don't exist")
-        #     else:
-        #         print("No black data for this sequence")
+        if seriesBlack:
+            L0_BLA = self.read_series(seq_dir, seriesBlack, cc, lat, lon, metadata, "L0_BLA")
+            # if all([os.path.isfile(os.path.join(seq_dir, "RADIOMETER/", f)) for f in seriesBlack]):
+            #     L0_BLA = self.read_series(seq_dir, seriesBlack, cc, lat, lon, metadata, "L0_BLA")
+        else:
+            print("No black data for this sequence")
 
         if seriesPict:
             print("Here we should move the pictures to some place???")
