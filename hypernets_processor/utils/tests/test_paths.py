@@ -8,7 +8,7 @@ from hypernets_processor.utils.paths import relative_path
 import os
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "31/3/2020"
 __version__ = __version__
@@ -28,9 +28,10 @@ class TestPaths(unittest.TestCase):
 
         full_path = relative_path(fname, data_directory)
 
-        self.assertEqual(full_path, os.path.abspath("../../../data/tests/cli/jobs1.config"))
+        self.assertEqual(
+            full_path, os.path.abspath("../../../data/tests/cli/jobs1.config")
+        )
         self.assertEqual(cwd, os.getcwd())
-
 
     def test_relative_path_in_subdirectory(self):
 
@@ -42,7 +43,9 @@ class TestPaths(unittest.TestCase):
 
         full_path = relative_path(fname, data_directory)
 
-        self.assertEqual(full_path, os.path.abspath("../../../data/tests/cli/jobs1.config"))
+        self.assertEqual(
+            full_path, os.path.abspath("../../../data/tests/cli/jobs1.config")
+        )
         self.assertEqual(cwd, os.getcwd())
 
     def test_relative_path_in_relative_directory(self):
@@ -55,7 +58,9 @@ class TestPaths(unittest.TestCase):
 
         full_path = relative_path(fname, data_directory)
 
-        self.assertEqual(full_path, os.path.abspath("../../../data/tests/cli/jobs1.config"))
+        self.assertEqual(
+            full_path, os.path.abspath("../../../data/tests/cli/jobs1.config")
+        )
         self.assertEqual(cwd, os.getcwd())
 
 

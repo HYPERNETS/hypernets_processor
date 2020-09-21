@@ -43,7 +43,7 @@ class TestHypernetsDSBuilder(unittest.TestCase):
                                      propagate_ds="propagate_ds")
 
         # test calls to create_template_dataset
-        mock_pnu.return_value.create_product_name.assert_called_once_with("def1", context=context)
+        mock_pnu.return_value.create_product_name.assert_called_once_with("def1")
         mock_create_template_dataset.assert_called_once_with("vars1", dim_sizes_dict,
                                                              metadata={"product_name":
                                                                 mock_pnu.return_value.create_product_name.return_value},
@@ -72,7 +72,7 @@ class TestHypernetsDSBuilder(unittest.TestCase):
                                      propagate_ds="propagate_ds")
 
         # test calls to create_template_dataset
-        mock_pnu.return_value.create_product_name.assert_called_once_with("def1", context=context)
+        mock_pnu.return_value.create_product_name.assert_called_once_with("def1")
         mock_create_template_dataset.assert_called_once_with("vars1", dim_sizes_dict,
                                                              metadata={"product_name":
                                                                 mock_pnu.return_value.create_product_name.return_value},
@@ -93,7 +93,7 @@ class TestHypernetsDSBuilder(unittest.TestCase):
         ds = hdsb.create_ds_template(dim_sizes_dict, ds_format="def1", propagate_ds="propagate_ds")
 
         # test calls to create_template_dataset
-        mock_pnu.return_value.create_product_name.assert_called_once_with("def1", context=None)
+        mock_pnu.return_value.create_product_name.assert_called_once_with("def1")
         mock_create_template_dataset.assert_called_once_with("vars1", dim_sizes_dict,
                                                              metadata={"product_name":
                                                                 mock_pnu.return_value.create_product_name.return_value},

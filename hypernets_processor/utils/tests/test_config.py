@@ -4,11 +4,11 @@ Tests for config module
 
 import unittest
 from hypernets_processor.version import __version__
-from hypernets_processor.utils.config import get_config_value
+from hypernets_processor.utils.config import get_config_value, infer_dtype
 from configparser import RawConfigParser
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "3/8/2020"
 __version__ = __version__
@@ -18,6 +18,26 @@ __status__ = "Development"
 
 
 class TestConfig(unittest.TestCase):
+    def test_infer_dtype_str(self):
+        dtype = infer_dtype("string")
+        self.assertEqual(dtype, str)
+
+    def test_infer_dtype_int(self):
+        dtype = infer_dtype("11")
+        self.assertEqual(dtype, int)
+
+    def test_infer_dtype_float(self):
+        dtype = infer_dtype("11.7")
+        self.assertEqual(dtype, float)
+
+    def test_infer_dtype_bool_True(self):
+        dtype = infer_dtype("False")
+        self.assertEqual(dtype, bool)
+
+    def test_infer_dtype_bool_False(self):
+        dtype = infer_dtype("False")
+        self.assertEqual(dtype, bool)
+
     def test_get_config_value_empty_string(self):
         config = RawConfigParser()
         config["section"] = {"key": ""}
@@ -39,12 +59,19 @@ class TestConfig(unittest.TestCase):
         val = get_config_value(config, "section", "key", dtype=bool)
         self.assertEqual(val, False)
 
-    def test_get_config_value_str(self):
+    def test_get_config_value_dtype_None(self):
         config = RawConfigParser()
         config["section"] = {"key": "val"}
 
         val = get_config_value(config, "section", "key")
         self.assertEqual(val, "val")
+
+    def test_get_config_value_dtype_bool(self):
+        config = RawConfigParser()
+        config["section"] = {"key": "False"}
+
+        val = get_config_value(config, "section", "key")
+        self.assertEqual(val, False)
 
     def test_get_config_value_int(self):
         config = RawConfigParser()

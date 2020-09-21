@@ -9,7 +9,7 @@ from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "6/5/2020"
 __version__ = __version__
@@ -33,8 +33,12 @@ class HypernetsDSBuilder:
     :param metadata_defs: dictionary of metadata for each product format (default is Hypernets formats)
     """
 
-    def __init__(self, context=None, variables_dict_defs=VARIABLES_DICT_DEFS, metadata_defs=METADATA_DEFS):
-    
+    def __init__(
+        self,
+        context=None,
+        variables_dict_defs=VARIABLES_DICT_DEFS,
+        metadata_defs=METADATA_DEFS,
+    ):
         self.context = context
         self.variables_dict_defs = variables_dict_defs
         self.metadata_defs = metadata_defs
@@ -64,8 +68,12 @@ class HypernetsDSBuilder:
         if ds_format in self.return_ds_formats():
             variables_dict = self.variables_dict_defs[ds_format]
         else:
-            raise NameError("Invalid format name: " + ds_format + " - must be one of " +
-                            str(self.variables_dict_defs.keys()))
+            raise NameError(
+                "Invalid format name: "
+                + ds_format
+                + " - must be one of "
+                + str(self.variables_dict_defs.keys())
+            )
 
         # Find metadata def
         metadata = {}
@@ -88,11 +96,17 @@ class HypernetsDSBuilder:
                 metadata_db_query = {}
 
         # Set product_name metadata
-        pu = ProductNameUtil()
-        metadata["product_name"] = pu.create_product_name(ds_format, context=self.context)
+        pu = ProductNameUtil(context=self.context)
+        metadata["product_name"] = pu.create_product_name(ds_format)
 
-        return create_template_dataset(variables_dict, dim_sizes_dict, metadata=metadata, propagate_ds=propagate_ds,
-                                       metadata_db=metadata_db, metadata_db_query=metadata_db_query)
+        return create_template_dataset(
+            variables_dict,
+            dim_sizes_dict,
+            metadata=metadata,
+            propagate_ds=propagate_ds,
+            metadata_db=metadata_db,
+            metadata_db_query=metadata_db_query,
+        )
 
     def return_ds_formats(self):
         """
@@ -171,5 +185,5 @@ class HypernetsDSBuilder:
         return dim_sizes_dict
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
