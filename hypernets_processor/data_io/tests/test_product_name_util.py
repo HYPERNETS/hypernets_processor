@@ -23,23 +23,23 @@ class TestProductNameUtil(unittest.TestCase):
     def test_create_product_name_context(self):
 
         context = setup_test_context()
-        context.time = datetime.datetime(2018, 4, 3, 11, 0, 0)
-        pnu = ProductNameUtil()
-        pname = pnu.create_product_name("L_L1A_RAD", context=context)
-        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0.nc", pname)
+        context.set_config_value("time", datetime.datetime(2018, 4, 3, 11, 0, 0))
+        pnu = ProductNameUtil(context=context)
+        pname = pnu.create_product_name("L_L1A_RAD")
+        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0", pname)
 
     def test_create_product_name_params(self):
 
         pnu = ProductNameUtil()
         pname = pnu.create_product_name("L_L1A_RAD", network="land", site="site", version="0.0",
                                         time=datetime.datetime(2018, 4, 3, 11, 0, 0))
-        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0.nc", pname)
+        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0", pname)
 
     def test_create_product_name_none(self):
 
         pnu = ProductNameUtil()
         pname = pnu.create_product_name("L_L1A_RAD")
-        self.assertEqual("HYPERNETS_L1A_RAD.nc", pname)
+        self.assertEqual("HYPERNETS_L1A_RAD", pname)
 
 
 if __name__ == '__main__':
