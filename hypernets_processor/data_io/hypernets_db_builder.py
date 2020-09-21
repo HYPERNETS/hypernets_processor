@@ -7,7 +7,7 @@ from hypernets_processor.data_io.database_util import create_template_db
 from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "24/7/2020"
 __version__ = __version__
@@ -47,5 +47,5 @@ class HypernetsDBBuilder:
         return create_template_db(url, schema_dict=schema_dict, schema_sql=schema_sql)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

@@ -7,7 +7,7 @@ from hypernets_processor.version import __version__
 import os
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "31/3/2020"
 __version__ = __version__
