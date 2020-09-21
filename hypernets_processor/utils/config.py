@@ -7,7 +7,7 @@ from hypernets_processor.version import __version__
 import os
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "4/8/2020"
 __version__ = __version__
@@ -16,7 +16,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def get_config_value(config, section, key, dtype=str):
+def get_config_value(config, section, key, dtype=None):
     """
     Return value from config file
 
@@ -37,6 +37,9 @@ def get_config_value(config, section, key, dtype=str):
     """
 
     val = config.get(section, key, fallback=None)
+
+    dtype = infer_dtype(val) if dtype is None else dtype
+
     if (val == "") or (val is None):
         if dtype == bool:
             return False
@@ -53,6 +56,35 @@ def get_config_value(config, section, key, dtype=str):
 
     elif dtype == float:
         return config.getfloat(section, key)
+
+
+def infer_dtype(val):
+
+    # Check bool
+    if (val == "True") or (val == "False"):
+        return bool
+
+    # Check int
+    is_int = True
+    try:
+        int(val)
+    except:
+        is_int = False
+
+    if is_int:
+        return int
+
+    # Check float
+    is_float = True
+    try:
+        float(val)
+    except:
+        is_float = False
+
+    if is_float:
+        return float
+
+    return str
 
 
 if __name__ == "__main__":
