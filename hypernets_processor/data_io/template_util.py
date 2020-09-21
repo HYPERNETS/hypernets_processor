@@ -199,7 +199,9 @@ class TemplateUtil:
         """
 
         # Find variable names common to target_ds and source_ds, excluding specified exclude variables
-        common_variable_names = list(set(target_ds.variables).intersection(source_ds.variables))
+        common_variable_names = list(set(target_ds).intersection(source_ds))
+        #common_variable_names = list(set(target_ds.variables).intersection(source_ds.variables))
+        print(common_variable_names)
 
         if exclude is not None:
             common_variable_names = [name for name in common_variable_names if name not in exclude]
@@ -209,6 +211,7 @@ class TemplateUtil:
 
         # Propagate data
         for common_variable_name in common_variable_names:
+            print(source_ds[common_variable_name].values)
             target_ds[common_variable_name].values = source_ds[common_variable_name].values
 
     # todo - add method to propagate common unpopulated metadata
