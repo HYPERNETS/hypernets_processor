@@ -49,7 +49,7 @@ class InterpolateL1c:
         print("interpolate irradiances")
         dataset_l1b=self.interpolate_irradiance(dataset_l1b, dataset_l1b_irr)
 
-        if self.context.write_l1b:
+        if self.context.get_config_value("write_l1b"):
             self.writer.write(dataset_l1b,overwrite=True)
         return dataset_l1b
 
@@ -73,7 +73,8 @@ class InterpolateL1c:
         return dataset_l1c
 
     def interpolate_irradiance(self,dataset_l1c,dataset_l1b_irr):
-        interpolation_function = self._measurement_function_factory.get_measurement_function(self.context.measurement_function_interpolate)
+        measurement_function_interpolate=self.context.get_config_value('measurement_function_interpolate')
+        interpolation_function = self._measurement_function_factory.get_measurement_function(measurement_function_interpolate)
 
         acqui_irr = dataset_l1b_irr['acquisition_time'].values
         acqui_rad = dataset_l1c['acquisition_time'].values
@@ -84,7 +85,8 @@ class InterpolateL1c:
         return dataset_l1c
 
     def interpolate_skyradiance(self,dataset_l1c,dataset_l1a_skyrad):
-        interpolation_function = self._measurement_function_factory.get_measurement_function(self.context.measurement_function_interpolate)
+        measurement_function_interpolate=self.context.get_config_value("measurement_function_interpolate")
+        interpolation_function = self._measurement_function_factory.get_measurement_function(measurement_function_interpolate)
 
         acqui_irr = dataset_l1a_skyrad['acquisition_time'].values
         acqui_rad = dataset_l1c['acquisition_time'].values

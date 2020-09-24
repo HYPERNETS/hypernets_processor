@@ -4,7 +4,7 @@ HypernetsWriter class
 
 from hypernets_processor.version import __version__
 import os
-
+from datetime import datetime
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -24,7 +24,7 @@ class HypernetsWriter:
         self.context = context
 
     def write(
-        self, ds, directory=None, overwrite=False, fmt="netcdf4", compression_level=None
+            self, ds, directory=None, overwrite=False, fmt="netcdf4", compression_level=None
     ):
         """
         Write xarray dataset to file
@@ -56,12 +56,21 @@ class HypernetsWriter:
                 )
 
             archive_directory = self.context.get_config_value("archive_directory")
-            site = self.context.get_config_value("site")
-            year = self.context.get_config_value("time").year
-            month = self.context.get_config_value("time").month
-            day = self.context.get_config_value("time").day
+
+            # take it from input file?
+            date = datetime.strptime(ds.attrs["sequence_id"].replace("SEQ", ""), "%Y%m%dT%H%M%S")
+            # site = self.context.get_config_value("site")
+            # year = self.context.get_config_value("time").year
+            # month = self.context.get_config_value("time").month
+            # day = self.context.get_config_value("time").day
+            site = ds.attrs["site_id"]
+            year = date.year
+            month = date.month
+            day = date.day
 
             directory = os.path.join(archive_directory, site, str(year), str(month), str(day))
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
         path = os.path.join(directory, ds.attrs["product_name"]) + "." + fmt
 
@@ -71,7 +80,9 @@ class HypernetsWriter:
             else:
                 raise IOError("The file already exists: " + path)
 
+
         if fmt == "nc":
+            print('here')
             HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
 
         elif fmt == "csv":

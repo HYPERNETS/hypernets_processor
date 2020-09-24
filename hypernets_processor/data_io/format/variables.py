@@ -1,3 +1,4 @@
+
 """
 Variable definitions for Hypernets land a water network data products
 """
@@ -42,7 +43,6 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                          "units": "nm",
                                                          "preferred_symbol": "wv"},
                                           "encoding": {'dtype': np.uint16, "scale_factor": 1.0, "offset": 0.0}},
-
                            "bandwidth": {"dim": [WL_DIM],
                                          "dtype": np.float32,
                                          "attributes": {},

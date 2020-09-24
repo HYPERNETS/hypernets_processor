@@ -23,5 +23,5 @@ class MeasurementFunctionFactory:
     def get_names(self):
         return self.measurement_functions.keys()
 
-    def get_measurement_function(self,name):
+    def get_measurement_function(self,name) -> object:
         return self.measurement_functions[name]
