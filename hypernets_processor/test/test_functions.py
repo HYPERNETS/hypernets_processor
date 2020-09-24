@@ -112,7 +112,6 @@ def setup_test_job_config(raw_data_directory=None, anomoly_db_url=None):
     :return: test job configuration information
     :rtype: configparser.RawConfigParser
     """
-
     job_config = read_config_file(TEMPLATE_JOB_CONFIG_PATH)
 
     job_config["Info"]["network"] = "land"

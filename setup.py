@@ -18,7 +18,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(name='hypernets_processor',
       version=__version__,
       description='Software for processing Hypernets field data',
-      authors=['Sam Hunt', 'Clémence Goyens'],
+      authors=['Sam Hunt', 'Clémence Goyens', 'Pieter De Vis'],
       long_description=long_description,
       author_email='sam.hunt@npl.co.uk',
       url='http://hypernets.eu',
@@ -30,7 +30,7 @@ setup(name='hypernets_processor',
                                   os.path.join('etc', 'jobs.txt')],
 
       },
-      install_requires=['numpy', 'netCDF4', 'xarray', 'schedule', 'matplotlib'],
+      install_requires=['numpy', 'netCDF4', 'xarray', 'schedule', 'matplotlib', 'punpy', 'dataset', 'pysolar', 'sqlalchemy_utils'],
       entry_points={
           'console_scripts': [
                 'hypernets_processor =  hypernets_processor.cli.hypernets_processor_cli:cli'
