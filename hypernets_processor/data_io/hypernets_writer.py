@@ -4,9 +4,9 @@ HypernetsWriter class
 
 from hypernets_processor.version import __version__
 import os
+from datetime import datetime
 
-
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "12/2/2020"
 __version__ = __version__
@@ -23,7 +23,9 @@ class HypernetsWriter:
     def __init__(self, context=None):
         self.context = context
 
-    def write(self, ds, directory=None, overwrite=False, fmt='netcdf4', compression_level=None):
+    def write(
+            self, ds, directory=None, overwrite=False, fmt="netcdf4", compression_level=None
+    ):
         """
         Write xarray dataset to file
 
@@ -44,15 +46,31 @@ class HypernetsWriter:
         :param compression_level: the file compression level if 'netCDF4' fmt, 0 - 9 (default is 5)
         """
 
-        if (fmt.lower() == 'netcdf4') or (fmt.lower() == 'netcdf'):
+        if (fmt.lower() == "netcdf4") or (fmt.lower() == "netcdf"):
             fmt = "nc"
 
         if directory is None:
             if self.context is None:
-                raise ValueError("cannot write without either the self.context or directory parameters specified")
+                raise ValueError(
+                    "cannot write without either the self.context or directory parameters specified"
+                )
 
-            directory = os.path.join(self.context.archive_directory, self.context.site, str(self.context.time.year),
-                                     str(self.context.time.month), str(self.context.time.day))
+            archive_directory = self.context.get_config_value("archive_directory")
+
+            # take it from input file?
+            date = datetime.strptime(ds.attrs["sequence_id"].replace("SEQ", ""), "%Y%m%dT%H%M%S")
+            # site = self.context.get_config_value("site")
+            # year = self.context.get_config_value("time").year
+            # month = self.context.get_config_value("time").month
+            # day = self.context.get_config_value("time").day
+            site = ds.attrs["site_id"]
+            year = date.year
+            month = date.month
+            day = date.day
+
+            directory = os.path.join(archive_directory, site, str(year), str(month), str(day))
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
         path = os.path.join(directory, ds.attrs["product_name"]) + "." + fmt
 
@@ -62,14 +80,16 @@ class HypernetsWriter:
             else:
                 raise IOError("The file already exists: " + path)
 
-        if fmt == 'nc':
+
+        if fmt == "nc":
+            print('here')
             HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
 
-        elif fmt == 'csv':
+        elif fmt == "csv":
             HypernetsWriter._write_csv(ds, path)
 
         else:
-            raise NameError("Invalid fmt: "+fmt)
+            raise NameError("Invalid fmt: " + fmt)
 
     @staticmethod
     def _write_netcdf(ds, path, compression_level=None):
@@ -97,7 +117,7 @@ class HypernetsWriter:
             var_encoding.update(ds[var_name].encoding)
             encoding.update({var_name: var_encoding})
 
-        ds.to_netcdf(path, format='netCDF4', engine='netcdf4', encoding=encoding)
+        ds.to_netcdf(path, format="netCDF4", engine="netcdf4", encoding=encoding)
 
     @staticmethod
     def _write_csv(ds, path):
@@ -116,10 +136,10 @@ class HypernetsWriter:
 
         # write metadata
         metadata_path = os.path.splitext(path)[0] + "_meta.txt"
-        with open(metadata_path, 'w') as f:
+        with open(metadata_path, "w") as f:
             for meta_name in ds.attrs.keys():
                 f.write(meta_name + ": " + ds.attrs[meta_name] + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

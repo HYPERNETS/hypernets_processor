@@ -1,4 +1,6 @@
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
+from hypernets_processor.rhymer.rhymer.ancillary.rhymer_ancillary import RhymerAncillary
+import numpy as np
 
 
 ## interpolate Mobley sky reflectance LUT
@@ -10,22 +12,28 @@ from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 ##                     QV 2019-07-10 integrated in rhymer
 class RhymerProcessing:
 
-    def mobley_lut_interp(self, ths, thv, phi, wind=2., rholut=None):
-        if rholut is None: rholut = self.mobley_lut_read()
+    def __init__(self, context):
+        self.context = context
+        self.rhymeranc = RhymerAncillary(context)
+        self.rhymershared=RhymerShared(context)
+
+    def mobley_lut_interp(self, ths, thv, phi, wind=2.):
+
+        rholut = self.mobley_lut_read()
         dval = rholut['header']
 
-        ## find wind speeds
-        wind_id, wind_br = RhymerShared().lutpos(dval['Wind'], wind)
+        # find wind speeds
+        wind_id, wind_br = self.rhymershared.lutpos(dval['Wind'], wind)
         wind_w = wind_id - wind_br[0]
 
-        ## find geometry
-        ths_id, ths_br = RhymerShared().lutpos(dval['Theta-sun'], ths)
-        thv_id, thv_br = RhymerShared().lutpos(dval['Theta'], thv)
-        phi_id, phi_br = RhymerShared().lutpos(dval['Phi'], abs(phi))
+        # find geometry
+        ths_id, ths_br = self.rhymershared.lutpos(dval['Theta-sun'], ths)
+        thv_id, thv_br = self.rhymershared.lutpos(dval['Theta'], thv)
+        phi_id, phi_br = self.rhymershared.lutpos(dval['Phi'], abs(phi))
 
         ## interpolate for both bracketing wind speeds
-        it1 = RhymerShared().interp3d(rholut['data'][wind_br[0], :, :, :], ths_id, thv_id, phi_id)
-        it2 = RhymerShared().interp3d(rholut['data'][wind_br[1], :, :, :], ths_id, thv_id, phi_id)
+        it1 = self.rhymershared.interp3d(rholut['data'][wind_br[0], :, :, :], ths_id, thv_id, phi_id)
+        it2 = self.rhymershared.interp3d(rholut['data'][wind_br[1], :, :, :], ths_id, thv_id, phi_id)
 
         ## and weigh to wind speed
         rint = it2 * wind_w + it1 * (1. - wind_w)
@@ -35,13 +43,9 @@ class RhymerProcessing:
     ## QV 2018-07-18
     ## Last modifications: 2019-07-10 (QV) integrated in rhymer
 
-    def mobley_lut_read(self, ifile=None, version='M1999'):
-        import numpy as np
-
-        if ifile is None:
-            if version == 'M1999':
-                vf = 'rhoTable_AO1999'
-            ifile = '{}/{}'.format(self.rhymer_data_dir, 'Shared/Mobley/{}.txt'.format(vf))
+    def mobley_lut_read(self):
+        vf = self.context.get_config_value("rholut")
+        ifile = '{}/{}'.format(self.context.get_config_value("rhymer_data_dir"), 'Shared/Mobley/{}.txt'.format(vf))
 
         header = '   I   J    Theta      Phi  Phi-view       rho'.split()
         data, cur = {}, None
@@ -107,7 +111,7 @@ class RhymerProcessing:
     def similarity_read(self, ifile=None):
 
         if ifile is None:
-            ifile = '{}/Shared/REMSEM/similarityspectrumtable.txt'.format(self.rhymer_data_dir)
+            ifile = '{}/Shared/REMSEM/similarityspectrumtable.txt'.format(self.context.get_config_value("rhymer_data_dir"))
 
         ss_data = {'wave': np.ndarray(0), 'ave': np.ndarray(0), 'std': np.ndarray(0), 'cv': np.ndarray(0)}
 
@@ -130,4 +134,3 @@ class RhymerProcessing:
         idx = np.argsort(ss_data['wave'])
         for k in ss_data.keys(): ss_data[k] = ss_data[k][idx]
         return (ss_data)
-
