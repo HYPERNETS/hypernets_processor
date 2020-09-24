@@ -30,7 +30,7 @@ setup(name='hypernets_processor',
                                   os.path.join('etc', 'jobs.txt')],
 
       },
-      install_requires=['numpy', 'netCDF4', 'xarray', 'schedule', 'matplotlib', 'punpy'],
+      install_requires=['numpy', 'netCDF4', 'xarray', 'schedule', 'matplotlib', 'punpy', 'dataset', 'pysolar', 'sqlalchemy_utils'],
       entry_points={
           'console_scripts': [
                 'hypernets_processor =  hypernets_processor.cli.hypernets_processor_cli:cli'

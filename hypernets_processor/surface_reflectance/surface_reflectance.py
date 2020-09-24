@@ -28,20 +28,20 @@ class SurfaceReflectance:
 
     def process(self,dataset_l1c):
         dataset_l1c = self.perform_checks(dataset_l1c)
-        l1tol2_function = self._measurement_function_factory.get_measurement_function(self.context.measurement_function_surface_reflectance)
+        l1tol2_function = self._measurement_function_factory.get_measurement_function(self.context.get_config_value("measurement_function_surface_reflectance"))
         input_vars = l1tol2_function.get_argument_names()
         input_qty = self.find_input(input_vars,dataset_l1c)
         u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1c)
         u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1c)
         dataset_l2 = self.l2_from_l1c_dataset(dataset_l1c)
 
-        if self.context.network=="water":
+        if self.context.get_config_value("network")=="W":
             dataset_l2 = self.process_measurement_function(["nlw","rhow_nosc","rhow"],
                 dataset_l2,l1tol2_function.function,input_qty,u_random_input_qty,
                 u_systematic_input_qty)
 
-        elif self.context.network=="land":
-            dataset_l2 = self.process_measurement_function(["reflectance"],dataset_l2,
+        elif self.context.get_config_value("network")=="L":
+            dataset_l2 = self.process_measurement_function("reflectance",dataset_l2,
                                                            l1tol2_function.function,
                                                            input_qty,u_random_input_qty,
                                                            u_systematic_input_qty)
@@ -124,12 +124,12 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
-        if self.context.network == "land":
+        if self.context.get_config_value("network") == "L":
             l2a_dim_sizes_dict = {"wavelength":len(datasetl1c["wavelength"]),
                                   "series":len(datasetl1c['series'])}
             l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "L_L2A")
 
-        elif self.context.network == "water":
+        elif self.context.get_config_value("network") == "W":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
                                   "scan": len(datasetl1c['scan'])}
             l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A")
