@@ -41,7 +41,7 @@ class SurfaceReflectance:
                 u_systematic_input_qty)
 
         elif self.context.network=="land":
-            dataset_l2 = self.process_measurement_function("reflectance",dataset_l2,
+            dataset_l2 = self.process_measurement_function(["reflectance"],dataset_l2,
                                                            l1tol2_function.function,
                                                            input_qty,u_random_input_qty,
                                                            u_systematic_input_qty)
@@ -140,16 +140,30 @@ class SurfaceReflectance:
                                      u_systematic_input_quantities):
         measurand = measurement_function(*input_quantities)
         u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,output_vars=len(measurandstrings))
-        u_systematic_measurand,corr_systematic_measurand,corr_between = self.prop.propagate_systematic(measurement_function,
+
+        if len(measurandstrings)>1:
+            u_systematic_measurand,corr_systematic_measurand,corr_between = self.prop.propagate_systematic(measurement_function,
                                                                                           input_quantities,
                                                                                           u_systematic_input_quantities,
                                                                                           return_corr=True,corr_axis=0,output_vars=len(measurandstrings))
-        for im, measurandstring in enumerate(measurandstrings):
-            dataset[measurandstring].values = measurand[im]
-            dataset["u_random_"+measurandstring].values = u_random_measurand[im]
-            dataset["u_systematic_"+measurandstring].values = u_systematic_measurand[im]
-            dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand[im]))
-            dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand[im]
+            for im, measurandstring in enumerate(measurandstrings):
+                dataset[measurandstring].values = measurand[im]
+                dataset["u_random_"+measurandstring].values = u_random_measurand[im]
+                dataset["u_systematic_"+measurandstring].values = u_systematic_measurand[im]
+                dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand[im]))
+                dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand[im]
+
+        else:
+            u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(
+                measurement_function,input_quantities,u_systematic_input_quantities,
+                return_corr=True,corr_axis=0,output_vars=len(measurandstrings))
+            measurandstring=measurandstrings[0]
+            dataset[measurandstring].values = measurand
+            dataset["u_random_"+measurandstring].values = u_random_measurand
+            dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
+            dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
+            dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand
+
 
         return dataset
 

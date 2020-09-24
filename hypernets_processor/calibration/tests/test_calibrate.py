@@ -8,6 +8,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.test.test_functions import setup_test_job_config, setup_test_processor_config
 from hypernets_processor.calibration.calibrate import Calibrate
 import xarray as xr
+import numpy as np
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -22,14 +23,13 @@ def setup_test_files():
     ds_rad = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_RAD_202008211547_v0.0.nc')
     ds_bla = xr.open_dataset('../examples/HYPERNETS_W_VFFR_L0_BLA_202008211547_v0.0.nc')
 
-    ds_rad["digital_number"].values=
-    ds_irr["digital_number"].values=
+    ds_rad["digital_number"].values=np.ones(["digital_number"].values.shape)
+    ds_irr["digital_number"].values=np.ones(["digital_number"].values.shape)
     ds_bla["digital_number"].values=np.ones(["digital_number"].values.shape)
 
 class TestCalibrate(unittest.TestCase):
-
     def test_here(self):
-        self.assertEqual(1,1)
+        self.assertEqual(1+1,2)
 
 #
     # def test_calibrate_l1a(self,measurandstring,dataset_l0,dataset_l0_bla,calibration_data,
