@@ -4,7 +4,7 @@ Context class
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import get_config_value
 import dataset
-
+import configparser
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -36,6 +36,7 @@ class Context:
         self.metadata_db = None
         self.anomoly_db = None
 
+
         # Unpack processor_config to set relevant attributes
         if processor_config is not None:
             self.unpack_config(processor_config)
@@ -53,7 +54,7 @@ class Context:
         # Connect to anomoly database
         if "anomoly_db_url" in self.get_config_names():
             self.anomoly_db = dataset.connect(self.get_config_value("anomoly_db_url"))
-
+                                              
     def unpack_config(self, config, protected_values=None):
         """
         Unpacks config data, sets relevant entries to values instance attribute
@@ -61,14 +62,15 @@ class Context:
         :type config: configparser.RawConfigParser
         :param config: config data
         """
+        cp = configparser.ConfigParser()
+        cp.read(config)
 
         protected_values = [] if protected_values is None else protected_values
-
-        for section in config.sections():
-            for name in config[section].keys():
+        for section in cp.sections():
+            for name in cp[section].keys():
 
                 if name not in protected_values:
-                    value = get_config_value(config, section, name)
+                    value = get_config_value(cp, section, name)
                     self.set_config_value(name, value)
 
     def set_config_value(self, name, value):

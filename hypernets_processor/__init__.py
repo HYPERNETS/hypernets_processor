@@ -1,4 +1,3 @@
-from hypernets_processor.data_io.hypernets_reader import read_hypernets_data
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.main_processor import HypernetsProcessor

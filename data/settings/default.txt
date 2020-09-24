@@ -17,3 +17,10 @@ mapping_vis_c: +3.7714483E-05
 mapping_vis_d: +6.6769395E-10
 mapping_vis_e: -4.0577247E-12
 mapping_vis_f: +0.0000000E+00
+
+[MEASPROTOCOL]
+protocol=water_std
+valheader=radiance, irradiance
+nbrlu=6
+nbred=3
+nbrlsky=3

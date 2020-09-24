@@ -25,10 +25,13 @@ DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
                     "W_L1A_RAD": "L1A_RAD",
                     "L_L1A_IRR": "L1A_IRR",
                     "W_L1A_IRR": "L1A_IRR",
-                    "L_L1B_RAD": "L1B",
-                    "W_L1B_RAD": "L1B",
-                    "L_L1B_IRR": "L1B",
-                    "W_L1B_IRR": "L1B",
+                    "L_L1B_RAD": "L1B_RAD",
+                    "W_L1B_RAD": "L1B_RAD",
+                    "L_L1B_IRR": "L1B_IRR",
+                    "W_L1B_IRR": "L1B_IRR",
+                    "W_L1B": "L1B",
+                    "L_L1C": "L1C",
+                    "W_L1C": "L1C",
                     "L_L2A": "L2A_REF",
                     "W_L2A": "L2A_REF",
                     "L_L2B": "L2B_REF",
@@ -44,8 +47,7 @@ class ProductNameUtil:
         self.context = context
 
     def create_product_name(
-        self, ds_format, network=None, site=None, time=None, version=None
-    ):
+        self, ds_format, network=None, site=None, time=None, version=None):
         """
         Return a valid product name for Hypernets file
 

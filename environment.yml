@@ -19,6 +19,9 @@ dependencies:
   - dataset
   - sqlalchemy-utils
   - psycopg2
+  - pip
+  - pip:
+      - punpy>=0.2.1
   #
   # for testing only
   #
