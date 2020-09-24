@@ -52,7 +52,6 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
 
     # Add variables
     ds = TemplateUtil.add_variables(ds, variables_dict, dim_sizes_dict)
-
     # Add metadata
     if metadata is not None:
 

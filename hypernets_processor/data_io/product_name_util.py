@@ -47,8 +47,7 @@ class ProductNameUtil:
         self.context = context
 
     def create_product_name(
-        self, ds_format, network=None, site=None, time=None, version=None
-    ):
+        self, ds_format, network=None, site=None, time=None, version=None):
         """
         Return a valid product name for Hypernets file
 
