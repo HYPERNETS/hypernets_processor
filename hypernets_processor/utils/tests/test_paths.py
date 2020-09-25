@@ -29,7 +29,7 @@ class TestPaths(unittest.TestCase):
         full_path = relative_path(fname, data_directory)
 
         self.assertEqual(
-            full_path, os.path.abspath("../../../data/tests/cli/jobs1.config")
+            full_path, os.path.abspath(r"../../../data/tests/cli/jobs1.config")
         )
         self.assertEqual(cwd, os.getcwd())
 
@@ -44,7 +44,7 @@ class TestPaths(unittest.TestCase):
         full_path = relative_path(fname, data_directory)
 
         self.assertEqual(
-            full_path, os.path.abspath("../../../data/tests/cli/jobs1.config")
+            full_path, os.path.abspath(r"../../../data/tests/cli/jobs1.config")
         )
         self.assertEqual(cwd, os.getcwd())
 
