@@ -51,30 +51,17 @@ class HypernetsProcessor:
         # Runs hypernets data processing jobs
         # """
 
-        processor_config = "/home/clem/OneDrive/projects/hypernets_processor/hypernets_processor/etc/processor.config"
-        print(os.path.isfile(processor_config))
-
-        self.context = Context(processor_config=processor_config)
-        self.context.set_config_value('fresnel_option', 'Mobley')
-        print(self.context.get_config_names())
-
-        print(self.context.get_config_value("lat"))
-
-
-
-
-
 
         # run L0
-        set_dir = "~/OneDrive/projects/hypernets_processor/hypernets_processor"
+        # set_dir = "~/OneDrive/projects/hypernets_processor/hypernets_processor"
         # settings_file = set_dir + '/data/settings/default.txt'
-        server_dir = "/home/clem/OneDrive/projects/hypernets_processor/hypernets_processor/data_io/tests/reader/"
-        seq_id="SEQ20200916T124255"
+        server_dir = os.path.join(this_directory_path,"data_io/tests/reader/")
+        seq_id=self.context.get_config_value("sequence_id")
 
         # seq_dir=server_dir+"reader/SEQ20200625T095941/"
         seq_dir = server_dir + seq_id+"/"
 
-        L0_IRR, L0_RAD, L0_BLA = HypernetsReader(self.context).read_sequence(seq_dir)
+        l0_irr, l0_rad, l0_bla = HypernetsReader(self.context).read_sequence(seq_dir)
 
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ", "")
@@ -148,13 +135,11 @@ class HypernetsProcessor:
         #     plt.show()
         #     data.close()
 
-        ds_bla = xr.open_dataset(ProductNameUtil(self.context).create_product_name(ds_format="L0_BLA", time=seq_id))
-        ds_rad = xr.open_dataset(ProductNameUtil(self.context).create_product_name(ds_format="L0_RAD", time=seq_id))
-        ds_irr = xr.open_dataset(ProductNameUtil(self.context).create_product_name(ds_format="L0_IRR", time=seq_id))
+        # l0_bla = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_BLA", time=seq_id)+".nc")
+        # l0_rad = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_RAD", time=seq_id)+".nc")
+        # l0_irr = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_IRR", time=seq_id)+".nc")
 
-        # ds_bla = ds_bla.rename({"digital_number":"dark_signal"})
-        # ds_bla["digital_number"].values= ds_bla["digital_number"].values/10.
-        print(datetime.utcfromtimestamp(i) for i in ds_rad['acquisition_time'].values)
+        #print(datetime.utcfromtimestamp(i) for i in ds_rad['acquisition_time'].values)
 
         #np.save("wavs_hypernets.npy",ds_rad["wavelength"].values)
 
@@ -175,17 +160,17 @@ class HypernetsProcessor:
         rhymer = RhymerHypstar(self.context)
 
         calibration_data = {}
-        calibration_data["gains"] = np.ones(len(ds_rad["wavelength"]))
-        calibration_data["temp"] = 20 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_random_gains"] = 0.1 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_random_dark_signal"] = np.zeros((len(ds_rad["wavelength"])))
-        calibration_data["u_random_temp"] = 1 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_systematic_gains"] = 0.05 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_systematic_dark_signal"] = np.zeros((len(ds_rad["wavelength"])))
-        calibration_data["u_systematic_temp"] = 1 * np.ones(len(ds_rad["wavelength"]))
+        calibration_data["gains"] = np.ones(len(l0_rad["wavelength"]))
+        calibration_data["temp"] = 20 * np.ones(len(l0_rad["wavelength"]))
+        calibration_data["u_random_gains"] = 0.1 * np.ones(len(l0_rad["wavelength"]))
+        calibration_data["u_random_dark_signal"] = np.zeros((len(l0_rad["wavelength"])))
+        calibration_data["u_random_temp"] = 1 * np.ones(len(l0_rad["wavelength"]))
+        calibration_data["u_systematic_gains"] = 0.05 * np.ones(len(l0_rad["wavelength"]))
+        calibration_data["u_systematic_dark_signal"] = np.zeros((len(l0_rad["wavelength"])))
+        calibration_data["u_systematic_temp"] = 1 * np.ones(len(l0_rad["wavelength"]))
 
-        L1a_rad = cal.calibrate_l1a("radiance", ds_rad, ds_bla, calibration_data)
-        L1a_irr = cal.calibrate_l1a("irradiance", ds_irr, ds_bla, calibration_data)
+        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla, calibration_data)
+        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla, calibration_data)
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 
@@ -232,6 +217,9 @@ class HypernetsProcessor:
 
 
 if __name__ == "__main__":
-    hp = HypernetsProcessor()
+    this_directory_path = os.path.abspath(os.path.dirname(__file__))
+    processor_config = os.path.join(this_directory_path,"etc/processor.config")
+    job_config = os.path.join(this_directory_path,"etc/job.config")
+    hp = HypernetsProcessor(job_config=job_config,processor_config=processor_config)
     hp.run()
     pass

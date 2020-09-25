@@ -9,8 +9,9 @@ from hypernets_processor.test.test_functions import setup_test_job_config, setup
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
 from hypernets_processor.interpolation.interpolate import InterpolateL1c
-from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
+from hypernets_processor.context import Context
 from hypernets_processor import HypernetsDSBuilder
+import os.path
 
 import numpy as np
 
@@ -47,6 +48,7 @@ def setup_test_files(context):
                                         "L_L1B_IRR")
 
     ds_l2a = dsb.create_ds_template({"wavelength":N_WAVELENGTHS,"series":n_series},"L_L2A")
+    ds_l2a_avg = dsb.create_ds_template({"wavelength":N_WAVELENGTHS,"series":n_series},"L_L2A")
 
     ds_l0_rad["digital_number"].values = arr[5]
     ds_l0_rad["acquisition_time"].values = np.arange(30)
@@ -65,23 +67,28 @@ def setup_test_files(context):
     ds_l1b_irr["irradiance"].values = arr[3]
 
     ds_l2a["reflectance"].values = arr[4]
+    ds_l2a_avg["reflectance"].values = arr[9]
 
-    return ds_l0_rad,ds_l0_irr,ds_l0_bla,ds_l1a_rad,ds_l1a_irr,ds_l1b_rad,ds_l1b_irr,ds_l2a
+    return ds_l0_rad,ds_l0_irr,ds_l0_bla,ds_l1a_rad,ds_l1a_irr,ds_l1b_rad,ds_l1b_irr,ds_l2a,ds_l2a_avg
 
 class TestEndToEnd(unittest.TestCase):
 
     def test_end_to_end(self):
-        context = setup_test_context()
-        context.network = "land"
-        context.measurement_function_calibrate = "StandardMeasurementFunction"
-        context.measurement_function_interpolate = "LandNetworkInterpolationIrradianceLinear"
-        context.measurement_function_surface_reflectance = "LandNetworkProtocol"
+        this_directory_path = os.path.abspath(os.path.dirname(__file__))
+        processor_config = os.path.join(this_directory_path,"../etc/processor.config")
+        job_config = os.path.join(this_directory_path,"../etc/job.config")
 
-        cal=Calibrate(context,MCsteps=100)
+        context = Context(processor_config=processor_config,job_config=job_config)
+        context.set_config_value('network', 'L')
+        context.set_config_value('measurement_function_calibrate', 'StandardMeasurementFunction')
+        context.set_config_value('measurement_function_interpolate', 'LandNetworkInterpolationIrradianceLinear')
+        context.set_config_value('measurement_function_surface_reflectance', 'LandNetworkProtocol')
+
+        cal = Calibrate(context,MCsteps=100)
         intp = InterpolateL1c(context,MCsteps=1000)
         surf = SurfaceReflectance(context,MCsteps=1000)
 
-        test_l0_rad,test_l0_irr,test_l0_bla,test_l1a_rad,test_l1a_irr,test_l1b_rad,test_l1b_irr,test_l2a=setup_test_files(context)
+        test_l0_rad,test_l0_irr,test_l0_bla,test_l1a_rad,test_l1a_irr,test_l1b_rad,test_l1b_irr,test_l2a,test_l2a_avg=setup_test_files(context)
 
         calibration_data={}
         calibration_data["gains"] = np.ones(len(test_l0_rad["wavelength"]))
@@ -95,6 +102,7 @@ class TestEndToEnd(unittest.TestCase):
 
 
         L1a_rad = cal.calibrate_l1a("radiance",test_l0_rad,test_l0_bla,calibration_data)
+        print("flag",L1a_rad["quality_flag"].values)
         L1a_irr = cal.calibrate_l1a("irradiance",test_l0_irr,test_l0_bla,calibration_data)
         L1b_rad = cal.average_l1b("radiance",L1a_rad)
         L1b_irr = cal.average_l1b("irradiance",L1a_irr)
@@ -102,12 +110,13 @@ class TestEndToEnd(unittest.TestCase):
         L2a = surf.process(L1c)
 
         np.testing.assert_allclose(test_l1b_rad["radiance"].values,L1b_rad["radiance"].values,rtol=0.12,equal_nan=True)
-        np.testing.assert_allclose(np.nansum(test_l1b_rad["radiance"].values),np.nansum(L1b_rad["radiance"].values),rtol=0.04,equal_nan=True)
+        np.testing.assert_allclose(np.nansum(test_l1b_rad["radiance"].values),np.nansum(L1b_rad["radiance"].values),rtol=0.05,equal_nan=True)
 
         #np.testing.assert_allclose(test_l1b_rad["radiance"].values,L1b_rad["radiance"].values,rtol=0.03,equal_nan=True)
         #np.testing.assert_allclose(L1b_irr["irradiance"].values,test_l1b_irr["irradiance"].values,rtol=0.04,equal_nan=True)
         np.testing.assert_allclose(test_l2a["reflectance"].values,L2a["reflectance"].values,rtol=0.19,equal_nan=True)
         np.testing.assert_allclose(np.nansum(test_l2a["reflectance"].values),np.nansum(L2a["reflectance"].values),rtol=0.05,equal_nan=True)
+        np.testing.assert_allclose(np.nansum(test_l2a_avg["reflectance"].values),np.nansum(L2a["reflectance"].values),rtol=0.001,equal_nan=True)
 
 if __name__ == '__main__':
     unittest.main()

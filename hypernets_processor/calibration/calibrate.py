@@ -66,8 +66,6 @@ class Calibrate:
                                                                                       "u_systematic_" + measurandstring)
         dataset_l1b["corr_random_" + measurandstring].values = np.eye(
             len(dataset_l1b["u_systematic_" + measurandstring].values))
-        print((dataset_l1b["corr_systematic_" + measurandstring].values).shape)
-        print((self.calc_mean_masked(dataset_l1a, "corr_systematic_" + measurandstring, corr=True)).shape)
         dataset_l1b["corr_systematic_" + measurandstring].values = self.calc_mean_masked(dataset_l1a,
                                                                                          "corr_systematic_" + measurandstring,
                                                                                          corr=True)
@@ -204,21 +202,23 @@ class Calibrate:
 
         return datasetl0, datasetl1a
 
-    def clip_and_mask(self, dataset, k_unc=2):
+    def clip_and_mask(self, dataset, k_unc=3):
         mask = []
 
         # check if zeros, max, fillvalue:
 
         # check if integrated signal is outlier
-        acqui = np.unique(dataset['acquisition_time'])
-        out = np.empty((len(acqui), len(dataset['wavelength'])))
-        for i in range(len(acqui)):
-            ids = np.where(dataset['acquisition_time'] == acqui[i])
-            intsig = np.sum((dataset["digital_number"].values[:, ids]), axis=0)[0]
-            noiseavg, noisestd, values = self.sigma_clip(intsig)
+        series_ids = np.unique(dataset['series_id'])
+        out = np.empty((len(series_ids), len(dataset['wavelength'])))
+        for i in range(len(series_ids)):
+            ids = np.where(dataset['series_id'] == series_ids[i])
+            intsig = np.nansum((dataset["digital_number"].values[:, ids]), axis=0)[0]
+            noisestd, noiseavg = self.sigma_clip(intsig)
             maski = np.ones_like(intsig)
             maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 2
             mask = np.append(mask, maski)
+            print("mask",mask)
+
 
         # check if 10% of pixels are outiers
 
@@ -227,7 +227,7 @@ class Calibrate:
 
         return mask
 
-    def sigma_clip(self, values, tolerance=0.001, median=True, sigma_thresh=3.0):
+    def sigma_clip(self, values, tolerance=0.01, median=True, sigma_thresh=3.0):
         # Remove NaNs from input values
         values = np.array(values)
         values = values[np.where(np.isnan(values) == False)]
@@ -260,7 +260,7 @@ class Calibrate:
         values = values[np.where(check < 1)]
 
         # Return results
-        return sigma_new, average, values
+        return sigma_new, average
 
     def l1a_template_from_l0_dataset(self, measurandstring, dataset_l0):
         """
