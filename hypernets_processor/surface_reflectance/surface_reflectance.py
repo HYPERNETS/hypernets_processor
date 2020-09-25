@@ -41,7 +41,7 @@ class SurfaceReflectance:
                 u_systematic_input_qty)
 
         elif self.context.get_config_value("network")=="L":
-            dataset_l2 = self.process_measurement_function("reflectance",dataset_l2,
+            dataset_l2 = self.process_measurement_function(["reflectance"],dataset_l2,
                                                            l1tol2_function.function,
                                                            input_qty,u_random_input_qty,
                                                            u_systematic_input_qty)
