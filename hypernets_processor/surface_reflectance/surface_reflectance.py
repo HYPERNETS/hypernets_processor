@@ -6,6 +6,8 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import ProtocolFactory
+from hypernets_processor.calibration import Calibrate
+
 import punpy
 import numpy as np
 
@@ -24,6 +26,7 @@ class SurfaceReflectance:
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
         self.hdsb = HypernetsDSBuilder(context=context)
         self.writer=HypernetsWriter(context)
+        self.calibrate=Calibration(context)
         self.context = context
 
     def process(self,dataset_l1c):
@@ -33,12 +36,29 @@ class SurfaceReflectance:
         input_qty = self.find_input(input_vars,dataset_l1c)
         u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1c)
         u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1c)
-        dataset_l2 = self.l2_from_l1c_dataset(dataset_l1c)
+        dataset_l1d = self.l1d_from_l1c_dataset(dataset_l1c)
+        dataset_l2a = self.l2_from_l1c_dataset(dataset_l1c)
 
         if self.context.get_config_value("network")=="W":
-            dataset_l2 = self.process_measurement_function(["nlw","rhow_nosc","rhow"],
-                dataset_l2,l1tol2_function.function,input_qty,u_random_input_qty,
+
+            dataset_l1d = self.process_measurement_function(["nlw","rhow_nosc","rhow"],
+                dataset_l1d,l1tol2_function.function,input_qty,u_random_input_qty,
                 u_systematic_input_qty)
+
+            dataset_l2a[measurandstring].values = self.calibrate.calc_mean_masked(dataset_l1d, measurandstring)
+            dataset_l2a["u_random_" + measurandstring].values = self.calibrate.calc_mean_masked(dataset_l1d,
+                                                                                      "u_random_" + measurandstring,
+                                                                                      rand_unc=True)
+            dataset_l2a["u_systematic_" + measurandstring].values = self.calibrate.calc_mean_masked(dataset_l1d,
+                                                                                          "u_systematic_" + measurandstring)
+            dataset_l2a["corr_random_" + measurandstring].values = np.eye(
+                len(dataset_l2a["u_systematic_" + measurandstring].values))
+            dataset_l2a["corr_systematic_" + measurandstring].values = self.calibrate.calc_mean_masked(dataset_l1d,
+                                                                                             "corr_systematic_" + measurandstring,
+                                                                                             corr=True)
+            self.writer.write(dataset_l2,overwrite=True)
+            self.writer.write(dataset_l1d,overwrite=True)
+            return dataset_l2, dataset_l1d
 
         elif self.context.get_config_value("network")=="L":
             dataset_l2 = self.process_measurement_function(["reflectance"],dataset_l2,
@@ -46,8 +66,8 @@ class SurfaceReflectance:
                                                            input_qty,u_random_input_qty,
                                                            u_systematic_input_qty)
 
-        self.writer.write(dataset_l2,overwrite=True)
-        return dataset_l2
+            self.writer.write(dataset_l2,overwrite=True)
+            return dataset_l2
 
     def find_input(self,variables,dataset):
         """
@@ -115,6 +135,24 @@ class SurfaceReflectance:
 
         return dataset_l1
 
+    def l1d_from_l1c_dataset(self,datasetl1c):
+        """
+        Makes a L2 template of the data, and propagates the appropriate keywords from L1.
+
+        :param datasetl0:
+        :type datasetl0:
+        :return:
+        :rtype:
+        """
+        if self.context.get_config_value("network") == "L":
+            print("No L1D level for land)
+        elif self.context.get_config_value("network") == "W":
+            l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
+                                  "scan": len(datasetl1c['scan'])}
+            l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L1D")
+
+        return l1d
+
     def l2_from_l1c_dataset(self,datasetl1c):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
@@ -131,7 +169,7 @@ class SurfaceReflectance:
 
         elif self.context.get_config_value("network") == "W":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
-                                  "scan": len(datasetl1c['scan'])}
+                                  "series": len(datasetl1c['series'])}
             l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A")
 
         return l2a
