@@ -159,18 +159,8 @@ class HypernetsProcessor:
         surf = SurfaceReflectance(self.context, MCsteps=100)
         rhymer = RhymerHypstar(self.context)
 
-        calibration_data = {}
-        calibration_data["gains"] = np.ones(len(l0_rad["wavelength"]))
-        calibration_data["temp"] = 20 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_random_gains"] = 0.1 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_random_dark_signal"] = np.zeros((len(l0_rad["wavelength"])))
-        calibration_data["u_random_temp"] = 1 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_systematic_gains"] = 0.05 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_systematic_dark_signal"] = np.zeros((len(l0_rad["wavelength"])))
-        calibration_data["u_systematic_temp"] = 1 * np.ones(len(l0_rad["wavelength"]))
-
-        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla, calibration_data)
-        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla, calibration_data)
+        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
+        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 
@@ -221,5 +211,6 @@ if __name__ == "__main__":
     processor_config = os.path.join(this_directory_path,"etc/processor.config")
     job_config = os.path.join(this_directory_path,"etc/job.config")
     hp = HypernetsProcessor(job_config=job_config,processor_config=processor_config)
+    hp.context.set_config_value("processor_directory",this_directory_path)
     hp.run()
     pass
