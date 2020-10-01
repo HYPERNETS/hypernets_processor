@@ -760,7 +760,7 @@ L_L2A_REFLECTANCE_VARIABLES = {"u_random_reflectance": {"dim": [WL_DIM, SERIES_D
                                                "encoding": {'dtype': np.int16, "scale_factor": 0.1, "offset": 0.0}}}
 
 # W_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A water data product
-W_L2A_REFLECTANCE_VARIABLES = {"nlw": {"dim": [WL_DIM, Lu_SCAN_DIM],
+W_L1D_REFLECTANCE_VARIABLES = {"nlw": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                      "dtype": np.float32,
                                                                      "attributes": {
                                                                          "standard_name":
@@ -907,6 +907,11 @@ W_L2A_REFLECTANCE_VARIABLES = {"nlw": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                             "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                                          "offset": 0.0}}
                                }
+W_L2A_REFLECTANCE_VARIABLES = deepcopy(W_L1D_REFLECTANCE_VARIABLES)
+
+for variable in W_L2A_REFLECTANCE_VARIABLES.keys():
+    W_L2A_REFLECTANCE_VARIABLES[variable]["dim"] = [d if d != Lu_SCAN_DIM else SERIES_DIM
+                                             for d in W_L2A_REFLECTANCE_VARIABLES[variable]["dim"]]
 
 # L_L2B_REFLECTANCE_VARIABLES - Reflectance variables required for L2A land data product
 L_L2B_REFLECTANCE_VARIABLES = {"u_random_reflectance": {"dim": [WL_DIM, SERIES_DIM],
