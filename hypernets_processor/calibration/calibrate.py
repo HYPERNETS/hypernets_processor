@@ -28,7 +28,7 @@ class Calibrate:
         self.writer = HypernetsWriter(context)
         self.context = context
 
-    def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data):
+    def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla):
 
         if measurandstring != "radiance" and measurandstring != "irradiance":
             print("the measurandstring needs to be either 'radiance' or 'irradiance")
@@ -40,7 +40,10 @@ class Calibrate:
         print("the used variables are:", input_vars)
 
         dataset_l1a = self.l1a_template_from_l0_dataset(measurandstring, dataset_l0)
+        #dataset_l0 = self.correct_DN_units(dataset_l0,dataset_l0_bla)
         dataset_l0, dataset_l1a = self.preprocess_l0(dataset_l0, dataset_l1a)
+
+        calibration_data = self.prepare_calibration_data(measurandstring)
 
         input_qty_l1a = self.find_input(input_vars, dataset_l0, dataset_l0_bla, calibration_data)
         u_random_input_qty_l1a = self.find_u_random_input(input_vars, dataset_l0, dataset_l0_bla, calibration_data)
@@ -53,6 +56,43 @@ class Calibrate:
             self.writer.write(dataset_l1a, overwrite=True)
 
         return dataset_l1a
+
+    # def correct_DN_units(self,dataset,dataset_bla):
+    #     non_linear_cals=np.genfromtxt(r"../../examples/calibration_files/hypstar_"+
+    #                         str(self.context.get_config_value("hypstar_cal_number"))+
+    #                         "_nonlin_corr_coefs_"+
+    #                         str(self.context.get_config_value("cal_date"))+".dat")
+    #     if self.context.get_config_value("network")=="W":
+    #         non_lin_func=np.poly1d(non_linear_cals[:,0])
+    #     elif self.context.get_config_value("network")=="L":
+    #         non_lin_func=np.poly1d(non_linear_cals[:,0])
+
+    def prepare_calibration_data(self,measurandstring):
+        hypstar=self.context.get_config_value("hypstar_cal_number")
+        caldate=self.context.get_config_value("cal_date")
+        directory=self.context.get_config_value("processor_directory")
+        non_linear_cals = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+
+                                str(hypstar)+"_nonlin_corr_coefs_"+str(caldate)+".dat")
+
+        if measurandstring == "radiance":
+            gains = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+
+                                  str(hypstar)+"_radcal_L_"+str(caldate)+".dat")
+        else:
+            gains = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+
+                                  str(hypstar)+"_radcal_E_"+str(caldate)+".dat")
+
+        print(non_linear_cals)
+        print(gains[:,0])
+        calibration_data = {}
+        calibration_data["gains"] = gains[:,1]
+        calibration_data["u_random_gains"] = gains[:,3]
+        calibration_data["u_systematic_gains"] = gains[:,2]
+
+        calibration_data["non_linearity_coefficients"] = non_linear_cals[:,0]
+        calibration_data["u_random_non_linearity_coefficients"] = np.zeros(len(non_linear_cals[:,0]))
+        calibration_data["u_systematic_non_linearity_coefficients"] = np.zeros(len(non_linear_cals[:,0]))
+
+        return calibration_data
 
     def average_l1b(self, measurandstring, dataset_l1a):
 
@@ -144,7 +184,10 @@ class Calibrate:
             try:
                 inputs.append(dataset["u_random_" + var].values)
             except:
-                inputs.append(ancillary_dataset["u_random_" + var])
+                try:
+                    inputs.append(ancillary_dataset["u_random_" + var])
+                except:
+                    inputs.append(None)
         return inputs
 
     def find_u_systematic_input(self, variables, dataset, datasetbla, ancillary_dataset, masked_avg=False):
@@ -166,7 +209,10 @@ class Calibrate:
                 else:
                     inputs.append(dataset["u_systematic_" + var].values)
             except:
-                inputs.append(ancillary_dataset["u_systematic_" + var])
+                try:
+                    inputs.append(ancillary_dataset["u_systematic_" + var])
+                except:
+                    inputs.append(None)
 
         return inputs
 
@@ -316,11 +362,12 @@ class Calibrate:
                                      u_systematic_input_quantities):
         datashape = input_quantities[0].shape
         for i in range(len(input_quantities)):
-            if len(input_quantities[i].shape) < len(datashape):
-                input_quantities[i] = np.tile(input_quantities[i], (datashape[1], 1)).T
-            if len(u_random_input_quantities[i].shape) < len(datashape):
-                u_random_input_quantities[i] = np.tile(u_random_input_quantities[i], (datashape[1], 1)).T
-                u_systematic_input_quantities[i] = np.tile(u_systematic_input_quantities[i], (datashape[1], 1)).T
+            if u_random_input_quantities[i] is not None:
+                if len(input_quantities[i].shape) < len(datashape):
+                    input_quantities[i] = np.tile(input_quantities[i],(datashape[1],1)).T
+                if len(u_random_input_quantities[i].shape) < len(datashape):
+                    u_random_input_quantities[i] = np.tile(u_random_input_quantities[i], (datashape[1], 1)).T
+                    u_systematic_input_quantities[i] = np.tile(u_systematic_input_quantities[i], (datashape[1], 1)).T
         measurand = measurement_function(*input_quantities)
         u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
                                                         u_random_input_quantities)
