@@ -18,7 +18,7 @@ class StandardMeasurementFunction:
                                        non_linear[6]*DN**6+
                                        non_linear[7]*DN**7)
 
-        return gains*Corrected_DN*int_time/1000
+        return gains*Corrected_DN/int_time*1000
 
     @staticmethod
     def get_name():

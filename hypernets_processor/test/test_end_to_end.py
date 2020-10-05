@@ -50,15 +50,29 @@ def setup_test_files(context):
     ds_l2a = dsb.create_ds_template({"wavelength":N_WAVELENGTHS,"series":n_series},"L_L2A")
     ds_l2a_avg = dsb.create_ds_template({"wavelength":N_WAVELENGTHS,"series":n_series},"L_L2A")
 
-    ds_l0_rad["digital_number"].values = arr[5]
+    hypstar = context.get_config_value("hypstar_cal_number")
+    caldate = context.get_config_value("cal_date")
+    directory = context.get_config_value("processor_directory")
+    non_linear_cals = np.genfromtxt(
+        directory+r"/../examples/calibration_files/hypstar_"+str(
+            hypstar)+"_nonlin_corr_coefs_"+str(caldate)+".dat")
+    gainsL = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+str(
+            hypstar)+"_radcal_L_"+str(caldate)+".dat")
+    gainsE = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+str(
+            hypstar)+"_radcal_E_"+str(caldate)+".dat")
+    ds_l0_rad["digital_number"].values = arr[5]* np.array(np.tile(ds_l0_rad["integration_time"],(arr[5].shape[0],1))/1000./np.tile(gainsL[:,1],(arr[5].shape[1],1)).T)
     ds_l0_rad["acquisition_time"].values = np.arange(30)
     ds_l0_rad["series_id"].values = np.repeat([1,2,3],10)
-    ds_l0_irr["digital_number"].values = arr[6]
+    ds_l0_rad["integration_time"].values = np.repeat(1024,30)
+    ds_l0_irr["digital_number"].values = arr[6]* np.array(np.tile(ds_l0_rad["integration_time"],(arr[5].shape[0],1))/1000./np.tile(gainsE[:,1],(arr[5].shape[1],1)).T)
     ds_l0_irr["acquisition_time"].values = np.arange(30)
     ds_l0_irr["series_id"].values = np.repeat([1,2,3],10)
+    ds_l0_irr["integration_time"].values = np.repeat(1024,30)
     ds_l0_bla["digital_number"].values = np.zeros(ds_l0_bla["digital_number"].values.shape)
     ds_l0_bla["acquisition_time"].values = np.arange(30)
     ds_l0_bla["series_id"].values =  np.repeat([1,2,3],10)
+    ds_l0_bla["integration_time"].values = np.repeat(1024,30)
+
 
     ds_l1a_rad["radiance"].values=arr[5]
     ds_l1a_irr["irradiance"].values=arr[6]
@@ -75,14 +89,16 @@ class TestEndToEnd(unittest.TestCase):
 
     def test_end_to_end(self):
         this_directory_path = os.path.abspath(os.path.dirname(__file__))
-        processor_config = os.path.join(this_directory_path,"../etc/processor.config")
-        job_config = os.path.join(this_directory_path,"../etc/job.config")
+        this_directory_path = os.path.join(this_directory_path,"../")
+        processor_config = os.path.join(this_directory_path,"etc/processor.config")
+        job_config = os.path.join(this_directory_path,"etc/job.config")
 
         context = Context(processor_config=processor_config,job_config=job_config)
         context.set_config_value('network', 'L')
         context.set_config_value('measurement_function_calibrate', 'StandardMeasurementFunction')
         context.set_config_value('measurement_function_interpolate', 'LandNetworkInterpolationIrradianceLinear')
         context.set_config_value('measurement_function_surface_reflectance', 'LandNetworkProtocol')
+        context.set_config_value("processor_directory",this_directory_path)
 
         cal = Calibrate(context,MCsteps=100)
         intp = InterpolateL1c(context,MCsteps=1000)
@@ -90,25 +106,15 @@ class TestEndToEnd(unittest.TestCase):
 
         test_l0_rad,test_l0_irr,test_l0_bla,test_l1a_rad,test_l1a_irr,test_l1b_rad,test_l1b_irr,test_l2a,test_l2a_avg=setup_test_files(context)
 
-        calibration_data={}
-        calibration_data["gains"] = np.ones(len(test_l0_rad["wavelength"]))
-        calibration_data["temp"] = 20*np.ones(len(test_l0_rad["wavelength"]))
-        calibration_data["u_random_gains"] = 0.1*np.ones(len(test_l0_rad["wavelength"]))
-        calibration_data["u_random_dark_signal"] = np.zeros((len(test_l0_rad["wavelength"])))
-        calibration_data["u_random_temp"] = 1*np.ones(len(test_l0_rad["wavelength"]))
-        calibration_data["u_systematic_gains"] = 0.05*np.ones(len(test_l0_rad["wavelength"]))
-        calibration_data["u_systematic_dark_signal"] = np.zeros((len(test_l0_rad["wavelength"])))
-        calibration_data["u_systematic_temp"] = 1*np.ones(len(test_l0_rad["wavelength"]))
-
-
-        L1a_rad = cal.calibrate_l1a("radiance",test_l0_rad,test_l0_bla,calibration_data)
+        L1a_rad = cal.calibrate_l1a("radiance",test_l0_rad,test_l0_bla)
         print("flag",L1a_rad["quality_flag"].values)
-        L1a_irr = cal.calibrate_l1a("irradiance",test_l0_irr,test_l0_bla,calibration_data)
+        L1a_irr = cal.calibrate_l1a("irradiance",test_l0_irr,test_l0_bla)
         L1b_rad = cal.average_l1b("radiance",L1a_rad)
         L1b_irr = cal.average_l1b("irradiance",L1a_irr)
         L1c = intp.interpolate_l1c(L1b_rad,L1b_irr,)
         L2a = surf.process(L1c)
-
+        print("test",test_l0_rad["digital_number"].values[500][500:600],test_l1a_rad["radiance"].values[500][500:600],L1a_rad["radiance"].values[500][500:600])
+        np.testing.assert_allclose(test_l1b_rad["radiance"].values,L1b_rad["radiance"].values,rtol=0.12,equal_nan=True)
         np.testing.assert_allclose(test_l1b_rad["radiance"].values,L1b_rad["radiance"].values,rtol=0.12,equal_nan=True)
         np.testing.assert_allclose(np.nansum(test_l1b_rad["radiance"].values),np.nansum(L1b_rad["radiance"].values),rtol=0.05,equal_nan=True)
 
