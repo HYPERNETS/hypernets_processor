@@ -81,8 +81,8 @@ class Calibrate:
             gains = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+
                                   str(hypstar)+"_radcal_E_"+str(caldate)+".dat")
 
-        print(non_linear_cals)
-        print(gains[:,0])
+        # print(non_linear_cals)
+        # print(gains[:,0])
         calibration_data = {}
         calibration_data["gains"] = gains[:,1]
         calibration_data["u_random_gains"] = gains[:,3]
@@ -263,7 +263,7 @@ class Calibrate:
             maski = np.ones_like(intsig)
             maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 2
             mask = np.append(mask, maski)
-            print("mask",mask)
+            # print("mask",mask)
 
 
         # check if 10% of pixels are outiers
@@ -324,7 +324,7 @@ class Calibrate:
                                                        propagate_ds=dataset_l0)
         elif measurandstring == "irradiance":
             dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, "L_L1A_IRR", propagate_ds=dataset_l0)
-
+        dataset_l1a["wavelength"]=dataset_l0["wavelength"]
         return dataset_l1a
 
     def l1b_template_from_l1a_dataset(self, measurandstring, dataset_l1a):
@@ -362,20 +362,25 @@ class Calibrate:
                                      u_systematic_input_quantities):
         datashape = input_quantities[0].shape
         for i in range(len(input_quantities)):
-            if u_random_input_quantities[i] is not None:
-                if len(input_quantities[i].shape) < len(datashape):
+            if len(input_quantities[i].shape) < len(datashape):
+                if input_quantities[i].shape[0]==datashape[1]:
+                    input_quantities[i] = np.tile(input_quantities[i],(datashape[0],1))
+                else:
                     input_quantities[i] = np.tile(input_quantities[i],(datashape[1],1)).T
+
+            if u_random_input_quantities[i] is not None:
                 if len(u_random_input_quantities[i].shape) < len(datashape):
                     u_random_input_quantities[i] = np.tile(u_random_input_quantities[i], (datashape[1], 1)).T
                     u_systematic_input_quantities[i] = np.tile(u_systematic_input_quantities[i], (datashape[1], 1)).T
         measurand = measurement_function(*input_quantities)
+
         u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
-                                                        u_random_input_quantities)
+                                                        u_random_input_quantities,repeat_dims=1)
         u_systematic_measurand, corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
                                                                                            input_quantities,
-                                                                                           u_systematic_input_quantities,
+                                                                                           u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
                                                                                            return_corr=True,
-                                                                                           corr_axis=0)
+                                                                                           repeat_dims=1,corr_axis=0)
         dataset[measurandstring].values = measurand
         dataset["u_random_" + measurandstring].values = u_random_measurand
         dataset["u_systematic_" + measurandstring].values = u_systematic_measurand

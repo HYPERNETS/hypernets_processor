@@ -139,14 +139,15 @@ class SurfaceReflectance:
     def process_measurement_function(self,measurandstrings,dataset,measurement_function,input_quantities,u_random_input_quantities,
                                      u_systematic_input_quantities):
         measurand = measurement_function(*input_quantities)
-        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,output_vars=len(measurandstrings))
+        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,repeat_dims=1,output_vars=len(measurandstrings))
 
         if len(measurandstrings)>1:
             u_systematic_measurand,corr_systematic_measurand,corr_between = self.prop.propagate_systematic(measurement_function,
                                                                                           input_quantities,
-                                                                                          u_systematic_input_quantities,
-                                                                                          return_corr=True,corr_axis=0,output_vars=len(measurandstrings))
+                                                                                          u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
+                                                                                          return_corr=True,repeat_dims=1,corr_axis=0,output_vars=len(measurandstrings))
             for im, measurandstring in enumerate(measurandstrings):
+                print(np.array(measurand[im]).shape,np.array(u_random_measurand).shape)
                 dataset[measurandstring].values = measurand[im]
                 dataset["u_random_"+measurandstring].values = u_random_measurand[im]
                 dataset["u_systematic_"+measurandstring].values = u_systematic_measurand[im]
