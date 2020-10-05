@@ -161,6 +161,7 @@ class HypernetsProcessor:
 
         L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
         L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
+        #print(l0_rad["wavelength"],L1a_rad["wavelength"],L1a_irr["wavelength"])
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 

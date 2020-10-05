@@ -91,8 +91,6 @@ class InterpolateL1c:
         acqui_irr = dataset_l1a_skyrad['acquisition_time'].values
         acqui_rad = dataset_l1c['acquisition_time'].values
 
-
-        # haw can I pass the new name : "u_random_downwelling_radiance and u_systematic_downwelling_radiance"?
         dataset_l1c = self.process_measurement_function("downwelling_radiance",dataset_l1c,interpolation_function.function,
                                                         [acqui_rad,acqui_irr,dataset_l1a_skyrad['radiance'].values],
                                                         [None,None,dataset_l1a_skyrad['u_random_radiance'].values],
@@ -103,12 +101,28 @@ class InterpolateL1c:
 
     def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
                                      u_systematic_input_quantities):
+        datashape = dataset[measurandstring].shape
+        # for i in range(len(input_quantities)):
+        #     print(input_quantities[i].shape,datashape)
+        #     if len(input_quantities[i].shape) < len(datashape):
+        #         if input_quantities[i].shape[0] == datashape[1]:
+        #             input_quantities[i] = np.tile(input_quantities[i],(datashape[0],1))
+        #         else:
+        #             input_quantities[i] = np.tile(input_quantities[i],(datashape[1],1)).T
+        #
+        #     print(input_quantities[i].shape)
+        #     if u_random_input_quantities[i] is not None:
+        #         if len(u_random_input_quantities[i].shape) < len(datashape):
+        #             u_random_input_quantities[i] = np.tile(u_random_input_quantities[i],
+        #                                                    (datashape[1],1)).T
+        #             u_systematic_input_quantities[i] = np.tile(
+        #                 u_systematic_input_quantities[i],(datashape[1],1)).T
         measurand = measurement_function(*input_quantities)
-        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities)
+        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,repeat_dims=1)
         u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
                                                                                           input_quantities,
-                                                                                          u_systematic_input_quantities,
-                                                                                          return_corr=True,corr_axis=0)
+                                                                                          u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
+                                                                                          return_corr=True,repeat_dims=1,corr_axis=0)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand
         dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
