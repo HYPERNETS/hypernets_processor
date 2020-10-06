@@ -10,6 +10,7 @@ from sys import exit, version_info  # noqa
 
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 from pysolar.solar import *
 
 from hypernets_processor.data_io.format.header import HEADER_DEF
@@ -481,6 +482,16 @@ class HypernetsReader:
             print("No pictures for this sequence")
 
         return L0_IRR, L0_RAD, L0_BLA
+
+    def read_flag(self, flagint):
+    #flag = 2 ** 1 + 2 ** 3 + 2 ** 5  # 2+8+32
+        flagarray = 2 ** (np.linspace(0, 31, 32))
+        flags = []
+        while flagint:
+            r = 2 ** round(math.log2(flagint), 0)
+            flags.append(int(np.where(flagarray == r)[0]))
+            flagint -= r
+        return(flags)
 
 
 if __name__ == '__main__':
