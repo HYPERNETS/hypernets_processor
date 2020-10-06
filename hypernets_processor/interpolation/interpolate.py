@@ -17,7 +17,7 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
-class InterpolateL1c:
+class Interpolate:
     def __init__(self,context,MCsteps=1000,parallel_cores=1):
         self._measurement_function_factory = InterpolationFactory()
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
