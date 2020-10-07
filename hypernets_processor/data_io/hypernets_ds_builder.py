@@ -89,7 +89,6 @@ class HypernetsDSBuilder:
         if self.context is not None:
 
             metadata_db = self.context.metadata_db
-            print(metadata_db)
 
             # Evaluate queries for metadata_db to populate product metadata
             metadata_db_query = None
