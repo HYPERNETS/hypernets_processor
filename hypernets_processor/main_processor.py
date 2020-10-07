@@ -5,7 +5,7 @@ Contains main class for orchestrating hypernets data processing jobs
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
-from hypernets_processor.interpolation.interpolate import InterpolateL1c
+from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.context import Context
 from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
@@ -62,6 +62,7 @@ class HypernetsProcessor:
         seq_dir = server_dir + seq_id+"/"
 
         l0_irr, l0_rad, l0_bla = HypernetsReader(self.context).read_sequence(seq_dir)
+        l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
 
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ", "")
@@ -155,22 +156,13 @@ class HypernetsProcessor:
         # context.measurement_function_surface_reflectance = "WaterNetworkProtocol"
 
         cal = Calibrate(self.context, MCsteps=100)
-        intp = InterpolateL1c(self.context, MCsteps=100)
+        intp = Interpolate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=100)
         rhymer = RhymerHypstar(self.context)
 
-        calibration_data = {}
-        calibration_data["gains"] = np.ones(len(l0_rad["wavelength"]))
-        calibration_data["temp"] = 20 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_random_gains"] = 0.1 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_random_dark_signal"] = np.zeros((len(l0_rad["wavelength"])))
-        calibration_data["u_random_temp"] = 1 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_systematic_gains"] = 0.05 * np.ones(len(l0_rad["wavelength"]))
-        calibration_data["u_systematic_dark_signal"] = np.zeros((len(l0_rad["wavelength"])))
-        calibration_data["u_systematic_temp"] = 1 * np.ones(len(l0_rad["wavelength"]))
+        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
+        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
 
-        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla, calibration_data)
-        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla, calibration_data)
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 
@@ -191,6 +183,7 @@ class HypernetsProcessor:
         # L1b = rhymer.get_fresnelrefl(L1b)
         # L1b = rhymer.get_epsilon(L1b)
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
+        print("rad",L1b["u_random_downwelling_radiance"])
         #
         L1c=rhymer.process_l1c(L1b)
 
@@ -221,5 +214,6 @@ if __name__ == "__main__":
     processor_config = os.path.join(this_directory_path,"etc/processor.config")
     job_config = os.path.join(this_directory_path,"etc/job.config")
     hp = HypernetsProcessor(job_config=job_config,processor_config=processor_config)
+    hp.context.set_config_value("processor_directory",this_directory_path)
     hp.run()
     pass
