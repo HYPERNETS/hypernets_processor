@@ -19,7 +19,6 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
-
 class Calibrate:
     def __init__(self, context, MCsteps=1000, parallel_cores=0):
         self._measurement_function_factory = MeasurementFunctionFactory()
@@ -121,7 +120,7 @@ class Calibrate:
         else:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
         for i in range(len(series_id)):
-            ids = np.where((dataset['series_id'] == series_id[i]) & (dataset['quality_flag'] == 1))
+            ids = np.where((dataset['series_id'] == series_id[i]) & (dataset['quality_flag'] == 0))
             out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
             if rand_unc:
                 out[i] = out[i] / len(ids[0])

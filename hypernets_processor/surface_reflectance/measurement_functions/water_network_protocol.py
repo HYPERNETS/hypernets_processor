@@ -13,7 +13,7 @@ class WaterNetworkProtocol:
 
         rhow_all = [r - epsilon for r in rhow_nosc_all]
 
-        return lw_all, rhow_nosc_all, rhow_all
+        return lw_all, rhow_nosc_all, rhow_all, epsilon
 
     @staticmethod
     def get_name():
