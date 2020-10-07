@@ -5,7 +5,7 @@ Contains main class for orchestrating hypernets data processing jobs
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
-from hypernets_processor.interpolation.interpolate import InterpolateL1c
+from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.context import Context
 from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
@@ -156,7 +156,7 @@ class HypernetsProcessor:
         # context.measurement_function_surface_reflectance = "WaterNetworkProtocol"
 
         cal = Calibrate(self.context, MCsteps=100)
-        intp = InterpolateL1c(self.context, MCsteps=100)
+        intp = Interpolate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=100)
         rhymer = RhymerHypstar(self.context)
 
@@ -183,6 +183,7 @@ class HypernetsProcessor:
         # L1b = rhymer.get_fresnelrefl(L1b)
         # L1b = rhymer.get_epsilon(L1b)
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
+        print("rad",L1b["u_random_downwelling_radiance"])
         #
         L1c=rhymer.process_l1c(L1b)
 
