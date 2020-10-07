@@ -132,7 +132,7 @@ class HypernetsReader:
         print("Wavelength range:", min(wvl), "-", max(wvl))
         return wvl
 
-    def read_series(self, seq_dir, series, lat, lon, metadata, fileformat):
+    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat):
 
         model_name = self.model
 
@@ -195,8 +195,7 @@ class HypernetsReader:
 
         print("Wvl and Scan Dimensions:", len(wvl), scanDim)
         # use template from variables and metadata in format
-        ds = HypernetsDSBuilder()
-        ds = ds.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
+        ds = HypernetsDSBuilder().create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
 
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
@@ -283,7 +282,7 @@ class HypernetsReader:
                 ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
                 ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
 
-                # ds['quality_flag']
+                ds['quality_flag'][scan_number] = flag
                 ds['integration_time'][scan_number] = header['integration_time']
                 ds['temperature'][scan_number] = header['temperature']
 
@@ -317,7 +316,7 @@ class HypernetsReader:
     def read_metadata(self, seq_dir):
 
         model_name=self.model
-
+        flag=0
         #     Spectra name : AA_BBB_CCCC_D_EEEE_FFF_GG_HHHH_II_JJJJ.spe
 
         #     A : iterator over "the sequence repeat time"
@@ -373,6 +372,7 @@ class HypernetsReader:
             if not lat.isdigit():
                 print("Latitude is not given, use default")
                 lat=self.context.get_config_value("lat")
+                flag=flag+2**self.context.get_config_value("lat_default")
 
             if 'longitude' in globalattr.keys():
                 lon = globalattr['longitude']
@@ -382,6 +382,7 @@ class HypernetsReader:
             if not lon.isdigit():
                 print("Longitude is not given, use default")
                 lon=self.context.get_config_value("lon")
+                flag=flag+2**self.context.get_config_value("lon_default")
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
@@ -433,7 +434,7 @@ class HypernetsReader:
             print("Missing metadata file in sequence directory - check sequence directory")
             exit()
 
-        return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict
+        return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict,flag
 
     def read_sequence(self, seq_dir, setfile=None):
 
@@ -446,11 +447,11 @@ class HypernetsReader:
         L0_RAD = None
         L0_BLA = None
 
-        seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict = self.read_metadata(
+        seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag = self.read_metadata(
             seq_dir)
 
         if seriesIrr:
-            L0_IRR = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, "L0_IRR")
+            L0_IRR = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR")
 
             # can't use this when non concatanted spectra
         #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesIrr]):
@@ -461,7 +462,7 @@ class HypernetsReader:
             print("No irradiance data for this sequence")
 
         if seriesRad:
-            L0_RAD = self.read_series(seq_dir, seriesRad, lat, lon, metadata, "L0_RAD")
+            L0_RAD = self.read_series(seq_dir, seriesRad, lat, lon, metadata,flag, "L0_RAD")
         #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
         #             L0_RAD=read_series(seriesRad,cc, lat, lon, metadata, "L0_RAD")
         #         else:
@@ -470,7 +471,7 @@ class HypernetsReader:
             print("No radiance data for this sequence")
 
         if seriesBlack:
-            L0_BLA = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, "L0_BLA")
+            L0_BLA = self.read_series(seq_dir, seriesBlack, lat, lon, metadata,flag, "L0_BLA")
             # if all([os.path.isfile(os.path.join(seq_dir, "RADIOMETER/", f)) for f in seriesBlack]):
             #     L0_BLA = self.read_series(seq_dir, seriesBlack, cc, lat, lon, metadata, "L0_BLA")
         else:
@@ -484,7 +485,6 @@ class HypernetsReader:
         return L0_IRR, L0_RAD, L0_BLA
 
     def read_flag(self, flagint):
-    #flag = 2 ** 1 + 2 ** 3 + 2 ** 5  # 2+8+32
         flagarray = 2 ** (np.linspace(0, 31, 32))
         flags = []
         while flagint:
