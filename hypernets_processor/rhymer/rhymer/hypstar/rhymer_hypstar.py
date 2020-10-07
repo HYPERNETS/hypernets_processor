@@ -347,7 +347,7 @@ class RhymerHypstar:
             if self.context.get_config_value("similarity_test")==True:
                 if fail_simil:
                     if verbosity > 2: print('Failed simil test.')
-                    simil_flag[i] = 10
+                    simil_flag[i] = 2**self.context.get_config_value("simil_fail")
                     continue
                 else:
                     if verbosity > 2: print('Passed simil test.')
@@ -364,92 +364,92 @@ class RhymerHypstar:
 
         return rhow_nosc_all, rhow_all, epsilon, lw_all, simil_flag
 
-    def fresnelrefl_qc_simil(self, l1b, wind):
-
-        ## read mobley rho lut
-        rholut = self.rhymerproc.mobley_lut_read(self)
-
-        wavelength = l1b['wavelength'].values
-
-        fresnel_coeff = np.zeros(len(l1b.scan))
-        rhow_nosc_all = np.zeros((len(l1b.scan), len(wavelength)))
-        lw_all = np.zeros((len(l1b.scan), len(wavelength)))
-        rhow_all = np.zeros((len(l1b.scan), len(wavelength)))
-        epsilon = np.zeros(len(l1b.scan))
-        simil_flag = np.zeros(len(l1b.scan))
-
-        for i in range(len(l1b.scan)):
-            vza = l1b['viewing_zenith_angle'][i].values
-            sza = l1b['solar_zenith_angle'][i].values
-
-            diffa = l1b['viewing_azimuth_angle'][i].values - l1b['viewing_azimuth_angle'][i].values
-
-            if diffa >= 360:
-                diffa = diffa - 360
-            elif 0 <= diffa < 360:
-                diffa = diffa
-            else:
-                diffa = diffa + 360
-            raa = abs((diffa - 180))
-            sza = l1b['solar_zenith_angle'][i].values
-            ## get fresnel reflectance
-            if self.fresnel_option == 'Mobley':
-                if (sza is not None) & (raa is not None):
-                    sza_ = min(sza, 79.999)
-                    rhof = self.rhymerproc.mobley_lut_interp(sza, vza, raa,
-                                                                wind=wind[i],
-                                                                rholut=rholut)
-                else:
-                    # add a quality flag!
-                    fresnel = 'fixed'
-
-            if self.fresnel_option == 'Ruddick2006':
-                rhof = self.rhof_default
-                ## R2006
-                if wind is not None:
-                    rhof = rhof + 0.00039 * wind + 0.000034 * wind ** 2
-            ## compute rhow
-            lu = l1b['upwelling_radiance'][:, i].values
-            # should I average here or take the downwelling radiance per scan???
-            # mls stands for mean sky/downwelling radiance, so need to check if mean is better than interpolated?
-            mls = l1b['downwelling_radiance'][:, i].values
-            # same for ed? Better interpolated or mean Ed???
-            med = l1b['irradiance'][:, i].values
-
-            lw_all[i] = [(lu[w] - (rhof * mls[w])) for w in range(len(wavelength))]
-            rhow_nosc_all[i] = [np.pi * (lu[w] - (rhof * mls[w])) / med[w] for w in range(len(wavelength))]
-            fresnel_coeff[i] = rhof
-
-            ## compute similarity epsilon
-            print(self.similarity_alpha)
-            fail_simil, eps = self.qc_similarity(wavelength, rhow_nosc_all[i],
-                                                 self.similarity_wr,
-                                                 self.similarity_wp,
-                                                 self.similarity_w1,
-                                                 self.similarity_w2,
-                                                 self.similarity_alpha)
-
-            # ## R2005 quality control
-            # ## skip spectra not following similarity
-            # if self.similarity_test:
-            #     if fail_simil:
-            #         if verbosity > 2: print('Failed simil test.')
-            #         simil_flag[i] = 10
-            #         continue
-            #     else:
-            #         if verbosity > 2: print('Passed simil test.')
-            #         simil_flag[i] = 0
-
-            ## R2005 correction
-            if self.similarity_correct:
-                # print(epsilon)
-                rhow_all[i] = [r - eps for r in rhow_nosc_all[i]]
-            else:
-                rhow_all[i] = rhow_nosc_all[i]
-
-            epsilon[i] = eps
-
-        return lw_all, rhow_all, rhow_nosc_all, epsilon, simil_flag
+    # def fresnelrefl_qc_simil(self, l1b, wind):
+    #
+    #     ## read mobley rho lut
+    #     rholut = self.rhymerproc.mobley_lut_read(self)
+    #
+    #     wavelength = l1b['wavelength'].values
+    #
+    #     fresnel_coeff = np.zeros(len(l1b.scan))
+    #     rhow_nosc_all = np.zeros((len(l1b.scan), len(wavelength)))
+    #     lw_all = np.zeros((len(l1b.scan), len(wavelength)))
+    #     rhow_all = np.zeros((len(l1b.scan), len(wavelength)))
+    #     epsilon = np.zeros(len(l1b.scan))
+    #     simil_flag = np.zeros(len(l1b.scan))
+    #
+    #     for i in range(len(l1b.scan)):
+    #         vza = l1b['viewing_zenith_angle'][i].values
+    #         sza = l1b['solar_zenith_angle'][i].values
+    #
+    #         diffa = l1b['viewing_azimuth_angle'][i].values - l1b['viewing_azimuth_angle'][i].values
+    #
+    #         if diffa >= 360:
+    #             diffa = diffa - 360
+    #         elif 0 <= diffa < 360:
+    #             diffa = diffa
+    #         else:
+    #             diffa = diffa + 360
+    #         raa = abs((diffa - 180))
+    #         sza = l1b['solar_zenith_angle'][i].values
+    #         ## get fresnel reflectance
+    #         if self.context.get_config_value("fresnel_option") == 'Mobley':
+    #             if (sza is not None) & (raa is not None):
+    #                 sza_ = min(sza, 79.999)
+    #                 rhof = self.rhymerproc.mobley_lut_interp(sza, vza, raa,
+    #                                                             wind=wind[i],
+    #                                                             rholut=rholut)
+    #             else:
+    #                 # add a quality flag!
+    #                 fresnel = 'fixed'
+    #
+    #         if self.context.get_config_value("fresnel_option") == 'Ruddick2006':
+    #             rhof = self.rhof_default
+    #             ## R2006
+    #             if wind is not None:
+    #                 rhof = rhof + 0.00039 * wind + 0.000034 * wind ** 2
+    #         ## compute rhow
+    #         lu = l1b['upwelling_radiance'][:, i].values
+    #         # should I average here or take the downwelling radiance per scan???
+    #         # mls stands for mean sky/downwelling radiance, so need to check if mean is better than interpolated?
+    #         mls = l1b['downwelling_radiance'][:, i].values
+    #         # same for ed? Better interpolated or mean Ed???
+    #         med = l1b['irradiance'][:, i].values
+    #
+    #         lw_all[i] = [(lu[w] - (rhof * mls[w])) for w in range(len(wavelength))]
+    #         rhow_nosc_all[i] = [np.pi * (lu[w] - (rhof * mls[w])) / med[w] for w in range(len(wavelength))]
+    #         fresnel_coeff[i] = rhof
+    #
+    #         ## compute similarity epsilon
+    #         print(self.similarity_alpha)
+    #         fail_simil, eps = self.qc_similarity(wavelength, rhow_nosc_all[i],
+    #                                              self.similarity_wr,
+    #                                              self.similarity_wp,
+    #                                              self.similarity_w1,
+    #                                              self.similarity_w2,
+    #                                              self.similarity_alpha)
+    #
+    #         # ## R2005 quality control
+    #         # ## skip spectra not following similarity
+    #         # if self.similarity_test:
+    #         #     if fail_simil:
+    #         #         if verbosity > 2: print('Failed simil test.')
+    #         #         simil_flag[i] = 10
+    #         #         continue
+    #         #     else:
+    #         #         if verbosity > 2: print('Passed simil test.')
+    #         #         simil_flag[i] = 0
+    #
+    #         ## R2005 correction
+    #         if self.similarity_correct:
+    #             # print(epsilon)
+    #             rhow_all[i] = [r - eps for r in rhow_nosc_all[i]]
+    #         else:
+    #             rhow_all[i] = rhow_nosc_all[i]
+    #
+    #         epsilon[i] = eps
+    #
+    #     return lw_all, rhow_all, rhow_nosc_all, epsilon, simil_flag
 
     ## QC a single rhow scan from PANTHYR
     ## according to R2005
@@ -506,12 +506,10 @@ class RhymerHypstar:
         l1c_dim_sizes_dict = {"wavelength": len(l1b["wavelength"]),
                               "scan": len(np.unique(l1b['scan']))}
         dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict, "W_L1C", propagate_ds=l1b)
-        dataset_l1c['reflectance'].values = rhow_all.T
-
-        print(rhow_nosc_all.T)
-
+        dataset_l1c['quality_flag'].values=[np.add(dataset_l1c['quality_flag'][i].values,simil_flag[i]) for i in range(len(dataset_l1c['scan']))]
         dataset_l1c['reflectance_nosc'].values = rhow_nosc_all.T
         dataset_l1c['epsilon'].values = epsilon
         dataset_l1c['water_leaving_radiance'].values = lw_all.T
 
         return dataset_l1c
+

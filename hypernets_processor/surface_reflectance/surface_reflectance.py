@@ -42,12 +42,32 @@ class SurfaceReflectance:
             measurandstrings=["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"]
 
             dataset_l1d = self.l1d_from_l1c_dataset(dataset_l1c)
-            dataset_l2a = self.l2_from_l1c_dataset(dataset_l1c)
+            dataset_l1d = self.process_measurement_function(measurandstrings,
+                                                            dataset_l1d, l1tol2_function.function, input_qty,
+                                                            u_random_input_qty,
+                                                            u_systematic_input_qty)
+            # average by series for L2A
+
+            l2a_dim_sizes_dict = {"wavelength": len(dataset_l1c["wavelength"]),
+                                  "series": len(np.unique(dataset_l1c['series_id']))}
+            dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A",
+                                                           propagate_ds=dataset_l1d)
+
+            series_id = np.unique(dataset_l1d['series_id'])
+            dataset_l2a["series_id"].values = series_id
+            for variablestring in ["acquisition_time", "viewing_azimuth_angle", "viewing_zenith_angle",
+                                   "solar_azimuth_angle", "solar_zenith_angle"]:
+                temp_arr = np.empty(len(series_id))
+                for i in range(len(series_id)):
+                    ids = np.where((dataset_l2a['series_id'] == series_id[i]) & (dataset_l2a['quality_flag'] == 1))
+                    temp_arr[i] = np.mean(dataset_l2a[variablestring].values[ids])
+                dataset_l2a[variablestring].values = temp_arr
+
+            #dataset_l2a = self.l2_from_l1c_dataset(dataset_l1c)
             dataset_l2a = self.process_measurement_function(measurandstrings,
                                                             dataset_l2a, l1tol2_function.function, input_qty,
                                                             u_random_input_qty,
                                                             u_systematic_input_qty)
-
             dataset_l2a[measurandstrings].values = self.calibrate.calc_mean_masked(dataset_l1d,measurandstrings)
             dataset_l2a["u_random_" + measurandstrings].values = self.calibrate.calc_mean_masked(
                 dataset_l1d,
@@ -181,11 +201,8 @@ class SurfaceReflectance:
         if self.context.get_config_value("network") == "L":
             print("No L1D level for land")
         elif self.context.get_config_value("network") == "W":
-
-
-
             l1d_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
-                                  "series": len(datasetl1c['series_id'])}
+                                  "scan": len(datasetl1c['scan'])}
             print(l1d_dim_sizes_dict)
             l1d = self.hdsb.create_ds_template(l1d_dim_sizes_dict, "W_L1D")
             print(l1d)
