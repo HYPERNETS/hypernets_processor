@@ -259,8 +259,8 @@ class Calibrate:
             ids = np.where(dataset['series_id'] == series_ids[i])
             intsig = np.nansum((dataset["digital_number"].values[:, ids]), axis=0)[0]
             noisestd, noiseavg = self.sigma_clip(intsig)
-            maski = np.ones_like(intsig)
-            maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 2
+            maski = np.zeros_like(intsig)
+            maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 1
             mask = np.append(mask, maski)
             # print("mask",mask)
 
