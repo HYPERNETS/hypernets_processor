@@ -62,6 +62,7 @@ class HypernetsProcessor:
         seq_dir = server_dir + seq_id+"/"
 
         l0_irr, l0_rad, l0_bla = HypernetsReader(self.context).read_sequence(seq_dir)
+        l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
 
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ", "")
@@ -161,7 +162,7 @@ class HypernetsProcessor:
 
         L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
         L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
-        #print(l0_rad["wavelength"],L1a_rad["wavelength"],L1a_irr["wavelength"])
+
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 

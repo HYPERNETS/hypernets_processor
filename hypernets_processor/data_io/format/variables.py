@@ -219,11 +219,11 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                                                           "units": "-"},
                                            "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
                     "digital_number": {"dim": [WL_DIM, SCAN_DIM],
-                                       "dtype": np.uint32,
+                                       "dtype": np.float32,
                                        "attributes": {"standard_name": "digital_number",
                                                       "long_name": "Digital number, raw data",
                                                       "units": "-"},
-                                       "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}}
+                                       "encoding": {'dtype': np.float32, "scale_factor": 1, "offset": 0.0}}
                     # "series_id": {"dim": [SCAN_DIM],
                     #                "dtype": np.chararray,
                     #                "attributes": {"standard_name": "series_id",
@@ -262,11 +262,11 @@ L1A_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SCAN_DIM],
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
                                                   "encoding": {'dtype': np.uint32, "scale_factor": 0.001, "offset": 0.0}},
                      "radiance": {"dim": [WL_DIM, SCAN_DIM],
-                                  "dtype": np.int32,
+                                  "dtype": np.float32,
                                   "attributes": {"standard_name": "radiance",
                                                  "long_name": "upwelling radiance",
                                                  "units": "mW m^-2 nm^-1 sr^-1"},
-                                  "encoding": {'dtype': np.int32, "scale_factor": 0.001, "offset": 0.0}}}
+                                  "encoding": {'dtype': np.float32, "scale_factor": 0.001, "offset": 0.0}}}
 
 L1A_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SCAN_DIM],
                                              "dtype": np.uint32,
@@ -328,11 +328,11 @@ L1B_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SERIES_DIM],
                                                       "units": "mW m^-2 nm^-1 sr^-1"},
                                                   "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
                      "radiance": {"dim": [WL_DIM, SERIES_DIM],
-                                  "dtype": np.int32,
+                                  "dtype": np.float32,
                                   "attributes": {"standard_name": "radiance",
                                                  "long_name": "upwelling radiance",
                                                  "units": "mW m^-2 nm^-1 sr^-1"},
-                                  "encoding": {'dtype': np.int32, "scale_factor": 1, "offset": 0.0}}}
+                                  "encoding": {'dtype': np.float32, "scale_factor": 1, "offset": 0.0}}}
 
 W_L1B_VARIABLES = {"u_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                      "dtype": np.uint32,

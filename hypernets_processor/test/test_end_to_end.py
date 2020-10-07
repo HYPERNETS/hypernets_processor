@@ -12,7 +12,7 @@ from hypernets_processor.interpolation.interpolate import InterpolateL1c
 from hypernets_processor.context import Context
 from hypernets_processor import HypernetsDSBuilder
 import os.path
-
+import matplotlib.pyplot as plt
 import numpy as np
 
 '''___Authorship___'''
@@ -60,11 +60,11 @@ def setup_test_files(context):
             hypstar)+"_radcal_L_"+str(caldate)+".dat")
     gainsE = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+str(
             hypstar)+"_radcal_E_"+str(caldate)+".dat")
-    ds_l0_rad["digital_number"].values = arr[5]* np.array(np.tile(ds_l0_rad["integration_time"],(arr[5].shape[0],1))/1000./np.tile(gainsL[:,1],(arr[5].shape[1],1)).T)
+    ds_l0_rad["digital_number"].values = arr[7]
     ds_l0_rad["acquisition_time"].values = np.arange(30)
     ds_l0_rad["series_id"].values = np.repeat([1,2,3],10)
     ds_l0_rad["integration_time"].values = np.repeat(1024,30)
-    ds_l0_irr["digital_number"].values = arr[6]* np.array(np.tile(ds_l0_rad["integration_time"],(arr[5].shape[0],1))/1000./np.tile(gainsE[:,1],(arr[5].shape[1],1)).T)
+    ds_l0_irr["digital_number"].values = arr[8]
     ds_l0_irr["acquisition_time"].values = np.arange(30)
     ds_l0_irr["series_id"].values = np.repeat([1,2,3],10)
     ds_l0_irr["integration_time"].values = np.repeat(1024,30)
@@ -81,7 +81,7 @@ def setup_test_files(context):
     ds_l1b_irr["irradiance"].values = arr[3]
 
     ds_l2a["reflectance"].values = arr[4]
-    ds_l2a_avg["reflectance"].values = arr[9]
+    ds_l2a_avg["reflectance"].values = arr[11]
 
     return ds_l0_rad,ds_l0_irr,ds_l0_bla,ds_l1a_rad,ds_l1a_irr,ds_l1b_rad,ds_l1b_irr,ds_l2a,ds_l2a_avg
 
@@ -109,12 +109,15 @@ class TestEndToEnd(unittest.TestCase):
         L1a_rad = cal.calibrate_l1a("radiance",test_l0_rad,test_l0_bla)
         print("flag",L1a_rad["quality_flag"].values)
         L1a_irr = cal.calibrate_l1a("irradiance",test_l0_irr,test_l0_bla)
+        print("mainL0",test_l0_rad["digital_number"].values[500,:])
+        print("mainL1a",L1a_rad["radiance"].values[500,:])
         L1b_rad = cal.average_l1b("radiance",L1a_rad)
+        print("mainL1b",L1b_rad["radiance"].values[500])
         L1b_irr = cal.average_l1b("irradiance",L1a_irr)
-        L1c = intp.interpolate_l1c(L1b_rad,L1b_irr,)
+        L1c = intp.interpolate_l1c(L1b_rad,L1b_irr)
         L2a = surf.process(L1c)
         print("test",test_l0_rad["digital_number"].values[500][500:600],test_l1a_rad["radiance"].values[500][500:600],L1a_rad["radiance"].values[500][500:600])
-        np.testing.assert_allclose(test_l1b_rad["radiance"].values,L1b_rad["radiance"].values,rtol=0.12,equal_nan=True)
+        np.testing.assert_allclose(test_l1a_rad["radiance"].values[:,0],L1a_rad["radiance"].values[:,0],rtol=0.12,equal_nan=True)
         np.testing.assert_allclose(test_l1b_rad["radiance"].values,L1b_rad["radiance"].values,rtol=0.12,equal_nan=True)
         np.testing.assert_allclose(np.nansum(test_l1b_rad["radiance"].values),np.nansum(L1b_rad["radiance"].values),rtol=0.05,equal_nan=True)
 
