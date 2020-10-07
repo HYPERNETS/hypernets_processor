@@ -118,11 +118,12 @@ class InterpolateL1c:
         #             u_systematic_input_quantities[i] = np.tile(
         #                 u_systematic_input_quantities[i],(datashape[1],1)).T
         measurand = measurement_function(*input_quantities)
-        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,repeat_dims=1)
+
+        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,param_fixed=[False,True,True],repeat_dims=1)
         u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
                                                                                           input_quantities,
                                                                                           u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
-                                                                                          return_corr=True,repeat_dims=1,corr_axis=0)
+                                                                                          param_fixed=[False,True,True],return_corr=True,repeat_dims=1,corr_axis=0)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand
         dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
