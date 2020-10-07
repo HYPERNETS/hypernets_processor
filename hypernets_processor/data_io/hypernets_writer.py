@@ -116,7 +116,6 @@ class HypernetsWriter:
             var_encoding = dict(comp)
             var_encoding.update(ds[var_name].encoding)
             encoding.update({var_name: var_encoding})
-
         ds.to_netcdf(path, format="netCDF4", engine="netcdf4", encoding=encoding)
 
     @staticmethod
