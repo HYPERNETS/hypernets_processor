@@ -806,7 +806,7 @@ L_L2A_REFLECTANCE_VARIABLES = {"u_random_reflectance": {"dim": [WL_DIM, SERIES_D
                                                "encoding": {'dtype': np.int16, "scale_factor": 0.1, "offset": 0.0}}}
 
 W_L2A_REFLECTANCE_VARIABLES = {
-    "reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "reflectance": {"dim": [WL_DIM, SERIES_DIM],
                     "dtype": np.float32,
                     "attributes": {"standard_name": "surface_upwelling_radiance_per_unit_"
                                                     "wavelength_in_air_reflected_by_water",
@@ -826,7 +826,7 @@ W_L2A_REFLECTANCE_VARIABLES = {
                                    "units": "-",
                                    "preferred_symbol": "ls"},
                     "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
-    "water_leaving_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "water_leaving_radiance": {"dim": [WL_DIM, SERIES_DIM],
                                "dtype": np.float32,
                                "attributes": {
                                    "standard_name":
@@ -841,7 +841,7 @@ W_L2A_REFLECTANCE_VARIABLES = {
                                    "preferred_symbol": "nlw"},
                                "encoding": {'dtype': np.uint16,
                                             "scale_factor": 0.1, "offset": 0.0}},
-    "reflectance_nosc": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "reflectance_nosc": {"dim": [WL_DIM, SERIES_DIM],
                          "dtype": np.float32,
                          "attributes": {"standard_name": "surface_upwelling_radiance_per_unit_"
                                                          "wavelength_in_air_reflected_by_water_nosc",
@@ -853,7 +853,7 @@ W_L2A_REFLECTANCE_VARIABLES = {
                                         "units": "-",
                                         "preferred_symbol": "ls"},
                          "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
-    "u_random_water_leaving_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "u_random_water_leaving_radiance": {"dim": [WL_DIM, SERIES_DIM],
                                         "dtype": np.float32,
                                         "attributes": {
                                             "standard_name": "u_random_normalized_water_leaving_radiance",
@@ -861,7 +861,7 @@ W_L2A_REFLECTANCE_VARIABLES = {
                                                          "uncertainty",
                                             "units": "%"},
                                         "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "u_systematic_water_leaving_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "u_systematic_water_leaving_radiance": {"dim": [WL_DIM, SERIES_DIM],
                                             "dtype": np.float32,
                                             "attributes": {
                                                 "standard_name": "u_systematic_normalized_water_leaving_radiance",
@@ -890,14 +890,14 @@ W_L2A_REFLECTANCE_VARIABLES = {
                                                    "units": "-"},
                                                "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                             "offset": 0.0}},
-    "u_random_reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "u_random_reflectance": {"dim": [WL_DIM, SERIES_DIM],
                              "dtype": np.float32,
                              "attributes": {"standard_name": "u_random_water_leaving_reflectance",
                                             "long_name": "Random water leaving reflectance "
                                                          "uncertainty",
                                             "units": "%"},
                              "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "u_systematic_reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "u_systematic_reflectance": {"dim": [WL_DIM, SERIES_DIM],
                                  "dtype": np.float32,
                                  "attributes": {
                                      "standard_name": "u_systematic_water_leaving_reflectance",
@@ -923,7 +923,7 @@ W_L2A_REFLECTANCE_VARIABLES = {
                                         "units": "-"},
                                     "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                  "offset": 0.0}},
-    "u_random_reflectance_nosc": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "u_random_reflectance_nosc": {"dim": [WL_DIM, SERIES_DIM],
                                   "dtype": np.float32,
                                   "attributes": {
                                       "standard_name": "u_random_water_leaving_reflectance_nosc",
@@ -932,7 +932,7 @@ W_L2A_REFLECTANCE_VARIABLES = {
                                       "units": "%"},
                                   "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
                                                "offset": 0.0}},
-    "u_systematic_reflectance_nosc": {"dim": [WL_DIM, Lu_SCAN_DIM],
+    "u_systematic_reflectance_nosc": {"dim": [WL_DIM, SERIES_DIM],
                                       "dtype": np.float32,
                                       "attributes": {
                                           "standard_name":
@@ -1037,7 +1037,7 @@ VARIABLES_DICT_DEFS: Any = {"L0_RAD": {**COMMON_VARIABLES_SCAN, **L0_RAD_VARIABL
                             "W_L1C": {**COMMON_VARIABLES_Lu_SCAN,  **W_L1B_VARIABLES, **W_L1C_VARIABLES},
                             "W_L1D": {**COMMON_VARIABLES_SERIES, **W_L1D_VARIABLES},
                             "L_L2A": {**COMMON_VARIABLES_SERIES, **L_L2A_REFLECTANCE_VARIABLES},
-                            "W_L2A": {**COMMON_VARIABLES_Lu_SCAN, **W_L2A_REFLECTANCE_VARIABLES},
+                            "W_L2A": {**COMMON_VARIABLES_SERIES, **W_L2A_REFLECTANCE_VARIABLES},
                             "L_L2B": {**COMMON_VARIABLES_SERIES, **L_L2B_REFLECTANCE_VARIABLES},
                             "W_L2B": {**COMMON_VARIABLES_SEQ, **W_L2B_REFLECTANCE_VARIABLES}
                             }

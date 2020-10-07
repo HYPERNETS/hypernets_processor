@@ -207,7 +207,8 @@ class SurfaceReflectance:
 
         elif self.context.get_config_value("network") == "W":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1["wavelength"]),
-                                  "series": len(datasetl1['series'])}
+                                  "series": len(datasetl1['series_id'])}
+            print(l2a_dim_sizes_dict)
             l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A")
 
         return l2a
