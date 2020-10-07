@@ -12,7 +12,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.calibration.calibrate import Calibrate
-from hypernets_processor.interpolation.interpolate import InterpolateL1c
+from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 
@@ -27,7 +27,7 @@ class RhymerHypstar:
         self.hdsb = HypernetsDSBuilder(context=context)
         self.writer = HypernetsWriter(context)
         self.cal = Calibrate(context, MCsteps=100)
-        self.intp = InterpolateL1c(context, MCsteps=1000)
+        self.intp = Interpolate(context, MCsteps=1000)
         self.rhymeranc = RhymerAncillary(context)
         self.rhymerproc = RhymerProcessing(context)
         self.rhymershared = RhymerShared(context)
