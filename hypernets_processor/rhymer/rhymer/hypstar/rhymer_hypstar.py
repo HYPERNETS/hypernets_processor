@@ -12,7 +12,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.calibration.calibrate import Calibrate
-from hypernets_processor.interpolation.interpolate import InterpolateL1c
+from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 
@@ -27,7 +27,7 @@ class RhymerHypstar:
         self.hdsb = HypernetsDSBuilder(context=context)
         self.writer = HypernetsWriter(context)
         self.cal = Calibrate(context, MCsteps=100)
-        self.intp = InterpolateL1c(context, MCsteps=1000)
+        self.intp = Interpolate(context, MCsteps=1000)
         self.rhymeranc = RhymerAncillary(context)
         self.rhymerproc = RhymerProcessing(context)
         self.rhymershared = RhymerShared(context)
@@ -85,22 +85,28 @@ class RhymerHypstar:
 
                 ## continue if value exceeds the cv threshold
                 if v > self.context.get_config_value("diff_threshold"):
-                    # set quality flag to 10
-                    dataset['quality_flag'][scans[i]] = 10
+                    # get flag value for the temporal variability
+                    if measurandstring == 'irradiance':
+                        flagval=2 ** (self.context.get_config_value("temp_variability_ed"))
+                    else:
+                        flagval = 2 ** (self.context.get_config_value("temp_variability_lu"))
+
+                    dataset['quality_flag'][scans[i]] = dataset['quality_flag'][scans[i]]+flagval
                     seq = dataset.attrs["sequence_id"]
                     ts = datetime.utcfromtimestamp(dataset['acquisition_time'][i])
 
                     if verbosity > 2: print('Temporal jump: in {}:  Aquisition time {}, {}'.format(seq, ts, ', '.join(
                         ['{}:{}'.format(k, dataset[k][scans[i]].values) for k in ['scan', 'quality_flag']])))
 
-                ## check for complete spectra
-                ## assumed here they are masked by inf or nan by calibration step
-                if any([not np.isfinite(j) for j in data[i]]):
-                    # set quality flag to 10
-                    dataset['quality_flag'][scans[i]] = 10
-                    ts = datetime.utcfromtimestamp(dataset['acquisition_time'][i])
-                    if verbosity > 2: print('inf or Nan data in: Aquisition time {}, {}'.format(ts, ', '.join(
-                        ['{}:{}'.format(k, dataset[k][scans[i]].values) for k in ['scan', 'quality_flag']])))
+                # ## check for complete spectra
+                # ## assumed here they are masked by inf or nan by calibration step
+                # if any([not np.isfinite(j) for j in data[i]]):
+                #     # set quality flag to 10
+                #     flagval = 2 ** (self.context.get_config_value("inf_nan"))
+                #     dataset['quality_flag'][scans[i]] = dataset['quality_flag'][scans[i]] + flagval
+                #     ts = datetime.utcfromtimestamp(dataset['acquisition_time'][i])
+                #     if verbosity > 2: print('inf or Nan data in: Aquisition time {}, {}'.format(ts, ', '.join(
+                #         ['{}:{}'.format(k, dataset[k][scans[i]].values) for k in ['scan', 'quality_flag']])))
 
             return dataset
 
@@ -111,6 +117,9 @@ class RhymerHypstar:
         nbrlu = self.context.get_config_value("n_upwelling_rad")
         nbred = self.context.get_config_value("n_upwelling_irr")
         nbrlsky = self.context.get_config_value("n_downwelling_rad")
+        flag_nbrlu = self.context.get_config_value("min_nbrlu")
+        flag_nbred = self.context.get_config_value("min_nbred")
+        flag_nbrlsky = self.context.get_config_value("min_nbrlsky")
 
         if protocol != 'water_std':
             # here we should simply provide surface reflectance?
@@ -131,6 +140,8 @@ class RhymerHypstar:
                     senz = float(senz)
                     sena = abs(float(sena))
                 else:
+                    flagval = 2 ** (self.context.get_config_value("angles_missing"))
+                    scani['quality_flag'] = scani['quality_flag'] + flagval
                     if self.context.get_config_value("verbosity") > 2: print(
                         'NULL angles: Aquisition time {}, {}'.format(ts, ', '.join(
                             ['{}:{}'.format(k, scani[k].values) for k in ['scan', 'quality_flag']])))
@@ -155,7 +166,8 @@ class RhymerHypstar:
             sena_lsky = np.unique(lsky["viewing_azimuth_angle"].values)
             for i in sena_lu:
                 if i not in sena_lsky:
-                    lu["quality_flag"][lu["viewing_azimuth_angle"] == i] = 10
+                    flagval=self.context.get_config_value("lu_eq_missing")
+                    lu["quality_flag"][lu["viewing_azimuth_angle"] == i] = lu["quality_flag"][lu["viewing_azimuth_angle"] == i]+2**flagval
                     if self.context.get_config_value("verbosity") > 2:
                         ts = [datetime.utcfromtimestamp(x) for x in
                               lu['acquisition_time'][lu["viewing_azimuth_angle"] == i].values]
@@ -169,7 +181,8 @@ class RhymerHypstar:
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
             for i in senz_lu:
                 if i not in senz_lsky:
-                    lu["quality_flag"][lu["viewing_zenith_angle"] == i] = 10
+                    flagval = self.context.get_config_value("fresnel_angle_missing")
+                    lu["quality_flag"][lu["viewing_azimuth_angle"] == i] = lu["quality_flag"][lu["viewing_azimuth_angle"] == i] + 2 ** flagval
                     if self.context.get_config_value("verbosity") > 2:
                         ts = [datetime.utcfromtimestamp(x) for x in
                               lu['acquisition_time'][lu["viewing_zenith_angle"] == i].values]
@@ -180,14 +193,21 @@ class RhymerHypstar:
                                      in ['scan', 'quality_flag']])))
 
             # check if correct number of radiance and irradiance data
-            if lu.scan[lu['quality_flag'] <= 1].count() < nbrlu:
+            flag_nbrlu = self.context.get_config_value("min_nbrlu")
+            flag_nbred = self.context.get_config_value("min_nbred")
+            flag_nbrlsky = self.context.get_config_value("min_nbrlsky")
+
+            if lu.scan[lu['quality_flag'] <= 0].count() < nbrlu:
+                lu["quality_flag"].values = [lu.sel(scan=i)["quality_flag"]+2**flag_nbrlu for i in lu['scan']]
                 if self.context.get_config_value("verbosity") > 2:
                     print("No enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
             if lsky.scan[lsky['quality_flag'] <= 1].count() < nbrlsky:
+                lsky["quality_flag"] = [lsky.sel(scan=i)["quality_flag"]+2**flag_nbrlsky for i in lsky['scan']]
                 if self.context.get_config_value("verbosity") > 2:
                     print("No enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
 
             if irr.scan[irr['quality_flag'] <= 1].count() < nbred:
+                irr["quality_flag"] = [irr.sel(scan=i)["quality_flag"] + 2 ** flag_nbred for i in irr['scan']]
                 if self.context.get_config_value("verbosity") > 2:
                     print("No enough irradiance data for sequence {}".format(irr.attrs['sequence_id']))
 
@@ -198,9 +218,11 @@ class RhymerHypstar:
         lat = l1b.attrs['site_latitude']
         lon = l1b.attrs['site_latitude']
         wind = []
+        flagval = self.context.get_config_value("wind_default")
         for i in range(len(l1b.scan)):
             wa = self.context.get_config_value("wind_ancillary")
             if wa == False:
+                l1b.sel(scan=i)["quality_flag"]=l1b.sel(scan=i)["quality_flag"] + 2 ** flagval
                 print("Default wind speed {}".format(self.context.get_config_value("wind_default")))
                 wind.append(self.context.get_config_value("wind_default"))
             else:
@@ -237,15 +259,15 @@ class RhymerHypstar:
 
             ## get fresnel reflectance
             if self.context.get_config_value("fresnel_option") == 'Mobley':
-                # check here if no inconsistency between LUT and fresnel option??
-                rholut = self.rhymerproc.mobley_lut_read()
                 if (fresnel_sza[i] is not None) & (fresnel_raa[i] is not None):
                     sza = min(fresnel_sza[i], 79.999)
                     rhof = self.rhymerproc.mobley_lut_interp(sza, fresnel_vza[i], fresnel_raa[i],
                                                                 wind=wind[i])
                 else:
                     # add a quality flag!
-                    fresnel = 'fixed'
+                    flagval = self.context.get_config_value("fresnel_default")
+                    l1b["quality_flag"][i].values = l1b["quality_flag"][i].values + 2 ** flagval
+                    rhof = self.context.get_config_value("rhof_default")
 
             if self.context.get_config_value("fresnel_option") == 'Ruddick2006':
                 rhof = self.context.get_config_value("rhof_default")
@@ -262,31 +284,31 @@ class RhymerHypstar:
 
         return l1b
 
-    def get_epsilon(self, rhow_nosc, wavelength):
-
-        # wavelength = l1b['wavelength'].values
-        epsilon = np.zeros(len(rhow_nosc))
-
-        ## compute similarity epsilon
-        for i in range(len(rhow_nosc)):
-            fail_simil, eps = self.qc_similarity(wavelength, rhow_nosc[i],
-                                                 self.similarity_wr,
-                                                 self.similarity_wp,
-                                                 self.similarity_w1,
-                                                 self.similarity_w2,
-                                                 self.similarity_alpha)
-
-            ## R2005 quality control
-            ## skip spectra not following similarity
-            if self.similarity_test:
-                if fail_simil:
-                    if verbosity > 2: print('Failed simil test.')
-                    continue
-                else:
-                    if verbosity > 2: print('Passed simil test.')
-            epsilon[i] = eps
-        # l1b["epsilon"].values=epsilon
-        return epsilon
+    # def get_epsilon(self, rhow_nosc, wavelength):
+    #
+    #     # wavelength = l1b['wavelength'].values
+    #     epsilon = np.zeros(len(rhow_nosc))
+    #
+    #     ## compute similarity epsilon
+    #     for i in range(len(rhow_nosc)):
+    #         fail_simil, eps = self.qc_similarity(wavelength, rhow_nosc[i],
+    #                                              self.similarity_wr,
+    #                                              self.similarity_wp,
+    #                                              self.similarity_w1,
+    #                                              self.similarity_w2,
+    #                                              self.similarity_alpha)
+    #
+    #         ## R2005 quality control
+    #         ## skip spectra not following similarity
+    #         if self.similarity_test:
+    #             if fail_simil:
+    #                 if verbosity > 2: print('Failed simil test.')
+    #                 continue
+    #             else:
+    #                 if verbosity > 2: print('Passed simil test.')
+    #         epsilon[i] = eps
+    #     # l1b["epsilon"].values=epsilon
+    #     return epsilon
 
     def get_rhow_nosc(self, l1b):
 
@@ -407,16 +429,16 @@ class RhymerHypstar:
                                                  self.similarity_w2,
                                                  self.similarity_alpha)
 
-            ## R2005 quality control
-            ## skip spectra not following similarity
-            if self.similarity_test:
-                if fail_simil:
-                    if verbosity > 2: print('Failed simil test.')
-                    simil_flag[i] = 10
-                    continue
-                else:
-                    if verbosity > 2: print('Passed simil test.')
-                    simil_flag[i] = 0
+            # ## R2005 quality control
+            # ## skip spectra not following similarity
+            # if self.similarity_test:
+            #     if fail_simil:
+            #         if verbosity > 2: print('Failed simil test.')
+            #         simil_flag[i] = 10
+            #         continue
+            #     else:
+            #         if verbosity > 2: print('Passed simil test.')
+            #         simil_flag[i] = 0
 
             ## R2005 correction
             if self.similarity_correct:
