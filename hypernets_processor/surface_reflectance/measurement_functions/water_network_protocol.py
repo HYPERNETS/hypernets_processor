@@ -8,12 +8,12 @@ class WaterNetworkProtocol:
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
 
-        lw_all = [(upwelling_radiance[w] - (rhof * downwelling_radiance[w])) for w in range(len(downwelling_radiance))]
-        rhow_nosc_all = [np.pi * (upwelling_radiance[w] - (rhof * downwelling_radiance[w])) / irradiance[w] for w in range(len(downwelling_radiance))]
+        water_leaving_radiance = [(upwelling_radiance[w] - (rhof * downwelling_radiance[w])) for w in range(len(downwelling_radiance))]
+        reflectance_nosc = [np.pi * (upwelling_radiance[w] - (rhof * downwelling_radiance[w])) / irradiance[w] for w in range(len(downwelling_radiance))]
 
-        rhow_all = [r - epsilon for r in rhow_nosc_all]
+        reflectance = [r - epsilon for r in reflectance_nosc]
 
-        return lw_all, rhow_nosc_all, rhow_all
+        return water_leaving_radiance, reflectance_nosc, reflectance
 
     @staticmethod
     def get_name():
