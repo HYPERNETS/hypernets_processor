@@ -498,7 +498,7 @@ class RhymerHypstar:
         L1b = self.get_wind(L1b)
         L1b = self.get_fresnelrefl(L1b)
         if self.context.get_config_value("write_l1b")==True:
-            self.writer.write(L1b, overwrite=True)
+           self.writer.write(L1b, overwrite=True)
         return L1b
 
     def process_l1c(self, l1b):
@@ -511,6 +511,7 @@ class RhymerHypstar:
         dataset_l1c['reflectance_nosc'].values = rhow_nosc_all.T
         dataset_l1c['epsilon'].values = epsilon
         dataset_l1c['water_leaving_radiance'].values = lw_all.T
-
+        if self.context.get_config_value("write_l1c")==True:
+            self.writer.write(dataset_l1c, overwrite=True)
         return dataset_l1c
 
