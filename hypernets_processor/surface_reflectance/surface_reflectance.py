@@ -38,7 +38,7 @@ class SurfaceReflectance:
         u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1c)
 
         if self.context.get_config_value("network")=="W":
-            measurandstrings=["lw_all", "rhow_nosc_all", "rhow_all"]
+            measurandstrings=["water_leaving_radiance", "reflectance_nosc", "reflectance"]
             dataset_l1d = self.l1d_from_l1c_dataset(dataset_l1c)
             dataset_l1d = self.process_measurement_function(measurandstrings,
                                                             dataset_l1d, l1tol2_function.function, input_qty,

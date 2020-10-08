@@ -547,84 +547,7 @@ L1B_IRR_VARIABLES = {"u_random_irradiance": {"dim": [WL_DIM, SERIES_DIM],
                                     "encoding": {'dtype': np.int32, "scale_factor": 0.0001, "offset": 0.0}}}
 
 # > L1B_WATER_VARIABLES - Variables required for the water network L1b data product
-W_L1C_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                          "dtype": np.float32,
-                                          "attributes": {"standard_name": "upwelling_radiance_per_unit_wavelength"
-                                                                          "_in_air",
-                                                         "long_name": "Upwelling radiation is radiation from "
-                                                                      "below. It does not mean net upward. "
-                                                                      "The sign convention is that upwelling "
-                                                                      "is positive upwards and 'downwelling' "
-                                                                      "is positive downwards. Radiance is the "
-                                                                      "radiative flux in a particular direction, "
-                                                                      "per unit of solid angle. The direction "
-                                                                      "towards which it is going must be "
-                                                                      "specified, for instance with a coordinate "
-                                                                      "of zenith_angle.",
-                                                         "reference": "",
-                                                         "units": "mW m^-2 nm^-1 sr^-1",
-                                                         "NRC URI": "http://vocab.nerc.ac.uk/collection/P01/"
-                                                                    "current/TTWTIR01/",
-                                                         "preferred_symbol": "lu"},
-                                          "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}},
-                   "downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                            "dtype": np.float32,
-                                            "attributes": {"standard_name": "downwelling_radiance_per_unit_"
-                                                                            "wavelength_in_air",
-                                                           "long_name": "Downwelling radiation is radiation from "
-                                                                        "above. It does not mean 'net downward'. "
-                                                                        "The sign convention is that 'upwelling' is"
-                                                                        " positive upwards and 'downwelling' is "
-                                                                        "positive downwards. A coordinate variable "
-                                                                        "for radiation wavelength should be given "
-                                                                        "the standard name radiation_wavelength. "
-                                                                        "Radiance is the radiative flux in a "
-                                                                        "particular direction, per unit of solid "
-                                                                        "angle. The direction from which it is "
-                                                                        "coming must be specified, for instance "
-                                                                        "with a coordinate of zenith_angle.",
-                                                           "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",
-                                                           "units": "mW m^-2 nm^-1 sr^-1",
-                                                           "NRC URI": "http://vocab.nerc.ac.uk/collection/"
-                                                                      "P01/current/SKYIRR01/",
-                                                           "preferred_symbol": "ld"},
-                                            "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}},
-                   "irradiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                  "dtype": np.float32,
-                                  "attributes": {"standard_name": "downwelling_irradiance_per_unit_"
-                                                                  "wavelength_in_air",
-                                                 "long_name": "Downwelling vector irradiance as energy"
-                                                              " of electromagnetic radiation "
-                                                              "(unspecified single wavelength) "
-                                                              "in the atmosphere by cosine-collector "
-                                                              "radiometer",
-                                                 "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",
-                                                 "units": "mW m^-2 nm^-1",
-                                                 "NRC URI": "http://vocab.nerc.ac.uk/collection/"
-                                                            "P01/current/CSLRCCR1/",
-                                                 "preferred_symbol": "ed"},
-                                  "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}},
-                   "reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                   "dtype": np.float32,
-                                   "attributes": {"standard_name": "surface_upwelling_radiance_per_unit_"
-                                                                   "wavelength_in_air_reflected_by_water",
-                                                  "long_name": "The surface called 'surface' means the "
-                                                               "lower boundary of the atmosphere. "
-                                                               "Upwelling radiation is radiation from "
-                                                               "below. It does not mean 'net upward''. "
-                                                               "The sign convention is that 'upwelling' "
-                                                               "is positive upwards and 'downwelling' "
-                                                               "is positive downwards. Radiance is the "
-                                                               "radiative flux in a particular "
-                                                               "direction, per unit of solid angle. The "
-                                                               "direction towards which it is going must be"
-                                                               " specified, for instance with a coordinate "
-                                                               "of zenith_angle. ",
-                                                  "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",
-                                                  "units": "-",
-                                                  "preferred_symbol": "ls"},
-                                   "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}},
-                   "water_leaving_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+W_L1C_VARIABLES = {"water_leaving_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                      "dtype": np.float32,
                                                                      "attributes": {
                                                                          "standard_name":
@@ -784,43 +707,9 @@ W_L1C_VARIABLES = {"upwelling_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                               "reference": "",
                                               "units": "-"},
                                "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
-                   "u_random_epsilon": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                 "dtype": np.float32,
-                                                 "attributes": {
-                                                     "standard_name": "u_random_epsilon",
-                                                     "long_name": "Random epsilon uncertainty",
-                                                     "units": "%"},
-                                                 "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
-                                                              "offset": 0.0}},
-                   "u_systematic_epsilon": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                     "dtype": np.float32,
-                                                     "attributes": {
-                                                         "standard_name":
-                                                             "u_systematic_water_leaving_reflectance_nosc",
-                                                         "long_name": "Systematic epsilon uncertainty",
-                                                         "units": "%"},
-                                                     "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
-                                                                  "offset": 0.0}},
-                   "corr_random_epsilon": {"dim": [WL_DIM, WL_DIM],
-                                                    "dtype": np.float32,
-                                                    "attributes": {
-                                                        "standard_name": "corr_random_epsilon",
-                                                        "long_name": "Correlation matrix of random epsilon uncertainty",
-                                                        "units": "-"},
-                                                    "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
-                                                                 "offset": 0.0}},
-                   "corr_systematic_epsilon": {"dim": [WL_DIM, WL_DIM],
-                                                        "dtype": np.float32,
-                                                        "attributes": {
-                                                            "standard_name":
-                                                                "corr_systematic_epsilon",
-                                                            "long_name": "Correlation matrix of epsilon uncertainty",
-                                                            "units": "-"},
-                                                        "encoding": {'dtype': np.uint16, "scale_factor": 0.01,
-                                                                     "offset": 0.0}}
                    }
 
-W_L1D_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
+W_L1D_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                    "dtype": np.float32,
                                    "attributes": {"standard_name": "surface_upwelling_radiance_per_unit_"
                                                                    "wavelength_in_air_reflected_by_water",
@@ -928,153 +817,6 @@ L_L2A_REFLECTANCE_VARIABLES = {"u_random_reflectance": {"dim": [WL_DIM, SERIES_D
                                                "encoding": {'dtype': np.int16, "scale_factor": 0.0001, "offset": 0.0}}}
 
 # W_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A water data product
-W_L1D_REFLECTANCE_VARIABLES = {"nlw": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                                     "dtype": np.float32,
-                                                                     "attributes": {
-                                                                         "standard_name":
-                                                                             "water_leaving_radiance",
-                                                                         "long_name": "water-leaving radiance"
-                                                                                      " of electromagnetic radiation "
-                                                                                      "(unspecified single wavelength)"
-                                                                                      " from the water body by "
-                                                                                      "cosine-collector radiometer",
-                                                                         "reference": "",
-                                                                         "units": "mW m^-2 nm^-1 sr^-1",
-                                                                         "preferred_symbol": "nlw"},
-                                                                     "encoding": {'dtype': np.uint16,
-                                                                                  "scale_factor": 0.0001, "offset": 0.0}},
-                               "rhow": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                               "dtype": np.float32,
-                                               "attributes": {"standard_name": "water_leaving_reflectance",
-                                                              "long_name": "Reflectance of the water column at the "
-                                                                           "surface corrected for the NIR Similarity "
-                                                                           "spectrum (Ruddick et al., 2006)",
-                                                              "units": "-",
-                                                              "preferred_symbol": "rhow"},
-                                               "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}},
-                               "rhow_nosc": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                    "dtype": np.float32,
-                                                    "attributes": {"standard_name": "water_leaving_reflectance_nosc",
-                                                                   "long_name": "Reflectance of the water column at the "
-                                                                                "surface without correction for the NIR "
-                                                                                "similarity spectrum "
-                                                                                "(see Ruddick et al., 2006)",
-                                                                   "units": "-",
-                                                                   "preferred_symbol": "rhow_nosc"},
-                                                    "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                 "offset": 0.0}},
-                               "u_random_nlw": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                "dtype": np.float32,
-                                                "attributes": {
-                                                    "standard_name": "u_random_normalized_water_leaving_radiance",
-                                                    "long_name": "Random normalized water leaving radiance "
-                                                                 "uncertainty",
-                                                    "units": "%"},
-                                                "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}},
-                               "u_systematic_nlw": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                    "dtype": np.float32,
-                                                    "attributes": {
-                                                        "standard_name": "u_systematic_normalized_water_leaving_radiance",
-                                                        "long_name": "Systematic normalized water leaving radiance "
-                                                                     "uncertainty",
-                                                        "units": "%"},
-                                                    "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                 "offset": 0.0}},
-                               "corr_random_nlw": {"dim": [WL_DIM, WL_DIM],
-                                                  "dtype": np.float32,
-                                                  "attributes": {
-                                                      "standard_name": "corr_random_normalized_water_leaving_radiance",
-                                                      "long_name": "Correlation matrix of random normalized water "
-                                                                   "leaving radiance uncertainty",
-                                                      "units": "-"},
-                                                  "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                               "offset": 0.0}},
-                               "corr_systematic_nlw": {"dim": [WL_DIM, WL_DIM],
-                                                      "dtype": np.float32,
-                                                      "attributes": {
-                                                          "standard_name":
-                                                              "corr_systematic_normalized_water_leaving_radiance",
-                                                          "long_name":
-                                                              "Correlation matrix of systematic normalized water "
-                                                              "leaving radiance uncertainty",
-                                                          "units": "-"},
-                                                      "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                   "offset": 0.0}},
-                               "u_random_rhow": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                 "dtype": np.float32,
-                                                 "attributes": {"standard_name": "u_random_water_leaving_reflectance",
-                                                                "long_name": "Random water leaving reflectance "
-                                                                             "uncertainty",
-                                                                "units": "%"},
-                                                 "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}},
-                               "u_systematic_rhow": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                     "dtype": np.float32,
-                                                     "attributes": {
-                                                         "standard_name": "u_systematic_water_leaving_reflectance",
-                                                         "long_name": "Systematic water leaving reflectance uncertainty",
-                                                         "units": "%"},
-                                                     "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                  "offset": 0.0}},
-                               "corr_random_rhow": {"dim": [WL_DIM, WL_DIM],
-                                                   "dtype": np.float32,
-                                                   "attributes": {
-                                                       "standard_name": "corr_random_water_leaving_reflectance",
-                                                       "long_name": "Correlation matrix of random water leaving "
-                                                                    "reflectance uncertainty",
-                                                       "units": "-"},
-                                                   "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                "offset": 0.0}},
-                               "corr_systematic_rhow": {"dim": [WL_DIM, WL_DIM],
-                                                       "dtype": np.float32,
-                                                       "attributes": {
-                                                           "standard_name": "corr_systematic_water_leaving_reflectance",
-                                                           "long_name": "Correlation matrix of systematic water leaving "
-                                                                        "reflectance uncertainty",
-                                                           "units": "-"},
-                                                       "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                    "offset": 0.0}},
-                               "u_random_rhow_nosc": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                      "dtype": np.float32,
-                                                      "attributes": {
-                                                          "standard_name": "u_random_water_leaving_reflectance_nosc",
-                                                          "long_name": "Random water leaving reflectance not corrected "
-                                                                       "for NIR similarity spectrum uncertainty",
-                                                          "units": "%"},
-                                                      "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                   "offset": 0.0}},
-                               "u_systematic_rhow_nosc": {"dim": [WL_DIM, Lu_SCAN_DIM],
-                                                          "dtype": np.float32,
-                                                          "attributes": {
-                                                              "standard_name":
-                                                                  "u_systematic_water_leaving_reflectance_nosc",
-                                                              "long_name": "Systematic water leaving reflectance not "
-                                                                           "corrected for NIR similarity spectrum "
-                                                                           "uncertainty",
-                                                              "units": "%"},
-                                                          "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                       "offset": 0.0}},
-                               "corr_random_rhow_nosc": {"dim": [WL_DIM, WL_DIM],
-                                                        "dtype": np.float32,
-                                                        "attributes": {
-                                                            "standard_name": "corr_random_water_leaving_reflectance_nosc",
-                                                            "long_name": "Correlation matrix of random water leaving "
-                                                                         "reflectance not corrected for NIR similarity "
-                                                                         "spectrum uncertainty",
-                                                            "units": "-"},
-                                                        "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                     "offset": 0.0}},
-                               "corr_systematic_rhow_nosc": {"dim": [WL_DIM, WL_DIM],
-                                                            "dtype": np.float32,
-                                                            "attributes": {
-                                                                "standard_name":
-                                                                    "corr_systematic_water_leaving_reflectance_nosc",
-                                                                "long_name": "Correlation matrix of systematic water "
-                                                                             "leaving reflectance not corrected for NIR "
-                                                                             "similarity spectrum uncertainty",
-                                                                "units": "-"},
-                                                            "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                         "offset": 0.0}}
-                               }
 W_L2A_REFLECTANCE_VARIABLES = deepcopy(W_L1D_REFLECTANCE_VARIABLES)
 
 for variable in W_L2A_REFLECTANCE_VARIABLES.keys():
@@ -1147,12 +889,10 @@ VARIABLES_DICT_DEFS: Any = {"L0_RAD": {**COMMON_VARIABLES_SCAN, **L0_RAD_VARIABL
                             "W_L1A_IRR": {**COMMON_VARIABLES_SCAN, **L1A_IRR_VARIABLES},
                             "L_L1B_RAD": {**COMMON_VARIABLES_SERIES, **L1B_RAD_VARIABLES},
                             "W_L1B": {**COMMON_VARIABLES_Lu_SCAN, **W_L1B_VARIABLES},
+                            "W_L1C": {**COMMON_VARIABLES_Lu_SCAN, **W_L1B_VARIABLES, **W_L1C_VARIABLES},
+                            "W_L1D": {**COMMON_VARIABLES_Lu_SCAN, **W_L1B_VARIABLES, **W_L1C_VARIABLES, **W_L1D_REFLECTANCE_VARIABLES},
                             "L_L1B_IRR": {**COMMON_VARIABLES_SERIES, **L1B_IRR_VARIABLES},
                             "L_L1C": {**COMMON_VARIABLES_SERIES, **L1B_RAD_VARIABLES, **L1B_IRR_VARIABLES},
-                            "W_L1C": {**COMMON_VARIABLES_Lu_SCAN,  **W_L1B_VARIABLES, **W_L1C_VARIABLES},
-                            "W_L1D": {**COMMON_VARIABLES_Lu_SCAN, **W_L1B_VARIABLES, **W_L1C_VARIABLES, **W_L1D_VARIABLES},
-                            "W_L1C": {**COMMON_VARIABLES_Lu_SCAN, **W_L1C_VARIABLES},
-                            "W_L1D": {**COMMON_VARIABLES_Lu_SCAN, **W_L1D_REFLECTANCE_VARIABLES},
                             "L_L2A": {**COMMON_VARIABLES_SERIES, **L_L2A_REFLECTANCE_VARIABLES},
                             "W_L2A": {**COMMON_VARIABLES_SERIES, **W_L2A_REFLECTANCE_VARIABLES},
                             "L_L2B": {**COMMON_VARIABLES_SERIES, **L_L2B_REFLECTANCE_VARIABLES},

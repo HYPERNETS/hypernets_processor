@@ -353,16 +353,17 @@ class RhymerHypstar:
                     if verbosity > 2: print('Passed simil test.')
                     simil_flag[i] = 0
 
-            ## R2005 correction
-            if self.context.get_config_value("similarity_correct")==True:
-                # print(epsilon)
-                rhow_all[i] = [r - eps for r in rhow_nosc_all[i]]
-            else:
-                rhow_all[i] = rhow_nosc_all[i]
+            # ## R2005 correction
+            # this step is done in surface_reflectance (level L1d)
+            # if self.context.get_config_value("similarity_correct")==True:
+            #     # print(epsilon)
+            #     rhow_all[i] = [r - eps for r in rhow_nosc_all[i]]
+            # else:
+            #     rhow_all[i] = rhow_nosc_all[i]
 
             epsilon[i] = eps
 
-        return rhow_nosc_all, rhow_all, epsilon, lw_all, simil_flag
+        return rhow_nosc_all, epsilon, lw_all, simil_flag
 
     # def fresnelrefl_qc_simil(self, l1b, wind):
     #
@@ -502,7 +503,7 @@ class RhymerHypstar:
 
     def process_l1c(self, l1b):
 
-        rhow_nosc_all, rhow_all, epsilon, lw_all, simil_flag = self.get_rhow_nosc(l1b)
+        rhow_nosc_all, epsilon, lw_all, simil_flag = self.get_rhow_nosc(l1b)
         l1c_dim_sizes_dict = {"wavelength": len(l1b["wavelength"]),
                               "scan": len(np.unique(l1b['scan']))}
         dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict, "W_L1C", propagate_ds=l1b)
