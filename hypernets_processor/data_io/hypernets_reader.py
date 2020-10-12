@@ -30,6 +30,7 @@ class HypernetsReader:
     def __init__(self, context):
         self.context = context
         self.model = self.context.get_config_value("model").split(',')
+        self.hdsb = HypernetsDSBuilder(context=context)
 
         cckeys = ['mapping_vis_a', 'mapping_vis_b', 'mapping_vis_c', 'mapping_vis_d', 'mapping_vis_e', 'mapping_vis_f']
         ccvalues = []
@@ -195,7 +196,7 @@ class HypernetsReader:
 
         print("Wvl and Scan Dimensions:", len(wvl), scanDim)
         # use template from variables and metadata in format
-        ds = HypernetsDSBuilder().create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
+        ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
 
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl

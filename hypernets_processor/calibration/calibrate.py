@@ -343,6 +343,8 @@ class Calibrate:
         elif measurandstring == "irradiance":
             dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset_l1a)
 
+        dataset_l1b["wavelength"].values = dataset_l1a["wavelength"].values
+
         series_id = np.unique(dataset_l1a['series_id'])
         dataset_l1b["series_id"].values = series_id
 
@@ -350,7 +352,7 @@ class Calibrate:
                                "solar_azimuth_angle", "solar_zenith_angle"]:
             temp_arr = np.empty(len(series_id))
             for i in range(len(series_id)):
-                ids = np.where((dataset_l1a['series_id'] == series_id[i]) & (dataset_l1a['quality_flag'] == 1))
+                ids = np.where((dataset_l1a['series_id'] == series_id[i]) & (dataset_l1a['quality_flag'] == 0))
                 temp_arr[i] = np.mean(dataset_l1a[variablestring].values[ids])
             dataset_l1b[variablestring].values = temp_arr
 
