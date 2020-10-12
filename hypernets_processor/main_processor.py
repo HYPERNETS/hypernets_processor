@@ -6,6 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
 from hypernets_processor.interpolation.interpolate import Interpolate
+from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.context import Context
 from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
@@ -50,7 +51,12 @@ class HypernetsProcessor:
         # """
         # Runs hypernets data processing jobs
         # """
-
+        reader=HypernetsReader(self.context)
+        cal = Calibrate(self.context,MCsteps=100)
+        intp = Interpolate(self.context,MCsteps=100)
+        surf = SurfaceReflectance(self.context,MCsteps=100)
+        rhymer = RhymerHypstar(self.context)
+        plot = Plotting(self.context)
 
         # run L0
         # set_dir = "~/OneDrive/projects/hypernets_processor/hypernets_processor"
@@ -60,8 +66,7 @@ class HypernetsProcessor:
 
         # seq_dir=server_dir+"reader/SEQ20200625T095941/"
         seq_dir = server_dir + seq_id+"/"
-
-        l0_irr, l0_rad, l0_bla = HypernetsReader(self.context).read_sequence(seq_dir)
+        l0_irr, l0_rad, l0_bla = reader.read_sequence(seq_dir)
         l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
 
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
@@ -155,14 +160,20 @@ class HypernetsProcessor:
         # context.measurement_function_interpolate = "WaterNetworkInterpolationLinear"
         # context.measurement_function_surface_reflectance = "WaterNetworkProtocol"
 
-        cal = Calibrate(self.context, MCsteps=100)
-        intp = Interpolate(self.context, MCsteps=100)
-        surf = SurfaceReflectance(self.context, MCsteps=100)
-        rhymer = RhymerHypstar(self.context)
-
         L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
         L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
 
+        if self.context.get_config_value("plot_l1a"):
+            plot.plot_scans_in_series("radiance",L1a_rad)
+            plot.plot_scans_in_series("irradiance",L1a_irr)
+
+        test_L1b_rad = cal.average_l1b("radiance",L1a_rad)
+        test_L1b_irr = cal.average_l1b("irradiance",L1a_irr)
+
+        if self.context.get_config_value("plot_l1b"):
+            plot.plot_series_in_sequence("radiance",test_L1b_rad)
+            plot.plot_diff_scans("radiance",L1a_rad)
+            plot.plot_diff_scans("radiance",L1a_rad,test_L1b_rad)
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 
@@ -183,13 +194,15 @@ class HypernetsProcessor:
         # L1b = rhymer.get_fresnelrefl(L1b)
         # L1b = rhymer.get_epsilon(L1b)
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
-        print("rad",L1b["u_random_downwelling_radiance"])
-        #
+        #       print("rad",L1b["u_random_downwelling_radiance"])
         L1c=rhymer.process_l1c(L1b)
 
         #L1d_irr = cal.average_l1b("irradiance", L1c)
 
         L2a = surf.process(L1c)
+        if self.context.get_config_value("plot_l2a"):
+            plot.plot_series_in_sequence("nlw",test_L1b_rad)
+
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
         # wind=RhymerHypstar(context).retrieve_wind(L1c)
