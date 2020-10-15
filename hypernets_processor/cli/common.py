@@ -150,5 +150,77 @@ def read_jobs_list(fname):
     return jobs
 
 
+def cli_input_yn(query, default=True):
+
+    str_def = "n"
+    if default:
+        str_def = "y"
+
+    res = input(query.capitalize() + " (y/n) [" + str_def + "]: ") or str_def
+
+    if res == "y":
+        return True
+    elif res == "n":
+        return False
+
+    raise ValueError("enter y or n")
+
+
+def cli_input_str_default(query, default=None):
+
+    str_def = ""
+    if default is not None:
+        str_def = " [" + default + "]"
+
+    res = input(query.capitalize() + str_def + ": ") or default
+
+    return res
+
+
+def cli_input_str_opts(query, options=None):
+
+    str_def = ""
+    if options is not None:
+        str_def = "[" + "/".join(options) + "]"
+
+    res = input(query.capitalize() + str_def + ": ")
+
+    if res in options:
+        return res
+
+    raise ValueError("must be one of " + str(options))
+
+
+def determine_if_set(value_name, context):
+    value = context.get_config_value(value_name)
+
+    set_value = True
+    if value is not None:
+        set_value = cli_input_yn(
+            "update " + value_name + ", currently '" + value + "'",
+            default=False
+        )
+    return set_value
+
+
+def determine_set_value(value_name, context, default=None, return_existing=False):
+    value = context.get_config_value(value_name)
+
+    set_value = determine_if_set(value_name, context)
+
+    value_return = None
+
+    if set_value:
+        value_return = cli_input_str_default(
+            "set "+value_name,
+            default=default
+        )
+
+    if (value_return is None) and return_existing:
+        return value
+    return value_return
+
+
+
 if __name__ == "__main__":
     pass
