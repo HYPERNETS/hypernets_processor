@@ -4,10 +4,12 @@ Tests for HypernetsWriter class
 
 import unittest
 from unittest.mock import patch, MagicMock
+from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.test.test_functions import setup_test_context
 from hypernets_processor.version import __version__
 from xarray import Dataset
+import numpy as np
 
 
 '''___Authorship___'''
@@ -80,6 +82,19 @@ class TestHypernetsWriter(unittest.TestCase):
         HypernetsWriter._write_netcdf(ds, path)
 
         ds.to_netcdf.assert_called_once_with(path, encoding={}, engine='netcdf4', format='netCDF4')
+
+    def test_fill_ds(self):
+        ds = Dataset()
+        ds["array_variable1"] = DatasetUtil.create_variable([7, 8], np.float32)
+        ds["array_variable2"] = DatasetUtil.create_variable([7, 8], np.float32)
+
+        ds["array_variable1"][2, 3] = np.nan
+        ds["array_variable2"][2, 3] = np.nan
+
+        HypernetsWriter.fill_ds(ds)
+
+        self.assertTrue(np.all(ds["array_variable1"] == 9.96921E36))
+        self.assertTrue(np.all(ds["array_variable2"] == 9.96921E36))
 
 
 if __name__ == '__main__':
