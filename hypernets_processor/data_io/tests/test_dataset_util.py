@@ -4,7 +4,7 @@ Tests for DatasetUtil class
 
 import unittest
 import numpy as np
-from xarray import DataArray, Variable
+from xarray import DataArray, Variable, Dataset
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.version import __version__
 
@@ -240,6 +240,159 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertEqual(-9223372036854775806, DatasetUtil.get_default_fill_value(np.int64))
         self.assertEqual(np.float32(9.96921E36), DatasetUtil.get_default_fill_value(np.float32))
         self.assertEqual(9.969209968386869E36, DatasetUtil.get_default_fill_value(np.float64))
+
+    def test__get_flag_encoding(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        masks = [1, 2, 4, 8, 16, 32, 64, 128]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+
+        ds["flags"] = flags_vector_variable
+
+        meanings_out, masks_out = DatasetUtil._get_flag_encoding(ds["flags"])
+
+        self.assertCountEqual(meanings, meanings_out)
+        self.assertCountEqual(masks, masks_out)
+
+    def test__get_flag_encoding_not_flag_var(self):
+        ds = Dataset()
+        ds["array_variable"] = DatasetUtil.create_variable([7, 8, 3], np.int8, attributes={"standard_name": "std"})
+
+        self.assertRaises(KeyError, DatasetUtil._get_flag_encoding, ds["array_variable"])
+
+    def test_unpack_flags(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        masks = [1, 2, 4, 8, 16, 32, 64, 128]
+        flags_vector_variable = DatasetUtil.create_flags_variable([2,3], meanings, dim_names=["dim1", "dim2"],
+                                                                  attributes={"standard_name": "std"})
+
+        ds["flags"] = flags_vector_variable
+        ds["flags"][0, 0] = ds["flags"][0, 0] | 8
+
+        empty = np.zeros((2, 3), bool)
+        flag4 = np.zeros((2, 3), bool)
+        flag4[0,0] = True
+
+        flags = DatasetUtil.unpack_flags(ds["flags"])
+
+        self.assertTrue((flags["flag1"].data == empty).all())
+        self.assertTrue((flags["flag2"].data == empty).all())
+        self.assertTrue((flags["flag3"].data == empty).all())
+        self.assertTrue((flags["flag4"].data == flag4).all())
+        self.assertTrue((flags["flag5"].data == empty).all())
+        self.assertTrue((flags["flag6"].data == empty).all())
+        self.assertTrue((flags["flag7"].data == empty).all())
+        self.assertTrue((flags["flag8"].data == empty).all())
+
+    def test_get_set_flags(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+        ds["flags"][3] = ds["flags"][3] | 8
+        ds["flags"][3] = ds["flags"][3] | 32
+
+        set_flags = DatasetUtil.get_set_flags(ds["flags"][3])
+
+        self.assertCountEqual(set_flags, ["flag4", "flag6"])
+
+    def test_get_set_flags_2d(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+
+        self.assertRaises(ValueError, DatasetUtil.get_set_flags, ds["flags"])
+
+    def test_check_flag_set_true(self):
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+        ds["flags"][3] = ds["flags"][3] | 8
+        ds["flags"][3] = ds["flags"][3] | 32
+
+        flag_set = DatasetUtil.check_flag_set(ds["flags"][3], "flag6")
+
+        self.assertTrue(flag_set)
+
+    def test_check_flag_set_false(self):
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+        ds["flags"][3] = ds["flags"][3] | 8
+
+        flag_set = DatasetUtil.check_flag_set(ds["flags"][3], "flag6")
+
+        self.assertFalse(flag_set)
+
+    def test_check_flag_set_2d(self):
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+
+        self.assertRaises(ValueError, DatasetUtil.check_flag_set, ds["flags"], "flag6")
+
+    def test_set_flag(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5, 4], meanings, dim_names=["dim1", "dim2"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+
+        ds["flags"] = DatasetUtil.set_flag(ds["flags"], "flag4")
+
+        flags = np.full(ds["flags"].shape, 0|8)
+
+        self.assertTrue((ds["flags"].data == flags).all())
+
+    def test_set_flag_error_if_set(self):
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+        ds["flags"][3] = ds["flags"][3] | 8
+
+        self.assertRaises(ValueError, DatasetUtil.set_flag, ds["flags"], "flag4", error_if_set=True)
+
+    def test_unset_flag(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+        ds["flags"][:] = ds["flags"][:] | 8
+
+        ds["flags"] = DatasetUtil.unset_flag(ds["flags"], "flag4")
+
+        flags = np.zeros(ds["flags"].shape)
+
+        self.assertTrue((ds["flags"].data == flags).all())
+
+    def test_set_flag_error_if_unset(self):
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([5], meanings, dim_names=["dim1"],
+                                                                  attributes={"standard_name": "std"})
+        ds["flags"] = flags_vector_variable
+
+        self.assertRaises(ValueError, DatasetUtil.unset_flag, ds["flags"], "flag4", error_if_unset=True)
 
 
 if __name__ == '__main__':
