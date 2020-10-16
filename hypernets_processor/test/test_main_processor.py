@@ -15,6 +15,7 @@ __email__ = ""
 __status__ = "Development"
 
 
+# This tests won't work atm!
 class TestHypernetsProcessor(unittest.TestCase):
     # One way of testing is to set up the module to run the specific method you're interested in. You can then test
     # the output of that module.
