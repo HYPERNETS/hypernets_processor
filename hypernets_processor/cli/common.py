@@ -24,6 +24,8 @@ __status__ = "Development"
 this_directory = os.path.dirname(__file__)
 etc_directory = os.path.join(os.path.dirname(this_directory), "etc")
 PROCESSOR_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
+PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_land_defaults.config")
+PROCESSOR_WATER_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_water_defaults.config")
 SCHEDULER_CONFIG_PATH = os.path.join(etc_directory, "scheduler.config")
 
 
@@ -203,7 +205,7 @@ def determine_if_set(value_name, context):
     return set_value
 
 
-def determine_set_value(value_name, context, default=None, return_existing=False):
+def determine_set_value(value_name, context, default=None, options=None, return_existing=False):
     value = context.get_config_value(value_name)
 
     set_value = determine_if_set(value_name, context)
@@ -211,10 +213,17 @@ def determine_set_value(value_name, context, default=None, return_existing=False
     value_return = None
 
     if set_value:
-        value_return = cli_input_str_default(
-            "set "+value_name,
-            default=default
-        )
+        if options is not None:
+            value_return = cli_input_str_opts(
+                "set "+value_name,
+                options=options
+            )
+
+        else:
+            value_return = cli_input_str_default(
+                "set " + value_name,
+                default=default
+            )
 
     if (value_return is None) and return_existing:
         return value
