@@ -40,9 +40,6 @@ def main(settings):
 
     processor_config = read_config_file(config_path)
 
-    # Set network
-    processor_config["Processor"]["network"] = settings["network"]
-
     # Create directories (resets with existing if unchanged)
     os.makedirs(settings["working_directory"], exist_ok=True)
     processor_config["Processor"]["processor_working_directory"] = settings["working_directory"]
