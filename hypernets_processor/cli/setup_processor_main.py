@@ -3,8 +3,10 @@ Main function to setup processor on install
 """
 
 from hypernets_processor.version import __version__
+from hypernets_processor.cli.common import read_config_file, PROCESSOR_CONFIG_PATH, PROCESSOR_LAND_DEFAULTS_CONFIG_PATH, PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
 from hypernets_processor.data_io.hypernets_db_builder import HypernetsDBBuilder
 import os
+from sqlalchemy_utils import database_exists
 
 
 '''___Authorship___'''
@@ -16,38 +18,57 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def main(working_directory=None, mdb_path=None, set_mdb=False, adb_path=None, set_adb=False, archive_directory=None):
+def main(settings):
     """
     Main function to run routine to setup hypernets_processor
 
-    :type processor_config_path: str
-    :param processor_config_path: processor configuration file path
+    :type settings: dict
+    :param settings: user defined configuration values
     """
 
-    # Create directories
-    os.makedirs(working_directory, exist_ok=True)
-    os.makedirs(archive_directory, exist_ok=True)
+    # Set default config values for chosen network
+    config_path = PROCESSOR_CONFIG_PATH
+    if settings["network_defaults"]:
+        if settings["network"] == "land":
+            def_config_path = PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
+        elif settings["network"] == "water":
+            def_config_path = PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
+        else:
+            raise KeyError("Invalid network name ("+settings["network"]+")")
+
+        config_path = [PROCESSOR_CONFIG_PATH, def_config_path]
+
+    processor_config = read_config_file(config_path)
+
+    # Set network
+    processor_config["Processor"]["network"] = settings["network"]
+
+    # Create directories (resets with existing if unchanged)
+    os.makedirs(settings["working_directory"], exist_ok=True)
+    processor_config["Processor"]["processor_working_directory"] = settings["working_directory"]
+    os.makedirs(settings["archive_directory"], exist_ok=True)
+    processor_config["Output"]["archive_directory"] = settings["archive_directory"]
 
     # Create databases
     hdb = HypernetsDBBuilder()
 
-    if mdb_path is None:
-        mdb_path = os.path.join(working_directory, "metadata.db")
+    dbs = ["metadata", "anomoly"]
+    for db in dbs:
+        url = settings[db+"_db_url"]
 
-    if set_mdb:
-        metadata_db_url = "sqlite:///" + mdb_path
+        if (url is not None) and not database_exists(url):
+            new_db = hdb.create_db_template(url, db)
+            new_db.close()
+            processor_config["Databases"][db+"_db_url"] = url
 
-        if not os.path.exists(mdb_path):
-            metadata_db = hdb.create_db_template(metadata_db_url, "metadata_db")
+    # Set processor log file
+    if not os.path.exists(settings["log_path"]):
+        open(settings["log_path"], 'a').close()
+    processor_config["Log"]["log_path"] = settings["log_path"]
 
-    if adb_path is None:
-        adb_path = os.path.join(working_directory, "anomoly.db")
-
-    if set_adb:
-        anomoly_db_url = "sqlite:///" + adb_path
-
-        if not os.path.exists(mdb_path):
-            anomoly_db = hdb.create_db_template(anomoly_db_url, "anomoly_db")
+    # Write updated config file
+    with open(PROCESSOR_CONFIG_PATH, 'w') as f:
+        processor_config.write(f)
 
     return None
 

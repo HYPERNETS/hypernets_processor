@@ -6,6 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.cli.setup_processor_main import main
 from hypernets_processor.cli.common import cli_input_yn, cli_input_str_default, PROCESSOR_CONFIG_PATH, read_config_file, determine_set_value, determine_if_set
 import argparse
+import os
 from hypernets_processor.context import Context
 
 
@@ -41,46 +42,53 @@ parsed_args = parser.parse_args()
 
 def cli():
     """
-    Command line interface function for hypernets_scheduler_main
+    Command line interface for hypernets_scheduler_main
     """
 
     processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
     context = Context(processor_config)
 
-    # Determine archive directory to set
-    archive_directory = determine_set_value("archive_directory", context, return_existing=True)
+    settings = dict()
 
-    working_directory = determine_set_value(
-        "processor_working_directory",
+    # Determine network
+    settings["network"] = determine_set_value(
+        "network",
         context,
-        default="./.hypernets",
+        options=["land", "water"],
         return_existing=True
     )
+    settings["network_defaults"] = cli_input_yn("set network default config values (overwrites existing)")
 
-    set_mdb = determine_if_set("metadata_db_url", context)
-    mdb_path = None
-    if set_mdb:
-        old_mdb = cli_input_yn("use existing metadata database", default=False)
-        if old_mdb:
-            mdb_path = cli_input_str_default("enter metadata database url")
-
-    set_adb = determine_if_set("anomoly_db_url", context)
-    adb_path = None
-    if set_adb:
-        old_adb = cli_input_yn("use existing anomoly database", default=False)
-        if old_adb:
-            adb_path = cli_input_str_default("enter anomoly database url")
-
-    main(
-        working_directory=working_directory,
-        mdb_path=mdb_path,
-        set_mdb=set_mdb,
-        adb_path=adb_path,
-        set_adb=set_adb,
-        archive_directory=archive_directory
+    # Determine archive directory to set
+    settings["archive_directory"] = os.path.abspath(
+        determine_set_value(
+            "archive_directory",
+            context,
+            return_existing=True
+        )
     )
 
-    return None
+    home_directory = os.path.expanduser("~")
+    settings["working_directory"] = os.path.abspath(
+        determine_set_value(
+            "processor_working_directory",
+            context,
+            default=os.path.join(home_directory, ".hypernets"),
+            return_existing=True
+        )
+    )
+
+    dbs = ["metadata", "anomoly"]
+    for db in dbs:
+        settings[db + "_db_url"] = determine_set_value(
+                db+"_db_url",
+                context,
+                default="sqlite:///"+os.path.join(settings["working_directory"], db+".db"),
+            )
+
+    settings["log_path"] = os.path.join(settings["working_directory"], "processor.log")
+
+    main(settings)
 
 
 if __name__ == "__main__":
