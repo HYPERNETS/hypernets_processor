@@ -34,7 +34,7 @@ def open_database(url, create_format=None):
     elif create_format is not None:
         url_ = make_url(url)
         if url_.drivername == "sqlite":
-            makedirs(dirname(url_.database))
+            makedirs(dirname(url_.database), exist_ok=True)
 
         hdb = HypernetsDBBuilder()
         return hdb.create_db_template(url, create_format)
