@@ -3,6 +3,7 @@ Context class
 """
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import get_config_value
+from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
 from hypernets_processor.data_io.hypernets_db_builder import open_database
 
 import configparser
@@ -49,10 +50,14 @@ class Context:
             )
 
         # Connect to anomoly databases
-        db_fmts = ["metadata", "anomoly"]
+        db_fmts = DB_DICT_DEFS.keys()
         for db_fmt in db_fmts:
             if db_fmt + "_db_url" in self.get_config_names():
-                self.product_db = open_database(self.get_config_value(db_fmt + "_db_url"), create_format=db_fmt)
+                setattr(
+                    self,
+                    db_fmt+"_db",
+                    open_database(self.get_config_value(db_fmt + "_db_url"), create_format=db_fmt)
+                )
 
     def unpack_config(self, config, protected_values=None):
         """

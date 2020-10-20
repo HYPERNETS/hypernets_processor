@@ -9,6 +9,7 @@ from hypernets_processor.utils.config import (
     PROCESSOR_LAND_DEFAULTS_CONFIG_PATH,
     PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
 )
+from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
 from hypernets_processor.data_io.hypernets_db_builder import open_database
 import os
 
@@ -51,8 +52,7 @@ def main(settings):
     processor_config["Output"]["archive_directory"] = settings["archive_directory"]
 
     # Create databases
-    db_fmts = ["metadata", "anomoly"]
-    for db_fmt in db_fmts:
+    for db_fmt in DB_DICT_DEFS.keys():
         url = settings[db_fmt + "_db_url"]
 
         if url is not None:
