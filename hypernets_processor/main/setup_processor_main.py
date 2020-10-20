@@ -9,9 +9,8 @@ from hypernets_processor.utils.config import (
     PROCESSOR_LAND_DEFAULTS_CONFIG_PATH,
     PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
 )
-from hypernets_processor.data_io.hypernets_db_builder import HypernetsDBBuilder
+from hypernets_processor.data_io.hypernets_db_builder import open_database
 import os
-from sqlalchemy_utils import database_exists
 
 
 '''___Authorship___'''
@@ -52,16 +51,14 @@ def main(settings):
     processor_config["Output"]["archive_directory"] = settings["archive_directory"]
 
     # Create databases
-    hdb = HypernetsDBBuilder()
+    db_fmts = ["metadata", "anomoly"]
+    for db_fmt in db_fmts:
+        url = settings[db_fmt + "_db_url"]
 
-    dbs = ["metadata", "anomoly"]
-    for db in dbs:
-        url = settings[db+"_db_url"]
-
-        if (url is not None) and not database_exists(url):
-            new_db = hdb.create_db_template(url, db)
+        if url is not None:
+            new_db = open_database(url, create_format=db_fmt)
             new_db.close()
-            processor_config["Databases"][db+"_db_url"] = url
+            processor_config["Databases"][db_fmt + "_db_url"] = url
 
     # Set processor log file
     if not os.path.exists(settings["log_path"]):
