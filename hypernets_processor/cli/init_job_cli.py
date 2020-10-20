@@ -4,6 +4,7 @@ job init cli
 
 from hypernets_processor.version import __version__
 import argparse
+from hypernets_processor.main.init_job_main import main
 
 
 '''___Authorship___'''

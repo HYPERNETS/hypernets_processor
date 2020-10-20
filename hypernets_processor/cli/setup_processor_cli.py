@@ -3,7 +3,7 @@ hypernets_processor setup cli
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.setup_processor_main import main
+from hypernets_processor.main.setup_processor_main import main
 from hypernets_processor.cli.common import cli_input_yn, PROCESSOR_CONFIG_PATH, read_config_file, determine_set_value
 import argparse
 import os
