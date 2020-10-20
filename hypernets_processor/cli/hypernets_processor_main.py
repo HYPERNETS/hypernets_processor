@@ -4,7 +4,8 @@ Main function for hypernets_processor_cli to run
 
 from hypernets_processor.version import __version__
 from hypernets_processor.main_processor import HypernetsProcessor
-from hypernets_processor.cli.common import configure_logging, read_config_file
+from hypernets_processor.utils.config import read_config_file
+from hypernets_processor.utils.logging import configure_logging
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"

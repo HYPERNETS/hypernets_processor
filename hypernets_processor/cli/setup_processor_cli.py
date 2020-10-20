@@ -4,10 +4,11 @@ hypernets_processor setup cli
 
 from hypernets_processor.version import __version__
 from hypernets_processor.main.setup_processor_main import main
-from hypernets_processor.cli.common import cli_input_yn, PROCESSOR_CONFIG_PATH, read_config_file, determine_set_value
+from hypernets_processor.utils.config import PROCESSOR_CONFIG_PATH, read_config_file
+from hypernets_processor.utils.cli import cli_input_yn, determine_set_value
+from hypernets_processor.context import Context
 import argparse
 import os
-from hypernets_processor.context import Context
 
 
 '''___Authorship___'''

@@ -6,8 +6,7 @@ import unittest
 from unittest.mock import patch
 from hypernets_processor.version import __version__
 from hypernets_processor.cli.hypernets_processor_main import main
-from hypernets_processor.cli.common import read_config_file, PROCESSOR_CONFIG_PATH
-
+from hypernets_processor.utils.cli import read_config_file
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"

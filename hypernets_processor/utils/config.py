@@ -2,9 +2,10 @@
 Module of helper functions for configfile operations
 """
 
-
 from hypernets_processor.version import __version__
+from hypernets_processor.utils.paths import relative_path
 import os
+import configparser
 
 
 """___Authorship___"""
@@ -14,6 +15,51 @@ __version__ = __version__
 __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
+
+
+this_directory = os.path.dirname(__file__)
+etc_directory = os.path.join(os.path.dirname(this_directory), "etc")
+PROCESSOR_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
+PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_land_defaults.config")
+PROCESSOR_WATER_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_water_defaults.config")
+SCHEDULER_CONFIG_PATH = os.path.join(etc_directory, "scheduler.config")
+
+
+def read_config_file(fname):
+    """
+    Returns information from configuration file
+
+    :type fname: str
+    :param fname: path of configuration file
+
+    :return: configuration information
+    :rtype: configparser.RawConfigParser
+    """
+
+    # Open file
+    config = configparser.RawConfigParser()
+    config.read(fname)
+
+    return config
+
+
+def read_jobs_list(fname):
+    """
+    Return job config paths from jobs list file
+
+    :type fname: str
+    :param fname: path of jobs list file
+
+    :return: job config paths
+    :rtype: list
+    """
+
+    # Read lines for file
+    with open(fname, "r") as f:
+        #lines = [line.rstrip() for line in f.readlines()]
+        jobs = [relative_path(line.rstrip(), os.path.dirname(fname)) for line in f.readlines()]
+
+    return jobs
 
 
 def get_config_value(config, section, key, dtype=None):
@@ -59,6 +105,14 @@ def get_config_value(config, section, key, dtype=None):
 
 
 def infer_dtype(val):
+    """
+    Return inferred dtype of val
+
+    :param val: value
+
+    :return: inferred data type
+    :rtype: type
+    """
 
     # Check bool
     if (val == "True") or (val == "False"):

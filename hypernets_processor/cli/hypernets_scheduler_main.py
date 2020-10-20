@@ -3,7 +3,8 @@ Main function for hypernets_scheduler_cli to run
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.common import configure_logging, read_config_file, read_jobs_list
+from hypernets_processor.utils.config import read_config_file, read_jobs_list
+from hypernets_processor.utils.logging import configure_logging
 from hypernets_processor.utils.config import get_config_value
 from hypernets_processor import Scheduler
 from hypernets_processor.cli.hypernets_processor_main import main as processor_main
