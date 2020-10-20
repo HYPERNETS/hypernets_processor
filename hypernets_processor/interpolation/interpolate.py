@@ -29,8 +29,6 @@ class Interpolate:
         # chek for upwelling radiance
         upscan = [i for i, e in enumerate(dataset_l1a_rad['viewing_zenith_angle'].values) if e <= 90]
 
-        print("upscan {}".format(upscan) + "is the same as L1A-rad {}".format(len(dataset_l1a_rad.scan)))
-
         l1b_dim_sizes_dict = {"wavelength":len(dataset_l1a_rad["wavelength"]),
                               "scan":len(upscan)}
 
