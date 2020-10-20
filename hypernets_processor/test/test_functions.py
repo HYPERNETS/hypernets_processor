@@ -4,9 +4,8 @@ test_functions module - module with functions to help with testing
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_db_builder import HypernetsDBBuilder
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
-from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 from hypernets_processor.context import Context
-from hypernets_processor.cli.common import read_config_file, configure_logging
+from hypernets_processor.utils.cli import read_config_file, configure_logging
 from hypernets_processor.utils.paths import relative_path
 import datetime
 import os

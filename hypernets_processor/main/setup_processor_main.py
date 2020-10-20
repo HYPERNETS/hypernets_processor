@@ -3,7 +3,12 @@ Main function to setup processor on install
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.common import read_config_file, PROCESSOR_CONFIG_PATH, PROCESSOR_LAND_DEFAULTS_CONFIG_PATH, PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
+from hypernets_processor.utils.config import (
+    read_config_file,
+    PROCESSOR_CONFIG_PATH,
+    PROCESSOR_LAND_DEFAULTS_CONFIG_PATH,
+    PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
+)
 from hypernets_processor.data_io.hypernets_db_builder import HypernetsDBBuilder
 import os
 from sqlalchemy_utils import database_exists
