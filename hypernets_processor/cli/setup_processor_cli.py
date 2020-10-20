@@ -4,6 +4,7 @@ hypernets_processor setup cli
 
 from hypernets_processor.version import __version__
 from hypernets_processor.main.setup_processor_main import main
+from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
 from hypernets_processor.utils.config import PROCESSOR_CONFIG_PATH, read_config_file
 from hypernets_processor.utils.cli import cli_input_yn, determine_set_value
 from hypernets_processor.context import Context
@@ -79,13 +80,12 @@ def cli():
         )
     )
 
-    dbs = ["metadata", "anomoly"]
-    for db in dbs:
-        settings[db + "_db_url"] = determine_set_value(
-                db+"_db_url",
-                context,
-                default="sqlite:///"+os.path.join(settings["working_directory"], db+".db"),
-            )
+    for db_fmt in DB_DICT_DEFS.keys():
+        settings[db_fmt + "_db_url"] = determine_set_value(
+            db_fmt+"_db_url",
+            context,
+            default="sqlite:///"+os.path.join(settings["working_directory"], db_fmt+".db"),
+        )
 
     settings["log_path"] = os.path.join(settings["working_directory"], "processor.log")
 
