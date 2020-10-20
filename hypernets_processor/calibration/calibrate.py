@@ -36,10 +36,8 @@ class Calibrate:
         calibrate_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
         input_vars = calibrate_function.get_argument_names()
-        print("the used variables are:", input_vars)
 
         dataset_l1a = self.l1a_template_from_l0_dataset(measurandstring, dataset_l0)
-        #dataset_l0 = self.correct_DN_units(dataset_l0,dataset_l0_bla)
         dataset_l0, dataset_l1a = self.preprocess_l0(dataset_l0, dataset_l1a)
 
         calibration_data = self.prepare_calibration_data(measurandstring)
@@ -228,8 +226,18 @@ class Calibrate:
         du = DatasetUtil()
 
         mask = self.clip_and_mask(datasetl0)
-        datasetl0["quality_flag"].values = mask
-        datasetl1a["quality_flag"].values = mask
+        # datasetl0["quality_flag"].values = mask
+        # datasetl1a["quality_flag"].values = mask
+
+        flagval = 2 ** (self.context.get_config_value("outliers"))
+
+        datasetl0["quality_flag"].values = [
+            flagval + datasetl0["quality_flag"].values[i] if mask[i] == 1 else
+            datasetl0["quality_flag"].values[i] for i in range(len(mask))]
+
+        datasetl1a["quality_flag"].values = [
+            flagval + datasetl1a["quality_flag"].values[i] if mask[i] == 1 else
+            datasetl1a["quality_flag"].values[i] for i in range(len(mask))]
 
         DN_rand = du.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
                                      dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
@@ -258,8 +266,8 @@ class Calibrate:
         for i in range(len(series_ids)):
             ids = np.where(dataset['series_id'] == series_ids[i])
             intsig = np.nansum((dataset["digital_number"].values[:, ids]), axis=0)[0]
-            noisestd, noiseavg = self.sigma_clip(intsig)
-            maski = np.zeros_like(intsig)
+            noisestd, noiseavg = self.sigma_clip(intsig) # calculate std and avg for non NaN columns
+            maski = np.zeros_like(intsig) # mask the columns that have NaN
             maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 1
             mask = np.append(mask, maski)
             # print("mask",mask)
