@@ -24,6 +24,7 @@ PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_lan
 PROCESSOR_WATER_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_water_defaults.config")
 SCHEDULER_CONFIG_PATH = os.path.join(etc_directory, "scheduler.config")
 JOB_CONFIG_TEMPLATE_PATH = os.path.join(etc_directory, "job_template.config")
+JOBS_FILE_PATH = os.path.join(etc_directory, "jobs.txt")
 
 
 def read_config_file(fname):
