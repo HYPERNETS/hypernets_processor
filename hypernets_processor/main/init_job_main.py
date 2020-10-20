@@ -3,6 +3,8 @@ Main function for job init
 """
 
 from hypernets_processor.version import __version__
+from hypernets_processor.utils.config import read_config_file, JOB_CONFIG_TEMPLATE_PATH, JOBS_FILE_PATH
+import os
 
 
 '''___Authorship___'''
@@ -22,7 +24,29 @@ def main(settings):
     :param settings: user defined configuration values
     """
 
-    return None
+    # Create config from template
+    job_config = read_config_file(JOB_CONFIG_TEMPLATE_PATH)
+
+    job_config["Job"]["job_name"] = settings["job_name"]
+
+    # Create directories (resets with existing if unchanged)
+    os.makedirs(settings["job_working_directory"], exist_ok=True)
+    job_config["Job"]["job_working_directory"] = settings["job_working_directory"]
+    os.makedirs(settings["raw_data_directory"], exist_ok=True)
+    job_config["Input"]["raw_data_directory"] = settings["raw_data_directory"]
+
+    # Write config
+    job_config_path = os.path.join(settings["job_working_directory"], settings["job_name"]+".config")
+    with open(job_config_path, 'w') as f:
+        job_config.write(f)
+
+    # Add to scheduler
+    if settings["add_to_scheduler"]:
+        with open(JOBS_FILE_PATH, "a") as f:
+            if os.path.getsize(JOBS_FILE_PATH) > 0:
+                f.write("\n" + job_config_path)
+            else:
+                f.write(job_config_path)
 
 
 if __name__ == "__main__":
