@@ -43,8 +43,13 @@ METADATA_DB = {}
 # Anolomy Database
 ANOMOLY_DB = {}
 
+# Product Database
+PRODUCT_DB = {}
+
+
 # Database format defs
 # --------------------
 
 DB_DICT_DEFS = {"metadata": METADATA_DB,
-                "anomoly": ANOMOLY_DB}
+                "anomoly": ANOMOLY_DB,
+                "product": PRODUCT_DB}
