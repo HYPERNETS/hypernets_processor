@@ -28,7 +28,7 @@ TEMPLATE_PROCESSOR_CONFIG_PATH = relative_path(
     "../etc/processor.config", this_directory
 )
 TEMPLATE_JOB_CONFIG_PATH = relative_path(
-    "../cli/config_templates/job.config", this_directory
+    "../etc/job_template.config", this_directory
 )
 
 TEST_DS_DIM_SIZES_W = {"wavelength": 271, "series": 3, "scan": 10, "sequence": 1}
