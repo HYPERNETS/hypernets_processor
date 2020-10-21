@@ -3,7 +3,9 @@ Context class
 """
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import get_config_value
-import dataset
+from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
+from hypernets_processor.data_io.hypernets_db_builder import open_database
+
 import configparser
 
 """___Authorship___"""
@@ -35,7 +37,7 @@ class Context:
         self.logger = logger
         self.metadata_db = None
         self.anomoly_db = None
-
+        self.archive_db = None
 
         # Unpack processor_config to set relevant attributes
         if processor_config is not None:
@@ -47,14 +49,16 @@ class Context:
                 job_config, protected_values=PROCESSOR_CONFIG_PROTECTED_VALUES
             )
 
-        # Connect to metadata database
-        if "metadata_db_url" in self.get_config_names():
-            self.metadata_db = dataset.connect(self.get_config_value("metadata_db_url"))
+        # Connect to anomoly databases
+        db_fmts = DB_DICT_DEFS.keys()
+        for db_fmt in db_fmts:
+            if db_fmt + "_db_url" in self.get_config_names():
+                setattr(
+                    self,
+                    db_fmt+"_db",
+                    open_database(self.get_config_value(db_fmt + "_db_url"), create_format=db_fmt)
+                )
 
-        # Connect to anomoly database
-        if "anomoly_db_url" in self.get_config_names():
-            self.anomoly_db = dataset.connect(self.get_config_value("anomoly_db_url"))
-                                              
     def unpack_config(self, config, protected_values=None):
         """
         Unpacks config data, sets relevant entries to values instance attribute
@@ -62,15 +66,13 @@ class Context:
         :type config: configparser.RawConfigParser
         :param config: config data
         """
-        cp = configparser.ConfigParser()
-        cp.read(config)
 
         protected_values = [] if protected_values is None else protected_values
-        for section in cp.sections():
-            for name in cp[section].keys():
+        for section in config.sections():
+            for name in config[section].keys():
 
                 if name not in protected_values:
-                    value = get_config_value(cp, section, name)
+                    value = get_config_value(config, section, name)
                     self.set_config_value(name, value)
 
     def set_config_value(self, name, value):
