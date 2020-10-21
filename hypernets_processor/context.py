@@ -37,7 +37,7 @@ class Context:
         self.logger = logger
         self.metadata_db = None
         self.anomoly_db = None
-        self.product_db = None
+        self.archive_db = None
 
         # Unpack processor_config to set relevant attributes
         if processor_config is not None:
