@@ -43,8 +43,12 @@ METADATA_DB = {}
 # Anolomy Database
 ANOMOLY_DB = {}
 
-# Product Database
-PRODUCT_DB = {}
+# Archive Database
+ARCHIVE_DB = {"products": {"columns": {"product_name": {"type": str},
+                                       "raw_product_name": {"type": str}
+                                       }
+                           }
+              }
 
 
 # Database format defs
@@ -52,4 +56,4 @@ PRODUCT_DB = {}
 
 DB_DICT_DEFS = {"metadata": METADATA_DB,
                 "anomoly": ANOMOLY_DB,
-                "product": PRODUCT_DB}
+                "archive": ARCHIVE_DB}
