@@ -45,7 +45,8 @@ ANOMOLY_DB = {}
 
 # Archive Database
 ARCHIVE_DB = {"products": {"columns": {"product_name": {"type": str},
-                                       "raw_product_name": {"type": str}
+                                       "raw_product_name": {"type": str},
+                                       "site": {"type": str}
                                        }
                            }
               }
