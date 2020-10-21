@@ -43,7 +43,7 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None):
     """
 
     if config is not None:
-        fname = get_config_value(config, "Log", "path", dtype=str)
+        fname = get_config_value(config, "Log", "log_path", dtype=str)
         verbose = get_config_value(config, "Log", "verbose", dtype=bool)
         quiet = get_config_value(config, "Log", "quiet", dtype=bool)
 
