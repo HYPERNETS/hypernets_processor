@@ -40,6 +40,12 @@ def main(settings):
     with open(job_config_path, 'w') as f:
         job_config.write(f)
 
+    # Set job log file
+    log_path = os.path.join(settings["job_working_directory"], settings["job_name"] + ".log")
+    if not os.path.exists(log_path):
+        open(log_path, 'a').close()
+    job_config["Log"]["log_path"] = log_path
+
     # Add to scheduler
     if settings["add_to_scheduler"]:
         with open(JOBS_FILE_PATH, "a") as f:
