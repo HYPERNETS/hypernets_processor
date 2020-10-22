@@ -11,9 +11,12 @@ from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceR
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.context import Context
 from hypernets_processor import HypernetsDSBuilder
+from hypernets_processor.test.test_functions import setup_test_context
+
 import os.path
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -90,10 +93,19 @@ class TestEndToEnd(unittest.TestCase):
     def test_end_to_end(self):
         this_directory_path = os.path.abspath(os.path.dirname(__file__))
         this_directory_path = os.path.join(this_directory_path,"../")
-        processor_config = os.path.join(this_directory_path,"etc/processor.config")
-        job_config = os.path.join(this_directory_path,"etc/job.config")
 
-        context = Context(processor_config=processor_config,job_config=job_config)
+        tmpdir = "tmp_"+"".join(random.choices(string.ascii_lowercase,k=6))
+        #context = setup_test_context()
+        context = setup_test_context(
+        raw_data_directory = os.path.join(tmpdir,"data"),
+        archive_directory = os.path.join(tmpdir,"out"),
+        metadata_db_url = "sqlite:///"+tmpdir+"/metadata.db",
+        anomoly_db_url = "sqlite:///"+tmpdir+"/anomoly.db",
+        archive_db_url = "sqlite:///"+tmpdir+"/archive.db",
+        create_directories = True,
+        create_dbs = True
+                 )
+
         context.set_config_value('network', 'L')
         context.set_config_value('measurement_function_calibrate', 'StandardMeasurementFunction')
         context.set_config_value('measurement_function_interpolate', 'LandNetworkInterpolationIrradianceLinear')
