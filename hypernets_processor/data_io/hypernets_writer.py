@@ -4,7 +4,9 @@ HypernetsWriter class
 
 from hypernets_processor.version import __version__
 import os
+import numpy as np
 from datetime import datetime
+
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -115,6 +117,9 @@ class HypernetsWriter:
             var_encoding = dict(comp)
             var_encoding.update(ds[var_name].encoding)
             encoding.update({var_name: var_encoding})
+
+        ds = HypernetsWriter.fill_ds(ds)
+
         ds.to_netcdf(path, format="netCDF4", engine="netcdf4", encoding=encoding)
 
     @staticmethod
@@ -137,6 +142,24 @@ class HypernetsWriter:
         with open(metadata_path, "w") as f:
             for meta_name in ds.attrs.keys():
                 f.write(meta_name + ": " + ds.attrs[meta_name] + "\n")
+
+    @staticmethod
+    def fill_ds(ds):
+        """
+        Fill nan's in ds will fillValue
+
+        :type ds: xarray.Dataset
+        :param ds: dataset
+
+        :return: filled data
+        :rtype: xarray.Dataset
+        """
+
+        for variable in ds.variables.keys():
+            idx = np.where(np.isnan(ds[variable]))
+            ds[variable][idx] = ds[variable]._FillValue
+
+        return ds
 
 
 if __name__ == "__main__":
