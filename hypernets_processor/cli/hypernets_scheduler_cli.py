@@ -4,7 +4,7 @@ scheduler for hypernets_processor jobs cli
 
 from hypernets_processor.version import __version__
 from hypernets_processor.cli.hypernets_scheduler_main import main
-from hypernets_processor.cli.common import SCHEDULER_CONFIG_PATH
+from hypernets_processor.utils.config import SCHEDULER_CONFIG_PATH
 import argparse
 
 

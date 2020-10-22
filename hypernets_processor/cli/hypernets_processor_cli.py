@@ -3,7 +3,8 @@ hypernets_processor cli
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.common import configure_std_parser, PROCESSOR_CONFIG_PATH
+from hypernets_processor.utils.config import PROCESSOR_CONFIG_PATH
+from hypernets_processor.utils.cli import configure_std_parser
 from hypernets_processor.cli.hypernets_processor_main import main
 
 
