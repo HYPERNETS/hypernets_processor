@@ -41,12 +41,16 @@ class Context:
 
         # Unpack processor_config to set relevant attributes
         if processor_config is not None:
-            self.unpack_config(processor_config)
+            config_proc = configparser.ConfigParser()
+            config_proc.read(processor_config)
+            self.unpack_config(config_proc)
 
         # Unpack processor_config to set relevant attributes
         if job_config is not None:
+            config_job = configparser.ConfigParser()
+            config_job.read(job_config)
             self.unpack_config(
-                job_config, protected_values=PROCESSOR_CONFIG_PROTECTED_VALUES
+                config_job, protected_values=PROCESSOR_CONFIG_PROTECTED_VALUES
             )
 
         # Connect to anomoly databases
