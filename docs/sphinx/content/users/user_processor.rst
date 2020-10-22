@@ -5,8 +5,8 @@
 
 .. _user_processor:
 
-Automated Processing User Guide
-===============================
+User Guide - Automated Processing
+=================================
 
 This section provides a user guide for running the `hypernets_processor` module as an automated processor of incoming field data. In this scenario, a set of field hypstar systems are regularly syncing raw data to a server.  Running on this server, the `hypernets_processor` processes the data and adds it to an archive that can be accessed through a user portal.
 
@@ -74,16 +74,16 @@ As well as defining required job configuration information, the job configuratio
 For all jobs, it is important relevant metadata be added to the metadata database, so it can be added to the data products.
 
 .. _user_processor-scheduler:
-Run Scheduler
--------------
+Running Job Scheduler
+---------------------
 
 Once setup the automated processing scheduler can be started with::
 
-   $ hypernets_processor_scheduler
+   $ hypernets_scheduler
 
 To see options, try::
 
-   $ hypernets_processor_scheduler --help
+   $ hypernets_scheduler --help
 
 All jobs are run regularly, processing any new data synced to the server from the field since the last run. The run schedule is defined in the scheduler config, which may be edited as::
 
