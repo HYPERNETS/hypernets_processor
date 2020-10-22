@@ -31,20 +31,25 @@ def main(settings):
 
     # Create directories (resets with existing if unchanged)
     os.makedirs(settings["job_working_directory"], exist_ok=True)
-    job_config["Job"]["job_working_directory"] = settings["job_working_directory"]
+    job_config["Job"]["job_working_directory"] = os.path.abspath(settings["job_working_directory"])
     os.makedirs(settings["raw_data_directory"], exist_ok=True)
-    job_config["Input"]["raw_data_directory"] = settings["raw_data_directory"]
-
-    # Write config
-    job_config_path = os.path.join(settings["job_working_directory"], settings["job_name"]+".config")
-    with open(job_config_path, 'w') as f:
-        job_config.write(f)
+    job_config["Input"]["raw_data_directory"] = os.path.abspath(settings["raw_data_directory"])
 
     # Set job log file
     log_path = os.path.join(settings["job_working_directory"], settings["job_name"] + ".log")
     if not os.path.exists(log_path):
         open(log_path, 'a').close()
-    job_config["Log"]["log_path"] = log_path
+    job_config["Log"]["log_path"] = os.path.abspath(log_path)
+
+    # Write config
+    job_config_path = os.path.abspath(
+        os.path.join(settings["job_working_directory"],
+                     settings["job_name"]+".config"
+                     )
+        )
+
+    with open(job_config_path, 'w') as f:
+        job_config.write(f)
 
     # Add to scheduler
     if settings["add_to_scheduler"]:
