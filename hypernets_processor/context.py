@@ -57,11 +57,15 @@ class Context:
         db_fmts = DB_DICT_DEFS.keys()
         for db_fmt in db_fmts:
             if db_fmt + "_db_url" in self.get_config_names():
-                setattr(
-                    self,
-                    db_fmt+"_db",
-                    open_database(self.get_config_value(db_fmt + "_db_url"), create_format=db_fmt)
-                )
+                if self.get_config_value(db_fmt + "_db_url") is not None:
+                    setattr(
+                        self,
+                        db_fmt+"_db",
+                        open_database(
+                            self.get_config_value(db_fmt + "_db_url"),
+                            create_format=db_fmt
+                        )
+                    )
 
     def unpack_config(self, config, protected_values=None):
         """
