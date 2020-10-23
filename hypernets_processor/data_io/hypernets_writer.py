@@ -5,7 +5,6 @@ HypernetsWriter class
 from hypernets_processor.version import __version__
 import os
 import numpy as np
-from datetime import datetime
 
 
 """___Authorship___"""
@@ -26,7 +25,7 @@ class HypernetsWriter:
         self.context = context
 
     def write(
-            self, ds, directory=None, overwrite=False, fmt=None, compression_level=None
+        self, ds, directory=None, overwrite=False, fmt=None, compression_level=None
     ):
         """
         Write xarray dataset to file
@@ -49,34 +48,11 @@ class HypernetsWriter:
         :param compression_level: the file compression level if 'netCDF4' fmt, 0 - 9 (default is 5)
         """
 
-        # Determine product format
-        if fmt is None:
-            if self.context is None:
-                raise ValueError(
-                    "cannot write without either the self.context or fmt parameters specified"
-                )
-            fmt = self.context.get_config_value("product_format")
+        fmt = self.return_fmt(fmt)
+        directory = self.return_directory(directory)
 
-        if (fmt.lower() == "netcdf4") or (fmt.lower() == "netcdf"):
-            fmt = "nc"
-
-        # Determine directory
-        if directory is None:
-            if self.context is None:
-                raise ValueError(
-                    "cannot write without either the self.context or directory parameters specified"
-                )
-
-            archive_directory = self.context.get_config_value("archive_directory")
-
-            site = self.context.get_config_value("site")
-            year = self.context.get_config_value("time").year
-            month = self.context.get_config_value("time").month
-            day = self.context.get_config_value("time").day
-
-            directory = os.path.join(archive_directory, site, str(year), str(month), str(day))
-            if not os.path.exists(directory):
-                os.makedirs(directory)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
         path = os.path.join(directory, ds.attrs["product_name"]) + "." + fmt
 
@@ -94,8 +70,66 @@ class HypernetsWriter:
         elif fmt == "csv":
             HypernetsWriter._write_csv(ds, path)
 
+    def return_fmt(self, fmt=None):
+        """
+        Return product fmt, with respect to context and specified value
+
+        :type fmt: str
+        :param fmt: (optional, required if self.context is None) format to write to, may be 'netCDF4' or 'csv'.
+        overwrites directory determined from self.context
+
+        :return: product format
+        :rtype: str
+        """
+
+        if fmt is None:
+            if self.context is None:
+                raise ValueError(
+                    "cannot write without either the self.context or fmt parameters specified"
+                )
+            fmt = self.context.get_config_value("product_format")
+
+        if (fmt.lower() == "netcdf4") or (fmt.lower() == "netcdf"):
+            return "nc"
+        elif fmt.lower() == "csv":
+            return "csv"
         else:
             raise NameError("Invalid fmt: " + fmt)
+
+    def return_directory(self, directory=None):
+        """
+        Return product directory, with respect to context and specified value
+
+        :type directory: str
+        :param directory: (optional, required if self.context is None) directory to write to.
+        overwrites directory determined from self.context
+
+        :return: directory
+        :rtype: str
+        """
+
+        if directory is None:
+            if self.context is None:
+                raise ValueError(
+                    "cannot write without either the self.context or directory parameters specified"
+                )
+
+            directory = self.context.get_config_value("archive_directory")
+            if "to_archive" in self.context.get_config_names():
+                if self.context.get_config_value("to_archive"):
+                    archive_directory = self.context.get_config_value(
+                        "archive_directory"
+                    )
+
+                    site = self.context.get_config_value("site")
+                    year = self.context.get_config_value("time").year
+                    month = self.context.get_config_value("time").month
+                    day = self.context.get_config_value("time").day
+
+                    directory = os.path.join(
+                        archive_directory, site, str(year), str(month), str(day)
+                    )
+        return directory
 
     @staticmethod
     def _write_netcdf(ds, path, compression_level=None):
