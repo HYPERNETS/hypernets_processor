@@ -10,6 +10,10 @@ from hypernets_processor.test.test_functions import setup_test_context
 from hypernets_processor.version import __version__
 from xarray import Dataset
 import numpy as np
+import os
+import string
+import random
+import shutil
 
 
 '''___Authorship___'''
@@ -28,15 +32,30 @@ class TestHypernetsWriter(unittest.TestCase):
 
     @patch('hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter._write_netcdf')
     def test_write_netcdf(self, mock_write):
-        context = setup_test_context()
+        tmpdir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
+        context = setup_test_context(
+            raw_data_directory=os.path.join(tmpdir, "data"),
+            archive_directory=os.path.join(tmpdir, "out"),
+            metadata_db_url="sqlite:///" + tmpdir + "/metadata.db",
+            anomoly_db_url="sqlite:///" + tmpdir + "/anomoly.db",
+            archive_db_url="sqlite:///" + tmpdir + "/archive.db",
+            create_directories=True,
+            create_dbs=True
+        )
 
         ds = Dataset()
         ds.attrs["product_name"] = "test"
 
         hw = HypernetsWriter(context=context)
 
-        hw.write(ds, fmt="netcdf")
-        mock_write.assert_called_once_with(ds, "out/site/2021/4/3/test.nc", compression_level=None)
+        hw.write(ds)
+        mock_write.assert_called_once_with(
+            ds,
+            os.path.join(tmpdir, "out", "site", "2021", "4", "3", "test.nc"),
+            compression_level=None
+        )
+
+        shutil.rmtree(tmpdir)
 
     @patch('hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter._write_netcdf')
     def test_write_no_context_netcdf(self, mock_write):
@@ -58,13 +77,21 @@ class TestHypernetsWriter(unittest.TestCase):
         hw.write(ds, directory="test", fmt="csv")
         mock_write.assert_called_once_with(ds, "test/test.csv")
 
-    def test_write_no_context_no_directory_netcdf(self):
+    def test_write_no_context_nofmt_netcdf(self):
         ds = Dataset()
         ds.attrs["product_name"] = "test"
 
         hw = HypernetsWriter()
 
         self.assertRaises(ValueError, hw.write, ds)
+
+    def test_write_no_context_nodirectory_netcdf(self):
+        ds = Dataset()
+        ds.attrs["product_name"] = "test"
+
+        hw = HypernetsWriter()
+
+        self.assertRaises(ValueError, hw.write, ds, fmt="netCDF4")
 
     def test_write_no_context_badfmt(self):
         ds = Dataset()
