@@ -116,9 +116,10 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "hypernets_processor =  hypernets_processor.cli.hypernets_processor_cli:cli",
-            "hypernets_processor_setup =  hypernets_processor.cli.setup_processor_cli:cli",
-            "hypernets_processor_job_init =  hypernets_processor.cli.init_job_cli:cli"
+            "hypernets_sequence_processor = hypernets_processor.cli.sequence_processor_cli:cli",
+            "hypernets_scheduler = hypernets_processor.cli.hypernets_scheduler_cli:cli",
+            "hypernets_processor_setup = hypernets_processor.cli.setup_processor_cli:cli",
+            "hypernets_processor_job_init = hypernets_processor.cli.init_job_cli:cli"
         ],
     },
 )
