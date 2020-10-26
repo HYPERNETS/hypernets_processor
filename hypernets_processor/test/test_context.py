@@ -119,7 +119,7 @@ class TestContext(unittest.TestCase):
         self.assertEqual(context.get_config_value("site"), "site")
         self.assertEqual(context.get_config_value("raw_data_directory"), "data")
         self.assertEqual(
-            context.get_config_value("anomoly_db_url"), "sqlite:///anomoly.db"
+            context.get_config_value("anomaly_db_url"), "sqlite:///anomaly.db"
         )
         self.assertEqual(
             context.get_config_value("measurement_function_name"),
@@ -140,9 +140,9 @@ class TestContext(unittest.TestCase):
 
         # Test dbs
         self.assertEqual(context.metadata_db, mock_dataset.connect.return_value)
-        self.assertEqual(context.anomoly_db, mock_dataset.connect.return_value)
+        self.assertEqual(context.anomaly_db, mock_dataset.connect.return_value)
         self.assertCountEqual(
-            [call("sqlite:///anomoly.db"), call("sqlite:///metadata.db")],
+            [call("sqlite:///anomaly.db"), call("sqlite:///metadata.db")],
             mock_dataset.connect.call_args_list,
         )
 
