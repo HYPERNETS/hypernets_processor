@@ -365,25 +365,23 @@ class HypernetsReader:
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
             # look for latitude and longitude or lat and lon , more elegant way??
-            if 'latitude' in globalattr.keys():
-                lat = globalattr['latitude']
+            if 'latitude' in (globalattr.keys()):
+                lat = float(globalattr['latitude'])
+            elif 'lat' in (globalattr.keys()):
+                lat = float(globalattr['lat'])
             else:
-                lat = globalattr['lat']
-
-            if not lat.isdigit():
                 print("Latitude is not given, use default")
-                lat=self.context.get_config_value("lat")
-                flag=flag+2**self.context.get_config_value("lat_default")
+                lat = self.context.get_config_value("lat")
+                flag = flag + 2 ** self.context.get_config_value("lat_default")
 
-            if 'longitude' in globalattr.keys():
-                lon = globalattr['longitude']
+            if 'longitude' in (globalattr.keys()):
+                lon = float(globalattr['longitude'])
+            elif 'lon' in (globalattr.keys()):
+                lon = float(globalattr['lon'])
             else:
-                lon = globalattr['lon']
-
-            if not lon.isdigit():
                 print("Longitude is not given, use default")
-                lon=self.context.get_config_value("lon")
-                flag=flag+2**self.context.get_config_value("lon_default")
+                lon = self.context.get_config_value("lon")
+                flag = flag + 2 ** self.context.get_config_value("lon_default")
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
