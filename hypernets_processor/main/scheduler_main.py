@@ -5,7 +5,7 @@ Main function for running scheduler
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import read_config_file, read_jobs_list
 from hypernets_processor.utils.logging import configure_logging
-from hypernets_processor.utils.config import get_config_value, PROCESSOR_CONFIG_PATH
+from hypernets_processor.utils.config import get_config_value, PROCESSOR_CONFIG_PATH, JOBS_FILE_PATH
 from hypernets_processor import Scheduler
 from hypernets_processor.main.sequence_processor_main import main as processor_main
 
@@ -53,7 +53,11 @@ def unpack_scheduler_config(scheduler_config):
         scheduler_config_dict[sch]["hours"] = get_config_value(scheduler_config, sch, "hours", dtype=int)
         scheduler_config_dict[sch]["start_time"] = get_config_value(scheduler_config, sch, "start_time", dtype=str)
         scheduler_config_dict[sch]["parallel"] = get_config_value(scheduler_config, sch, "seconds", dtype=bool)
+
+        # Use custom jobs list provided, else use default
         scheduler_config_dict[sch]["jobs_list"] = get_config_value(scheduler_config, sch, "jobs_list", dtype=str)
+        if scheduler_config_dict[sch]["jobs_list"] is None:
+            scheduler_config_dict[sch]["jobs_list"] = JOBS_FILE_PATH
 
         # todo - sort out start time format
 
