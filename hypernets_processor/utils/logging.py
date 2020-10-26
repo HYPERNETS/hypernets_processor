@@ -21,7 +21,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def configure_logging(fname=None, verbose=None, quiet=None, config=None):
+def configure_logging(fname=None, verbose=None, quiet=None, config=None, name=None):
     """
     Configure logger
 
@@ -38,6 +38,9 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None):
     :param config: Config file with logging configuration information. This finds fname, verbose and quiet if not
     specifed as arguments
 
+    :type name: str
+    :param name: (optional) set name of logger to get
+
     :return: logger
     :rtype: logging.logger
     """
@@ -48,7 +51,10 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None):
         quiet = get_config_value(config, "Log", "quiet", dtype=bool)
 
     # Configure logger
-    logger = logging.getLogger(__name__)
+    if name is None:
+        name = __name__
+
+    logger = logging.getLogger(name)
 
     # Define verboseness levels
     if verbose:

@@ -42,7 +42,7 @@ class TestSequenceProcessorMain(unittest.TestCase):
             raw_data_directory=os.path.join(tmpdir, "data"),
             archive_directory=os.path.join(tmpdir, "out"),
             metadata_db_url="sqlite:///"+tmpdir+"/metadata.db",
-            anomoly_db_url="sqlite:///"+tmpdir+"/anomoly.db",
+            anomaly_db_url="sqlite:///"+tmpdir+"/anomaly.db",
             archive_db_url="sqlite:///"+tmpdir+"/archive.db",
             create_directories=True,
             create_dbs=True
@@ -61,13 +61,14 @@ class TestSequenceProcessorMain(unittest.TestCase):
             raw_data_directory=os.path.join(tmpdir, "data"),
             archive_directory=os.path.join(tmpdir, "out"),
             metadata_db_url="sqlite:///" + tmpdir + "/metadata.db",
-            anomoly_db_url="sqlite:///" + tmpdir + "/anomoly.db",
+            anomaly_db_url="sqlite:///" + tmpdir + "/anomaly.db",
             archive_db_url="sqlite:///" + tmpdir + "/archive.db",
             create_directories=True,
             create_dbs=True
         )
 
         expected_sequences = [
+            os.path.join(tmpdir, "data", "SEQ20200311T112230"),
             os.path.join(tmpdir, "data", "SEQ20200311T112330"),
             os.path.join(tmpdir, "data", "SEQ20200311T112430"),
             os.path.join(tmpdir, "data", "SEQ20200311T112530")
@@ -84,7 +85,7 @@ class TestSequenceProcessorMain(unittest.TestCase):
             raw_data_directory=os.path.join(tmpdir, "data"),
             archive_directory=os.path.join(tmpdir, "out"),
             metadata_db_url="sqlite:///" + tmpdir + "/metadata.db",
-            anomoly_db_url="sqlite:///" + tmpdir + "/anomoly.db",
+            anomaly_db_url="sqlite:///" + tmpdir + "/anomaly.db",
             archive_db_url="sqlite:///" + tmpdir + "/archive.db",
             create_directories=True,
             create_dbs=True
@@ -108,7 +109,7 @@ class TestSequenceProcessorMain(unittest.TestCase):
             raw_data_directory=os.path.join(tmpdir, "data"),
             archive_directory=os.path.join(tmpdir, "out"),
             metadata_db_url="sqlite:///" + tmpdir + "/metadata.db",
-            anomoly_db_url="sqlite:///" + tmpdir + "/anomoly.db",
+            anomaly_db_url="sqlite:///" + tmpdir + "/anomaly.db",
             archive_db_url="sqlite:///" + tmpdir + "/archive.db",
             create_directories=True,
             create_dbs=True

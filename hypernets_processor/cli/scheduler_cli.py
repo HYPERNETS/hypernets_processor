@@ -1,9 +1,9 @@
 """
-scheduler for hypernets_processor jobs cli
+cli for job scheduler
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.hypernets_scheduler_main import main
+from hypernets_processor.main.scheduler_main import main
 from hypernets_processor.utils.config import SCHEDULER_CONFIG_PATH
 import argparse
 
@@ -41,7 +41,7 @@ parsed_args = parser.parse_args()
 
 def cli():
     """
-    Command line interface function for hypernets_scheduler_main
+    Command line interface function for scheduler_main
     """
 
     # run main

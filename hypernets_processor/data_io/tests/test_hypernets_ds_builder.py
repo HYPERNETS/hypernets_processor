@@ -27,7 +27,7 @@ class TestHypernetsDSBuilder(unittest.TestCase):
     def test_create_ds_template_context(self, mock_pnu, mock_create_template_dataset):
         temp_name = ''.join(random.choices(string.ascii_lowercase, k=6))
 
-        context = setup_test_context(anomoly_db_url="sqlite:///anomoly_"+temp_name+".db",
+        context = setup_test_context(anomaly_db_url="sqlite:///anomaly_"+temp_name+".db",
                                      metadata_db_url="sqlite:///metadata_"+temp_name+".db",
                                      create_dbs=True)
         dim_sizes_dict = {"n_w": 271, "n_s": 10}
