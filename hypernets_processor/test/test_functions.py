@@ -59,7 +59,13 @@ def setup_test_anomaly_db(url):
 
     db = HypernetsDBBuilder.create_db_template(url, "anomaly")
 
-    # todo - add test data to test anomaly db
+    db["anomalies"].insert(
+        dict(
+            anomaly="anomaly_name",
+            raw_product_name="SEQ20200311T112430",
+            site="site",
+        )
+    )
 
     db.commit()
     del db
@@ -78,14 +84,14 @@ def setup_test_archive_db(url):
     db["products"].insert(
         dict(
             product_name="new_product1",
-            raw_product_name="SEQ20200311T112230",
+            raw_product_name="SEQ20200311T112130",
             site="site",
         )
     )
     db["products"].insert(
         dict(
             product_name="new_product2",
-            raw_product_name="SEQ20200311T112330",
+            raw_product_name="SEQ20200311T112230",
             site="site",
         )
     )
@@ -234,6 +240,11 @@ def setup_test_context(
     if create_directories:
         os.makedirs(processor_config["Output"]["archive_directory"])
         os.makedirs(job_config["Input"]["raw_data_directory"])
+        os.makedirs(
+            os.path.join(
+                job_config["Input"]["raw_data_directory"], "SEQ20200311T112230"
+            )
+        )
         os.makedirs(
             os.path.join(
                 job_config["Input"]["raw_data_directory"], "SEQ20200311T112330"
