@@ -17,6 +17,8 @@ import os.path
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import string
+import shutil
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -63,6 +65,16 @@ def setup_test_files(context):
             hypstar)+"_radcal_L_"+str(caldate)+".dat")
     gainsE = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+str(
             hypstar)+"_radcal_E_"+str(caldate)+".dat")
+
+    ds_l0_rad["wavelength"].values = arr[1]
+    ds_l0_irr["wavelength"].values = arr[1]
+    ds_l0_bla["wavelength"].values = arr[1]
+    ds_l1a_rad["wavelength"].values = arr[1]
+    ds_l1a_irr["wavelength"].values = arr[1]
+    ds_l1b_rad["wavelength"].values = arr[1]
+    ds_l1b_irr["wavelength"].values = arr[1]
+    ds_l2a["wavelength"].values = arr[1]
+
     ds_l0_rad["digital_number"].values = arr[7]/1000
     ds_l0_rad["acquisition_time"].values = np.arange(30)
     ds_l0_rad["series_id"].values = np.repeat([1,2,3],10)
@@ -96,6 +108,7 @@ class TestEndToEnd(unittest.TestCase):
 
         tmpdir = "tmp_"+"".join(random.choices(string.ascii_lowercase,k=6))
         #context = setup_test_context()
+
         context = setup_test_context(
         raw_data_directory = os.path.join(tmpdir,"data"),
         archive_directory = os.path.join(tmpdir,"out"),
@@ -103,15 +116,32 @@ class TestEndToEnd(unittest.TestCase):
         anomoly_db_url = "sqlite:///"+tmpdir+"/anomoly.db",
         archive_db_url = "sqlite:///"+tmpdir+"/archive.db",
         create_directories = True,
-        create_dbs = True
-                 )
+        create_dbs = True )
 
         context.set_config_value('network', 'L')
         context.set_config_value('measurement_function_calibrate', 'StandardMeasurementFunction')
         context.set_config_value('measurement_function_interpolate', 'LandNetworkInterpolationIrradianceLinear')
         context.set_config_value('measurement_function_surface_reflectance', 'LandNetworkProtocol')
         context.set_config_value("processor_directory",this_directory_path)
+        context.set_config_value("archive_directory", os.path.join(tmpdir,"out"))
 
+        context.set_config_value('version','0.1')
+        context.set_config_value('site_abbr','test')
+        context.set_config_value('hypstar_cal_number','220241')
+        context.set_config_value('cal_date','200728')
+        context.set_config_value('outliers',7)
+
+        context.set_config_value('write_l2a',True)
+        context.set_config_value('write_l1a',True)
+        context.set_config_value('write_l1b',True)
+        context.set_config_value('plot_l2a',True)
+        context.set_config_value('plot_l1a',True)
+        context.set_config_value('plot_l1b',True)
+        context.set_config_value('plot_diff',True)
+        context.set_config_value('plotting_directory',os.path.join(tmpdir,"out/plots/"))
+        context.set_config_value('plotting_fmt',"png")
+
+        print(context.get_config_value('plotting_directory'))
         cal = Calibrate(context,MCsteps=100)
         intp = Interpolate(context,MCsteps=1000)
         surf = SurfaceReflectance(context,MCsteps=1000)
@@ -119,12 +149,8 @@ class TestEndToEnd(unittest.TestCase):
         test_l0_rad,test_l0_irr,test_l0_bla,test_l1a_rad,test_l1a_irr,test_l1b_rad,test_l1b_irr,test_l2a,test_l2a_avg=setup_test_files(context)
 
         L1a_rad = cal.calibrate_l1a("radiance",test_l0_rad,test_l0_bla)
-        # print("flag",L1a_rad["quality_flag"].values)
         L1a_irr = cal.calibrate_l1a("irradiance",test_l0_irr,test_l0_bla)
-        # print("mainL0",test_l0_rad["digital_number"].values[500,:])
-        # print("mainL1a",L1a_rad["radiance"].values[500,:])
         L1b_rad = cal.average_l1b("radiance",L1a_rad)
-        # print("mainL1b",L1b_rad["radiance"].values[500])
         L1b_irr = cal.average_l1b("irradiance",L1a_irr)
         L1c = intp.interpolate_l1c(L1b_rad,L1b_irr)
         L2a = surf.process(L1c)
@@ -137,6 +163,7 @@ class TestEndToEnd(unittest.TestCase):
         np.testing.assert_allclose(test_l2a["reflectance"].values,L2a["reflectance"].values,rtol=0.19,equal_nan=True)
         np.testing.assert_allclose(np.nansum(test_l2a["reflectance"].values),np.nansum(L2a["reflectance"].values),rtol=0.05,equal_nan=True)
         np.testing.assert_allclose(np.nansum(test_l2a_avg["reflectance"].values),np.nansum(L2a["reflectance"].values),rtol=0.001,equal_nan=True)
-        # print(L2a["reflectance"].values)
+        #shutil.rmtree(tmpdir)
+
 if __name__ == '__main__':
     unittest.main()

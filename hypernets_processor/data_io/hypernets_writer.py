@@ -157,7 +157,8 @@ class HypernetsWriter:
 
         for variable in ds.variables.keys():
             idx = np.where(np.isnan(ds[variable]))
-            ds[variable][idx] = ds[variable]._FillValue
+            if np.sum(idx)>0:
+                ds[variable][idx] = ds[variable]._FillValue
 
         return ds
 

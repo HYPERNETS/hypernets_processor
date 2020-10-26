@@ -9,6 +9,7 @@ import punpy
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.dataset_util import DatasetUtil
+from hypernets_processor.plotting.plotting import Plotting
 import numpy as np
 
 '''___Authorship___'''
@@ -25,6 +26,7 @@ class Calibrate:
         self.prop = punpy.MCPropagation(MCsteps, parallel_cores=parallel_cores)
         self.hdsb = HypernetsDSBuilder(context=context)
         self.writer = HypernetsWriter(context)
+        self.plot = Plotting(context)
         self.context = context
 
     def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla):
@@ -51,6 +53,9 @@ class Calibrate:
                                                         u_random_input_qty_l1a, u_systematic_input_qty_l1a)
         if self.context.get_config_value("write_l1a"):
             self.writer.write(dataset_l1a, overwrite=True)
+
+        if self.context.get_config_value("plot_l1a"):
+            self.plot.plot_scans_in_series(measurandstring,dataset_l1a)
 
         return dataset_l1a
 
@@ -106,9 +111,14 @@ class Calibrate:
         dataset_l1b["corr_systematic_" + measurandstring].values = self.calc_mean_masked(dataset_l1a,
                                                                                          "corr_systematic_" + measurandstring,
                                                                                          corr=True)
+        if self.context.get_config_value("write_l1b"):
+            self.writer.write(dataset_l1b, overwrite=True)
 
-        self.writer.write(dataset_l1b, overwrite=True)
+        if self.context.get_config_value("plot_l1b"):
+            self.plot.plot_series_in_sequence(measurandstring,dataset_l1b)
 
+        if self.context.get_config_value("plot_diff"):
+            self.plot.plot_diff_scans(measurandstring,dataset_l1a,dataset_l1b)
         return dataset_l1b
 
     def calc_mean_masked(self, dataset, var, rand_unc=False, corr=False):
