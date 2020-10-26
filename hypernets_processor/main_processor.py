@@ -163,17 +163,12 @@ class HypernetsProcessor:
         L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
         L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
 
-        if self.context.get_config_value("plot_l1a"):
-            plot.plot_scans_in_series("radiance",L1a_rad)
-            plot.plot_scans_in_series("irradiance",L1a_irr)
+
 
         test_L1b_rad = cal.average_l1b("radiance",L1a_rad)
         test_L1b_irr = cal.average_l1b("irradiance",L1a_irr)
 
-        if self.context.get_config_value("plot_l1b"):
-            plot.plot_series_in_sequence("radiance",test_L1b_rad)
-            plot.plot_diff_scans("radiance",L1a_rad)
-            plot.plot_diff_scans("radiance",L1a_rad,test_L1b_rad)
+
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 
@@ -200,8 +195,7 @@ class HypernetsProcessor:
         #L1d_irr = cal.average_l1b("irradiance", L1c)
 
         L2a = surf.process(L1c)
-        if self.context.get_config_value("plot_l2a"):
-            plot.plot_series_in_sequence("nlw",test_L1b_rad)
+
 
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 

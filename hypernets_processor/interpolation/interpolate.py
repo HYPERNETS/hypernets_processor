@@ -67,7 +67,8 @@ class Interpolate:
 
         dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr)
 
-        self.writer.write(dataset_l1c,overwrite=True)
+        if self.context.get_config_value("write_l1c"):
+            self.writer.write(dataset_l1c,overwrite=True)
         return dataset_l1c
 
     def interpolate_irradiance(self,dataset_l1c,dataset_l1b_irr):

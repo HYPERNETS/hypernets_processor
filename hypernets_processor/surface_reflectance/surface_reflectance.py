@@ -8,6 +8,7 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import ProtocolFactory
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
+from hypernets_processor.plotting.plotting import Plotting
 
 import punpy
 import numpy as np
@@ -28,6 +29,7 @@ class SurfaceReflectance:
         self.hdsb = HypernetsDSBuilder(context=context)
         self.writer = HypernetsWriter(context)
         self.calibrate = Calibrate(context)
+        self.plot = Plotting(context)
         self.context = context
         self.rh = RhymerHypstar(context)
 
@@ -92,8 +94,8 @@ class SurfaceReflectance:
                 dataset_l2a["corr_systematic_" + measurandstring].values = self.calibrate.calc_mean_masked(dataset,
                                                                                                            "corr_systematic_" + measurandstring,
                                                                                                            corr=True)
-
-                self.writer.write(dataset_l2a, overwrite=True)
+                if self.context.get_config_value("plot_l2a"):
+                    self.plot.plot_series_in_sequence(measurandstring,dataset_l2a)
 
         elif self.context.get_config_value("network") == "L":
             dataset_l2a = self.l2_from_l1c_dataset(dataset)
@@ -101,8 +103,14 @@ class SurfaceReflectance:
                                                             l1tol2_function.function,
                                                             input_qty, u_random_input_qty,
                                                             u_systematic_input_qty)
-
+            if self.context.get_config_value("plot_l2a"):
+                self.plot.plot_series_in_sequence("reflectance",dataset_l2a)
+                print("plotting")
+        if self.context.get_config_value("write_l2a"):
             self.writer.write(dataset_l2a, overwrite=True)
+
+
+
         return dataset_l2a
 
     def find_input(self, variables, dataset):
