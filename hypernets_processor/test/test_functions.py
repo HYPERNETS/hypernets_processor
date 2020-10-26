@@ -49,17 +49,17 @@ def setup_test_metadata_db(url):
     del db
 
 
-def setup_test_anomoly_db(url):
+def setup_test_anomaly_db(url):
     """
-    Creates anomoly_db for testing, populated with test data
+    Creates anomaly_db for testing, populated with test data
 
     :type url: str
     :param url: database url
     """
 
-    db = HypernetsDBBuilder.create_db_template(url, "anomoly")
+    db = HypernetsDBBuilder.create_db_template(url, "anomaly")
 
-    # todo - add test data to test anomoly db
+    # todo - add test data to test anomaly db
 
     db.commit()
     del db
@@ -105,7 +105,7 @@ def setup_test_processor_config(
     archive_directory=None,
     metadata_db_url=None,
     archive_db_url=None,
-    anomoly_db_url=None,
+    anomaly_db_url=None,
 ):
     """
     Creates processor_config for testing
@@ -119,8 +119,8 @@ def setup_test_processor_config(
     :type archive_db_url: str
     :param archive_db_url: (optional) archive db url, set if provided else default value used
 
-    :type anomoly_db_url: str
-    :param anomoly_db_url: (optional) anomoly db url, set if provided else default value used
+    :type anomaly_db_url: str
+    :param anomaly_db_url: (optional) anomaly db url, set if provided else default value used
 
     :return: test processor configuration information
     :rtype: configparser.RawConfigParser
@@ -134,8 +134,8 @@ def setup_test_processor_config(
         metadata_db_url if metadata_db_url is not None else "sqlite:///metadata.db"
     )
 
-    processor_config["Databases"]["anomoly_db_url"] = (
-        anomoly_db_url if anomoly_db_url is not None else "sqlite:///anomoly.db"
+    processor_config["Databases"]["anomaly_db_url"] = (
+        anomaly_db_url if anomaly_db_url is not None else "sqlite:///anomaly.db"
     )
 
     processor_config["Databases"]["archive_db_url"] = (
@@ -187,7 +187,7 @@ def setup_test_logger():
 def setup_test_context(
     raw_data_directory=None,
     archive_directory=None,
-    anomoly_db_url=None,
+    anomaly_db_url=None,
     metadata_db_url=None,
     archive_db_url=None,
     create_directories=False,
@@ -202,8 +202,8 @@ def setup_test_context(
     :type archive_directory: str
     :param archive_directory: (optional) data archive directory, set if provided else default value used
 
-    :type anomoly_db_url: str
-    :param anomoly_db_url: (opitional) anomoly db url, set if provided
+    :type anomaly_db_url: str
+    :param anomaly_db_url: (opitional) anomaly db url, set if provided
 
     :type metadata_db_url: str
     :param metadata_db_url: (optional) metadata db url, set if provided else default value used
@@ -224,7 +224,7 @@ def setup_test_context(
     processor_config = setup_test_processor_config(
         archive_directory=archive_directory,
         metadata_db_url=metadata_db_url,
-        anomoly_db_url=anomoly_db_url,
+        anomaly_db_url=anomaly_db_url,
         archive_db_url=archive_db_url,
     )
     job_config = setup_test_job_config(raw_data_directory=raw_data_directory)
@@ -252,12 +252,12 @@ def setup_test_context(
 
     if create_dbs:
         setup_test_metadata_db(processor_config["Databases"]["metadata_db_url"])
-        setup_test_anomoly_db(processor_config["Databases"]["anomoly_db_url"])
+        setup_test_anomaly_db(processor_config["Databases"]["anomaly_db_url"])
         setup_test_archive_db(processor_config["Databases"]["archive_db_url"])
 
     if not create_dbs:
         processor_config["Databases"]["metadata_db_url"] = None
-        processor_config["Databases"]["anomoly_db_url"] = None
+        processor_config["Databases"]["anomaly_db_url"] = None
         processor_config["Databases"]["archive_db_url"] = None
 
     context = Context(
@@ -288,9 +288,9 @@ def teardown_test_context(context, remove_directories=False, remove_dbs=False):
         del context.metadata_db
         os.remove(metadata_db_path)
 
-        anomoly_db_path = context.anomoly_db.engine.url.database
-        del context.anomoly_db
-        os.remove(anomoly_db_path)
+        anomaly_db_path = context.anomaly_db.engine.url.database
+        del context.anomaly_db
+        os.remove(anomaly_db_path)
 
         archive_db_path = context.archive_db.engine.url.database
         del context.archive_db
