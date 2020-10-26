@@ -87,7 +87,7 @@ def cli():
             default="sqlite:///"+os.path.join(settings["working_directory"], db_fmt+".db"),
         )
 
-    settings["log_path"] = os.path.join(settings["working_directory"], "processor.log")
+    settings["log_path"] = os.path.join(settings["working_directory"], "scheduler.log")
 
     main(settings)
 

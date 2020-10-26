@@ -8,6 +8,7 @@ from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceR
 from hypernets_processor.interpolation.interpolate import InterpolateL1c
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.data_io.hypernets_reader import HypernetsReader
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
 import numpy as np
 
@@ -44,6 +45,7 @@ class SequenceProcessor:
 
         # update context
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
+        writer = HypernetsWriter(self.context)
 
         # Read L0
         self.context.logger.debug("Reading raw data...")
@@ -51,21 +53,38 @@ class SequenceProcessor:
         l0_irr, l0_rad, l0_bla = reader.read_sequence(sequence_path)
         self.context.logger.debug("Done")
 
-        # Calibrate to L1a
-        self.context.logger.debug("Calibrating L1a...")
-        calibrate = Calibrate(self.context, MCsteps=100)
-        L1a_rad = calibrate.calibrate_l1a("radiance", l0_rad, l0_bla)
-        L1a_irr = calibrate.calibrate_l1a("irradiance", l0_irr, l0_bla)
-        self.context.logger.debug("Done")
+        # Write L0
+        if self.context.get_config_value("write_l0"):
+            self.context.logger.debug("Writing L0 data...")
+            writer.write(l0_irr)
+            writer.write(l0_rad)
+            writer.write(l0_bla)
+            # todo - add to archive database if to_archive
+            self.context.logger.debug("Done")
 
-        if self.context.get_config_value("network") == "w":
-            pass
-
-        elif self.context.get_config_value("network") == "l":
-            pass
-
-        else:
-            raise NameError("Invalid network: " + self.context.get_config_value("network"))
+        # # Calibrate to L1a
+        # self.context.logger.debug("Calibrating L1a...")
+        # calibrate = Calibrate(self.context, MCsteps=100)
+        # L1a_rad = calibrate.calibrate_l1a("radiance", l0_rad, l0_bla)
+        # L1a_irr = calibrate.calibrate_l1a("irradiance", l0_irr, l0_bla)
+        # self.context.logger.debug("Done")
+        #
+        # # Write L1a
+        # if self.context.get_config_value("write_L1a"):
+        #     self.context.logger.debug("Writing L1a data...")
+        #     writer.write(L1a_rad)
+        #     writer.write(L1a_irr)
+        #     # todo - add to archive database if to_archive
+        #     self.context.logger.debug("Done")
+        #
+        # if self.context.get_config_value("network") == "w":
+        #     pass
+        #
+        # elif self.context.get_config_value("network") == "l":
+        #     pass
+        #
+        # else:
+        #     raise NameError("Invalid network: " + self.context.get_config_value("network"))
 
         return None
 

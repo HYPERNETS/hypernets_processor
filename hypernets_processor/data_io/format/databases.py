@@ -40,8 +40,13 @@ Database schema specification for Hypernets land and water network
 # Metadata Database
 METADATA_DB = {}
 
-# Anolomy Database
-ANOMOLY_DB = {}
+# Anomaly Database
+ANOMALY_DB = {"anomalies": {"columns": {"anomaly": {"type": str},
+                                        "raw_product_name": {"type": str},
+                                        "site": {"type": str}
+                                        }
+                            }
+              }
 
 # Archive Database
 ARCHIVE_DB = {"products": {"columns": {"product_name": {"type": str},
@@ -56,5 +61,5 @@ ARCHIVE_DB = {"products": {"columns": {"product_name": {"type": str},
 # --------------------
 
 DB_DICT_DEFS = {"metadata": METADATA_DB,
-                "anomoly": ANOMOLY_DB,
+                "anomaly": ANOMALY_DB,
                 "archive": ARCHIVE_DB}

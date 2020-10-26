@@ -6,10 +6,12 @@ import unittest
 from unittest.mock import patch, MagicMock
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
-from hypernets_processor.test.test_functions import setup_test_context
+from hypernets_processor.context import Context
 from hypernets_processor.version import __version__
 from xarray import Dataset
 import numpy as np
+import os
+from datetime import datetime as dt
 
 
 '''___Authorship___'''
@@ -26,53 +28,95 @@ __status__ = "Development"
 
 class TestHypernetsWriter(unittest.TestCase):
 
+    def test_return_fmt_netcdf(self):
+        hw = HypernetsWriter()
+        self.assertEqual("nc", hw.return_fmt(fmt="netcdf"))
+
+    def test_return_fmt_netcdf4(self):
+        hw = HypernetsWriter()
+        self.assertEqual("nc", hw.return_fmt(fmt="netcdf4"))
+
+    def test_return_fmt_csv(self):
+        hw = HypernetsWriter()
+        self.assertEqual("csv", hw.return_fmt(fmt="csv"))
+
+    def test_return_fmt_invalid(self):
+        hw = HypernetsWriter()
+        self.assertRaises(NameError, hw.return_fmt, "invalid")
+
+    def test_return_fmt_context(self):
+        context = Context()
+        context.set_config_value("product_format", "netcdf")
+        hw = HypernetsWriter(context)
+        self.assertEqual("nc", hw.return_fmt())
+
+    def test_return_fmt_noinput(self):
+        hw = HypernetsWriter()
+        self.assertRaises(ValueError, hw.return_fmt)
+
+    def test_return_directory(self):
+        hw = HypernetsWriter()
+        self.assertEqual("directory", hw.return_directory(directory="directory"))
+
+    def test_return_directory_context_toarchive(self):
+        context = Context()
+        context.set_config_value("archive_directory", "directory")
+        context.set_config_value("site", "site")
+        context.set_config_value("time", dt(2020, 4, 5, 11, 23, 4, 5))
+        context.set_config_value("to_archive", True)
+
+        hw = HypernetsWriter(context)
+        self.assertEqual(os.path.join("directory", "site", "2020", "4", "5"), hw.return_directory())
+
+    def test_return_directory_context_nottoarchive(self):
+        context = Context()
+        context.set_config_value("archive_directory", "directory")
+        context.set_config_value("site", "site")
+        context.set_config_value("time", dt(2020, 4, 5, 11, 23, 4, 5))
+        context.set_config_value("to_archive", False)
+
+        hw = HypernetsWriter(context)
+        self.assertEqual(os.path.join("directory"), hw.return_directory())
+
+    def test_return_directory_noinput(self):
+        hw = HypernetsWriter()
+        self.assertRaises(ValueError, hw.return_directory)
+
+    @patch(
+        'hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter.return_fmt',
+        return_value="nc"
+    )
+    @patch(
+        'hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter.return_directory',
+        return_value="directory"
+    )
     @patch('hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter._write_netcdf')
-    def test_write_netcdf(self, mock_write):
-        context = setup_test_context()
-
-        ds = Dataset()
-        ds.attrs["product_name"] = "test"
-
-        hw = HypernetsWriter(context=context)
-
-        hw.write(ds, fmt="netcdf")
-        mock_write.assert_called_once_with(ds, "out/site/2021/4/3/test.nc", compression_level=None)
-
-    @patch('hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter._write_netcdf')
-    def test_write_no_context_netcdf(self, mock_write):
+    def test_write_netcdf(self, mock_write, mock_dir, mock_fmt):
         ds = Dataset()
         ds.attrs["product_name"] = "test"
 
         hw = HypernetsWriter()
 
-        hw.write(ds, directory="test", fmt="netcdf")
-        mock_write.assert_called_once_with(ds, "test/test.nc", compression_level=None)
+        hw.write(ds)
+        mock_write.assert_called_once_with(ds, os.path.join("directory", "test.nc"), compression_level=None)
 
+    @patch(
+        'hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter.return_fmt',
+        return_value="csv"
+    )
+    @patch(
+        'hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter.return_directory',
+        return_value="directory"
+    )
     @patch('hypernets_processor.data_io.tests.test_hypernets_writer.HypernetsWriter._write_csv')
-    def test_write_no_context_csv(self, mock_write):
+    def test_write_csv(self, mock_write, mock_dir, mock_fmt):
         ds = Dataset()
         ds.attrs["product_name"] = "test"
 
         hw = HypernetsWriter()
 
-        hw.write(ds, directory="test", fmt="csv")
-        mock_write.assert_called_once_with(ds, "test/test.csv")
-
-    def test_write_no_context_no_directory_netcdf(self):
-        ds = Dataset()
-        ds.attrs["product_name"] = "test"
-
-        hw = HypernetsWriter()
-
-        self.assertRaises(ValueError, hw.write, ds)
-
-    def test_write_no_context_badfmt(self):
-        ds = Dataset()
-        ds.attrs["product_name"] = "test"
-
-        hw = HypernetsWriter()
-
-        self.assertRaises(NameError, hw.write, ds, directory="asdfasdf", fmt="dsfdfg")
+        hw.write(ds)
+        mock_write.assert_called_once_with(ds, os.path.join("directory", "test.csv")  )
 
     def test__write_netcdf(self):
 
