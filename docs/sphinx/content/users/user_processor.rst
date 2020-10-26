@@ -89,7 +89,7 @@ All jobs are run regularly, processing any new data synced to the server from th
 
    $ vim <installation_directory>/hypernets_processor/etc/scheduler.config
 
-Processed products are added to the data archive and listed in the archive database. Any anomolies are add to the anomoly database. More detailed job related log information is added to the job log file. Summary log information for all jobs is added to the processor log file.
+Processed products are added to the data archive and listed in the archive database. Any anomalies are add to the anomaly database. More detailed job related log information is added to the job log file. Summary log information for all jobs is added to the processor log file.
 
 To amend the list of scheduled jobs, edit the list of job configuration files listed in the processor jobs file as::
 
