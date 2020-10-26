@@ -1,13 +1,13 @@
 """
-Main function for hypernets_scheduler_cli to run
+Main function for running scheduler
 """
 
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import read_config_file, read_jobs_list
 from hypernets_processor.utils.logging import configure_logging
-from hypernets_processor.utils.config import get_config_value
+from hypernets_processor.utils.config import get_config_value, PROCESSOR_CONFIG_PATH
 from hypernets_processor import Scheduler
-from hypernets_processor.cli.hypernets_processor_main import main as processor_main
+from hypernets_processor.main.sequence_processor_main import main as processor_main
 
 
 '''___Authorship___'''
@@ -21,10 +21,10 @@ __status__ = "Development"
 
 def unpack_scheduler_config(scheduler_config):
     """
-    Returns information from scheduler configuration file
+    Returns information from scheduler configuration information
 
-    :type fname: str
-    :param fname: path of configuration file
+    :type scheduler_config: configparser.RawConfigParser
+    :param scheduler_config: scheduler configuration
 
     :rtype: dict
     :return: scheduler configuration information, with entries (defaults occur if entry omitted from config file):
@@ -93,8 +93,8 @@ def main(scheduler_config_path):
 
         # read job config file to set job name
         job_config = read_config_file(job_config_path)
-        if ("Job" in job_config.keys()) and ("name" in job_config["name"].keys()):
-            scheduler_job_config["name"] = job_config["Job"]["name"]
+        if ("Job" in job_config.keys()) and ("job_name" in job_config["Job"].keys()):
+            scheduler_job_config["name"] = job_config["Job"]["job_name"]
         else:
             scheduler_job_config["name"] = job_config_path
 
@@ -108,7 +108,9 @@ def main(scheduler_config_path):
         # schedule job
         processor_sch.schedule(processor_main,
                                scheduler_job_config=scheduler_job_config,
-                               job_config_path=job_config_path)
+                               job_config_path=job_config_path,
+                               processor_config_path=PROCESSOR_CONFIG_PATH,
+                               to_archive=True)
 
     # run scheduled jobs
     processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
