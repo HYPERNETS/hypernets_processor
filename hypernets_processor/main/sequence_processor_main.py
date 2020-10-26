@@ -48,7 +48,7 @@ def get_target_sequences(context, to_archive):
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
 
-    if to_archive:
+    if to_archive is True:
         processed_products = [
             product["raw_product_name"]
             for product in context.archive_db["products"].find(
@@ -56,10 +56,19 @@ def get_target_sequences(context, to_archive):
             )
         ]
 
+        failed_products = [
+            product["raw_product_name"]
+            for product in context.anomaly_db["anomalies"].find(
+                site=context.get_config_value("site")
+            )
+        ]
+
+        complete_products = processed_products + failed_products
+
         directory = os.path.dirname(raw_paths[0])
 
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
-        raw_products = list(set(raw_products) - set(processed_products))
+        raw_products = list(set(raw_products) - set(complete_products))
         raw_paths = [
             os.path.join(directory, raw_product) for raw_product in raw_products
         ]

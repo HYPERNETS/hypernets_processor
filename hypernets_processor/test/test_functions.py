@@ -62,7 +62,7 @@ def setup_test_anomaly_db(url):
     db["anomalies"].insert(
         dict(
             anomaly="anomaly_name",
-            raw_product_name="SEQ20200311T112430",
+            raw_product_name="SEQ20200311T112330",
             site="site",
         )
     )

@@ -68,6 +68,7 @@ class TestSequenceProcessorMain(unittest.TestCase):
         )
 
         expected_sequences = [
+            os.path.join(tmpdir, "data", "SEQ20200311T112230"),
             os.path.join(tmpdir, "data", "SEQ20200311T112330"),
             os.path.join(tmpdir, "data", "SEQ20200311T112430"),
             os.path.join(tmpdir, "data", "SEQ20200311T112530")
