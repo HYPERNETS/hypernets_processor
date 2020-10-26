@@ -94,7 +94,11 @@ def main(processor_config_path, job_config_path, to_archive):
     job_config = read_config_file(job_config_path)
 
     # Configure logging
-    logger = configure_logging(config=job_config)
+    name = __name__
+    if "job_name" in job_config["Job"].keys():
+        name = job_config["Job"]["job_name"]
+
+    logger = configure_logging(config=job_config, name=name)
 
     # Define context
     context = Context(

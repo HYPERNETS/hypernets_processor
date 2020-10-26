@@ -81,7 +81,7 @@ def main(scheduler_config_path):
 
     scheduler_config = read_config_file(scheduler_config_path)
 
-    logger = configure_logging(config=scheduler_config)
+    logger = configure_logging(config=scheduler_config, name=__name__)
 
     scheduler_config = unpack_scheduler_config(scheduler_config)
 
