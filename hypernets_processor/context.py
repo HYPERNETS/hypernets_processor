@@ -36,7 +36,7 @@ class Context:
         self.config_values = {}
         self.logger = logger
         self.metadata_db = None
-        self.anomoly_db = None
+        self.anomaly_db = None
         self.archive_db = None
 
         # Unpack processor_config to set relevant attributes
@@ -49,7 +49,7 @@ class Context:
                 job_config, protected_values=PROCESSOR_CONFIG_PROTECTED_VALUES
             )
 
-        # Connect to anomoly databases
+        # Connect to databases
         db_fmts = DB_DICT_DEFS.keys()
         for db_fmt in db_fmts:
             if db_fmt + "_db_url" in self.get_config_names():

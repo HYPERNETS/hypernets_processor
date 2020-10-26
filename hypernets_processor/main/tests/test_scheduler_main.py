@@ -1,13 +1,13 @@
 """
-Tests for hypernets_scheduler_main module
+Tests for scheduler_main module
 """
 
 import unittest
-from unittest import mock
 from unittest.mock import patch, call
 from hypernets_processor.version import __version__
-from hypernets_processor.cli.hypernets_scheduler_main import main, unpack_scheduler_config, read_jobs_list
-from hypernets_processor.cli.hypernets_processor_main import main as hpmain
+from hypernets_processor.main.scheduler_main import main, unpack_scheduler_config
+from hypernets_processor.utils.config import JOBS_FILE_PATH
+from hypernets_processor.main.sequence_processor_main import main as hpmain
 from configparser import RawConfigParser
 import os
 import random
@@ -78,7 +78,7 @@ def write_test_config_files(directory=this_directory):
 
 class TestHypernetsSchedulerMain(unittest.TestCase):
 
-    @patch('hypernets_processor.cli.hypernets_scheduler_main.Scheduler')
+    @patch('hypernets_processor.main.scheduler_main.Scheduler')
     def test_main(self, mock_sched):
 
         # main input parameters
@@ -95,10 +95,20 @@ class TestHypernetsSchedulerMain(unittest.TestCase):
         # define expected calls
         calls = []
         for job in job_list:
-            calls.append(call(hpmain,
-                              job_config_path=job,
-                              scheduler_job_config={'name': job, 'seconds': None, 'minutes': 3,
-                                                    'hours': None, 'parallel': False}))
+            calls.append(
+                call(
+                    hpmain,
+                    job_config_path=job,
+                    to_archive=True,
+                    scheduler_job_config={
+                        'name': job,
+                        'seconds': None,
+                        'minutes': 3,
+                        'hours': None,
+                        'parallel': False
+                    }
+                ),
+            )
 
         mock_sched.return_value.schedule.assert_has_calls(calls)
 
@@ -121,6 +131,21 @@ class TestHypernetsSchedulerMain(unittest.TestCase):
                                              "start_time": "2",
                                              "parallel": False,
                                              "jobs_list": "path"}}
+        self.assertDictEqual(expected_d, d)
+
+    def test_unpack_scheduler_config_nojoblist(self):
+        schedule_config = create_scheduler_config()
+        schedule_config.remove_option("Processor Schedule", "jobs_list")
+
+        d = unpack_scheduler_config(schedule_config)
+        self.assertEqual(type(d), dict)
+
+        expected_d = {"Processor Schedule": {"minutes": 3,
+                                             "seconds": None,
+                                             "hours": None,
+                                             "start_time": "2",
+                                             "parallel": False,
+                                             "jobs_list": JOBS_FILE_PATH}}
         self.assertDictEqual(expected_d, d)
 
 
