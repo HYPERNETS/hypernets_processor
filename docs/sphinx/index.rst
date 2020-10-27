@@ -17,6 +17,7 @@ For Users:
    :maxdepth: 2
 
    content/users/users
+   content/atbd/atbd
 
 For Developers:
 ~~~~~~~~~~~~~~~
@@ -30,7 +31,7 @@ API Documentation
 ~~~~~~~~~~~~~~~~~
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    content/API/hypernets_processor
 

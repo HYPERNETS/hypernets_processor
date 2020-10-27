@@ -3,14 +3,21 @@
    Email: sam.hunt@npl.co.uk
    Created: 22/10/20
 
-.. _user_processor:
+.. _user_automated:
 
 User Guide - Automated Processing
 =================================
 
-This section provides a user guide for running the `hypernets_processor` module as an automated processor of incoming field data. In this scenario, a set of field hypstar systems are regularly syncing raw data to a server.  Running on this server, the `hypernets_processor` processes the data and adds it to an archive that can be accessed through a user portal.
+This section provides a user guide for running the **hypernets_processor** module as an automated processor of incoming field data. In this scenario, a set of field hypstar systems are regularly syncing raw data to a server.  Running on this server, the **hypernets_processor** processes the data and adds it to an archive that can be accessed through a user portal.
 
 Covered in this section is installing and setting up the processor, setting up specific job (e.g. field site) and running the automated job scheduler.
+
+Prerequisites
+-------------
+
+**hypernets_processor** is distributed using Git, from the project's `GitHub <https://github.com/HYPERNETS/hypernets_processor>`_ repository. This can be installed on your Linux server using your package manager of choice, following the instruction on the `Git website <https://git-scm.com/download/linux>`_.
+
+Python 3 is required to run the software, the `Anaconda <https://www.anaconda.com>`_ distribution provides a convenient way to install this.
 
 Server Installation
 -------------------
@@ -38,6 +45,7 @@ Finally, commit any changes to the module made during set up and push::
 Any future changes to the processor configuration should be committed, to ensure appropriate version control. Updates to the processor are then made by merging release branches onto the operational branch (see :ref:`user_processor-updates`).
 
 .. _user_processor-processor_setup:
+
 Processor Configuration
 -----------------------
 
@@ -53,6 +61,7 @@ For further configuration one can directly edit the processor configuration file
 
 
 .. _user_processor-job_setup:
+
 Job Setup
 ---------
 
@@ -74,6 +83,7 @@ As well as defining required job configuration information, the job configuratio
 For all jobs, it is important relevant metadata be added to the metadata database, so it can be added to the data products.
 
 .. _user_processor-scheduler:
+
 Running Job Scheduler
 ---------------------
 
@@ -96,6 +106,7 @@ To amend the list of scheduled jobs, edit the list of job configuration files li
    $ vim <installation_directory>/hypernets_processor/etc/jobs.txt
 
 .. _user_processor-updates:
+
 Updates
 -------
 
