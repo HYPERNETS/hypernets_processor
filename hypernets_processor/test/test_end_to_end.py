@@ -113,7 +113,7 @@ class TestEndToEnd(unittest.TestCase):
         raw_data_directory = os.path.join(tmpdir,"data"),
         archive_directory = os.path.join(tmpdir,"out"),
         metadata_db_url = "sqlite:///"+tmpdir+"/metadata.db",
-        anomoly_db_url = "sqlite:///"+tmpdir+"/anomoly.db",
+        anomaly_db_url = "sqlite:///"+tmpdir+"/anomoly.db",
         archive_db_url = "sqlite:///"+tmpdir+"/archive.db",
         create_directories = True,
         create_dbs = True )
@@ -127,6 +127,7 @@ class TestEndToEnd(unittest.TestCase):
 
         context.set_config_value('version','0.1')
         context.set_config_value('site_abbr','test')
+        context.set_config_value('product_format','netcdf4')
         context.set_config_value('hypstar_cal_number','220241')
         context.set_config_value('cal_date','200728')
         context.set_config_value('outliers',7)
@@ -163,7 +164,7 @@ class TestEndToEnd(unittest.TestCase):
         np.testing.assert_allclose(test_l2a["reflectance"].values,L2a["reflectance"].values,rtol=0.19,equal_nan=True)
         np.testing.assert_allclose(np.nansum(test_l2a["reflectance"].values),np.nansum(L2a["reflectance"].values),rtol=0.05,equal_nan=True)
         np.testing.assert_allclose(np.nansum(test_l2a_avg["reflectance"].values),np.nansum(L2a["reflectance"].values),rtol=0.001,equal_nan=True)
-        #shutil.rmtree(tmpdir)
+        shutil.rmtree(tmpdir)
 
 if __name__ == '__main__':
     unittest.main()
