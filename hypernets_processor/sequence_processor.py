@@ -10,7 +10,6 @@ from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypst
 from hypernets_processor.data_io.hypernets_reader import HypernetsReader
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
-import numpy as np
 
 
 '''___Authorship___'''
@@ -62,29 +61,55 @@ class SequenceProcessor:
             # todo - add to archive database if to_archive
             self.context.logger.debug("Done")
 
-        # # Calibrate to L1a
-        # self.context.logger.debug("Calibrating L1a...")
-        # calibrate = Calibrate(self.context, MCsteps=100)
-        # L1a_rad = calibrate.calibrate_l1a("radiance", l0_rad, l0_bla)
-        # L1a_irr = calibrate.calibrate_l1a("irradiance", l0_irr, l0_bla)
-        # self.context.logger.debug("Done")
-        #
-        # # Write L1a
-        # if self.context.get_config_value("write_L1a"):
-        #     self.context.logger.debug("Writing L1a data...")
-        #     writer.write(L1a_rad)
-        #     writer.write(L1a_irr)
-        #     # todo - add to archive database if to_archive
-        #     self.context.logger.debug("Done")
-        #
-        # if self.context.get_config_value("network") == "w":
-        #     pass
-        #
-        # elif self.context.get_config_value("network") == "l":
-        #     pass
-        #
-        # else:
-        #     raise NameError("Invalid network: " + self.context.get_config_value("network"))
+        # Calibrate to L1a
+        self.context.logger.debug("Processing to L1a...")
+        calibrate = Calibrate(self.context, MCsteps=100)
+        L1a_rad = calibrate.calibrate_l1a("radiance", l0_rad, l0_bla)
+        L1a_irr = calibrate.calibrate_l1a("irradiance", l0_irr, l0_bla)
+        self.context.logger.debug("Done")
+
+        intp = InterpolateL1c(self.context, MCsteps=1000)
+        surf = SurfaceReflectance(self.context, MCsteps=1000)
+
+        if self.context.get_config_value("network") == "w":
+            rhymer = RhymerHypstar(self.context)
+
+            self.context.logger.debug("Processing to L1b...")
+            L1b = rhymer.process_l1b(L1a_rad, L1a_irr)
+            self.context.logger.debug("Done")
+
+            self.context.logger.debug("Processing to L1c...")
+            L1c = rhymer.process_l1c(L1b)
+            self.context.logger.debug("Done")
+
+            self.context.logger.debug("Processing to L1d...")
+            L1d = surf.process_l1d(L1c)
+            self.context.logger.debug("Done")
+
+            self.context.logger.debug("Processing to L2a...")
+            L2a = surf.process(L1d)
+            self.context.logger.debug("Done")
+
+        elif self.context.get_config_value("network") == "l":
+
+            self.context.logger.debug("Processing to L1b radiance...")
+            L1b_rad = calibrate.average_l1b("radiance", L1a_rad)
+            self.context.logger.debug("Done")
+
+            self.context.logger.debug("Processing to L1b irradiance...")
+            L1b_irr = calibrate.average_l1b("irradiance", L1a_irr)
+            self.context.logger.debug("Done")
+
+            self.context.logger.debug("Processing to L1c...")
+            L1c = intp.interpolate_l1c(L1b_rad, L1b_irr)
+            self.context.logger.debug("Done")
+
+            self.context.logger.debug("Processing to L2a...")
+            L2a = surf.process(L1c)
+            self.context.logger.debug("Done")
+
+        else:
+            raise NameError("Invalid network: " + self.context.get_config_value("network"))
 
         return None
 
