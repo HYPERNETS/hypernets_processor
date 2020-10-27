@@ -62,7 +62,7 @@ class HypernetsWriter:
             else:
                 raise IOError("The file already exists: " + path)
 
-        ds = HypernetsWriter.fill_ds(ds)
+        #ds = HypernetsWriter.fill_ds(ds)
 
         if fmt == "nc":
             HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
@@ -193,8 +193,10 @@ class HypernetsWriter:
         """
 
         for variable in ds.variables.keys():
-            idx = np.where(np.isnan(ds[variable]))
+            idx = np.where(np.isnan(ds[variable].values))
             if np.sum(idx)>0:
+                print(variable,idx,ds[variable]._FillValue)
+                print(ds[variable][idx])
                 ds[variable][idx] = ds[variable]._FillValue
 
         return ds
