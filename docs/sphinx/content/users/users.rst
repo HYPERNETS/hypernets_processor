@@ -8,12 +8,11 @@
 User Guide
 ==========
 
-There are two main use cases for the hypernets_processor package. The primary function of the software is the automated preparation of data retrieved from network sites for distribution to users. Additionally, the software may also be used for ad-hoc processing of particular field acquisitions, for example for testing instrument operation in the field. For information on each these use cases click on one of the following links:
+There are two main use cases for the **hypernets_processor** module. The primary function of the software is the automated preparation of data retrieved from network sites for distribution to users. Additionally, the software may also be used for ad-hoc processing of particular field acquisitions, for example for testing instrument operation in the field. For information on each these use cases read the following sections.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   use_field
-   user_processor
-   atbd
+   user_adhoc
+   user_automated
