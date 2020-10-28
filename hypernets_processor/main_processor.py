@@ -188,8 +188,8 @@ class HypernetsProcessor:
         L1c=rhymer.process_l1c(L1b)
 
         #L1d_irr = cal.average_l1b("irradiance", L1c)
-
-        L2a = surf.process(L1c)
+        L1d= surf.process_l1d(L1c)
+        L2a = surf.process(L1d)
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
         # wind=RhymerHypstar(context).retrieve_wind(L1c)

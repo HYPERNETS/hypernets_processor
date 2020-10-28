@@ -16,7 +16,7 @@ from pysolar.solar import *
 from hypernets_processor.data_io.format.header import HEADER_DEF
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.version import __version__
-
+from hypernets_processor.data_io.dataset_util import DatasetUtil as du
 '''___Authorship___'''
 __author__ = "Clémence Goyens"
 __created__ = "12/2/2020"
@@ -187,10 +187,10 @@ class HypernetsReader:
         f = open(FOLDER_NAME + series[1], "rb")
         # Header definition with length, description and decoding format
 
-        #header = self.read_header(f, HEADER_DEF)
-        #print(header)
+        header = self.read_header(f, HEADER_DEF)
+        print(header)
 
-        pixCount= 2048 #header['Pixel Count']
+        pixCount= header['Pixel Count']
 
         # if bool(header) == False:
         #     print("Data corrupt go to next line")
@@ -251,14 +251,14 @@ class HypernetsReader:
 
             nextLine = True
             while nextLine:
-                # # if no reader comment those lines
-                # header = self.read_header(f, HEADER_DEF)
-                # print(header)
-                # if bool(header) == False:
-                #     print("Data corrupt go to next line")
-                #     break
-                #     continue
-                pixCount= 2048#header['Pixel Count']
+                # if no header comment those lines
+                header = self.read_header(f, HEADER_DEF)
+                print(header)
+                if bool(header) == False:
+                    print("Data corrupt go to next line")
+                    break
+                    continue
+                pixCount= header['Pixel Count']
                 scan = self.read_data(f, pixCount)
                 # should include this back again when crc32 is in the headers!
                 #crc32 = self.read_footer(f, 4)
@@ -300,8 +300,8 @@ class HypernetsReader:
                 ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
 
                 ds['quality_flag'][scan_number] = flag
-                ds['integration_time'][scan_number] = 1000#header['integration_time']
-                ds['temperature'][scan_number] = 1000#header['temperature']
+                ds['integration_time'][scan_number] = header['integration_time']
+                ds['temperature'][scan_number] = header['temperature']
 
                 # accelaration:
                 # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
@@ -314,13 +314,16 @@ class HypernetsReader:
 
                 a = 19.6
                 b = 2 ** 15
-                # ds['acceleration_x_mean'][scan_number] = header['acceleration_x_mean'] * a / b
-                # ds['acceleration_x_std'][scan_number] = header['acceleration_x_std'] * a / b
-                # ds['acceleration_y_mean'][scan_number] = header['acceleration_y_mean'] * a / b
-                # ds['acceleration_y_std'][scan_number] = header['acceleration_y_std'] * a / b
-                # ds['acceleration_z_mean'][scan_number] = header['acceleration_z_mean'] * a / b
-                # ds['acceleration_z_std'][scan_number] = header['acceleration_z_std'] * a / b
+                ds['acceleration_x_mean'][scan_number] = header['acceleration_x_mean'] * a / b
+                ds['acceleration_x_std'][scan_number] = header['acceleration_x_std'] * a / b
+                ds['acceleration_y_mean'][scan_number] = header['acceleration_y_mean'] * a / b
+                ds['acceleration_y_std'][scan_number] = header['acceleration_y_std'] * a / b
+                ds['acceleration_z_mean'][scan_number] = header['acceleration_z_mean'] * a / b
+                ds['acceleration_z_std'][scan_number] = header['acceleration_z_std'] * a / b
 
+                print(header['Pixel Count'])
+                print(pixCount)
+                print(len(scan))
                 ds['digital_number'][0:pixCount, scan_number] = scan
 
                 scan_number += 1
@@ -388,7 +391,7 @@ class HypernetsReader:
             else:
                 print("Latitude is not given, use default")
                 lat = self.context.get_config_value("lat")
-                flag = flag + 2 ** self.context.get_config_value("lat_default")
+                flag = flag + 2 ** self.context.get_config_value("lat_default") #du.set_flag(flag, "lat_default") #
 
             if 'longitude' in (globalattr.keys()):
                 lon = float(globalattr['longitude'])
@@ -397,7 +400,7 @@ class HypernetsReader:
             else:
                 print("Longitude is not given, use default")
                 lon = self.context.get_config_value("lon")
-                flag = flag + 2 ** self.context.get_config_value("lon_default")
+                flag = flag + 2 ** self.context.get_config_value("lon_default") #du.set_flag(flag, "lon_default")  #
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
@@ -477,14 +480,14 @@ class HypernetsReader:
         else:
             print("No irradiance data for this sequence")
 
-        # if seriesRad:
-        #     L0_RAD = self.read_series(seq_dir, seriesRad, lat, lon, metadata,flag, "L0_RAD")
-        # #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
-        # #             L0_RAD=read_series(seriesRad,cc, lat, lon, metadata, "L0_RAD")
-        # #         else:
-        # #             print("Radiance files listed but don't exist")
-        # else:
-        #     print("No radiance data for this sequence")
+        if seriesRad:
+            L0_RAD = self.read_series(seq_dir, seriesRad, lat, lon, metadata,flag, "L0_RAD")
+        #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
+        #             L0_RAD=read_series(seriesRad,cc, lat, lon, metadata, "L0_RAD")
+        #         else:
+        #             print("Radiance files listed but don't exist")
+        else:
+            print("No radiance data for this sequence")
 
         if seriesBlack:
             L0_BLA = self.read_series(seq_dir, seriesBlack, lat, lon, metadata,flag, "L0_BLA")
