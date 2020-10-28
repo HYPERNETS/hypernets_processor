@@ -35,7 +35,7 @@ class HypernetsReader:
         ccvalues = []
         for i in range(len(cckeys)):
             ccvalues.append(self.context.get_config_value(cckeys[i]))
-        self.cc = dict(zip(cckeys, ccvalues))
+        self.cc_vis = dict(zip(cckeys, ccvalues))
 
     # READ METADATA
     # CG - 20200331
@@ -122,14 +122,26 @@ class HypernetsReader:
         unpackData, = unpack('<I', data)
         print(unpackData)
 
-    def read_wavelength(self, pix):
+    def read_wavelength(self, pixcount):
 
-        cc=self.cc
-        # or rather have it estimated only once for vis and swir?
-        wvl = float(cc['mapping_vis_a']) + pix * float(cc['mapping_vis_b']) + pix ** 2 * float(cc['mapping_vis_c'])
-        +pix ** 3 * float(cc['mapping_vis_d']) + pix ** 4 * float(cc['mapping_vis_e'])
-        +pix ** 5 * float(cc['mapping_vis_f'])
-        print("Wavelength range:", min(wvl), "-", max(wvl))
+        import numpy as np
+        print(pixcount)
+        pix = np.linspace(0, pixcount, pixcount)
+        if pixcount == 2048:
+            print("Visible spectra, pixel count {}".format(pix))
+            cc = self.cc_vis
+            # or rather have it estimated only once for vis and swir?
+            wvl = float(cc['mapping_vis_a']) + pix * float(cc['mapping_vis_b']) + pix ** 2 * float(cc['mapping_vis_c'])
+            +pix ** 3 * float(cc['mapping_vis_d']) + pix ** 4 * float(cc['mapping_vis_e'])
+            +pix ** 5 * float(cc['mapping_vis_f'])
+            print("Wavelength range:", min(wvl), "-", max(wvl))
+
+        elif pixcount == 256:
+            file = '/home/cgoyens/OneDrive/BackUpThinkpadClem/Projects/HYPERNETS/NetworkDesign_D52/DataProcChain/hypernets_processor/hypernets_processor/data_io/tests/reader/SWIR_wvl'
+            print("SWIR spectra, pixel count {}".format(pix))
+            # or rather have it estimated only once for vis and swir?
+            wvl = np.loadtxt(file, delimiter="\t")
+
         return wvl
 
     def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat):
@@ -175,14 +187,16 @@ class HypernetsReader:
         f = open(FOLDER_NAME + series[1], "rb")
         # Header definition with length, description and decoding format
 
-        header = self.read_header(f, HEADER_DEF)
+        #header = self.read_header(f, HEADER_DEF)
+        #print(header)
+
+        pixCount= 2048 #header['Pixel Count']
 
         # if bool(header) == False:
         #     print("Data corrupt go to next line")
         #     header = self.read_header(f, HEADER_DEF)
 
-        pix = np.linspace(0, header['Pixel Count'], header['Pixel Count'])
-        wvl = self.read_wavelength(pix)
+        wvl = self.read_wavelength(pixCount)
 
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
@@ -206,6 +220,7 @@ class HypernetsReader:
 
         # read all spectra (== spe files with concanated files) in a series
         for spectra in series:
+            print(spectra)
             model = dict(zip(model_name, spectra.split('_')[:-1]))
             specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + model[
                 'azimuth_ref'] + '_' + model['vza']
@@ -236,15 +251,17 @@ class HypernetsReader:
 
             nextLine = True
             while nextLine:
-                header = self.read_header(f, HEADER_DEF)
-                print(header)
-                if bool(header) == False:
-                    print("Data corrupt go to next line")
-                    break
-                    continue
-                scan = self.read_data(f, header['Pixel Count'])
+                # # if no reader comment those lines
+                # header = self.read_header(f, HEADER_DEF)
+                # print(header)
+                # if bool(header) == False:
+                #     print("Data corrupt go to next line")
+                #     break
+                #     continue
+                pixCount= 2048#header['Pixel Count']
+                scan = self.read_data(f, pixCount)
                 # should include this back again when crc32 is in the headers!
-                # crc32 = self.read_footer(f, 4)
+                #crc32 = self.read_footer(f, 4)
 
                 #HypernetsReader(self.context).plot_spectra(spectra, scan)
 
@@ -283,8 +300,8 @@ class HypernetsReader:
                 ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
 
                 ds['quality_flag'][scan_number] = flag
-                ds['integration_time'][scan_number] = header['integration_time']
-                ds['temperature'][scan_number] = header['temperature']
+                ds['integration_time'][scan_number] = 1000#header['integration_time']
+                ds['temperature'][scan_number] = 1000#header['temperature']
 
                 # accelaration:
                 # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
@@ -297,14 +314,14 @@ class HypernetsReader:
 
                 a = 19.6
                 b = 2 ** 15
-                ds['acceleration_x_mean'][scan_number] = header['acceleration_x_mean'] * a / b
-                ds['acceleration_x_std'][scan_number] = header['acceleration_x_std'] * a / b
-                ds['acceleration_y_mean'][scan_number] = header['acceleration_y_mean'] * a / b
-                ds['acceleration_y_std'][scan_number] = header['acceleration_y_std'] * a / b
-                ds['acceleration_z_mean'][scan_number] = header['acceleration_z_mean'] * a / b
-                ds['acceleration_z_std'][scan_number] = header['acceleration_z_std'] * a / b
+                # ds['acceleration_x_mean'][scan_number] = header['acceleration_x_mean'] * a / b
+                # ds['acceleration_x_std'][scan_number] = header['acceleration_x_std'] * a / b
+                # ds['acceleration_y_mean'][scan_number] = header['acceleration_y_mean'] * a / b
+                # ds['acceleration_y_std'][scan_number] = header['acceleration_y_std'] * a / b
+                # ds['acceleration_z_mean'][scan_number] = header['acceleration_z_mean'] * a / b
+                # ds['acceleration_z_std'][scan_number] = header['acceleration_z_std'] * a / b
 
-                ds['digital_number'][0:header['Pixel Count'], scan_number] = scan
+                ds['digital_number'][0:pixCount, scan_number] = scan
 
                 scan_number += 1
 
@@ -388,7 +405,7 @@ class HypernetsReader:
             # to change!!!!
 
             if 'cc' not in globalattr:
-                cc = self.cc
+                cc = self.cc_vis
             else:
                 cc = list(str.split(globalattr['cc'], "\n"))
                 cc = {k.strip(): float(v.strip()) for k, v in (i.split(":") for i in cc[1:14])}
@@ -425,8 +442,9 @@ class HypernetsReader:
 
             # this is slow????
             seriesIrr = [x for x, y in zip(seriesName, action) if int(y) == 8]
-            seriesRad = [x for x, y in zip(seriesName, action) if int(y) == 16]
             seriesBlack = [x for x, y in zip(seriesName, action) if int(y) == 0]
+            seriesRad = [x for x, y in zip(seriesName, action) if int(y) == 16]
+
 
         else:
             print("Missing metadata file in sequence directory - check sequence directory")
@@ -459,14 +477,14 @@ class HypernetsReader:
         else:
             print("No irradiance data for this sequence")
 
-        if seriesRad:
-            L0_RAD = self.read_series(seq_dir, seriesRad, lat, lon, metadata,flag, "L0_RAD")
-        #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
-        #             L0_RAD=read_series(seriesRad,cc, lat, lon, metadata, "L0_RAD")
-        #         else:
-        #             print("Radiance files listed but don't exist")
-        else:
-            print("No radiance data for this sequence")
+        # if seriesRad:
+        #     L0_RAD = self.read_series(seq_dir, seriesRad, lat, lon, metadata,flag, "L0_RAD")
+        # #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
+        # #             L0_RAD=read_series(seriesRad,cc, lat, lon, metadata, "L0_RAD")
+        # #         else:
+        # #             print("Radiance files listed but don't exist")
+        # else:
+        #     print("No radiance data for this sequence")
 
         if seriesBlack:
             L0_BLA = self.read_series(seq_dir, seriesBlack, lat, lon, metadata,flag, "L0_BLA")
