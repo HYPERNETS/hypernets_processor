@@ -52,6 +52,7 @@ def parse_sequence_path(path):
     :return: unpacked path, containing datetime (None if not a sequence path)
     :rtype: dict
     """
+
     sequence_path = os.path.basename(path)
 
     if sequence_path[:3] == "SEQ":

@@ -5,7 +5,7 @@ Contains main class for processing sequence data
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
-from hypernets_processor.interpolation.interpolate import Interpolate
+from hypernets_processor.interpolation.interpolate import InterpolateL1c
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.data_io.hypernets_reader import HypernetsReader
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
@@ -68,7 +68,7 @@ class SequenceProcessor:
         L1a_irr = calibrate.calibrate_l1a("irradiance", l0_irr, l0_bla)
         self.context.logger.debug("Done")
 
-        intp = Interpolate(self.context, MCsteps=1000)
+        intp = InterpolateL1c(self.context, MCsteps=1000)
         surf = SurfaceReflectance(self.context, MCsteps=1000)
 
         if self.context.get_config_value("network") == "w":
