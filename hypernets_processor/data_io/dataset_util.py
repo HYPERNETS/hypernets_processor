@@ -4,7 +4,7 @@ DatasetUtil class
 
 from hypernets_processor.version import __version__
 import string
-from xarray import Variable, DataArray, Dataset
+from xarray import Variable, DataArray
 import numpy as np
 
 
@@ -224,13 +224,10 @@ dekrie
     def _get_flag_encoding(da):
         """
         Returns flag encoding for flag type data array
-
         :type da: xarray.DataArray
         :param da: data array
-
         :return: flag meanings
         :rtype: list
-
         :return: flag masks
         :rtype: list
         """
@@ -247,10 +244,8 @@ dekrie
     def unpack_flags(da):
         """
         Breaks down flag data array into dataset of boolean masks for each flag
-
         :type da: xarray.DataArray
         :param da: dataset
-
         :return: flag masks
         :rtype: xarray.Dataset
         """
@@ -268,13 +263,10 @@ dekrie
     def set_flag(da, flag_name, error_if_set=False):
         """
         Sets named flag for elements in data array
-
         :type da: xarray.DataArray
         :param da: dataset
-
         :type flag_name: str
         :param flag_name: name of flag to set
-
         :type error_if_set: bool
         :param error_if_set: raises error if chosen flag is already set for any element
         """
@@ -295,13 +287,10 @@ dekrie
     def unset_flag(da, flag_name, error_if_unset=False):
         """
         Unsets named flag for specified index of dataset variable
-
         :type da: xarray.DataArray
         :param da: data array
-
         :type flag_name: str
         :param flag_name: name of flag to unset
-
         :type error_if_unset: bool
         :param error_if_unset: raises error if chosen flag is already set at specified index
         """
@@ -322,10 +311,8 @@ dekrie
     def get_set_flags(da):
         """
         Return list of set flags for single element data array
-
         :type da: xarray.DataArray
         :param da: single element data array
-
         :return: set flags
         :rtype: list
         """
@@ -346,13 +333,10 @@ dekrie
     def check_flag_set(da, flag_name):
         """
         Returns if flag for single element data array
-
         :type da: xarray.DataArray
         :param da: single element data array
-
         :type flag_name: str
         :param flag_name: name of flag to set
-
         :return: set flags
         :rtype: list
         """
@@ -365,6 +349,8 @@ dekrie
         if flag_name in set_flags:
             return True
         return False
+
+
 
 
 if __name__ == "__main__":

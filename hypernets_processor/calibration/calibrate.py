@@ -241,9 +241,19 @@ class Calibrate:
 
         flagval = 2 ** (self.context.get_config_value("outliers"))
 
+        print(np.where(mask > 0))
+
+        break
         datasetl0["quality_flag"].values = [
             flagval + datasetl0["quality_flag"].values[i] if mask[i] == 1 else
             datasetl0["quality_flag"].values[i] for i in range(len(mask))]
+
+
+
+        datasetl0["quality_flag"].values = [
+            flagval + datasetl0["quality_flag"].values[i] if mask[i] == 1 else
+            datasetl0["quality_flag"].values[i] for i in range(len(mask))]
+
 
         datasetl1a["quality_flag"].values = [
             flagval + datasetl1a["quality_flag"].values[i] if mask[i] == 1 else
