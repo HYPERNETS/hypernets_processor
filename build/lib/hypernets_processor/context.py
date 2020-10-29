@@ -78,6 +78,7 @@ class Context:
         protected_values = [] if protected_values is None else protected_values
         for section in config.sections():
             for name in config[section].keys():
+
                 if name not in protected_values:
                     value = get_config_value(config, section, name)
                     self.set_config_value(name, value)

@@ -36,8 +36,6 @@ def get_target_sequences(context, to_archive):
     # raw_data_directory may either be a sequence path or directory of sequence paths
 
     raw_paths = []
-    print(context.get_config_value("raw_data_directory"))
-
     if parse_sequence_path(context.get_config_value("raw_data_directory")) is not None:
         raw_paths.append(context.get_config_value("raw_data_directory"))
     else:
@@ -107,7 +105,7 @@ def main(processor_config_path, job_config_path, to_archive):
         processor_config=processor_config, job_config=job_config, logger=logger
     )
     context.set_config_value("to_archive", to_archive)
-    print(context.get_config_value("raw_data_directory"),job_config, job_config_path)
+
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
 
