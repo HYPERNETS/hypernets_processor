@@ -22,10 +22,8 @@ PROCESSOR_CONFIG_PROTECTED_VALUES = []
 class Context:
     """
     Class to determine and store processor state
-
     :type processor_config: configparser.RawConfigParser
     :param processor_config: processor config data object
-
     :type job_config: configparser.RawConfigParser
     :param job_config: job config data object
     """
@@ -66,7 +64,6 @@ class Context:
     def unpack_config(self, config, protected_values=None):
         """
         Unpacks config data, sets relevant entries to values instance attribute
-
         :type config: configparser.RawConfigParser
         :param config: config data
         """
@@ -82,10 +79,8 @@ class Context:
     def set_config_value(self, name, value):
         """
         Sets config data to values instance attribute
-
         :type name: str
         :param name: config data name
-
         :param value: config data value
         """
 
@@ -94,10 +89,8 @@ class Context:
     def get_config_value(self, name):
         """
         Get config value
-
         :type name: str
         :param name: config data name
-
         :return: config value
         """
 
@@ -106,7 +99,6 @@ class Context:
     def get_config_names(self):
         """
         Get available config value names
-
         :return: config value names
         :rtype: list
         """
