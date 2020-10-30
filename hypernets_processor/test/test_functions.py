@@ -267,9 +267,9 @@ def setup_test_context(
         setup_test_archive_db(processor_config["Databases"]["archive_db_url"])
 
     if not create_dbs:
-        processor_config["Databases"]["metadata_db_url"] = None
-        processor_config["Databases"]["anomaly_db_url"] = None
-        processor_config["Databases"]["archive_db_url"] = None
+        processor_config["Databases"]["metadata_db_url"] = ""
+        processor_config["Databases"]["anomaly_db_url"] = ""
+        processor_config["Databases"]["archive_db_url"] = ""
 
     context = Context(
         processor_config=processor_config, job_config=job_config, logger=logger

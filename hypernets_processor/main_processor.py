@@ -7,6 +7,8 @@ from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.plotting.plotting import Plotting
+from hypernets_processor.utils.logging import configure_logging
+from hypernets_processor.utils.config import read_config_file
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.context import Context
 from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
@@ -44,6 +46,10 @@ class HypernetsProcessor:
         """
         Constructor method
         """
+        if "job_name" in job_config["Job"].keys():
+            name = job_config["Job"]["job_name"]
+
+        logger = configure_logging(config=job_config,name=name)
         self.context = Context(job_config,processor_config,logger)
 
 
@@ -58,6 +64,7 @@ class HypernetsProcessor:
         # settings_file = set_dir + '/data/settings/default.txt'
         server_dir = os.path.join(this_directory_path,"data_io/tests/reader/")
         seq_id=self.context.get_config_value("sequence_id")
+        print(self.context.get_config_value("write_l0"))
 
         # seq_dir=server_dir+"reader/SEQ20200625T095941/"
         seq_dir = server_dir + seq_id+"/"
@@ -184,12 +191,12 @@ class HypernetsProcessor:
         # L1b = rhymer.get_fresnelrefl(L1b)
         # L1b = rhymer.get_epsilon(L1b)
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
-        print("rad",L1b["u_random_downwelling_radiance"])
         #
         L1c=rhymer.process_l1c(L1b)
-
         #L1d_irr = cal.average_l1b("irradiance", L1c)
         L1d= surf.process_l1d(L1c)
+        print("rad",L1d["u_random_downwelling_radiance"])
+
         L2a = surf.process(L1d)
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
@@ -206,14 +213,17 @@ class HypernetsProcessor:
         # L2a
         # print(L1b)
         # # L2a=surf.process(L1c,"LandNetworkProtocol")
-
+        self.context.logger.info("all done!")
+        print("all done!")
         return None
 
 
 if __name__ == "__main__":
     this_directory_path = os.path.abspath(os.path.dirname(__file__))
-    processor_config = os.path.join(this_directory_path,"etc/processor.config")
-    job_config = os.path.join(this_directory_path,"etc/job.config")
+    processor_config_path= os.path.join(this_directory_path,"etc/processor.config")
+    job_config_path= os.path.join(this_directory_path,"etc/job.config")
+    processor_config = read_config_file(processor_config_path)
+    job_config = read_config_file(job_config_path)
     hp = HypernetsProcessor(job_config=job_config,processor_config=processor_config)
     hp.context.set_config_value("processor_directory",this_directory_path)
     hp.run()

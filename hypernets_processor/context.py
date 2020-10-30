@@ -22,10 +22,8 @@ PROCESSOR_CONFIG_PROTECTED_VALUES = []
 class Context:
     """
     Class to determine and store processor state
-
     :type processor_config: configparser.RawConfigParser
     :param processor_config: processor config data object
-
     :type job_config: configparser.RawConfigParser
     :param job_config: job config data object
     """
@@ -41,16 +39,12 @@ class Context:
 
         # Unpack processor_config to set relevant attributes
         if processor_config is not None:
-            config_proc = configparser.ConfigParser()
-            config_proc.read(processor_config)
-            self.unpack_config(config_proc)
+            self.unpack_config(processor_config)
 
         # Unpack processor_config to set relevant attributes
         if job_config is not None:
-            config_job = configparser.ConfigParser()
-            config_job.read(job_config)
             self.unpack_config(
-                config_job, protected_values=PROCESSOR_CONFIG_PROTECTED_VALUES
+                job_config, protected_values=PROCESSOR_CONFIG_PROTECTED_VALUES
             )
 
         # Connect to databases
@@ -70,7 +64,6 @@ class Context:
     def unpack_config(self, config, protected_values=None):
         """
         Unpacks config data, sets relevant entries to values instance attribute
-
         :type config: configparser.RawConfigParser
         :param config: config data
         """
@@ -78,6 +71,7 @@ class Context:
         protected_values = [] if protected_values is None else protected_values
         for section in config.sections():
             for name in config[section].keys():
+
                 if name not in protected_values:
                     value = get_config_value(config, section, name)
                     self.set_config_value(name, value)
@@ -85,10 +79,8 @@ class Context:
     def set_config_value(self, name, value):
         """
         Sets config data to values instance attribute
-
         :type name: str
         :param name: config data name
-
         :param value: config data value
         """
 
@@ -97,10 +89,8 @@ class Context:
     def get_config_value(self, name):
         """
         Get config value
-
         :type name: str
         :param name: config data name
-
         :return: config value
         """
 
@@ -109,7 +99,6 @@ class Context:
     def get_config_names(self):
         """
         Get available config value names
-
         :return: config value names
         :rtype: list
         """

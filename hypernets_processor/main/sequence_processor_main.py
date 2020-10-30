@@ -12,7 +12,7 @@ import os
 
 
 """___Authorship___"""
-__author__ = "Sam Hunr"
+__author__ = "Sam Hunt"
 __created__ = "21/10/2020"
 __version__ = __version__
 __maintainer__ = "Sam Hunt"
@@ -107,7 +107,6 @@ def main(processor_config_path, job_config_path, to_archive):
         processor_config=processor_config, job_config=job_config, logger=logger
     )
     context.set_config_value("to_archive", to_archive)
-    print(context.get_config_value("raw_data_directory"),job_config, job_config_path)
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
 

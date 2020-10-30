@@ -183,7 +183,7 @@ class HypernetsReader:
         # Header definition with length, description and decoding format
 
         header = self.read_header(f, HEADER_DEF)
-        self.context.logger.debugger(header)
+        self.context.logger.debug(header)
 
         pixCount = header['Pixel Count']
 
@@ -284,12 +284,13 @@ class HypernetsReader:
 
                 #             print(datetime.fromtimestamp(int(ts+timereboot)))
                 #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
-
-                ds.attrs["site_latitude"] = lat
-                ds.attrs["site_longitude"] = lon
-                ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
-                ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
-
+                if lat is not None:
+                    ds.attrs["site_latitude"] = lat
+                    ds.attrs["site_longitude"] = lon
+                    ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
+                    ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
+                else:
+                    self.context.logger.error("Lattitude is not found, using default values instead for lat, lon, sza and saa.")
                 ds['quality_flag'][scan_number] = flag
                 ds['integration_time'][scan_number] = header['integration_time']
                 ds['temperature'][scan_number] = header['temperature']
@@ -358,7 +359,7 @@ class HypernetsReader:
         #     ACTION_NONE  : 0x03   (03)
 
         metadata = ConfigParser()
-
+        print("seq",os.path.join(seq_dir, "metadata.txt"))
         if os.path.exists(os.path.join(seq_dir, "metadata.txt")):
             metadata.read(os.path.join(seq_dir, "metadata.txt"))
             # ------------------------------
@@ -455,7 +456,7 @@ class HypernetsReader:
             seq_dir)
 
         if seriesIrr:
-            l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag, "l0_irr")
+            l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_irr, overwrite=True)
             # can't use this when non concatanted spectra
@@ -467,7 +468,7 @@ class HypernetsReader:
             self.context.logger.error("No irradiance data for this sequence")
 
         if seriesRad:
-            l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag, "l0_rad")
+            l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag, "L0_RAD")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_rad, overwrite=True)
         #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
@@ -478,7 +479,7 @@ class HypernetsReader:
             self.context.logger.error("No radiance data for this sequence")
 
         if seriesBlack:
-            l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag, "l0_bla")
+            l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag, "L0_BLA")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_bla, overwrite=True)
             # if all([os.path.isfile(os.path.join(seq_dir, "RADIOMETER/", f)) for f in seriesBlack]):

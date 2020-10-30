@@ -16,10 +16,15 @@ __status__ = "Development"
 
 
 class Plotting():
-    def __init__(self,context):
+    def __init__(self,context,path=None):
         self.context = context
-        if not os.path.exists(self.context.get_config_value("plotting_directory")):
-            os.makedirs(self.context.get_config_value("plotting_directory"))
+        if path is None:
+            if self.context.get_config_value("plotting_directory") is not None:
+                self.path = self.context.get_config_value("plotting_directory")
+            else:
+                self.path = os.path.join(self.context.get_config_value("archive_directory"),"plots")
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         pass
 
     def plot_variable(self,measurandstring,*args,**kwargs):
@@ -38,9 +43,9 @@ class Plotting():
     def plot_scans_in_series(self,measurandstring,dataset):
         series_id = np.unique(dataset['series_id'])
         for i in range(len(series_id)):
-            plotpath = self.context.get_config_value("plotting_directory")+"plot_"+\
+            plotpath = os.path.join(self.path,"plot_"+\
                        dataset.attrs['product_name']+"_series_"+str(
-                series_id[i])+"."+self.context.get_config_value("plotting_fmt")
+                series_id[i])+"."+self.context.get_config_value("plotting_format"))
 
             ids = np.where((dataset['series_id'] == series_id[i]))[0]
             ydata_subset=dataset[measurandstring].values[:,ids]
@@ -48,19 +53,19 @@ class Plotting():
                                ydata_subset)
 
     def plot_series_in_sequence(self,measurandstring,dataset):
-        plotpath = self.context.get_config_value("plotting_directory")+"plot_"+\
-                   dataset.attrs['product_name']+"."+self.context.get_config_value("plotting_fmt")
+        plotpath = os.path.join(self.path,"plot_"+
+                   dataset.attrs['product_name']+"."+self.context.get_config_value("plotting_format"))
 
-        angle_labels=["sza= {:.2f}, saa= {:.2f}".format(dataset["solar_zenith_angle"].values[i],dataset["solar_azimuth_angle"].values[i]) for i in range(len(dataset["solar_zenith_angle"].values))]
+        angle_labels=["vza= {:.2f}, vaa= {:.2f}".format(dataset["viewing_zenith_angle"].values[i],dataset["viewing_azimuth_angle"].values[i]) for i in range(len(dataset["viewing_zenith_angle"].values))]
         self.plot_variable(measurandstring,plotpath,dataset["wavelength"].values,
                            dataset[measurandstring].values,labels=angle_labels)
 
     def plot_diff_scans(self,measurandstring,dataset,dataset_avg=None):
         series_id = np.unique(dataset['series_id'])
         for i in range(len(series_id)):
-            plotpath = self.context.get_config_value("plotting_directory")+"plot_diff_"+\
+            plotpath = os.path.join(self.path,"plot_diff_"+
                        dataset.attrs['product_name']+"_series_"+str(
-                series_id[i])+"."+self.context.get_config_value("plotting_fmt")
+                series_id[i])+"."+self.context.get_config_value("plotting_format"))
 
 
             ids = np.where((dataset['series_id'] == series_id[i]))[0]
@@ -72,7 +77,7 @@ class Plotting():
                 avgs = np.tile(dataset_avg[measurandstring].values[:,avg_ids],len(ydata_subset[0]))
 
             self.plot_variable("relative difference",plotpath,dataset["wavelength"].values,
-                               (ydata_subset-avgs)/avgs)
+                               (ydata_subset-avgs)/avgs,ylim=[-0.2,0.2])
 
     def plot_radiance(self,plotpath,xdata,ydata,labels=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
@@ -125,10 +130,11 @@ class Plotting():
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")
+        ax1.set_ylim([0,0.2])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
-    def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None):
+    def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
         if labels is None:
             ax1.plot(xdata,ydata,alpha=0.3)
@@ -138,5 +144,7 @@ class Plotting():
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(measurandstring)
+        if ylim is not None:
+            ax1.set_ylim(ylim)
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
