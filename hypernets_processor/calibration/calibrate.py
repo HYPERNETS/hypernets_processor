@@ -11,6 +11,7 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.plotting.plotting import Plotting
 import numpy as np
+import os
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -32,15 +33,15 @@ class Calibrate:
     def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla):
 
         if measurandstring != "radiance" and measurandstring != "irradiance":
-            print("the measurandstring needs to be either 'radiance' or 'irradiance")
+            self.context.logger.error("the measurandstring needs to be either 'radiance' or 'irradiance")
             exit()
 
         calibrate_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
         input_vars = calibrate_function.get_argument_names()
 
+        dataset_l0 = self.preprocess_l0(dataset_l0)
         dataset_l1a = self.l1a_template_from_l0_dataset(measurandstring, dataset_l0)
-        dataset_l0, dataset_l1a = self.preprocess_l0(dataset_l0, dataset_l1a)
 
         calibration_data = self.prepare_calibration_data(measurandstring)
 
@@ -72,16 +73,16 @@ class Calibrate:
     def prepare_calibration_data(self,measurandstring):
         hypstar=self.context.get_config_value("hypstar_cal_number")
         caldate=self.context.get_config_value("cal_date")
-        directory=self.context.get_config_value("processor_directory")
-        non_linear_cals = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+
-                                str(hypstar)+"_nonlin_corr_coefs_"+str(caldate)+".dat")
+        directory=self.context.get_config_value("calibration_directory")
+        non_linear_cals = np.genfromtxt(os.path.join(directory,"hypstar_"+
+                                str(hypstar)+"_nonlin_corr_coefs_"+str(caldate)+".dat"))
 
         if measurandstring == "radiance":
-            gains = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+
-                                  str(hypstar)+"_radcal_L_"+str(caldate)+".dat")
+            gains = np.genfromtxt(os.path.join(directory,"hypstar_"+
+                                  str(hypstar)+"_radcal_L_"+str(caldate)+".dat"))
         else:
-            gains = np.genfromtxt(directory+r"/../examples/calibration_files/hypstar_"+
-                                  str(hypstar)+"_radcal_E_"+str(caldate)+".dat")
+            gains = np.genfromtxt(os.path.join(directory,"hypstar_"+
+                                  str(hypstar)+"_radcal_E_"+str(caldate)+".dat"))
 
         # print(non_linear_cals)
         # print(gains[:,0])
@@ -128,7 +129,8 @@ class Calibrate:
         else:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
         for i in range(len(series_id)):
-            ids = np.where((dataset['series_id'] == series_id[i]) & (dataset['quality_flag'] == 0))
+            ids = np.where((dataset['series_id'] == series_id[i]) &
+                  np.invert(DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
             out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
             if rand_unc:
                 out[i] = out[i] / len(ids[0])
@@ -223,7 +225,7 @@ class Calibrate:
 
         return inputs
 
-    def preprocess_l0(self, datasetl0, datasetl1a):
+    def preprocess_l0(self, datasetl0):
         """
         Identifies and removes faulty measurements (e.g. due to cloud cover).
 
@@ -232,36 +234,13 @@ class Calibrate:
         :return:
         :rtype:
         """
-        dim_sizes_dict = {"wavelength": len(datasetl0["wavelength"]), "scan": len(datasetl0["scan"])}
-        du = DatasetUtil()
-
         mask = self.clip_and_mask(datasetl0)
-        # datasetl0["quality_flag"].values = mask
-        # datasetl1a["quality_flag"].values = mask
 
-        flagval = 2 ** (self.context.get_config_value("outliers"))
+        datasetl0["quality_flag"][np.where(mask==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask==1)],"outliers") #for i in range(len(mask))]
 
-        print(np.where(mask > 0))
-
-        break
-        datasetl0["quality_flag"].values = [
-            flagval + datasetl0["quality_flag"].values[i] if mask[i] == 1 else
-            datasetl0["quality_flag"].values[i] for i in range(len(mask))]
-
-
-
-        datasetl0["quality_flag"].values = [
-            flagval + datasetl0["quality_flag"].values[i] if mask[i] == 1 else
-            datasetl0["quality_flag"].values[i] for i in range(len(mask))]
-
-
-        datasetl1a["quality_flag"].values = [
-            flagval + datasetl1a["quality_flag"].values[i] if mask[i] == 1 else
-            datasetl1a["quality_flag"].values[i] for i in range(len(mask))]
-
-        DN_rand = du.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
+        DN_rand = DatasetUtil.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
                                      dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
-        DN_syst = du.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
+        DN_syst = DatasetUtil.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
                                      dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
 
         datasetl0["u_random_digital_number"] = DN_rand
@@ -273,7 +252,7 @@ class Calibrate:
         datasetl0["u_random_digital_number"].values = rand
         datasetl0["u_systematic_digital_number"] = DN_syst
 
-        return datasetl0, datasetl1a
+        return datasetl0
 
     def clip_and_mask(self, dataset, k_unc=3):
         mask = []
@@ -290,7 +269,6 @@ class Calibrate:
             maski = np.zeros_like(intsig) # mask the columns that have NaN
             maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 1
             mask = np.append(mask, maski)
-            # print("mask",mask)
 
 
         # check if 10% of pixels are outiers
@@ -351,7 +329,9 @@ class Calibrate:
                                                        propagate_ds=dataset_l0)
         elif measurandstring == "irradiance":
             dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, "L_L1A_IRR", propagate_ds=dataset_l0)
-        dataset_l1a["wavelength"]=dataset_l0["wavelength"]
+
+        dataset_l1a=dataset_l1a.assign_coords(wavelength=dataset_l0.wavelength)
+
         return dataset_l1a
 
     def l1b_template_from_l1a_dataset(self, measurandstring, dataset_l1a):
@@ -371,7 +351,7 @@ class Calibrate:
         elif measurandstring == "irradiance":
             dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset_l1a)
 
-        dataset_l1b["wavelength"].values = dataset_l1a["wavelength"].values
+        dataset_l1b=dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
 
         series_id = np.unique(dataset_l1a['series_id'])
         dataset_l1b["series_id"].values = series_id
@@ -380,7 +360,8 @@ class Calibrate:
                                "solar_azimuth_angle", "solar_zenith_angle"]:
             temp_arr = np.empty(len(series_id))
             for i in range(len(series_id)):
-                ids = np.where((dataset_l1a['series_id'] == series_id[i]) & (dataset_l1a['quality_flag'] == 0))
+                ids = np.where((dataset_l1a['series_id'] == series_id[i]) & np.invert(
+                     DatasetUtil.unpack_flags(dataset_l1a["quality_flag"])["outliers"]))
                 temp_arr[i] = np.mean(dataset_l1a[variablestring].values[ids])
             dataset_l1b[variablestring].values = temp_arr
 

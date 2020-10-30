@@ -95,7 +95,7 @@ class RhymerHypstar:
                     seq = dataset.attrs["sequence_id"]
                     ts = datetime.utcfromtimestamp(dataset['acquisition_time'][i])
 
-                    if verbosity > 2: print('Temporal jump: in {}:  Aquisition time {}, {}'.format(seq, ts, ', '.join(
+                    if verbosity > 2: self.context.logger.info('Temporal jump: in {}:  Aquisition time {}, {}'.format(seq, ts, ', '.join(
                         ['{}:{}'.format(k, dataset[k][scans[i]].values) for k in ['scan', 'quality_flag']])))
 
                 # ## check for complete spectra
@@ -113,7 +113,7 @@ class RhymerHypstar:
     def cycleparse(self, rad, irr):
 
         protocol = self.context.get_config_value("measurement_function_surface_reflectance")
-        print(protocol)
+        self.context.logger.debug(protocol)
         nbrlu = self.context.get_config_value("n_upwelling_rad")
         nbred = self.context.get_config_value("n_upwelling_irr")
         nbrlsky = self.context.get_config_value("n_downwelling_rad")
@@ -124,7 +124,7 @@ class RhymerHypstar:
         if protocol != 'WaterNetworkProtocol':
             # here we should simply provide surface reflectance?
             # what about a non-standard protocol but that includes the required standard series?
-            print('Unknown measurement protocol: {}'.format(protocol))
+            self.context.logger.error('Unknown measurement protocol: {}'.format(protocol))
         else:
             uprad = []
             downrad = []
@@ -132,7 +132,7 @@ class RhymerHypstar:
                 scani = rad.sel(scan=i)
                 sena = scani["viewing_azimuth_angle"].values
                 senz = scani["viewing_zenith_angle"].values
-                print(scani['acquisition_time'].values)
+                self.context.logger.debug(scani['acquisition_time'].values)
                 ts = datetime.utcfromtimestamp(int(scani['acquisition_time'].values))
                 # not fromtimestamp?
 
@@ -142,7 +142,8 @@ class RhymerHypstar:
                 else:
                     flagval = 2 ** (self.context.get_config_value("angles_missing"))
                     scani['quality_flag'] = scani['quality_flag'] + flagval
-                    if self.context.get_config_value("verbosity") > 2: print(
+                    if self.context.get_config_value("verbosity") > 2:
+                        self.context.logger.info(
                         'NULL angles: Aquisition time {}, {}'.format(ts, ', '.join(
                             ['{}:{}'.format(k, scani[k].values) for k in ['scan', 'quality_flag']])))
                     continue
@@ -171,7 +172,7 @@ class RhymerHypstar:
                     if self.context.get_config_value("verbosity") > 2:
                         ts = [datetime.utcfromtimestamp(x) for x in
                               lu['acquisition_time'][lu["viewing_azimuth_angle"] == i].values]
-                        print('No azimuthal equivalent downwelling radiance measurement: Aquisition time {}, {}'.format(
+                        self.context.logger.info('No azimuthal equivalent downwelling radiance measurement: Aquisition time {}, {}'.format(
                             ts, ', '.join(
                                 ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k in
                                  ['scan', 'quality_flag']])))
@@ -186,7 +187,7 @@ class RhymerHypstar:
                     if self.context.get_config_value("verbosity") > 2:
                         ts = [datetime.utcfromtimestamp(x) for x in
                               lu['acquisition_time'][lu["viewing_zenith_angle"] == i].values]
-                        print(
+                        self.context.logger.info(
                             'No downwelling radiance measurement at appropriate fresnel angle: Aquisition time {}, {}'.format(
                                 ts, ', '.join(
                                     ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k
@@ -196,16 +197,16 @@ class RhymerHypstar:
             if lu.scan[lu['quality_flag'] <= 0].count() < nbrlu:
                 lu["quality_flag"].values = [lu.sel(scan=i)["quality_flag"].values+flag_nbrlu for i in lu['scan']]
                 if self.context.get_config_value("verbosity") > 2:
-                    print("No enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
+                    self.context.logger.info("No enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
             if lsky.scan[lsky['quality_flag'] <= 1].count() < nbrlsky:
                 lsky["quality_flag"].values = [lsky.sel(scan=i)["quality_flag"].values+flag_nbrlsky for i in lsky['scan']]
                 if self.context.get_config_value("verbosity") > 2:
-                    print("No enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
+                    self.context.logger.info("No enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
 
             if irr.scan[irr['quality_flag'] <= 1].count() < nbred:
                 irr["quality_flag"].values = [irr.sel(scan=i)["quality_flag"].values + 2 ** flag_nbred for i in irr['scan']]
                 if self.context.get_config_value("verbosity") > 2:
-                    print("No enough irradiance data for sequence {}".format(irr.attrs['sequence_id']))
+                    self.context.logger.info("No enough irradiance data for sequence {}".format(irr.attrs['sequence_id']))
 
             return lu, lsky, irr
 
@@ -219,7 +220,7 @@ class RhymerHypstar:
             wa = self.context.get_config_value("wind_ancillary")
             if wa == False:
                 l1b.sel(scan=i)["quality_flag"]=l1b.sel(scan=i)["quality_flag"] + 2 ** flagval
-                print("Default wind speed {}".format(self.context.get_config_value("wind_default")))
+                self.context.logger.info("Default wind speed {}".format(self.context.get_config_value("wind_default")))
                 wind.append(self.context.get_config_value("wind_default"))
             else:
                 isodate = datetime.utcfromtimestamp(l1b['acquisition_time'].values[i]).strftime('%Y-%m-%d')
@@ -267,7 +268,7 @@ class RhymerHypstar:
 
             if self.context.get_config_value("fresnel_option") == 'Ruddick2006':
                 rhof = self.context.get_config_value("rhof_default")
-                print("Apply Ruddick et al., 2006")
+                self.context.logger.info("Apply Ruddick et al., 2006")
                 if wind[i] is not None:
                     rhof = rhof + 0.00039 * wind[i]  + 0.000034 * wind[i]  ** 2
 
@@ -301,10 +302,10 @@ class RhymerHypstar:
             ## skip spectra not following similarity
             if self.context.get_config_value("similarity_test") == True:
                 if fail_simil:
-                    if self.context.get_config_value("verbosity") > 2: print('Failed simil test.')
+                    if self.context.get_config_value("verbosity") > 2: self.context.logger.info('Failed simil test.')
                     continue
                 else:
-                    if self.context.get_config_value("verbosity") > 2: print('Passed simil test.')
+                    if self.context.get_config_value("verbosity") > 2: self.context.logger.info('Passed simil test.')
             epsilon[i] = eps
             failSimil[i]=fail_simil
         return epsilon, failSimil
@@ -376,7 +377,6 @@ class RhymerHypstar:
         L1a_uprad, L1a_downrad, L1a_irr = self.cycleparse(L1a_rad, L1a_irr)
         L1b_downrad = self.cal.average_l1b("radiance", L1a_downrad)
         L1b_irr = self.cal.average_l1b("irradiance", L1a_irr)
-
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         L1b = self.intp.interpolate_l1b_w(L1a_uprad, L1b_downrad, L1b_irr)
         if self.context.get_config_value("write_l1b")==True:

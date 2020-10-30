@@ -38,7 +38,7 @@ class SurfaceReflectance:
         l1ctol1d_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
 
-        if self.context.get_config_value("network") == "W":
+        if self.context.get_config_value("network").lower() == "w":
             dataset_l1d = self.l1d_from_l1c_dataset(dataset_l1c)
 
             # add required correction factors here - but better to add them in the function factory???
@@ -63,11 +63,16 @@ class SurfaceReflectance:
                 u_random_input_qty,
                 u_systematic_input_qty)
 
-            self.writer.write(dataset_l1d, overwrite=True)
+            if self.context.get_config_value("write_l1d"):
+                self.writer.write(dataset_l1d, overwrite=True)
+
             return dataset_l1d
 
-        elif self.context.get_config_value("network") == "L":
-            print("no L1d processing for land network")
+        elif self.context.get_config_value("network").lower() == "l":
+            self.context.logger.error("no L1d processing for land network")
+        else:
+            self.context.logger.error("network is not correctly defined")
+
 
     def process(self, dataset):
         dataset = self.perform_checks(dataset)
@@ -79,7 +84,7 @@ class SurfaceReflectance:
         u_systematic_input_qty = self.find_u_systematic_input(input_vars, dataset)
 
 
-        if self.context.get_config_value("network") == "W":
+        if self.context.get_config_value("network").lower() == "w":
             dataset_l2a = self.l2_from_l1d_dataset(dataset)
             for measurandstring in ["water_leaving_radiance", "reflectance_nosc", "reflectance"]:
                 dataset_l2a[measurandstring].values = self.calibrate.calc_mean_masked(dataset, measurandstring)
@@ -97,7 +102,7 @@ class SurfaceReflectance:
                 if self.context.get_config_value("plot_l2a"):
                     self.plot.plot_series_in_sequence(measurandstring,dataset_l2a)
 
-        elif self.context.get_config_value("network") == "L":
+        elif self.context.get_config_value("network").lower() == "l":
             dataset_l2a = self.l2_from_l1c_dataset(dataset)
             dataset_l2a = self.process_measurement_function(["reflectance"], dataset_l2a,
                                                             l1tol2_function.function,
@@ -188,13 +193,14 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
-        if self.context.get_config_value("network") == "L":
+        if self.context.get_config_value("network").lower() == "l":
             print("No L1D level for land")
 
-        elif self.context.get_config_value("network") == "W":
+        elif self.context.get_config_value("network").lower() == "w":
             l1d_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
                                   "scan": len(datasetl1c["scan"])}
             dataset_l1d = self.hdsb.create_ds_template(l1d_dim_sizes_dict, "W_L1D", propagate_ds=datasetl1c)
+            dataset_l1d=dataset_l1d.assign_coords(wavelength=datasetl1c.wavelength)
 
         return dataset_l1d
 
@@ -207,19 +213,21 @@ class SurfaceReflectance:
         :return:
         :rtype:
         """
-        if self.context.get_config_value("network") == "L":
+        if self.context.get_config_value("network").lower() == "l":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
                                   "series": len(datasetl1c['series_id'])}
             dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "L_L2A", propagate_ds=datasetl1c)
+            dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
 
         return dataset_l2a
 
     def l2_from_l1d_dataset(self, datasetl1d):
 
-        if self.context.get_config_value("network") == "W":
+        if self.context.get_config_value("network").lower() == "w":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1d["wavelength"]),
                                   "series": len(np.unique(datasetl1d['series_id']))}
             dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A", propagate_ds=datasetl1d)
+            dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1d.wavelength)
 
             series_id = np.unique(datasetl1d['series_id'])
             dataset_l2a["series_id"].values = series_id

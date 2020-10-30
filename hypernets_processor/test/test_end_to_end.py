@@ -11,7 +11,7 @@ from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceR
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.context import Context
 from hypernets_processor import HypernetsDSBuilder
-from hypernets_processor.test.test_functions import setup_test_context
+from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
 
 import os.path
 import matplotlib.pyplot as plt
@@ -116,13 +116,15 @@ class TestEndToEnd(unittest.TestCase):
         anomaly_db_url = "sqlite:///"+tmpdir+"/anomoly.db",
         archive_db_url = "sqlite:///"+tmpdir+"/archive.db",
         create_directories = True,
-        create_dbs = True )
+        create_dbs = False )
 
-        context.set_config_value('network', 'L')
+        context.set_config_value('network', 'l')
         context.set_config_value('measurement_function_calibrate', 'StandardMeasurementFunction')
         context.set_config_value('measurement_function_interpolate', 'LandNetworkInterpolationIrradianceLinear')
         context.set_config_value('measurement_function_surface_reflectance', 'LandNetworkProtocol')
         context.set_config_value("processor_directory",this_directory_path)
+        context.set_config_value("calibration_directory",os.path.join(this_directory_path,"..\examples\calibration_files"))
+
         context.set_config_value("archive_directory", os.path.join(tmpdir,"out"))
 
         context.set_config_value('version','0.1')
@@ -140,7 +142,7 @@ class TestEndToEnd(unittest.TestCase):
         context.set_config_value('plot_l1b',True)
         context.set_config_value('plot_diff',True)
         context.set_config_value('plotting_directory',os.path.join(tmpdir,"out/plots/"))
-        context.set_config_value('plotting_fmt',"png")
+        context.set_config_value('plotting_format',"png")
 
         print(context.get_config_value('plotting_directory'))
         cal = Calibrate(context,MCsteps=100)

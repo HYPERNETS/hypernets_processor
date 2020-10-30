@@ -4,7 +4,7 @@ DatasetUtil class
 
 from hypernets_processor.version import __version__
 import string
-from xarray import Variable, DataArray
+from xarray import Variable, DataArray, Dataset
 import numpy as np
 
 
@@ -35,7 +35,7 @@ class DatasetUtil:
 
         :type dtype: type
         :param dtype: numpy data type
-dekrie
+
         :type dim_names: list
         :param dim_names: (optional) dimension names as strings, i.e. ["dim1_name", "dim2_name", "dim3_size"]
 

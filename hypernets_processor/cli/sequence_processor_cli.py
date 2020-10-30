@@ -103,7 +103,7 @@ def cli():
                 if key[:5] == "write":
                     job_config["Output"][key] = "True"
 
-        job_config["Log"]["log_path"] = "test.log"#os.path.abspath(parsed_args.log) if parsed_args.log is not None else ""
+        job_config["Log"]["log_path"] = os.path.abspath(parsed_args.log) if parsed_args.log is not None else ""
         job_config["Log"]["verbose"] = str(parsed_args.verbose) if parsed_args.verbose is not None else ""
         job_config["Log"]["quiet"] = str(parsed_args.quiet) if parsed_args.verbose is not None else ""
 
