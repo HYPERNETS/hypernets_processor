@@ -86,7 +86,6 @@ def cli():
             processor_defaults = PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
 
         job_config = read_config_file([JOB_CONFIG_TEMPLATE_PATH, processor_defaults])
-
         if parsed_args.input_directory is not None:
             job_config["Input"]["raw_data_directory"] = os.path.abspath(parsed_args.input_directory)
         else:
@@ -115,7 +114,6 @@ def cli():
             job_config["Job"]["job_working_directory"],
             job_config["Job"]["job_name"] + ".config"
         )
-
         os.makedirs(job_config["Job"]["job_working_directory"], exist_ok=True)
         with open(job_config_path, "w") as f:
             job_config.write(f)
