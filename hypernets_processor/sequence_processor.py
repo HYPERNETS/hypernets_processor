@@ -44,6 +44,7 @@ class SequenceProcessor:
 
         # update context
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
+        self.context.set_config_value("site_abbr", "TEST")
         writer = HypernetsWriter(self.context)
 
         # Read L0
@@ -52,20 +53,11 @@ class SequenceProcessor:
         l0_irr, l0_rad, l0_bla = reader.read_sequence(sequence_path)
         self.context.logger.debug("Done")
 
-        # Write L0
-        if self.context.get_config_value("write_l0"):
-            self.context.logger.debug("Writing L0 data...")
-            writer.write(l0_irr)
-            writer.write(l0_rad)
-            writer.write(l0_bla)
-            # todo - add to archive database if to_archive
-            self.context.logger.debug("Done")
-
         # Calibrate to L1a
         self.context.logger.debug("Processing to L1a...")
-        calibrate = Calibrate(self.context, MCsteps=100)
-        L1a_rad = calibrate.calibrate_l1a("radiance", l0_rad, l0_bla)
-        L1a_irr = calibrate.calibrate_l1a("irradiance", l0_irr, l0_bla)
+        cal = Calibrate(self.context, MCsteps=100)
+        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
+        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
         self.context.logger.debug("Done")
 
         intp = Interpolate(self.context, MCsteps=1000)
@@ -93,11 +85,11 @@ class SequenceProcessor:
         elif self.context.get_config_value("network") == "l":
 
             self.context.logger.debug("Processing to L1b radiance...")
-            L1b_rad = calibrate.average_l1b("radiance", L1a_rad)
+            L1b_rad = cal.average_l1b("radiance", L1a_rad)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1b irradiance...")
-            L1b_irr = calibrate.average_l1b("irradiance", L1a_irr)
+            L1b_irr = cal.average_l1b("irradiance", L1a_irr)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1c...")
@@ -110,6 +102,8 @@ class SequenceProcessor:
 
         else:
             raise NameError("Invalid network: " + self.context.get_config_value("network"))
+
+        self.context.logger.info("All Done")
 
         return None
 
