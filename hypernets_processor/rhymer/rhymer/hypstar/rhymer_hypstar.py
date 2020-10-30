@@ -13,6 +13,7 @@ from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.interpolation.interpolate import Interpolate
+from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 
@@ -28,6 +29,7 @@ class RhymerHypstar:
         self.writer = HypernetsWriter(context)
         self.cal = Calibrate(context, MCsteps=100)
         self.intp = Interpolate(context, MCsteps=1000)
+        self.plot=Plotting(context)
         self.rhymeranc = RhymerAncillary(context)
         self.rhymerproc = RhymerProcessing(context)
         self.rhymershared = RhymerShared(context)
@@ -384,10 +386,7 @@ class RhymerHypstar:
         return L1b
 
     def process_l1c(self, l1b):
-
-        l1c_dim_sizes_dict = {"wavelength": len(l1b["wavelength"]),
-                              "scan": len(np.unique(l1b['scan']))}
-        dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict, "W_L1C", propagate_ds=l1b)
+        dataset_l1c = self.l1c_from_l1b_dataset(l1b)
 
         dataset_l1c = self.get_wind(dataset_l1c)
         dataset_l1c = self.get_fresnelrefl(dataset_l1c)
@@ -399,5 +398,29 @@ class RhymerHypstar:
         dataset_l1c['reflectance_nosc'].values = rhow_nosc_all.T
         #dataset_l1c['epsilon'].values = epsilon
         dataset_l1c['water_leaving_radiance'].values = lw_all.T
+
+        if self.context.get_config_value("write_l1c"):
+            self.writer.write(dataset_l1c,overwrite=True)
+
+        if self.context.get_config_value("plot_l1c"):
+            self.plot.plot_scans_in_series("irradiance",dataset_l1c)
+
+        return dataset_l1c
+
+    def l1c_from_l1b_dataset(self,dataset_l1b):
+        """
+        Makes a L2 template of the data, and propagates the appropriate keywords from L1.
+
+        :param datasetl0:
+        :type datasetl0:
+        :return:
+        :rtype:
+        """
+        l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
+                              "scan":len(np.unique(dataset_l1b['scan']))}
+
+        dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"W_L1C",
+                                                   propagate_ds=dataset_l1b)
+        dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
 
         return dataset_l1c
