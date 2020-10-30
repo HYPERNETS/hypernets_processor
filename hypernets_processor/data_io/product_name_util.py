@@ -32,6 +32,7 @@ DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
                     "W_L1B": "L1B",
                     "L_L1C": "L1C",
                     "W_L1C": "L1C",
+                    "W_L1D": "L1D",
                     "L_L2A": "L2A_REF",
                     "W_L2A": "L2A_REF",
                     "L_L2B": "L2B_REF",
@@ -78,7 +79,7 @@ class ProductNameUtil:
             network = self.context.get_config_value("network")
 
         if (site is None) and (self.context is not None):
-            site = self.context.get_config_value("site")
+            site = self.context.get_config_value("site_abbr")
 
         if (time is None) and (self.context is not None):
             time = self.context.get_config_value("time")

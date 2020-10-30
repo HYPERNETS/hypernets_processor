@@ -5,7 +5,10 @@ Contains main class for orchestrating hypernets data processing jobs
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
-from hypernets_processor.interpolation.interpolate import InterpolateL1c
+from hypernets_processor.interpolation.interpolate import Interpolate
+from hypernets_processor.plotting.plotting import Plotting
+from hypernets_processor.utils.logging import configure_logging
+from hypernets_processor.utils.config import read_config_file
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.context import Context
 from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
@@ -43,6 +46,10 @@ class HypernetsProcessor:
         """
         Constructor method
         """
+        if "job_name" in job_config["Job"].keys():
+            name = job_config["Job"]["job_name"]
+
+        logger = configure_logging(config=job_config,name=name)
         self.context = Context(job_config,processor_config,logger)
 
 
@@ -51,30 +58,19 @@ class HypernetsProcessor:
         # Runs hypernets data processing jobs
         # """
 
-        processor_config = "/home/clem/OneDrive/projects/hypernets_processor/hypernets_processor/etc/processor.config"
-        print(os.path.isfile(processor_config))
-
-        self.context = Context(processor_config=processor_config)
-        self.context.set_config_value('fresnel_option', 'Mobley')
-        print(self.context.get_config_names())
-
-        print(self.context.get_config_value("lat"))
-
-
-
-
-
 
         # run L0
-        set_dir = "~/OneDrive/projects/hypernets_processor/hypernets_processor"
+        # set_dir = "~/OneDrive/projects/hypernets_processor/hypernets_processor"
         # settings_file = set_dir + '/data/settings/default.txt'
-        server_dir = "/home/clem/OneDrive/projects/hypernets_processor/hypernets_processor/data_io/tests/reader/"
-        seq_id="SEQ20200916T124255"
+        server_dir = os.path.join(this_directory_path,"data_io/tests/reader/")
+        seq_id=self.context.get_config_value("sequence_id")
+        print(self.context.get_config_value("write_l0"))
 
         # seq_dir=server_dir+"reader/SEQ20200625T095941/"
         seq_dir = server_dir + seq_id+"/"
 
-        L0_IRR, L0_RAD, L0_BLA = HypernetsReader(self.context).read_sequence(seq_dir)
+        l0_irr, l0_rad, l0_bla = HypernetsReader(self.context).read_sequence(seq_dir)
+        l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
 
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ", "")
@@ -148,13 +144,11 @@ class HypernetsProcessor:
         #     plt.show()
         #     data.close()
 
-        ds_bla = xr.open_dataset(ProductNameUtil(self.context).create_product_name(ds_format="L0_BLA", time=seq_id))
-        ds_rad = xr.open_dataset(ProductNameUtil(self.context).create_product_name(ds_format="L0_RAD", time=seq_id))
-        ds_irr = xr.open_dataset(ProductNameUtil(self.context).create_product_name(ds_format="L0_IRR", time=seq_id))
+        # l0_bla = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_BLA", time=seq_id)+".nc")
+        # l0_rad = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_RAD", time=seq_id)+".nc")
+        # l0_irr = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_IRR", time=seq_id)+".nc")
 
-        # ds_bla = ds_bla.rename({"digital_number":"dark_signal"})
-        # ds_bla["digital_number"].values= ds_bla["digital_number"].values/10.
-        print(datetime.utcfromtimestamp(i) for i in ds_rad['acquisition_time'].values)
+        #print(datetime.utcfromtimestamp(i) for i in ds_rad['acquisition_time'].values)
 
         #np.save("wavs_hypernets.npy",ds_rad["wavelength"].values)
 
@@ -170,22 +164,13 @@ class HypernetsProcessor:
         # context.measurement_function_surface_reflectance = "WaterNetworkProtocol"
 
         cal = Calibrate(self.context, MCsteps=100)
-        intp = InterpolateL1c(self.context, MCsteps=100)
+        intp = Interpolate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=100)
         rhymer = RhymerHypstar(self.context)
 
-        calibration_data = {}
-        calibration_data["gains"] = np.ones(len(ds_rad["wavelength"]))
-        calibration_data["temp"] = 20 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_random_gains"] = 0.1 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_random_dark_signal"] = np.zeros((len(ds_rad["wavelength"])))
-        calibration_data["u_random_temp"] = 1 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_systematic_gains"] = 0.05 * np.ones(len(ds_rad["wavelength"]))
-        calibration_data["u_systematic_dark_signal"] = np.zeros((len(ds_rad["wavelength"])))
-        calibration_data["u_systematic_temp"] = 1 * np.ones(len(ds_rad["wavelength"]))
+        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
+        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
 
-        L1a_rad = cal.calibrate_l1a("radiance", ds_rad, ds_bla, calibration_data)
-        L1a_irr = cal.calibrate_l1a("irradiance", ds_irr, ds_bla, calibration_data)
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 
@@ -208,10 +193,11 @@ class HypernetsProcessor:
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
         #
         L1c=rhymer.process_l1c(L1b)
-
         #L1d_irr = cal.average_l1b("irradiance", L1c)
+        L1d= surf.process_l1d(L1c)
+        print("rad",L1d["u_random_downwelling_radiance"])
 
-        L2a = surf.process(L1c)
+        L2a = surf.process(L1d)
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
         # wind=RhymerHypstar(context).retrieve_wind(L1c)
@@ -227,11 +213,18 @@ class HypernetsProcessor:
         # L2a
         # print(L1b)
         # # L2a=surf.process(L1c,"LandNetworkProtocol")
-
+        self.context.logger.info("all done!")
+        print("all done!")
         return None
 
 
 if __name__ == "__main__":
-    hp = HypernetsProcessor()
+    this_directory_path = os.path.abspath(os.path.dirname(__file__))
+    processor_config_path= os.path.join(this_directory_path,"etc/processor.config")
+    job_config_path= os.path.join(this_directory_path,"etc/job.config")
+    processor_config = read_config_file(processor_config_path)
+    job_config = read_config_file(job_config_path)
+    hp = HypernetsProcessor(job_config=job_config,processor_config=processor_config)
+    hp.context.set_config_value("processor_directory",this_directory_path)
     hp.run()
     pass
