@@ -47,11 +47,9 @@ class SurfaceReflectance:
                                                   dataset_l1d["wavelength"].values)
             dataset_l1d["epsilon"].values = epsilon
 
-            flagval = 2 ** (self.context.get_config_value("simil_fail"))
-
-            dataset_l1d["quality_flag"].values = [
-                flagval + dataset_l1d["quality_flag"].values[i] if failSimil[i] == True else
-                dataset_l1d["quality_flag"].values[i] for i in range(len(failSimil))]
+            dataset_l1d["quality_flag"][dataset_l1d["scan"] == [i for i, x in enumerate(failSimil) if x]] = du.set_flag(
+                dataset_l1d["quality_flag"][dataset_l1d["scan"] == [i for i, x in enumerate(failSimil) if x]],
+                "simil_fail")
 
             input_vars = l1ctol1d_function.get_argument_names()
             input_qty = self.find_input(input_vars, dataset_l1d)
@@ -260,8 +258,13 @@ class SurfaceReflectance:
                                    "solar_zenith_angle"]:
                 temp_arr = np.empty(len(series_id))
                 for i in range(len(series_id)):
-                    ids = np.where((datasetl1d['series_id'] == series_id[i]) & (
-                            datasetl1d['quality_flag'] == 1))
+                    flags = ["saturation", "nonlinearity", "bad_pointing", "outliers",
+                             "angles_missing", "lu_eq_missing", "fresnel_angle_missing",
+                             "fresnel_default", "temp_variability_ed", "temp_variability_lu",
+                             "min_nbred", "min_nbrlu", "min_nbrlsky"]
+                    flagged = np.any([du.unpack_flags(datasetl1d['quality_flag'])[x] for x in flags], axis=0)
+                    ids = np.where(
+                        (datasetl1d['series_id'] == series_id[i]) & (flagged == False))
                     temp_arr[i] = np.mean(datasetl1d[variablestring].values[ids])
                 dataset_l2a[variablestring].values = temp_arr
 

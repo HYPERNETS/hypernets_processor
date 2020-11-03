@@ -112,7 +112,7 @@ setup(
         "dataset",
         "sqlalchemy-utils",
         "punpy",
-        "psycopg2",
+        # "psycopg2",
     ],
     entry_points={
         "console_scripts": [

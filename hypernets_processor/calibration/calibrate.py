@@ -74,6 +74,7 @@ class Calibrate:
     def prepare_calibration_data(self,measurandstring):
         hypstar=self.context.get_config_value("hypstar_cal_number")
         directory=self.context.get_config_value("calibration_directory")
+        print(directory)
         caldates=[os.path.basename(path) for path in glob.glob
         (os.path.join(directory,"hypstar_"+str(hypstar)+"/radiometric/*"))]
         caldate=caldates[0]
