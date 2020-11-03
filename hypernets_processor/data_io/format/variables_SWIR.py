@@ -28,6 +28,8 @@ from hypernets_processor.data_io.format.flags import FLAG_WATER
 
 # Dimensions
 WL_DIM = "wavelength"
+WL_SWIR_DIM = "wavelength_SWIR"
+WL_VNIR_DIM = "wavelength_VNIR"
 SERIES_DIM = "series"
 SCAN_DIM = "scan"
 Lu_SCAN_DIM = "scan"
@@ -37,18 +39,45 @@ SEQ_DIM = "sequence"
 # --------------------------
 
 # > COMMON_VARIABLES - Variables are required for a data products
-COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
+L_WVL_VARIABLES_SCAN = {"wavelength_VNIR": {"dim": [WL_VNIR_DIM],
                                           "dtype": np.float32,
                                           "attributes": {"standard_name": "wavelength",
                                                          "long_name": "Wavelength",
                                                          "units": "nm",
                                                          "preferred_symbol": "wv"},
                                           "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
-                           "bandwidth": {"dim": [WL_DIM],
+                           "bandwidth_VNIR": {"dim": [WL_VNIR_DIM],
                                          "dtype": np.float32,
                                          "attributes": {},
                                          "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
-                           "viewing_azimuth_angle": {"dim": [SERIES_DIM],
+
+                            "wavelength_SWIR": {"dim": [WL_SWIR_DIM],
+                                          "dtype": np.float32,
+                                          "attributes": {"standard_name": "wavelength",
+                                                         "long_name": "Wavelength",
+                                                         "units": "nm",
+                                                         "preferred_symbol": "wv"},
+                                          "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
+                           "bandwidth_SWIR": {"dim": [WL_SWIR_DIM],
+                                         "dtype": np.float32,
+                                         "attributes": {},
+                                         "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}}
+                          }
+
+WVL_VARIABLES_SCAN = {"wavelength": {"dim": [WL_DIM],
+                                            "dtype": np.float32,
+                                            "attributes": {"standard_name": "wavelength",
+                                                           "long_name": "Wavelength",
+                                                           "units": "nm",
+                                                           "preferred_symbol": "wv"},
+                                            "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}},
+                        "bandwidth": {"dim": [WL_DIM],
+                                           "dtype": np.float32,
+                                           "attributes": {},
+                                           "encoding": {'dtype': np.uint16, "scale_factor": 0.1, "offset": 0.0}}
+                      }
+
+COMMON_VARIABLES_SCAN = {"viewing_azimuth_angle": {"dim": [SCAN_DIM],
                                                      "dtype": np.float32,
                                                      "attributes": {"standard_name": "sensor_azimuth_angle",
                                                                     "long_name": "sensor_azimuth_angle is the "
@@ -69,7 +98,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                      "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
                                                                   "offset": 0.0}},
 
-                           "viewing_zenith_angle": {"dim": [SERIES_DIM],
+                           "viewing_zenith_angle": {"dim": [SCAN_DIM],
                                                     "dtype": np.float32,
                                                     "attributes": {"standard_name": "sensor_zenith_angle",
                                                                    "long_name": "sensor_zenith_angle is the angle "
@@ -91,7 +120,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                     "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
                                                                  "offset": 0.0}},
 
-                           "solar_azimuth_angle": {"dim": [SERIES_DIM],
+                           "solar_azimuth_angle": {"dim": [SCAN_DIM],
                                                    "dtype": np.float32,
                                                    "attributes": {"standard_name": "solar_azimuth_angle",
                                                                   "long_name": "Solar azimuth angle is the horizontal "
@@ -105,7 +134,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                    "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
                                                                 "offset": 0.0}},
 
-                           "solar_zenith_angle": {"dim": [SERIES_DIM],
+                           "solar_zenith_angle": {"dim": [SCAN_DIM],
                                                   "dtype": np.float32,
                                                   "attributes": {"standard_name": "solar_zenith_angle",
                                                                  "long_name": "Solar zenith angle is the the angle "
@@ -115,7 +144,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                                  "preferred_symbol": "sza"},
                                                   "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
                                                                "offset": 0.0}},
-                           "acquisition_time": {"dim": [SERIES_DIM],
+                           "acquisition_time": {"dim": [SCAN_DIM],
                                                 "dtype": np.uint32,
                                                 "attributes": {"standard_name": "time",
                                                                "long_name": "Acquisition time in seconds since "
@@ -124,7 +153,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                                "units": "s"},
                                                 "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
 
-                           "series_id": {"dim": [SERIES_DIM],
+                           "series_id": {"dim": [SCAN_DIM],
                                          "dtype": np.uint16,
                                          "attributes": {"standard_name": "series_id",
                                                         "long_name": "Series id number",
@@ -132,19 +161,19 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                          "encoding": {'dtype': np.uint16, "scale_factor": 1, "offset": 0.0}}
                            }
 
-COMMON_VARIABLES_SEQ = deepcopy(COMMON_VARIABLES_SERIES)
-COMMON_VARIABLES_SCAN = deepcopy(COMMON_VARIABLES_SERIES)
+COMMON_VARIABLES_SERIES = deepcopy(COMMON_VARIABLES_SCAN)
 COMMON_VARIABLES_Lu_SCAN = deepcopy(COMMON_VARIABLES_SERIES)
+COMMON_VARIABLES_SEQ = deepcopy(COMMON_VARIABLES_SCAN)
 
 for variable in COMMON_VARIABLES_SEQ.keys():
-    COMMON_VARIABLES_SEQ[variable]["dim"] = [d if d != SERIES_DIM else SEQ_DIM
-                                             for d in COMMON_VARIABLES_SERIES[variable]["dim"]]
-for variable in COMMON_VARIABLES_SCAN.keys():
-    COMMON_VARIABLES_SCAN[variable]["dim"] = [d if d != SERIES_DIM else SCAN_DIM
-                                              for d in COMMON_VARIABLES_SERIES[variable]["dim"]]
+    COMMON_VARIABLES_SEQ[variable]["dim"] = [d if d != SCAN_DIM else SEQ_DIM
+                                             for d in COMMON_VARIABLES_SCAN[variable]["dim"]]
+for variable in COMMON_VARIABLES_SERIES.keys():
+    COMMON_VARIABLES_SERIES[variable]["dim"] = [d if d != SCAN_DIM else SERIES_DIM
+                                              for d in COMMON_VARIABLES_SCAN[variable]["dim"]]
 for variable in COMMON_VARIABLES_Lu_SCAN.keys():
-    COMMON_VARIABLES_Lu_SCAN[variable]["dim"] = [d if d != SERIES_DIM else Lu_SCAN_DIM
-                                                 for d in COMMON_VARIABLES_SERIES[variable]["dim"]]
+    COMMON_VARIABLES_Lu_SCAN[variable]["dim"] = [d if d != SCAN_DIM else Lu_SCAN_DIM
+                                                 for d in COMMON_VARIABLES_SCAN[variable]["dim"]]
 
 # > L0_VARIABLES - Variables required for the L0 dataset
 # SHOULD I ADD MAX NUMBER OF CHARACTERS FOR SERIES ID.... or is acquisition time sufficient - extra check required ????
@@ -156,7 +185,7 @@ for variable in COMMON_VARIABLES_Lu_SCAN.keys():
 #                                   "encoding": {'dtype': np.unicode_}},
 
 
-L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
+L_L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                                          "dtype": np.uint32,
                                          "attributes": {"standard_name": "integration_time",
                                                         "long_name": "Integration time during measurement",
@@ -204,7 +233,13 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                                                           "long_name": "",
                                                           "units": "-"},
                                            "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
-                    "digital_number": {"dim": [WL_DIM, SCAN_DIM],
+                    "digital_number_VNIR": {"dim": [WL_VNIR_DIM, SCAN_DIM],
+                                       "dtype": np.float32,
+                                       "attributes": {"standard_name": "digital_number",
+                                                      "long_name": "Digital number, raw data",
+                                                      "units": "-"},
+                                       "encoding": {'dtype': np.float32, "scale_factor": 1, "offset": 0.0}}
+                    "digital_number_SWIR": {"dim": [WL_SWIR_DIM, SCAN_DIM],
                                        "dtype": np.float32,
                                        "attributes": {"standard_name": "digital_number",
                                                       "long_name": "Digital number, raw data",
@@ -217,8 +252,79 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                     #                               "units": "-"}}
                     }
 
-L0_IRR_VARIABLES = L0_RAD_VARIABLES
-L0_BLA_VARIABLES = L0_RAD_VARIABLES
+L_L0_IRR_VARIABLES = L_L0_RAD_VARIABLES
+L_L0_BLA_VARIABLES = L_L0_RAD_VARIABLES
+
+
+W_L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
+                                         "dtype": np.uint32,
+                                         "attributes": {"standard_name": "integration_time",
+                                                        "long_name": "Integration time during measurement",
+                                                        "units": "s"},
+                                         "encoding": {'dtype': np.uint32, "scale_factor": 1, "offset": 0.0}},
+                    "temperature": {"dim": [SCAN_DIM],
+                                    "dtype": np.uint32,
+                                    "attributes": {"standard_name": "temperature",
+                                                   "long_name": "temperature of instrument",
+                                                   "units": "degrees"},
+                                    "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
+                    "acceleration_x_mean": {"dim": [SCAN_DIM],
+                                            "dtype": np.uint32,
+                                            "attributes": {"standard_name": "acceleration_x_mean",
+                                                           "long_name": "Time during measurement",
+                                                           "units": "-"},
+                                            "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
+                    "acceleration_x_std": {"dim": [SCAN_DIM],
+                                           "dtype": np.uint32,
+                                           "attributes": {"standard_name": "acceleration_x_std",
+                                                          "long_name": "",
+                                                          "units": "-"},
+                                           "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
+                    "acceleration_y_mean": {"dim": [SCAN_DIM],
+                                            "dtype": np.uint32,
+                                            "attributes": {"standard_name": "acceleration_y_mean",
+                                                           "long_name": "",
+                                                           "units": "-"},
+                                            "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
+                    "acceleration_y_std": {"dim": [SCAN_DIM],
+                                           "dtype": np.uint32,
+                                           "attributes": {"standard_name": "acceleration_y_std",
+                                                          "long_name": "",
+                                                          "units": "-"},
+                                           "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
+                    "acceleration_z_mean": {"dim": [SCAN_DIM],
+                                            "dtype": np.uint32,
+                                            "attributes": {"standard_name": "acceleration_z_mean",
+                                                           "long_name": "",
+                                                           "units": "-"},
+                                            "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
+                    "acceleration_z_std": {"dim": [SCAN_DIM],
+                                           "dtype": np.uint32,
+                                           "attributes": {"standard_name": "acceleration_z_std",
+                                                          "long_name": "",
+                                                          "units": "-"},
+                                           "encoding": {'dtype': np.uint32, "scale_factor": 0.01, "offset": 0.0}},
+                    "digital_number_VNIR": {"dim": [WL_VNIR_DIM, SCAN_DIM],
+                                       "dtype": np.float32,
+                                       "attributes": {"standard_name": "digital_number",
+                                                      "long_name": "Digital number, raw data",
+                                                      "units": "-"},
+                                       "encoding": {'dtype': np.float32, "scale_factor": 1, "offset": 0.0}}
+                    "digital_number_SWIR": {"dim": [WL_SWIR_DIM, SCAN_DIM],
+                                       "dtype": np.float32,
+                                       "attributes": {"standard_name": "digital_number",
+                                                      "long_name": "Digital number, raw data",
+                                                      "units": "-"},
+                                       "encoding": {'dtype': np.float32, "scale_factor": 1, "offset": 0.0}}
+                    # "series_id": {"dim": [SCAN_DIM],
+                    #                "dtype": np.chararray,
+                    #                "attributes": {"standard_name": "series_id",
+                    #                               "long_name": "series_id",
+                    #                               "units": "-"}}
+                    }
+
+W_L0_IRR_VARIABLES = W_L0_RAD_VARIABLES
+W_L0_BLA_VARIABLES = W_L0_RAD_VARIABLES
 
 # > L1A_RAD_VARIABLES - Radiance Variables required for L1 data products (except water L1B)
 L1A_RAD_VARIABLES = {"u_random_radiance": {"dim": [WL_DIM, SCAN_DIM],
@@ -880,22 +986,25 @@ for variable in W_QUALITY_SCAN.keys():
 # File format variable defs
 # -------------------------
 
-VARIABLES_DICT_DEFS: Any = {"L0_RAD": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_RAD_VARIABLES},
-                            "L0_IRR": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_IRR_VARIABLES},
-                            "L0_BLA": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_BLA_VARIABLES},
-                            "L_L1A_RAD": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_RAD_VARIABLES},
-                            "W_L1A_RAD": {**COMMON_VARIABLES_SCAN, **W_QUALITY_SCAN, **L1A_RAD_VARIABLES},
-                            "L_L1A_IRR": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_IRR_VARIABLES},
-                            "W_L1A_IRR": {**COMMON_VARIABLES_SCAN, **W_QUALITY_SCAN, **L1A_IRR_VARIABLES},
-                            "L_L1B_RAD": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_RAD_VARIABLES},
-                            "W_L1B": {**COMMON_VARIABLES_Lu_SCAN, **W_QUALITY_SCAN, **W_L1B_VARIABLES},
-                            "L_L1B_IRR": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_IRR_VARIABLES},
-                            "L_L1C": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_RAD_VARIABLES, **L1B_IRR_VARIABLES},
-                            "W_L1C": {**COMMON_VARIABLES_Lu_SCAN, **W_QUALITY_SCAN, **W_L1B_VARIABLES,
+VARIABLES_DICT_DEFS: Any = {"L_L0_RAD": {**WVL_VARIABLES_L, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_RAD_VARIABLES},
+                            "L_L0_IRR": {**WVL_VARIABLES_L, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_IRR_VARIABLES},
+                            "L_L0_BLA": {**WVL_VARIABLES_L, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_BLA_VARIABLES},
+                            "W_L0_RAD": {**WVL_VARIABLES, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_RAD_VARIABLES},
+                            "W_L0_IRR": {**WVL_VARIABLES, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_IRR_VARIABLES},
+                            "W_L0_BLA": {**WVL_VARIABLES, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0_BLA_VARIABLES},
+                            "L_L1A_RAD": {**WVL_VARIABLES, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_RAD_VARIABLES},
+                            "W_L1A_RAD": {**WVL_VARIABLES, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_RAD_VARIABLES},
+                            "L_L1A_IRR": {**WVL_VARIABLES, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_IRR_VARIABLES},
+                            "W_L1A_IRR": {**WVL_VARIABLES, **COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_IRR_VARIABLES},
+                            "L_L1B_RAD": {**WVL_VARIABLES, **COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_RAD_VARIABLES},
+                            "W_L1B": {**WVL_VARIABLES, **COMMON_VARIABLES_Lu_SCAN, **W_QUALITY_SCAN, **W_L1B_VARIABLES},
+                            "L_L1B_IRR": {**WVL_VARIABLES, **COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_IRR_VARIABLES},
+                            "L_L1C": {**WVL_VARIABLES, **COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_RAD_VARIABLES, **L1B_IRR_VARIABLES},
+                            "W_L1C": {**WVL_VARIABLES, **COMMON_VARIABLES_Lu_SCAN, **W_QUALITY_SCAN, **W_L1B_VARIABLES,
                                       **W_L1C_VARIABLES},
-                            "W_L1D": {**COMMON_VARIABLES_Lu_SCAN, **W_QUALITY_SCAN, **W_L1B_VARIABLES,
+                            "W_L1D": {**WVL_VARIABLES, **COMMON_VARIABLES_Lu_SCAN, **W_QUALITY_SCAN, **W_L1B_VARIABLES,
                                       **W_L1C_VARIABLES, **W_L1D_REFLECTANCE_VARIABLES},
-                            "L_L2A": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L_L2A_REFLECTANCE_VARIABLES},
-                            "W_L2A": {**COMMON_VARIABLES_SERIES, **W_QUALITY_SERIES, **W_L2A_REFLECTANCE_VARIABLES},
-                            "L_L2B": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L_L2B_REFLECTANCE_VARIABLES}
+                            "L_L2A": {**WVL_VARIABLES, **COMMON_VARIABLES_SERIES, **L_QUALITY, **L_L2A_REFLECTANCE_VARIABLES},
+                            "W_L2A": {**WVL_VARIABLES, **COMMON_VARIABLES_SERIES, **W_QUALITY_SERIES, **W_L2A_REFLECTANCE_VARIABLES},
+                            "L_L2B": {**WVL_VARIABLES, **COMMON_VARIABLES_SERIES, **L_QUALITY, **L_L2B_REFLECTANCE_VARIABLES}
                             }

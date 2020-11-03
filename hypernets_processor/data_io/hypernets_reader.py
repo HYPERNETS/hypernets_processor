@@ -52,12 +52,9 @@ class HypernetsReader:
         plt.show()
 
     def read_header(self, f, headerDef):
-
         header = {}
         for headLen, headName, headFormat in headerDef:
-            print('this is headLen', headLen)
             data = f.read(headLen)
-            print(data)
             if len(data) != headLen:
                 self.context.logger.error("Spectra length not similar to header length")
                 break
@@ -96,9 +93,7 @@ class HypernetsReader:
         prev = 0
         self.context.logger.info("Reading Data spectra ...")
         dataSpectra = []
-        print(data_len)
         for i in range(int(data_len)):  # Last read data is count
-            # print(i)
             data = f.read(2)
             if len(data) != 2:
                 self.context.logger.error("Warning : impossible to read 2 bytes")
@@ -109,7 +104,6 @@ class HypernetsReader:
             unpackData, = unpack('<H', data)
             dataSpectra.append(unpackData)
             prev = unpackData
-        # print(dataSpectra)
         return dataSpectra
 
     def read_footer(self, f, datalength):
@@ -121,7 +115,6 @@ class HypernetsReader:
     def read_wavelength(self, pixcount):
 
         import numpy as np
-        print(pixcount)
         pix = np.linspace(0, pixcount, pixcount)
         if pixcount == 2048:
             self.context.logger.info("Visible spectra, pixel count {}".format(pix))
