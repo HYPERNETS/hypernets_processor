@@ -130,9 +130,9 @@ class SurfaceReflectance:
                      "angles_missing","lu_eq_missing","fresnel_angle_missing",
                      "fresnel_default","temp_variability_ed","temp_variability_lu",
                      "min_nbred","min_nbrlu","min_nbrlsky"]
-            nonflagged = any(x in DatasetUtil.unpack_flags(dataset['quality_flag']) for x in flags)
+            flagged = np.any([DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in flags],axis=0)
             ids = np.where(
-                (dataset['series_id'] == series_id[i]) & (nonflagged == False))
+                (dataset['series_id'] == series_id[i]) & (flagged == False))
 
             out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
             if rand_unc:
