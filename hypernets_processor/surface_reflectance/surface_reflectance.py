@@ -9,6 +9,7 @@ from hypernets_processor.surface_reflectance.measurement_functions.protocol_fact
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.plotting.plotting import Plotting
+from hypernets_processor.data_io.dataset_util import DatasetUtil
 
 import punpy
 import numpy as np
@@ -87,16 +88,16 @@ class SurfaceReflectance:
         if self.context.get_config_value("network").lower() == "w":
             dataset_l2a = self.l2_from_l1d_dataset(dataset)
             for measurandstring in ["water_leaving_radiance", "reflectance_nosc", "reflectance"]:
-                dataset_l2a[measurandstring].values = self.calibrate.calc_mean_masked(dataset, measurandstring)
-                dataset_l2a["u_random_" + measurandstring].values = self.calibrate.calc_mean_masked(dataset,
+                dataset_l2a[measurandstring].values = self.calc_mean_masked(dataset, measurandstring)
+                dataset_l2a["u_random_" + measurandstring].values = self.calc_mean_masked(dataset,
                                                                                                     "u_random_" + measurandstring,
                                                                                                     rand_unc=True)
-                dataset_l2a["u_systematic_" + measurandstring].values = self.calibrate.calc_mean_masked(dataset,
+                dataset_l2a["u_systematic_" + measurandstring].values = self.calc_mean_masked(dataset,
                                                                                                         "u_systematic_" + measurandstring,
                                                                                                         rand_unc=True)
                 dataset_l2a["corr_random_" + measurandstring].values = np.eye(
                     len(dataset_l2a["u_systematic_" + measurandstring].values))
-                dataset_l2a["corr_systematic_" + measurandstring].values = self.calibrate.calc_mean_masked(dataset,
+                dataset_l2a["corr_systematic_" + measurandstring].values = self.calc_mean_masked(dataset,
                                                                                                            "corr_systematic_" + measurandstring,
                                                                                                            corr=True)
                 if self.context.get_config_value("plot_l2a"):
@@ -117,6 +118,28 @@ class SurfaceReflectance:
 
 
         return dataset_l2a
+
+    def calc_mean_masked(self, dataset, var, rand_unc=False, corr=False):
+        series_id = np.unique(dataset['series_id'])
+        if corr:
+            out = np.empty((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
+        else:
+            out = np.empty((len(series_id), len(dataset['wavelength'])))
+        for i in range(len(series_id)):
+            flags = ["saturation","nonlinearity","bad_pointing","outliers",
+                     "angles_missing","lu_eq_missing","fresnel_angle_missing",
+                     "fresnel_default","temp_variability_ed","temp_variability_lu",
+                     "min_nbred","min_nbrlu","min_nbrlsky"]
+            nonflagged = any(x in DatasetUtil.unpack_flags(dataset['quality_flag']) for x in flags)
+            ids = np.where(
+                (dataset['series_id'] == series_id[i]) & (nonflagged == False))
+
+            out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
+            if rand_unc:
+                out[i] = out[i] / len(ids[0])
+        if corr:
+            out = np.mean(out, axis=0)
+        return out.T
 
     def find_input(self, variables, dataset):
         """
