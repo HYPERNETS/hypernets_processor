@@ -90,11 +90,13 @@ class RhymerHypstar:
                 if v > self.context.get_config_value("diff_threshold"):
                     # get flag value for the temporal variability
                     if measurandstring == 'irradiance':
-                        dataset['quality_flag'][scans[i]] = du.set_flag(dataset["quality_flag"][scans[i]],
-                                                                        "temp_variability_ed")
+                        dataset['quality_flag'][dataset['scan'] == i] = du.set_flag(
+                            dataset["quality_flag"][dataset['scan'] == i],
+                            "temp_variability_ed")
                     else:
-                        dataset['quality_flag'][scans[i]] = du.set_flag(dataset["quality_flag"][scans[i]],
-                                                                        "temp_variability_lu")
+                        dataset['quality_flag'][dataset['scan'] == i] = du.set_flag(
+                            dataset["quality_flag"][dataset['scan'] == i],
+                            "temp_variability_lu")
 
                     seq = dataset.attrs["sequence_id"]
                     ts = datetime.utcfromtimestamp(dataset['acquisition_time'][i])
@@ -172,29 +174,33 @@ class RhymerHypstar:
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
             for i in senz_lu:
                 if i not in senz_lsky:
-                    lu["quality_flag"][lu["viewing_azimuth_angle"] == i] = du.set_flag(lu["quality_flag"][lu["viewing_azimuth_angle"]==i],"fresnel_angle_missing")
-                    ts = [datetime.utcfromtimestamp(x) for x in lu['acquisition_time'][lu["viewing_zenith_angle"] == i].values]
+                    lu["quality_flag"][lu["viewing_azimuth_angle"] == i] = du.set_flag(
+                        lu["quality_flag"][lu["viewing_azimuth_angle"] == i], "fresnel_angle_missing")
+                    ts = [datetime.utcfromtimestamp(x) for x in
+                          lu['acquisition_time'][lu["viewing_zenith_angle"] == i].values]
                     self.context.logger.info(
-                            'No downwelling radiance measurement at appropriate fresnel angle: Aquisition time {}, {}'.format(
-                                ts, ', '.join(
-                                    ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k
-                                     in ['scan', 'quality_flag']])))
+                        'No downwelling radiance measurement at appropriate fresnel angle: Aquisition time {}, {}'.format(
+                            ts, ', '.join(
+                                ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k
+                                 in ['scan', 'quality_flag']])))
 
             # check if correct number of radiance and irradiance data
 
             if lu.scan[lu['quality_flag'] <= 0].count() < nbrlu:
-                lu["quality_flag"].values = [du.set_flag(lu["quality_flag"][lu["scan"] == i], "min_nbrlu") for
-                                             i in lu["scan"]]
+
+                for i in range(len(lu["scan"])):
+                    lu["quality_flag"][lu["scan"]==i] = du.set_flag(lu["quality_flag"][lu["scan"] == i], "min_nbrlu")
                 self.context.logger.info(
                     "No enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
             if lsky.scan[lsky['quality_flag'] <= 1].count() < nbrlsky:
-                lsky["quality_flag"].values = [du.set_flag(lsky["quality_flag"][lu["scan"] == i], "min_nbrlu") for
-                                               i in lsky["scan"]]
+                for i in range(len(lsky["scan"])):
+                    lsky["quality_flag"][lsky["scan"] == i] = du.set_flag(lsky["quality_flag"][lsky["scan"] == i], "min_nbrlsky")
                 self.context.logger.info(
                     "No enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
             if irr.scan[irr['quality_flag'] <= 1].count() < nbred:
-                irr["quality_flag"].values = [du.set_flag(lsky["quality_flag"][irr["scan"] == i], "min_nbrlu") for
-                                              i in irr["scan"]]
+                for i in range(len(irr["scan"])):
+                    irr["quality_flag"][irr["scan"] == i] = du.set_flag(irr["quality_flag"][irr["scan"] == i],
+                                                                          "min_nbred")
                 self.context.logger.info(
                     "No enough downwelling irradiance data for sequence {}".format(irr.attrs['sequence_id']))
 
