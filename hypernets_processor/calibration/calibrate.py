@@ -14,7 +14,6 @@ import numpy as np
 import os
 import glob
 
-
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
 __created__ = "12/04/2020"
@@ -22,6 +21,7 @@ __version__ = __version__
 __maintainer__ = "Pieter De Vis"
 __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
+
 
 class Calibrate:
     def __init__(self, context, MCsteps=1000, parallel_cores=0):
@@ -43,7 +43,7 @@ class Calibrate:
         input_vars = calibrate_function.get_argument_names()
 
         calibration_data, wavids = self.prepare_calibration_data(measurandstring)
-        dataset_l0,dataset_l0_bla = self.preprocess_l0(dataset_l0,dataset_l0_bla,wavids)
+        dataset_l0, dataset_l0_bla = self.preprocess_l0(dataset_l0, dataset_l0_bla, wavids)
         dataset_l1a = self.l1a_template_from_l0_dataset(measurandstring, dataset_l0)
 
         input_qty_l1a = self.find_input(input_vars, dataset_l0, dataset_l0_bla, calibration_data)
@@ -57,7 +57,7 @@ class Calibrate:
             self.writer.write(dataset_l1a, overwrite=True)
 
         if self.context.get_config_value("plot_l1a"):
-            self.plot.plot_scans_in_series(measurandstring,dataset_l1a)
+            self.plot.plot_scans_in_series(measurandstring, dataset_l1a)
 
         return dataset_l1a
 
@@ -71,41 +71,39 @@ class Calibrate:
     #     elif self.context.get_config_value("network")=="L":
     #         non_lin_func=np.poly1d(non_linear_cals[:,0])
 
-    def prepare_calibration_data(self,measurandstring):
-        hypstar=self.context.get_config_value("hypstar_cal_number")
-        directory=self.context.get_config_value("calibration_directory")
+    def prepare_calibration_data(self, measurandstring):
+        hypstar = self.context.get_config_value("hypstar_cal_number")
+        directory = self.context.get_config_value("calibration_directory")
         print(directory)
-        caldates=[os.path.basename(path) for path in glob.glob
-        (os.path.join(directory,"hypstar_"+str(hypstar)+"/radiometric/*"))]
-        caldate=caldates[0]
+        caldates = [os.path.basename(path) for path in glob.glob
+        (os.path.join(directory, "hypstar_" + str(hypstar) + "/radiometric/*"))]
+        caldate = caldates[0]
         for f in glob.glob(os.path.join(directory,
-                            "hypstar_"+str(hypstar)+"/radiometric/"+str(caldate)+
-                            "/hypstar_"+str(hypstar)+"_nonlin_corr_coefs_*.dat")):
+                                        "hypstar_" + str(hypstar) + "/radiometric/" + str(caldate) +
+                                        "/hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat")):
             non_linear_cals = np.genfromtxt(f)
-
 
         if measurandstring == "radiance":
             for f in glob.glob(os.path.join(directory,
-                                            "hypstar_"+str(hypstar)+"/radiometric/"+str(
-                                                caldate)+"/hypstar_"+str(
-                                                hypstar)+"_radcal_L_*_vnir.dat")):
+                                            "hypstar_" + str(hypstar) + "/radiometric/" + str(
+                                                caldate) + "/hypstar_" + str(
+                                                hypstar) + "_radcal_L_*_vnir.dat")):
                 gains = np.genfromtxt(f)
-                wavids=[int(gains[0,0]),int(gains[-1,0])+1]
+                wavids = [int(gains[0, 0]), int(gains[-1, 0]) + 1]
         else:
             for f in glob.glob(os.path.join(directory,
-                                            "hypstar_"+str(hypstar)+"/radiometric/"+str(
-                                                caldate)+"/hypstar_"+str(
-                                                hypstar)+"_radcal_E_*_vnir.dat")):
+                                            "hypstar_" + str(hypstar) + "/radiometric/" + str(
+                                                caldate) + "/hypstar_" + str(
+                                                hypstar) + "_radcal_E_*_vnir.dat")):
                 gains = np.genfromtxt(f)
-                wavids=[int(gains[0,0]),int(gains[-1,0])+1]
-
+                wavids = [int(gains[0, 0]), int(gains[-1, 0]) + 1]
 
         calibration_data = {}
-        calibration_data["gains"] = gains[:,2]
-        calibration_data["u_random_gains"] = gains[:,2]*gains[:,19]/100
-        calibration_data["u_systematic_gains"] = gains[:,2]*gains[:,3]/100
+        calibration_data["gains"] = gains[:, 2]
+        calibration_data["u_random_gains"] = gains[:, 2] * gains[:, 19] / 100
+        calibration_data["u_systematic_gains"] = gains[:, 2] * gains[:, 3] / 100
 
-        calibration_data["non_linearity_coefficients"] = non_linear_cals[:,0]
+        calibration_data["non_linearity_coefficients"] = non_linear_cals[:, 0]
         calibration_data["u_random_non_linearity_coefficients"] = None
         calibration_data["u_systematic_non_linearity_coefficients"] = None
 
@@ -130,10 +128,10 @@ class Calibrate:
             self.writer.write(dataset_l1b, overwrite=True)
 
         if self.context.get_config_value("plot_l1b"):
-            self.plot.plot_series_in_sequence(measurandstring,dataset_l1b)
+            self.plot.plot_series_in_sequence(measurandstring, dataset_l1b)
 
         if self.context.get_config_value("plot_diff"):
-            self.plot.plot_diff_scans(measurandstring,dataset_l1a,dataset_l1b)
+            self.plot.plot_diff_scans(measurandstring, dataset_l1a, dataset_l1b)
         return dataset_l1b
 
     def calc_mean_masked(self, dataset, var, rand_unc=False, corr=False):
@@ -144,7 +142,7 @@ class Calibrate:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
         for i in range(len(series_id)):
             ids = np.where((dataset['series_id'] == series_id[i]) &
-                  np.invert(DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
+                           np.invert(DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
             out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
             if rand_unc:
                 out[i] = out[i] / len(ids[0])
@@ -155,7 +153,7 @@ class Calibrate:
     def find_nearest_black(self, dataset, acq_time, int_time):
         ids = np.where(
             (abs(dataset['acquisition_time'] - acq_time) == min(abs(dataset['acquisition_time'] - acq_time))) & (
-                        dataset['integration_time'] == int_time)) #todo check if interation time alwasy has to be same
+                    dataset['integration_time'] == int_time))  # todo check if interation time alwasy has to be same
         return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
 
     def find_input(self, variables, dataset, datasetbla, ancillary_dataset):
@@ -248,20 +246,22 @@ class Calibrate:
         :return:
         :rtype:
         """
-        datasetl0=datasetl0.isel(wavelength=slice(wavids[0],wavids[1]))
-        datasetl0_bla=datasetl0_bla.isel(wavelength=slice(wavids[0],wavids[1]))
-        mask = self.clip_and_mask(datasetl0,datasetl0_bla)
+        datasetl0 = datasetl0.isel(wavelength=slice(wavids[0], wavids[1]))
+        datasetl0_bla = datasetl0_bla.isel(wavelength=slice(wavids[0], wavids[1]))
+        mask = self.clip_and_mask(datasetl0, datasetl0_bla)
 
-        datasetl0["quality_flag"][np.where(mask==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask==1)],"outliers") #for i in range(len(mask))]
+        datasetl0["quality_flag"][np.where(mask == 1)] = DatasetUtil.set_flag(
+            datasetl0["quality_flag"][np.where(mask == 1)], "outliers")  # for i in range(len(mask))]
 
         DN_rand = DatasetUtil.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
-                                     dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
+                                              dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
         DN_syst = DatasetUtil.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
-                                     dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
+                                              dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
 
         datasetl0["u_random_digital_number"] = DN_rand
 
-        std = (datasetl0['digital_number'].where(mask==1)-datasetl0['digital_number'].where(datasetl0.quality_flag == 0)).std(dim="scan")
+        std = (datasetl0['digital_number'].where(mask == 1) - datasetl0['digital_number'].where(
+            datasetl0.quality_flag == 0)).std(dim="scan")
         rand = np.zeros_like(DN_rand.values)
         for i in range(len(datasetl0["scan"])):
             rand[:, i] = std
@@ -280,15 +280,14 @@ class Calibrate:
         out = np.empty((len(series_ids), len(dataset['wavelength'])))
         for i in range(len(series_ids)):
             ids = np.where(dataset['series_id'] == series_ids[i])
-            dark_signals = self.find_nearest_black(dataset_bla,np.mean(
-                dataset['acquisition_time'].values[ids]),np.mean(
+            dark_signals = self.find_nearest_black(dataset_bla, np.mean(
+                dataset['acquisition_time'].values[ids]), np.mean(
                 dataset['integration_time'].values[ids]))
-            intsig = np.nanmean((dataset["digital_number"].values[:, ids]-dark_signals[:,None,None]), axis=0)[0]
-            noisestd, noiseavg = self.sigma_clip(intsig) # calculate std and avg for non NaN columns
-            maski = np.zeros_like(intsig) # mask the columns that have NaN
+            intsig = np.nanmean((dataset["digital_number"].values[:, ids] - dark_signals[:, None, None]), axis=0)[0]
+            noisestd, noiseavg = self.sigma_clip(intsig)  # calculate std and avg for non NaN columns
+            maski = np.zeros_like(intsig)  # mask the columns that have NaN
             maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 1
             mask = np.append(mask, maski)
-
 
         # check if 10% of pixels are outiers
 
@@ -343,13 +342,20 @@ class Calibrate:
         """
 
         l1a_dim_sizes_dict = {"wavelength": len(dataset_l0["wavelength"]), "scan": len(dataset_l0["scan"])}
-        if measurandstring == "radiance":
-            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, ds_format="L_L1A_RAD",
-                                                       propagate_ds=dataset_l0)
-        elif measurandstring == "irradiance":
-            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, "L_L1A_IRR", propagate_ds=dataset_l0)
+        if self.context.get_config_value("network") == "l":
+            if measurandstring == "radiance":
+                dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, ds_format="L_L1A_RAD",
+                                                           propagate_ds=dataset_l0)
+            elif measurandstring == "irradiance":
+                dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, "L_L1A_IRR", propagate_ds=dataset_l0)
+        else:
+            if measurandstring == "radiance":
+                dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, ds_format="W_L1A_RAD",
+                                                           propagate_ds=dataset_l0)
+            elif measurandstring == "irradiance":
+                dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, "W_L1A_IRR", propagate_ds=dataset_l0)
 
-        dataset_l1a=dataset_l1a.assign_coords(wavelength=dataset_l0.wavelength)
+        dataset_l1a = dataset_l1a.assign_coords(wavelength=dataset_l0.wavelength)
 
         return dataset_l1a
 
@@ -364,25 +370,27 @@ class Calibrate:
         """
         l1b_dim_sizes_dict = {"wavelength": len(dataset_l1a["wavelength"]),
                               "series": len(np.unique(dataset_l1a['series_id']))}
+        if self.context.get_config_value("network") == "l":
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "W_L1B", propagate_ds=dataset_l1a)
+            dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
 
-        if measurandstring == "radiance":
-            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_RAD", propagate_ds=dataset_l1a)
-        elif measurandstring == "irradiance":
-            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset_l1a)
+        else:
+            if measurandstring == "radiance":
+                dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_RAD", propagate_ds=dataset_l1a)
+            elif measurandstring == "irradiance":
+                dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset_l1a)
+            dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
+            series_id = np.unique(dataset_l1a['series_id'])
+            dataset_l1b["series_id"].values = series_id
 
-        dataset_l1b=dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
-
-        series_id = np.unique(dataset_l1a['series_id'])
-        dataset_l1b["series_id"].values = series_id
-
-        for variablestring in ["acquisition_time", "viewing_azimuth_angle", "viewing_zenith_angle",
-                               "solar_azimuth_angle", "solar_zenith_angle"]:
-            temp_arr = np.empty(len(series_id))
-            for i in range(len(series_id)):
-                ids = np.where((dataset_l1a['series_id'] == series_id[i]) & np.invert(
-                     DatasetUtil.unpack_flags(dataset_l1a["quality_flag"])["outliers"]))
-                temp_arr[i] = np.mean(dataset_l1a[variablestring].values[ids])
-            dataset_l1b[variablestring].values = temp_arr
+            for variablestring in ["acquisition_time", "viewing_azimuth_angle", "viewing_zenith_angle",
+                                   "solar_azimuth_angle", "solar_zenith_angle"]:
+                temp_arr = np.empty(len(series_id))
+                for i in range(len(series_id)):
+                    ids = np.where((dataset_l1a['series_id'] == series_id[i]) & np.invert(
+                        DatasetUtil.unpack_flags(dataset_l1a["quality_flag"])["outliers"]))
+                    temp_arr[i] = np.mean(dataset_l1a[variablestring].values[ids])
+                dataset_l1b[variablestring].values = temp_arr
 
         return dataset_l1b
 
@@ -392,10 +400,10 @@ class Calibrate:
         datashape = input_quantities[0].shape
         for i in range(len(input_quantities)):
             if len(input_quantities[i].shape) < len(datashape):
-                if input_quantities[i].shape[0]==datashape[1]:
-                    input_quantities[i] = np.tile(input_quantities[i],(datashape[0],1))
+                if input_quantities[i].shape[0] == datashape[1]:
+                    input_quantities[i] = np.tile(input_quantities[i], (datashape[0], 1))
                 else:
-                    input_quantities[i] = np.tile(input_quantities[i],(datashape[1],1)).T
+                    input_quantities[i] = np.tile(input_quantities[i], (datashape[1], 1)).T
 
             if u_random_input_quantities[i] is not None:
                 if len(u_random_input_quantities[i].shape) < len(datashape):
@@ -404,12 +412,14 @@ class Calibrate:
         measurand = measurement_function(*input_quantities)
 
         u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
-                                                        u_random_input_quantities,repeat_dims=1)
+                                                        u_random_input_quantities, repeat_dims=1)
         u_systematic_measurand, corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
                                                                                            input_quantities,
-                                                                                           u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
+                                                                                           u_systematic_input_quantities,
+                                                                                           cov_x=['rand'] * len(
+                                                                                               u_systematic_input_quantities),
                                                                                            return_corr=True,
-                                                                                           repeat_dims=1,corr_axis=0)
+                                                                                           repeat_dims=1, corr_axis=0)
         dataset[measurandstring].values = measurand
         dataset["u_random_" + measurandstring].values = u_random_measurand
         dataset["u_systematic_" + measurandstring].values = u_systematic_measurand
