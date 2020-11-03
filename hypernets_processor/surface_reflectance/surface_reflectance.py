@@ -262,7 +262,7 @@ class SurfaceReflectance:
                              "angles_missing", "lu_eq_missing", "fresnel_angle_missing",
                              "fresnel_default", "temp_variability_ed", "temp_variability_lu",
                              "min_nbred", "min_nbrlu", "min_nbrlsky"]
-                    flagged = np.any([du.unpack_flags(datasetl1d['quality_flag'])[x] for x in flags], axis=0)
+                    flagged = np.any([DatasetUtil.unpack_flags(datasetl1d['quality_flag'])[x] for x in flags], axis=0)
                     ids = np.where(
                         (datasetl1d['series_id'] == series_id[i]) & (flagged == False))
                     temp_arr[i] = np.mean(datasetl1d[variablestring].values[ids])
