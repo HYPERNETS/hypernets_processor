@@ -3,8 +3,9 @@ Surface reflectance class
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
+from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.combine_SWIR.measurement_functions.combine_factory import CombineFactory
 import punpy
 import numpy as np
@@ -22,29 +23,42 @@ class CombineSWIR:
     def __init__(self,context,MCsteps=1000,parallel_cores=1):
         self._measurement_function_factory = CombineFactory()
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
-        self.hdsb = HypernetsDSBuilder(context=context)
+        self.avg = Average(context=context)
+        self.templ = DataTemplates(context)
         self.writer=HypernetsWriter(context)
         self.context = context
 
-    def combine(self,dataset_l1a):
+    def combine(self,measurandstring,dataset_l1a,dataset_l1a_swir):
         dataset_l1a = self.perform_checks(dataset_l1a)
         combine_function = self._measurement_function_factory.get_measurement_function(self.context.get_config_value("measurement_function_combine"))
         input_vars = combine_function.get_argument_names()
-        input_qty = self.find_input(input_vars,dataset_l1a)
-        u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1a)
-        u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1a)
-        dataset_l1b = self.l2_from_l1c_dataset(dataset_l1a)
+        # input_qty = self.find_input(input_vars,dataset_l1a)
+        # u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1a)
+        # u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1a)
+        dataset_l1b = self.avg.average_l1b(measurandstring,dataset_l1a)
+        dataset_l1b_swir = self.avg.average_l1b(measurandstring,dataset_l1a_swir)
+
+        dataset_l1b_comb = self.templ.l1b_template_from_combine(measurandstring,dataset_l1b,dataset_l1b_swir)
+        dataset_l1b_comb[measurandstring].values = measurand
+        dataset_l1b_comb["u_random_"+measurandstring].values = u_random_measurand
+        dataset_l1b_comb["u_systematic_"+measurandstring].values = u_systematic_measurand
+        dataset_l1b_comb["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
+        dataset_l1b_comb["corr_systematic_"+measurandstring].values = corr_systematic_measurand
 
         self.process_measurement_function(["radiance"],dataset_l1b,
                                           combine_function.function,input_qty,
                                           u_random_input_qty,u_systematic_input_qty)
 
 
-        self.process_measurement_function(["irradiance"],dataset_l1b,
-                                          combine_function.function,input_qty,
-                                          u_random_input_qty,u_systematic_input_qty)
+        if self.context.get_config_value("write_l1b"):
+            self.writer.write(dataset_l1b, overwrite=True)
 
-        self.writer.write(dataset_l1b,overwrite=True)
+        if self.context.get_config_value("plot_l1b"):
+            self.plot.plot_series_in_sequence(measurandstring,dataset_l1b)
+
+        # if self.context.get_config_value("plot_diff"):
+        #     self.plot.plot_diff_scans(measurandstring,dataset_l1a,dataset_l1b)
+
         return dataset_l1b
 
     def find_input(self,variables,dataset):

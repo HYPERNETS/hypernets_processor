@@ -9,13 +9,13 @@ from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.rhymer.rhymer.ancillary.rhymer_ancillary import RhymerAncillary
 from hypernets_processor.rhymer.rhymer.processing.rhymer_processing import RhymerProcessing
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
-from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
+from hypernets_processor.data_utils.average import Average
 
 import numpy as np
 import math
@@ -25,9 +25,9 @@ class RhymerHypstar:
 
     def __init__(self, context):
         self.context = context
-        self.hdsb = HypernetsDSBuilder(context=context)
+        self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
-        self.cal = Calibrate(context, MCsteps=100)
+        self.avg = Average(context)
         self.intp = Interpolate(context, MCsteps=1000)
         self.plot=Plotting(context)
         self.rhymeranc = RhymerAncillary(context)
@@ -377,8 +377,8 @@ class RhymerHypstar:
         L1a_irr = self.qc_scan(L1a_irr, measurandstring="irradiance")
         # QUALITY CHECK: MIN NBR OF SCANS -> ASSIGN FLAG
         L1a_uprad, L1a_downrad, L1a_irr = self.cycleparse(L1a_rad, L1a_irr)
-        L1b_downrad = self.cal.average_l1b("radiance", L1a_downrad)
-        L1b_irr = self.cal.average_l1b("irradiance", L1a_irr)
+        L1b_downrad = self.avg.average_l1b("radiance", L1a_downrad)
+        L1b_irr = self.avg.average_l1b("irradiance", L1a_irr)
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         L1b = self.intp.interpolate_l1b_w(L1a_uprad, L1b_downrad, L1b_irr)
         if self.context.get_config_value("write_l1b")==True:
@@ -386,7 +386,7 @@ class RhymerHypstar:
         return L1b
 
     def process_l1c(self, l1b):
-        dataset_l1c = self.l1c_from_l1b_dataset(l1b)
+        dataset_l1c = self.templ.l1c_from_l1b_dataset(l1b)
 
         dataset_l1c = self.get_wind(dataset_l1c)
         dataset_l1c = self.get_fresnelrefl(dataset_l1c)
@@ -407,20 +407,4 @@ class RhymerHypstar:
 
         return dataset_l1c
 
-    def l1c_from_l1b_dataset(self,dataset_l1b):
-        """
-        Makes a L2 template of the data, and propagates the appropriate keywords from L1.
 
-        :param datasetl0:
-        :type datasetl0:
-        :return:
-        :rtype:
-        """
-        l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
-                              "scan":len(np.unique(dataset_l1b['scan']))}
-
-        dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"W_L1C",
-                                                   propagate_ds=dataset_l1b)
-        dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
-
-        return dataset_l1c

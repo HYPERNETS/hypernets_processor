@@ -3,12 +3,13 @@ Interpolation class
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.interpolation.measurement_functions.interpolation_factory import InterpolationFactory
 import punpy
 import numpy as np
+import warnings
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -22,7 +23,7 @@ class Interpolate:
     def __init__(self,context,MCsteps=1000,parallel_cores=1):
         self._measurement_function_factory = InterpolationFactory()
         self.prop= punpy.MCPropagation(MCsteps,parallel_cores=parallel_cores)
-        self.hdsb = HypernetsDSBuilder(context=context)
+        self.templ = DataTemplates(context=context)
         self.writer=HypernetsWriter(context)
         self.plot=Plotting(context)
         self.context=context
@@ -31,10 +32,8 @@ class Interpolate:
         # chek for upwelling radiance
         upscan = [i for i, e in enumerate(dataset_l1a_rad['viewing_zenith_angle'].values) if e <= 90]
 
-        l1b_dim_sizes_dict = {"wavelength":len(dataset_l1a_rad["wavelength"]),
-                              "scan":len(upscan)}
+        dataset_l1b=self.templ.l1b_template_from_l1a_dataset_water(dataset_l1a_rad)
 
-        dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"W_L1B")
         dataset_l1b["wavelength"] = dataset_l1a_rad["wavelength"]
         dataset_l1b["upwelling_radiance"] = dataset_l1a_rad["radiance"].sel(scan=upscan)
         dataset_l1b["acquisition_time"] = dataset_l1a_rad["acquisition_time"].sel(scan=upscan)
@@ -45,6 +44,7 @@ class Interpolate:
         dataset_l1b["corr_systematic_upwelling_radiance"] = dataset_l1a_rad["corr_systematic_radiance"]
 
         print("interpolate sky radiance")
+        print(dataset_l1b)
         dataset_l1b=self.interpolate_skyradiance(dataset_l1b, dataset_l1b_uprad)
         print("interpolate irradiances")
         dataset_l1b=self.interpolate_irradiance(dataset_l1b, dataset_l1b_irr)
@@ -56,7 +56,7 @@ class Interpolate:
     def interpolate_l1c(self,dataset_l1b_rad,dataset_l1b_irr):
 
 
-        dataset_l1c=self.l1c_from_l1b_dataset(dataset_l1b_rad)
+        dataset_l1c=self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
         print(dataset_l1b_rad["acquisition_time"])
         dataset_l1c["acquisition_time"].values = dataset_l1b_rad["acquisition_time"].values
 
@@ -100,36 +100,18 @@ class Interpolate:
                                                         [None,None,dataset_l1a_skyrad['u_systematic_radiance'].values])
         return dataset_l1c
 
-    def l1c_from_l1b_dataset(self, dataset_l1b_rad):
-        """
-        Makes a L2 template of the data, and propagates the appropriate keywords from L1.
-
-        :param datasetl0:
-        :type datasetl0:
-        :return:
-        :rtype:
-        """
-        if self.context.get_config_value("network").lower() == "l":
-            l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b_rad["wavelength"]),
-                                  "series":len(dataset_l1b_rad['series'])}
-
-            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"L_L1C", propagate_ds=dataset_l1b_rad)
-            dataset_l1c=dataset_l1c.assign_coords(wavelength=dataset_l1b_rad.wavelength)
-
-        elif self.context.get_config_value("network").lower() == "w":
-            self.context.logger.error("no l1c interpolation for water network")
-
-        return dataset_l1c
 
     def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
                                      u_systematic_input_quantities):
+        print(input_quantities)
         measurand = measurement_function(*input_quantities)
-
-        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,param_fixed=[False,True,True],repeat_dims=1)
-        u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
-                                                                                          input_quantities,
-                                                                                          u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
-                                                                                          param_fixed=[False,True,True],return_corr=True,repeat_dims=1,corr_axis=0)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,param_fixed=[False,True,True],repeat_dims=1)
+            u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
+                                                                                              input_quantities,
+                                                                                              u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
+                                                                                              param_fixed=[False,True,True],return_corr=True,repeat_dims=1,corr_axis=0)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand
         dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
