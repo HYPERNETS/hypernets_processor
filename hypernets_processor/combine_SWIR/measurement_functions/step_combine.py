@@ -9,7 +9,7 @@ class StepCombine:
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
-        rad=np.append(rad_VIS[np.where(wavs_vis<=wav_step)],rad_SWIR[np.where(wavs_swir>wav_step)])
+        rad=np.concatenate((rad_VIS[np.where(wavs_vis<=wav_step)],rad_SWIR[np.where(wavs_swir>wav_step)]))
         return rad
 
     @staticmethod

@@ -62,9 +62,11 @@ class Interpolate:
 
         dataset_l1c["radiance"].values = dataset_l1b_rad["radiance"].values
         dataset_l1c["u_random_radiance"].values = dataset_l1b_rad["u_random_radiance"].values
-        dataset_l1c["u_systematic_radiance"].values = dataset_l1b_rad["u_systematic_radiance"].values
+        dataset_l1c["u_systematic_indep_radiance"].values = dataset_l1b_rad["u_systematic_indep_radiance"].values
+        dataset_l1c["u_systematic_corr_rad_irr_radiance"].values = dataset_l1b_rad["u_systematic_corr_rad_irr_radiance"].values
         dataset_l1c["corr_random_radiance"].values = dataset_l1b_rad["corr_random_radiance"].values
-        dataset_l1c["corr_systematic_radiance"].values = dataset_l1b_rad["corr_systematic_radiance"].values
+        dataset_l1c["corr_systematic_indep_radiance"].values = dataset_l1b_rad["corr_systematic_indep_radiance"].values
+        dataset_l1c["corr_systematic_corr_rad_irr_radiance"].values = dataset_l1b_rad["corr_systematic_corr_rad_irr_radiance"].values
 
         dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr)
 
@@ -81,10 +83,20 @@ class Interpolate:
 
         acqui_irr = dataset_l1b_irr['acquisition_time'].values
         acqui_rad = dataset_l1c['acquisition_time'].values
+        cov_indep = punpy.convert_corr_to_cov(
+            dataset_l1b_irr["corr_systematic_indep_irradiance"].values,
+            dataset_l1b_irr["u_systematic_indep_irradiance"].values)
+        cov_corr = punpy.convert_corr_to_cov(
+            dataset_l1b_irr["corr_systematic_corr_rad_irr_irradiance"].values,
+            dataset_l1b_irr["u_systematic_corr_rad_irr_irradiance"].values)
+
         dataset_l1c = self.process_measurement_function("irradiance",dataset_l1c,interpolation_function.function,
                                                         [acqui_rad,acqui_irr,dataset_l1b_irr['irradiance'].values],
                                                         [None,None,dataset_l1b_irr['u_random_irradiance'].values],
-                                                        [None,None,dataset_l1b_irr['u_systematic_irradiance'].values])
+                                                        [None,None,dataset_l1b_irr['u_systematic_indep_irradiance'].values],
+                                                        [None,None,dataset_l1b_irr['u_systematic_corr_rad_irr_irradiance'].values],
+                                                        [None,None,cov_indep],
+                                                        [None,None,cov_corr])
         return dataset_l1c
 
     def interpolate_skyradiance(self,dataset_l1c,dataset_l1a_skyrad):
@@ -100,25 +112,43 @@ class Interpolate:
                                                         [None,None,dataset_l1a_skyrad['u_systematic_radiance'].values])
         return dataset_l1c
 
-
-    def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,u_random_input_quantities,
-                                     u_systematic_input_quantities):
-        print(input_quantities)
+    def process_measurement_function(self,measurandstring,dataset,measurement_function,
+                                     input_quantities,u_random_input_quantities,
+                                     u_systematic_input_quantities_indep,
+                                     u_systematic_input_quantities_corr,
+                                     cov_systematic_input_quantities_indep,
+                                     cov_systematic_input_quantities_corr):
         measurand = measurement_function(*input_quantities)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,param_fixed=[False,True,True],repeat_dims=1)
-            u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
-                                                                                              input_quantities,
-                                                                                              u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
-                                                                                              param_fixed=[False,True,True],return_corr=True,repeat_dims=1,corr_axis=0)
+            u_random_measurand = self.prop.propagate_random(measurement_function,
+                                                            input_quantities,
+                                                            u_random_input_quantities,
+                                                            repeat_dims=1)
+            u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
+                measurement_function,input_quantities,
+                u_systematic_input_quantities_indep,
+                cov_x=cov_systematic_input_quantities_indep,return_corr=True,
+                repeat_dims=1,corr_axis=0)
+            u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
+                measurement_function,input_quantities,u_systematic_input_quantities_corr,
+                cov_x=cov_systematic_input_quantities_corr,return_corr=True,
+                repeat_dims=1,corr_axis=0)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand
-        dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
+        dataset["u_systematic_indep_"+measurandstring].values = u_syst_measurand_indep
+        dataset[
+            "u_systematic_corr_rad_irr_"+measurandstring].values = u_syst_measurand_corr
         dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
-        dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand
+        dataset[
+            "corr_systematic_indep_"+measurandstring].values = corr_syst_measurand_indep
+        dataset[
+            "corr_systematic_corr_rad_irr_"+measurandstring].values = corr_syst_measurand_corr
 
         return dataset
+
+
+
 
 
 
