@@ -28,12 +28,19 @@ class Average:
         dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring)
         dataset_l1b["u_random_" + measurandstring].values = self.calc_mean_masked(\
             dataset_l1a,"u_random_" + measurandstring,rand_unc=True)
-        dataset_l1b["u_systematic_" + measurandstring].values = self.calc_mean_masked\
-            (dataset_l1a,"u_systematic_" + measurandstring)
+        dataset_l1b["u_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
+        (dataset_l1a,"u_systematic_indep_"+measurandstring)
+        dataset_l1b["u_systematic_corr_rad_irr_"+measurandstring].values = self.calc_mean_masked\
+        (dataset_l1a,"u_systematic_corr_rad_irr_"+measurandstring)
+
         dataset_l1b["corr_random_" + measurandstring].values = np.eye(
-            len(dataset_l1b["u_systematic_" + measurandstring].values))
-        dataset_l1b["corr_systematic_" + measurandstring].values = self.calc_mean_masked\
-            (dataset_l1a,"corr_systematic_" + measurandstring,corr=True)
+                len(dataset_l1b["u_random_" + measurandstring].values))
+        dataset_l1b["corr_systematic_indep_"+measurandstring].values = \
+            self.calc_mean_masked(dataset_l1a,"corr_systematic_indep_"+
+                                  measurandstring,corr=True)
+        dataset_l1b["corr_systematic_corr_rad_irr_"+measurandstring].values = \
+            self.calc_mean_masked(dataset_l1a,"corr_systematic_corr_rad_irr_"+
+                                  measurandstring,corr=True)
 
         return dataset_l1b
 
@@ -44,13 +51,17 @@ class Average:
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
         else:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
+
         for i in range(len(series_id)):
             ids = np.where((dataset['series_id'] == series_id[i]) &
                            np.invert
                 (DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
             out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
+            print("ids",i,ids,out[i].shape)
+
             if rand_unc:
                 out[i] = out[i] / len(ids[0])
         if corr:
             out = np.mean(out, axis=0)
+        print(i,out[0].shape,out.shape,out.T.shape)
         return out.T

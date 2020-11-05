@@ -19,7 +19,6 @@ class StandardMeasurementFunction:
                                        non_linear[7]*DN**7)
 
         # print(DN[500,5],corrected_DN[500,5],(gains*corrected_DN/int_time*1000)[500,5])
-        # print(gains.shape,corrected_DN.shape,int_time.shape,digital_number.shape)
         return gains*corrected_DN/int_time*1000
 
     @staticmethod

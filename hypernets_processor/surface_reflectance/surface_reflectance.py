@@ -83,7 +83,7 @@ class SurfaceReflectance:
         input_vars = l1tol2_function.get_argument_names()
         input_qty = self.find_input(input_vars, dataset)
         u_random_input_qty = self.find_u_random_input(input_vars, dataset)
-        u_systematic_input_qty = self.find_u_systematic_input(input_vars, dataset)
+        u_systematic_input_qty, cov_systematic_input_qty = self.find_u_systematic_input(input_vars, dataset)
 
 
         if self.context.get_config_value("network").lower() == "w":
@@ -109,7 +109,8 @@ class SurfaceReflectance:
             dataset_l2a = self.process_measurement_function(["reflectance"], dataset_l2a,
                                                             l1tol2_function.function,
                                                             input_qty, u_random_input_qty,
-                                                            u_systematic_input_qty)
+                                                            u_systematic_input_qty,
+                                                            cov_systematic_input_qty)
             if self.context.get_config_value("plot_l2a"):
                 self.plot.plot_series_in_sequence("reflectance",dataset_l2a)
                 print("plotting")
@@ -189,12 +190,15 @@ class SurfaceReflectance:
         :rtype:
         """
         inputs = []
+        covs_indep = []
         for var in variables:
             try:
-                inputs.append(dataset["u_systematic_" + var].values)
+                inputs.append(dataset["u_systematic_indep_" + var].values)
+                covs_indep.append(punpy.convert_corr_to_cov(dataset["corr_systematic_indep_" + var].values,dataset["u_systematic_indep_" + var].values))
             except:
                 inputs.append(None)
-        return inputs
+                covs_indep.append(None)
+        return inputs, covs_indep
 
     def perform_checks(self, dataset_l1):
         """
@@ -211,7 +215,8 @@ class SurfaceReflectance:
 
     def process_measurement_function(self, measurandstrings, dataset, measurement_function, input_quantities,
                                      u_random_input_quantities,
-                                     u_systematic_input_quantities):
+                                     u_systematic_input_quantities,
+                                     cov_systematic_input_quantities):
         measurand = measurement_function(*input_quantities)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -220,11 +225,14 @@ class SurfaceReflectance:
                                                             output_vars=len(measurandstrings))
 
             if len(measurandstrings) > 1:
-                u_systematic_measurand, corr_systematic_measurand, corr_between = self.prop.propagate_systematic(
-                    measurement_function,
-                    input_quantities,
-                    u_systematic_input_quantities, cov_x=['rand'] * len(u_systematic_input_quantities),
-                    return_corr=True, repeat_dims=1, corr_axis=0, output_vars=len(measurandstrings))
+                u_systematic_measurand, corr_systematic_measurand, corr_between = \
+                    self.prop.propagate_systematic(measurement_function,
+                                                   input_quantities,
+                                                   u_systematic_input_quantities,
+                                                   cov_x=cov_systematic_input_quantities,
+                                                   return_corr=True, repeat_dims=1,
+                                                   corr_axis=0,
+                                                   output_vars=len(measurandstrings))
                 for im, measurandstring in enumerate(measurandstrings):
                     dataset[measurandstring].values = measurand[im]
                     dataset["u_random_" + measurandstring].values = u_random_measurand[im]
@@ -233,9 +241,12 @@ class SurfaceReflectance:
                     dataset["corr_systematic_" + measurandstring].values = corr_systematic_measurand[im]
 
             else:
-                u_systematic_measurand, corr_systematic_measurand = self.prop.propagate_systematic(
-                    measurement_function, input_quantities, u_systematic_input_quantities,
-                    return_corr=True, corr_axis=0, output_vars=len(measurandstrings))
+                self.prop.propagate_systematic(measurement_function,input_quantities,
+                                               u_systematic_input_quantities,
+                                               cov_x=cov_systematic_input_quantities,
+                                               return_corr=True,repeat_dims=1,
+                                               corr_axis=0,
+                                               output_vars=len(measurandstrings))
                 measurandstring = measurandstrings[0]
                 dataset[measurandstring].values = measurand
                 dataset["u_random_" + measurandstring].values = u_random_measurand
