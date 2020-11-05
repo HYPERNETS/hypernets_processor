@@ -7,8 +7,10 @@ from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.combine_SWIR.measurement_functions.combine_factory import CombineFactory
+
 import punpy
 import numpy as np
+import warnings
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -30,25 +32,56 @@ class CombineSWIR:
 
     def combine(self,measurandstring,dataset_l1a,dataset_l1a_swir):
         dataset_l1a = self.perform_checks(dataset_l1a)
-        combine_function = self._measurement_function_factory.get_measurement_function(self.context.get_config_value("measurement_function_combine"))
-        input_vars = combine_function.get_argument_names()
-        # input_qty = self.find_input(input_vars,dataset_l1a)
-        # u_random_input_qty = self.find_u_random_input(input_vars,dataset_l1a)
-        # u_systematic_input_qty = self.find_u_systematic_input(input_vars,dataset_l1a)
         dataset_l1b = self.avg.average_l1b(measurandstring,dataset_l1a)
         dataset_l1b_swir = self.avg.average_l1b(measurandstring,dataset_l1a_swir)
 
+        combine_function = self._measurement_function_factory.get_measurement_function(
+            self.context.get_config_value("measurement_function_combine"))
+        input_vars = combine_function.get_argument_names()
+        input_qty = [dataset_l1b["wavelength"].values,
+                     dataset_l1b[measurandstring].values,
+                     dataset_l1b_swir["wavelength"].values,
+                     dataset_l1b_swir[measurandstring].values,
+                     self.context.get_config_value("combine_lim_wav")]
+        u_random_input_qty = [None,
+                     dataset_l1b["u_random_"+measurandstring].values,
+                     None,
+                     dataset_l1b_swir["u_random_"+measurandstring].values,
+                     None]
+        u_systematic_input_qty_indep =  [None,
+                     dataset_l1b["u_systematic_indep_"+measurandstring].values,
+                     None,
+                     dataset_l1b_swir["u_systematic_indep_"+measurandstring].values,
+                     None]
+        u_systematic_input_qty_corr =  [None,
+                     dataset_l1b["u_systematic_corr_rad_irr_"+measurandstring].values,
+                     None,
+                     dataset_l1b_swir["u_systematic_corr_rad_irr_"+measurandstring].values,
+                     None]
+        cov_systematic_input_qty_indep =  [None,
+                     punpy.convert_corr_to_cov(dataset_l1b["corr_systematic_indep_" + measurandstring].values,
+                            dataset_l1b["u_systematic_indep_"+measurandstring].values),
+                     None,
+                     punpy.convert_corr_to_cov(dataset_l1b_swir["corr_systematic_indep_"+measurandstring].values,
+                            dataset_l1b_swir["u_systematic_indep_"+measurandstring].values),
+                     None]
+        cov_systematic_input_qty_corr = [None,
+                     punpy.convert_corr_to_cov(dataset_l1b["corr_systematic_corr_rad_irr_" + measurandstring].values,
+                            dataset_l1b["u_systematic_corr_rad_irr_"+measurandstring].values),
+                     None,
+                     punpy.convert_corr_to_cov(dataset_l1b_swir["corr_systematic_corr_rad_irr_"+measurandstring].values,
+                            dataset_l1b_swir["u_systematic_corr_rad_irr_"+measurandstring].values),
+                     None]
+
         dataset_l1b_comb = self.templ.l1b_template_from_combine(measurandstring,dataset_l1b,dataset_l1b_swir)
-        dataset_l1b_comb[measurandstring].values = measurand
-        dataset_l1b_comb["u_random_"+measurandstring].values = u_random_measurand
-        dataset_l1b_comb["u_systematic_"+measurandstring].values = u_systematic_measurand
-        dataset_l1b_comb["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
-        dataset_l1b_comb["corr_systematic_"+measurandstring].values = corr_systematic_measurand
 
-        self.process_measurement_function(["radiance"],dataset_l1b,
+        self.process_measurement_function(measurandstring,dataset_l1b_comb,
                                           combine_function.function,input_qty,
-                                          u_random_input_qty,u_systematic_input_qty)
-
+                                          u_random_input_qty,
+                                          u_systematic_input_qty_indep,
+                                          u_systematic_input_qty_corr,
+                                          cov_systematic_input_qty_indep,
+                                          cov_systematic_input_qty_corr)
 
         if self.context.get_config_value("write_l1b"):
             self.writer.write(dataset_l1b, overwrite=True)
@@ -148,21 +181,38 @@ class CombineSWIR:
 
         return l2a
 
-    def process_measurement_function(self,measurandstrings,dataset,measurement_function,input_quantities,u_random_input_quantities,
-                                     u_systematic_input_quantities):
+    def process_measurement_function(self,measurandstring,dataset,measurement_function,input_quantities,
+                                     u_random_input_quantities,
+                                     u_systematic_input_quantities_indep,
+                                     u_systematic_input_quantities_corr,
+                                     cov_systematic_input_quantities_indep,
+                                     cov_systematic_input_quantities_corr):
         measurand = measurement_function(*input_quantities)
-        u_random_measurand = self.prop.propagate_random(measurement_function,input_quantities,u_random_input_quantities,repeat_dims=1,output_vars=len(measurandstrings))
-
-        u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(
-            measurement_function,input_quantities,u_systematic_input_quantities,
-            return_corr=True,corr_axis=0,output_vars=len(measurandstrings))
-        measurandstring=measurandstrings[0]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            u_random_measurand = self.prop.propagate_random(measurement_function,
+                                                            input_quantities,
+                                                            u_random_input_quantities,
+                                                            repeat_dims=1)
+            u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
+                measurement_function,input_quantities,
+                u_systematic_input_quantities_indep,
+                cov_x=cov_systematic_input_quantities_indep,return_corr=True,
+                repeat_dims=1,corr_axis=0)
+            u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
+                measurement_function,input_quantities,u_systematic_input_quantities_corr,
+                cov_x=cov_systematic_input_quantities_corr,return_corr=True,
+                repeat_dims=1,corr_axis=0)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand
-        dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
+        dataset["u_systematic_indep_"+measurandstring].values = u_syst_measurand_indep
+        dataset[
+            "u_systematic_corr_rad_irr_"+measurandstring].values = u_syst_measurand_corr
         dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
-        dataset["corr_systematic_"+measurandstring].values = corr_systematic_measurand
-
+        dataset[
+            "corr_systematic_indep_"+measurandstring].values = corr_syst_measurand_indep
+        dataset[
+            "corr_systematic_corr_rad_irr_"+measurandstring].values = corr_syst_measurand_corr
 
         return dataset
 

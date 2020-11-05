@@ -33,7 +33,7 @@ class Calibrate:
         self.plot = Plotting(context)
         self.context = context
 
-    def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla):
+    def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla, swir=False):
         if measurandstring != "radiance" and measurandstring != "irradiance":
             self.context.logger.error("the measurandstring needs to be either 'radiance' or 'irradiance")
             exit()
@@ -42,14 +42,25 @@ class Calibrate:
             self.context.get_config_value("measurement_function_calibrate"))
         input_vars = calibrate_function.get_argument_names()
 
-        calibration_data, wavids = self.prepare_calibration_data(measurandstring)
+        calibration_data, wavids = self.prepare_calibration_data(measurandstring,swir)
         dataset_l0,dataset_l0_bla = self.preprocess_l0(dataset_l0,dataset_l0_bla,wavids)
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0)
-        input_qty_l1a = self.find_input(input_vars, dataset_l0, dataset_l0_bla, calibration_data)
-        u_random_input_qty_l1a = self.find_u_random_input(input_vars, dataset_l0, calibration_data)
-        u_systematic_input_qty_l1a = self.find_u_systematic_input(input_vars, dataset_l0, calibration_data)
-        dataset_l1a = self.process_measurement_function(measurandstring, dataset_l1a, calibrate_function.function,
-                                                        input_qty_l1a, u_random_input_qty_l1a, u_systematic_input_qty_l1a)
+        input_qty = self.find_input(input_vars, dataset_l0, dataset_l0_bla, calibration_data)
+        u_random_input_qty = self.find_u_random_input(input_vars, dataset_l0, calibration_data)
+        u_systematic_input_qty_indep,u_systematic_input_qty_corr,\
+        cov_systematic_input_qty_indep,cov_systematic_input_qty_corr = self.find_u_systematic_input(input_vars, dataset_l0, calibration_data)
+
+        dataset_l1a = self.process_measurement_function(measurandstring, dataset_l1a,
+                                                        calibrate_function.function,
+                                                        input_qty,
+                                                        u_random_input_qty,
+                                                        u_systematic_input_qty_indep,
+                                                        u_systematic_input_qty_corr,
+                                                        cov_systematic_input_qty_indep,
+                                                        cov_systematic_input_qty_corr)
+        if swir:
+            dataset_l1a.attrs['product_name']= dataset_l1a.attrs['product_name']+"_SWIR"
+
         if self.context.get_config_value("write_l1a"):
             self.writer.write(dataset_l1a, overwrite=True)
 
@@ -58,7 +69,7 @@ class Calibrate:
 
         return dataset_l1a
 
-    def prepare_calibration_data(self,measurandstring):
+    def prepare_calibration_data(self,measurandstring, swir=False):
         hypstar=self.context.get_config_value("hypstar_cal_number")
         directory=self.context.get_config_value("calibration_directory")
         caldates=[os.path.basename(path) for path in glob.glob
@@ -69,27 +80,31 @@ class Calibrate:
                             "\\hypstar_"+str(hypstar)+"_nonlin_corr_coefs_*.dat")):
             non_linear_cals = np.genfromtxt(f)
 
+        if swir:
+            sensortag="swir"
+        else:
+            sensortag="vnir"
 
         if measurandstring == "radiance":
             for f in glob.glob(os.path.join(directory,
                                             "hypstar_"+str(hypstar)+"/radiometric/"+str(
                                                 caldate)+"/hypstar_"+str(
-                                                hypstar)+"_radcal_L_*_vnir.dat")):
+                                                hypstar)+"_radcal_L_*_%s.dat"%(sensortag))):
                 gains = np.genfromtxt(f)
-                wavids=[int(gains[0,0]),int(gains[-1,0])+1]
+                wavids=[int(gains[0,0])-1,int(gains[-1,0])]
         else:
             for f in glob.glob(os.path.join(directory,
                                             "hypstar_"+str(hypstar)+"/radiometric/"+str(
                                                 caldate)+"/hypstar_"+str(
-                                                hypstar)+"_radcal_E_*_vnir.dat")):
+                                                hypstar)+"_radcal_E_*_%s.dat"%(sensortag))):
                 gains = np.genfromtxt(f)
-                wavids=[int(gains[0,0]),int(gains[-1,0])+1]
+                wavids=[int(gains[0,0])-1,int(gains[-1,0])]
 
 
         calibration_data = {}
         calibration_data["gains"] = gains[:,2]
         calibration_data["u_random_gains"] = None
-        calibration_data["u_systematic_gains"] = gains[:,2]*(gains[:,6]**2+
+        calibration_data["u_systematic_indep_gains"] = gains[:,2]*(gains[:,6]**2+
                 gains[:,7]**2+gains[:,8]**2+gains[:,9]**2+gains[:,10]**2+gains[:,11]**2+
                 gains[:,12]**2+gains[:,13]**2+gains[:,14]**2+gains[:,15]**2+
                 gains[:,16]**2+gains[:,17]**2+gains[:,19]**2)**0.5/100
@@ -106,10 +121,10 @@ class Calibrate:
         cov_filament=punpy.convert_corr_to_cov(np.ones((len(gains[:,2]),len(gains[:,2]))),
                 gains[:,2]*(gains[:,6]**2)**0.5/100)
 
-        calibration_data["cov_systematic_gains"] = cov_diag + cov_other + cov_full + cov_filament
+        calibration_data["cov_systematic_indep_gains"] = cov_diag + cov_other + cov_full + cov_filament
 
 
-        calibration_data["u_cosystematic_gains"] = gains[:,2]*(gains[:,4]**2+
+        calibration_data["u_systematic_corr_rad_irr_gains"] = gains[:,2]*(gains[:,4]**2+
                 gains[:,5]**2+gains[:,18]**2)**0.5/100
 
         cov_other = punpy.convert_corr_to_cov(np.eye(len(gains[:,2])),gains[:,2]*(
@@ -119,7 +134,7 @@ class Calibrate:
             np.ones((len(gains[:,2]),len(gains[:,2]))),
             gains[:,2]*(gains[:,5]**2)**0.5/100)
 
-        calibration_data["cov_cosystematic_gains"] = cov_other + cov_filament
+        calibration_data["cov_systematic_corr_rad_irr_gains"] = cov_other + cov_filament
 
         calibration_data["non_linearity_coefficients"] = non_linear_cals[:,0]
         calibration_data["u_random_non_linearity_coefficients"] = None
@@ -193,21 +208,29 @@ class Calibrate:
         :return:
         :rtype:
         """
-        inputs = []
-        covs = []
+        inputs_indep = []
+        covs_indep = []
+        inputs_corr = []
+        covs_corr = []
         for var in variables:
             try:
-                inputs.append(dataset["u_systematic_" + var].values)
-                covs.append(punpy.convert_corr_to_cov(dataset["corr_systematic_" + var].values,dataset["u_systematic_" + var].values))
+                inputs_indep.append(dataset["u_systematic_" + var].values)
+                covs_indep.append(punpy.convert_corr_to_cov(dataset["corr_systematic_" + var].values,dataset["u_systematic_" + var].values))
             except:
                 try:
-                    inputs.append(ancillary_dataset["u_systematic_" + var])
-                    covs.append(ancillary_dataset["cov_systematic_" + var])
+                    inputs_indep.append(ancillary_dataset["u_systematic_indep_"+var])
+                    covs_indep.append(ancillary_dataset["cov_systematic_indep_"+var])
                 except:
-                    inputs.append(None)
-                    covs.append(None)
+                    inputs_indep.append(None)
+                    covs_indep.append(None)
+                try:
+                    inputs_corr.append(ancillary_dataset["u_systematic_corr_rad_irr_"+var])
+                    covs_corr.append(ancillary_dataset["cov_systematic_corr_rad_irr_"+var])
+                except:
+                    inputs_corr.append(None)
+                    covs_corr.append(None)
 
-        return inputs
+        return inputs_indep,inputs_corr,covs_indep,covs_corr
 
     def preprocess_l0(self, datasetl0, datasetl0_bla, wavids):
         """
@@ -306,7 +329,10 @@ class Calibrate:
 
     def process_measurement_function(self, measurandstring, dataset, measurement_function, input_quantities,
                                      u_random_input_quantities,
-                                     u_systematic_input_quantities):
+                                     u_systematic_input_quantities_indep,
+                                     u_systematic_input_quantities_corr,
+                                     cov_systematic_input_quantities_indep,
+                                     cov_systematic_input_quantities_corr):
         datashape = input_quantities[0].shape
         for i in range(len(input_quantities)):
             if len(input_quantities[i].shape) < len(datashape):
@@ -318,24 +344,33 @@ class Calibrate:
             if u_random_input_quantities[i] is not None:
                 if len(u_random_input_quantities[i].shape) < len(datashape):
                     u_random_input_quantities[i] = np.tile(u_random_input_quantities[i], (datashape[1], 1)).T
-            if u_systematic_input_quantities[i] is not None:
-                if len(u_systematic_input_quantities[i].shape) < len(datashape):
-                    u_systematic_input_quantities[i] = np.tile(u_systematic_input_quantities[i], (datashape[1], 1)).T
+            if u_systematic_input_quantities_indep[i] is not None:
+                if len(u_systematic_input_quantities_indep[i].shape) < len(datashape):
+                    u_systematic_input_quantities_indep[i] = np.tile(u_systematic_input_quantities_indep[i], (datashape[1], 1)).T
+            if u_systematic_input_quantities_corr[i] is not None:
+                if len(u_systematic_input_quantities_corr[i].shape) < len(datashape):
+                    u_systematic_input_quantities_corr[i] = np.tile(u_systematic_input_quantities_corr[i], (datashape[1], 1)).T
 
         measurand = measurement_function(*input_quantities)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
                                                             u_random_input_quantities,repeat_dims=1)
-            u_systematic_measurand, corr_systematic_measurand = self.prop.propagate_systematic(measurement_function,
-                                                                                               input_quantities,
-                                                                                               u_systematic_input_quantities,cov_x=['rand']*len(u_systematic_input_quantities),
-                                                                                               return_corr=True,
-                                                                                               repeat_dims=1,corr_axis=0)
+            u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
+                measurement_function,input_quantities,u_systematic_input_quantities_indep,
+                cov_x=cov_systematic_input_quantities_indep,return_corr=True,
+                repeat_dims=1,corr_axis=0)
+            u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
+                measurement_function,input_quantities,u_systematic_input_quantities_corr,
+                cov_x=cov_systematic_input_quantities_corr,return_corr=True,
+                repeat_dims=1,corr_axis=0)
+
         dataset[measurandstring].values = measurand
         dataset["u_random_" + measurandstring].values = u_random_measurand
-        dataset["u_systematic_" + measurandstring].values = u_systematic_measurand
+        dataset["u_systematic_indep_" + measurandstring].values = u_syst_measurand_indep
+        dataset["u_systematic_corr_rad_irr_" + measurandstring].values = u_syst_measurand_corr
         dataset["corr_random_" + measurandstring].values = np.eye(len(u_random_measurand))
-        dataset["corr_systematic_" + measurandstring].values = corr_systematic_measurand
+        dataset["corr_systematic_indep_" + measurandstring].values = corr_syst_measurand_indep
+        dataset["corr_systematic_corr_rad_irr_" + measurandstring].values = corr_syst_measurand_corr
 
         return dataset

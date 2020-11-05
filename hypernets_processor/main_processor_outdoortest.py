@@ -65,7 +65,6 @@ class HypernetsProcessor:
         # settings_file = set_dir + '/data/settings/default.txt'
         server_dir = os.path.join(this_directory_path,"data_io/tests/reader/")
         seq_id=self.context.get_config_value("sequence_id")
-        print(self.context.get_config_value("write_l0"))
 
         # seq_dir=server_dir+"reader/SEQ20200625T095941/"
         seq_dir = server_dir + seq_id+"/"
@@ -134,48 +133,47 @@ class HypernetsProcessor:
         dim_sizes_dict = {"wavelength":len(wavs_swir),"scan":scanDim}
 
         # use template from variables and metadata in format
-        l0_rad_swir = hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,ds_format="L0_RAD")
-        l0_rad_swir["wavelength"] = wavs_swir
-        l0_rad_swir["scan"] = np.linspace(1,scanDim,scanDim)
-        l0_rad_swir["digital_number"].values = spec_swir[np.where(ID_swir == 1),5::][0].T
-        l0_rad_swir["acquisition_time"].values = spec_swir[np.where(ID_swir == 1),2][0]
-        l0_rad_swir["integration_time"].values = spec_swir[np.where(ID_swir == 1),3][0]
+        l0_swir_rad = hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,ds_format="L0_RAD")
+        l0_swir_rad["wavelength"] = wavs_swir
+        l0_swir_rad["scan"] = np.linspace(1,scanDim,scanDim)
+        l0_swir_rad["digital_number"].values = spec_swir[np.where(ID_swir == 1),5::][0].T
+        l0_swir_rad["acquisition_time"].values = spec_swir[np.where(ID_swir == 1),2][0]
+        l0_swir_rad["integration_time"].values = spec_swir[np.where(ID_swir == 1),3][0]
         for i in range(scanDim):
             acquisitionTime = times_swir[np.where(ID_swir == 1),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
                                                 '%Y%m%dT%H:%M:%S.%f%Z')
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
-            l0_rad_swir["acquisition_time"][i] = datetime.timestamp(acquisitionTime)
+            l0_swir_rad["acquisition_time"][i] = datetime.timestamp(acquisitionTime)
 
         scanDim = 10
         dim_sizes_dict = {"wavelength":len(wavs_swir),"scan":scanDim}
-        l0_irr_swir = hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,ds_format="L0_IRR")
-        l0_irr_swir["wavelength"] = wavs_swir
-        l0_irr_swir["scan"] = np.linspace(1,scanDim,scanDim)
-        l0_irr_swir["digital_number"].values = spec_swir[np.where(ID_swir == 2),5::][0].T
-        l0_irr_swir["acquisition_time"].values = spec_swir[np.where(ID_swir == 2),2][0]
-        l0_irr_swir["integration_time"].values = spec_swir[np.where(ID_swir == 2),3][0]
+        l0_swir_irr = hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,ds_format="L0_IRR")
+        l0_swir_irr["wavelength"] = wavs_swir
+        l0_swir_irr["scan"] = np.linspace(1,scanDim,scanDim)
+        l0_swir_irr["digital_number"].values = spec_swir[np.where(ID_swir == 2),5::][0].T
+        l0_swir_irr["acquisition_time"].values = spec_swir[np.where(ID_swir == 2),2][0]
+        l0_swir_irr["integration_time"].values = spec_swir[np.where(ID_swir == 2),3][0]
         for i in range(scanDim):
             acquisitionTime = times_swir[np.where(ID_swir == 2),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
                                                 '%Y%m%dT%H:%M:%S.%f%Z')
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
-            l0_irr_swir["acquisition_time"][i] = datetime.timestamp(acquisitionTime)
-
+            l0_swir_irr["acquisition_time"][i] = datetime.timestamp(acquisitionTime)
         scanDim = 20
         dim_sizes_dict = {"wavelength":len(wavs_swir),"scan":scanDim}
-        l0_bla_swir = hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,ds_format="L0_BLA")
-        l0_bla_swir["wavelength"] = wavs_swir
-        l0_bla_swir["scan"] = np.linspace(1,scanDim,scanDim)
-        l0_bla_swir["digital_number"].values = spec_swir[np.where(ID_swir == 0),5::][0].T
-        l0_bla_swir["acquisition_time"].values = spec_swir[np.where(ID_swir == 0),2][0]
-        l0_bla_swir["integration_time"].values = spec_swir[np.where(ID_swir == 0),3][0]
+        l0_swir_bla = hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,ds_format="L0_BLA")
+        l0_swir_bla["wavelength"] = wavs_swir
+        l0_swir_bla["scan"] = np.linspace(1,scanDim,scanDim)
+        l0_swir_bla["digital_number"].values = spec_swir[np.where(ID_swir == 0),5::][0].T
+        l0_swir_bla["acquisition_time"].values = spec_swir[np.where(ID_swir == 0),2][0]
+        l0_swir_bla["integration_time"].values = spec_swir[np.where(ID_swir == 0),3][0]
         for i in range(scanDim):
             acquisitionTime = times_swir[np.where(ID_swir == 0),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
                                                 '%Y%m%dT%H:%M:%S.%f%Z')
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
-            l0_bla_swir["acquisition_time"][i] = datetime.timestamp(acquisitionTime)
+            l0_swir_bla["acquisition_time"][i] = datetime.timestamp(acquisitionTime)
 
 
         reader = HypernetsReader(self.context)
@@ -196,8 +194,9 @@ class HypernetsProcessor:
             self.context.logger.debug("Processing to L1a...")
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla)
-            L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla)
-            L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla)
+
+            L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,swir=True)
+            L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,swir=True)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1b radiance...")
