@@ -5,8 +5,8 @@
 
 .. _user_automated:
 
-User Guide - Automated Processing
-=================================
+Automated Processing
+====================
 
 This section provides a user guide for running the **hypernets_processor** module as an automated processor of incoming field data. In this scenario, a set of field hypstar systems are regularly syncing raw data to a server.  Running on this server, the **hypernets_processor** processes the data and adds it to an archive that can be accessed through a user portal.
 

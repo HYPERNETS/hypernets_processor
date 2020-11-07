@@ -14,5 +14,5 @@ There are two main use cases for the **hypernets_processor** module. The primary
 .. toctree::
    :maxdepth: 1
 
-   user_adhoc
-   user_automated
+   content/users/adhoc
+   content/users/automated
