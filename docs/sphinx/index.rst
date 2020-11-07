@@ -8,36 +8,32 @@ hypernets_processor: Hypernets field and land network data processor
 
 The **hypernets_processor** module is a Python software package to process the `Hypernets <http://hypernets.eu/from_cms/summary>`_ land and water network in-situ hyperspectral data to surface reflectance products for distribution to users.
 
+There are two main use cases for the **hypernets_processor** module. The primary function of the software is the automated preparation of data retrieved from network sites for distribution to users. Additionally, the software may also be used for ad-hoc processing of particular field acquisitions, for example for testing instrument operation in the field.
+
 This documentation aimed at both users and developers of the software, find the relevant sections below.
 
-For Users:
-~~~~~~~~~~
+.. toctree::
+   :maxdepth: 1
+   :caption: User Guide
+
+   content/users/adhoc
+   content/users/automated
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: ATBD
 
-   content/users/users
    content/atbd/atbd
 
-For Developers:
-~~~~~~~~~~~~~~~
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer Guide
+
+   content/developers/getting_started
+   content/developers/software_design
 
 .. toctree::
    :maxdepth: 2
-
-   content/developers/developers
-
-API Documentation
-~~~~~~~~~~~~~~~~~
-
-.. toctree::
-   :maxdepth: 2
+   :caption: API Documentation
 
    content/API/hypernets_processor
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
