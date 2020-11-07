@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-hypernets_processor: Hypernets field and land network data processor
+hypernets_processor: Hypernets water and land network data processor
 ====================================================================
 
 The **hypernets_processor** module is a Python software package to process the `Hypernets <http://hypernets.eu/from_cms/summary>`_ land and water network in-situ hyperspectral data to surface reflectance products for distribution to users.
