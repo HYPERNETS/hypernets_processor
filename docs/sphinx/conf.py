@@ -76,6 +76,8 @@ source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
+atbd = 'atbd'
+userguide = 'userguide'
 
 # General information about the project.
 project = u'hypernets_processor'
@@ -295,7 +297,9 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'hypernets_processor.tex', u'Hypernets Processor Documentation',
+    (userguide, 'hypernets_processor_userguide.tex', u'Hypernets Processor User Guide',
+     u'Hypernets Project Team', 'manual'),
+    (atbd, 'hypernets_processor_atbd.tex', u'Hypernets Processor Algorithm Theoretical Basis Document',
      u'Hypernets Project Team', 'manual'),
 ]
 
@@ -352,7 +356,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'hypernets_processor', u'hypernets_processor Documentation',
+    (master_doc, 'hypernets_processor', u'Hypernets Processor User Guide',
      author, 'hypernets_processor', 'One line description of project.',
      'Miscellaneous'),
 ]
