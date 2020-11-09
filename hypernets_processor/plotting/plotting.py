@@ -70,23 +70,23 @@ class Plotting():
                        dataset.attrs['product_name']+"_series_"+str(
                 series_id[i])+"."+self.context.get_config_value("plotting_format"))
 
-            ids = np.where(dataset['series_id'] == series_id[i])
+            ids = np.where(dataset['series_id'] == series_id[i])[0]
 
             ydata_subset=dataset[measurandstring].values[:,ids]
             mask=DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]
+            mask = mask[ids]
+
             if dataset_avg is None:
                 ids_used = np.where((dataset['series_id'] == series_id[i]) & np.invert(
                     DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))[0]
                 ydata_subset_used = dataset[measurandstring].values[:,ids_used]
-                avgs=np.tile(np.mean(ydata_subset_used,axis=1)[...,None],len(ids_used))
-                mask=mask[ids_used]
+                avgs=np.tile(np.mean(ydata_subset_used,axis=1)[...,None],len(ids))
             else:
                 avg_ids = np.where((dataset_avg['series_id'] == series_id[i]))[0]
-                avgs = np.tile(dataset_avg[measurandstring].values[:,avg_ids],len(avg_ids))
-                mask=mask[avg_ids]
+                avgs = np.tile(dataset_avg[measurandstring].values[:,avg_ids],len(ids))
 
             self.plot_variable("relative difference",plotpath,dataset["wavelength"].values,
-                               (ydata_subset-avgs)/avgs,ylim=[-0.2,0.2],mask=mask)
+                               (ydata_subset-avgs)/avgs,ylim=[-0.3,0.3],mask=mask)
 
     def plot_radiance(self,plotpath,xdata,ydata,labels=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
@@ -99,7 +99,7 @@ class Plotting():
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)")
         ymax = np.percentile(ydata,95)*1.2
-        ax1.set_ylim([0,max(1,ymax)])
+        ax1.set_ylim([0,ymax])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
@@ -114,7 +114,7 @@ class Plotting():
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Irradiance ($mW\ nm^{-1}\ m^{-2}$)")
         ymax = np.percentile(ydata,95)*1.2
-        ax1.set_ylim([0,max(100,ymax)])
+        ax1.set_ylim([0,ymax])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
@@ -142,28 +142,32 @@ class Plotting():
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")
         ymax=np.percentile(ydata,95)*1.2
-        ax1.set_ylim([0,max(0.2,ymax)])
+        ax1.set_ylim([0,ymax])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
     def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None,mask=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
-        if labels is None and mask is None or len(np.where(mask))==0:
+        if labels is None and mask is None or len(np.where(mask)[0])==0:
             ax1.plot(xdata,ydata,alpha=0.3)
         elif mask is None:
             for i in range(len(labels)):
                 ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
         else:
-            print(ydata.shape)
-            print(ydata[:,np.where(np.invert(mask))].shape,ydata[:,np.where(np.invert(mask))][:,0].shape)
-            ax1.plot(xdata,ydata[:,np.where(mask)].reshape((len(ydata),len(np.where(mask)[0]))),label="masked",alpha=0.3)
-            ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3)
+            print(len(np.where(mask)[0]))
+            ax1.plot(xdata,ydata[:,np.where(mask)].reshape((len(ydata),len(np.where(mask)[0]))),label="masked",alpha=0.3,color="red")
+            ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3,color="green")
 
         if labels is not None or mask is not None:
-            ax1.legend()
+            handles,labels = plt.gca().get_legend_handles_labels()
+            by_label = dict(zip(labels,handles))
+            ax1.legend(by_label.values(),by_label.keys())
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(measurandstring)
         if ylim is not None:
             ax1.set_ylim(ylim)
+        else:
+            ymax = np.percentile(ydata,95)*1.2
+            ax1.set_ylim([0,ymax])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)

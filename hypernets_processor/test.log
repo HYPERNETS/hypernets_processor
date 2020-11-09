@@ -1020,3 +1020,429 @@
 2020-11-09 12:56:46,048 : INFO : Apply Ruddick et al., 2006
 2020-11-09 12:56:46,049 : INFO : Apply Ruddick et al., 2006
 2020-11-09 12:57:21,762 : INFO : all done!
+2020-11-09 16:02:22,319 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:02:22,493 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:02:22,608 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:02:22,735 : ERROR : No pictures for this sequence
+2020-11-09 16:02:42,556 : INFO : interpolate sky radiance
+2020-11-09 16:02:50,437 : INFO : interpolate irradiances
+2020-11-09 16:03:08,117 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,160 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,201 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,241 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,285 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,326 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,328 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,328 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,329 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,329 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,330 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,330 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:27,600 : INFO : all done!
+2020-11-09 16:05:30,601 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:05:30,931 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:05:31,117 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:05:31,375 : ERROR : No pictures for this sequence
+2020-11-09 16:05:59,997 : INFO : interpolate sky radiance
+2020-11-09 16:06:10,778 : INFO : interpolate irradiances
+2020-11-09 16:06:31,827 : INFO : Default wind speed 2.0
+2020-11-09 16:06:31,877 : INFO : Default wind speed 2.0
+2020-11-09 16:06:31,945 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,009 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,078 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,135 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,138 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,139 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,140 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,141 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,141 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,142 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:57,541 : INFO : all done!
+2020-11-09 16:12:20,991 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:12:21,116 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:12:21,227 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:12:21,349 : ERROR : No pictures for this sequence
+2020-11-09 16:12:37,283 : INFO : interpolate sky radiance
+2020-11-09 16:12:44,479 : INFO : interpolate irradiances
+2020-11-09 16:13:01,266 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,306 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,344 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,381 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,419 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,456 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,458 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,458 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,459 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,459 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,460 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,460 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:16,299 : INFO : all done!
+2020-11-09 16:29:36,845 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:29:36,959 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:29:37,065 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:29:37,197 : ERROR : No pictures for this sequence
+2020-11-09 16:29:53,704 : INFO : interpolate sky radiance
+2020-11-09 16:30:01,406 : INFO : interpolate irradiances
+2020-11-09 16:30:20,743 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,793 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,860 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,904 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,951 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,995 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,997 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,997 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,998 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,998 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,999 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,999 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:40,096 : INFO : all done!
+2020-11-09 16:31:27,608 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:31:27,809 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:31:27,977 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:31:28,286 : ERROR : No pictures for this sequence
+2020-11-09 16:31:56,656 : INFO : interpolate sky radiance
+2020-11-09 16:32:09,807 : INFO : interpolate irradiances
+2020-11-09 16:32:40,200 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,605 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,646 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,686 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,727 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,767 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,922 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,940 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,940 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,941 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,942 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,942 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:33:09,831 : INFO : all done!
+2020-11-09 16:37:24,146 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:37:24,280 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:37:24,460 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:37:24,671 : ERROR : No pictures for this sequence
+2020-11-09 16:37:42,366 : INFO : interpolate sky radiance
+2020-11-09 16:37:51,313 : INFO : interpolate irradiances
+2020-11-09 16:38:08,872 : INFO : Default wind speed 2.0
+2020-11-09 16:38:08,910 : INFO : Default wind speed 2.0
+2020-11-09 16:38:08,947 : INFO : Default wind speed 2.0
+2020-11-09 16:38:08,984 : INFO : Default wind speed 2.0
+2020-11-09 16:38:09,022 : INFO : Default wind speed 2.0
+2020-11-09 16:38:09,060 : INFO : Default wind speed 2.0
+2020-11-09 16:38:09,062 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,062 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,063 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,063 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,064 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,064 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:24,764 : INFO : all done!
+2020-11-09 16:41:18,657 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:41:18,957 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:41:19,199 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:41:19,420 : ERROR : No pictures for this sequence
+2020-11-09 16:41:47,975 : INFO : interpolate sky radiance
+2020-11-09 16:42:03,508 : INFO : interpolate irradiances
+2020-11-09 16:42:31,222 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,268 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,318 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,383 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,429 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,468 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,529 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,547 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,547 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,548 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,549 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,549 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:43:07,601 : INFO : all done!
+2020-11-09 16:46:13,463 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:46:13,607 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:46:13,733 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:46:13,881 : ERROR : No pictures for this sequence
+2020-11-09 16:46:37,957 : INFO : all done!
+2020-11-09 16:46:39,285 : INFO : interpolate sky radiance
+2020-11-09 16:46:48,508 : INFO : interpolate irradiances
+2020-11-09 16:47:07,790 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,829 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,868 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,908 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,947 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,985 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,987 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,988 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,988 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,989 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,989 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,990 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:23,951 : INFO : all done!
+2020-11-09 16:51:50,670 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:51:50,768 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:51:50,866 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:51:50,992 : ERROR : No pictures for this sequence
+2020-11-09 16:52:08,507 : INFO : interpolate sky radiance
+2020-11-09 16:54:58,341 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:54:58,439 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:54:58,537 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:54:58,653 : ERROR : No pictures for this sequence
+2020-11-09 16:55:15,764 : INFO : interpolate sky radiance
+2020-11-09 16:56:04,767 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:56:04,868 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:56:04,967 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:56:05,085 : ERROR : No pictures for this sequence
+2020-11-09 16:56:22,556 : INFO : interpolate sky radiance
+2020-11-09 16:57:54,714 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:57:54,810 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:57:54,909 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:57:55,020 : ERROR : No pictures for this sequence
+2020-11-09 16:58:11,985 : INFO : interpolate sky radiance
+2020-11-09 16:58:23,429 : INFO : interpolate irradiances
+2020-11-09 16:58:44,474 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,510 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,545 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,582 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,619 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,655 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,657 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,658 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,658 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,659 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,659 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,660 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:59:00,128 : INFO : all done!
+2020-11-09 17:01:01,230 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:01:01,326 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:01:01,426 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:01:01,554 : ERROR : No pictures for this sequence
+2020-11-09 17:01:19,177 : INFO : interpolate sky radiance
+2020-11-09 17:01:32,113 : INFO : interpolate irradiances
+2020-11-09 17:01:53,401 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,438 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,478 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,515 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,552 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,589 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,591 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,592 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,592 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,593 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,593 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,594 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:02:09,789 : INFO : all done!
+2020-11-09 17:10:01,320 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:01,415 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:01,512 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:01,637 : ERROR : No pictures for this sequence
+2020-11-09 17:10:17,916 : INFO : interpolate sky radiance
+2020-11-09 17:10:28,412 : INFO : interpolate irradiances
+2020-11-09 17:10:56,005 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:56,100 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:56,220 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:56,332 : ERROR : No pictures for this sequence
+2020-11-09 17:11:12,495 : INFO : interpolate sky radiance
+2020-11-09 17:11:24,146 : INFO : interpolate irradiances
+2020-11-09 17:11:45,098 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,145 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,190 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,236 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,279 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,316 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,319 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,319 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,320 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,320 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,321 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,321 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:12:03,600 : INFO : all done!
+2020-11-09 17:26:00,328 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:26:00,467 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:26:00,601 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:26:00,754 : ERROR : No pictures for this sequence
+2020-11-09 17:26:29,867 : INFO : interpolate sky radiance
+2020-11-09 17:26:40,092 : INFO : interpolate irradiances
+2020-11-09 17:27:11,514 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,607 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,724 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,828 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,923 : INFO : Default wind speed 2.0
+2020-11-09 17:27:12,011 : INFO : Default wind speed 2.0
+2020-11-09 17:27:12,016 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,017 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,019 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,020 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,021 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,022 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:49,671 : INFO : all done!
+2020-11-09 18:04:19,326 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:04:19,473 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:04:19,583 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:04:19,719 : ERROR : No pictures for this sequence
+2020-11-09 18:04:41,089 : INFO : interpolate sky radiance
+2020-11-09 18:18:33,760 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:18:33,883 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:18:33,996 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:18:34,125 : ERROR : No pictures for this sequence
+2020-11-09 18:18:54,596 : INFO : interpolate sky radiance
+2020-11-09 18:21:35,011 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:21:35,154 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:21:35,293 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:21:35,459 : ERROR : No pictures for this sequence
+2020-11-09 18:25:03,214 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:25:03,346 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:25:03,462 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:25:03,590 : ERROR : No pictures for this sequence
+2020-11-09 18:29:55,422 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:29:55,541 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:29:55,650 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:29:55,774 : ERROR : No pictures for this sequence
+2020-11-09 18:30:16,133 : INFO : interpolate sky radiance
+2020-11-09 18:30:52,309 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:30:52,436 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:30:52,549 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:30:52,679 : ERROR : No pictures for this sequence
+2020-11-09 18:31:13,700 : INFO : interpolate sky radiance
+2020-11-09 18:33:02,639 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:33:02,777 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:33:02,886 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:33:03,019 : ERROR : No pictures for this sequence
+2020-11-09 18:33:23,593 : INFO : interpolate sky radiance
+2020-11-09 18:35:31,174 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:35:31,301 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:35:31,417 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:35:31,549 : ERROR : No pictures for this sequence
+2020-11-09 18:35:53,429 : INFO : interpolate sky radiance
+2020-11-09 18:40:38,628 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:40:38,761 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:40:38,879 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:40:39,008 : ERROR : No pictures for this sequence
+2020-11-09 18:40:59,551 : INFO : interpolate sky radiance
+2020-11-09 18:55:42,980 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:55:43,115 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:55:43,225 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:55:43,351 : ERROR : No pictures for this sequence
+2020-11-09 18:56:03,881 : INFO : interpolate sky radiance
+2020-11-09 18:57:57,459 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:57:57,577 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:57:57,683 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:57:57,809 : ERROR : No pictures for this sequence
+2020-11-09 18:58:22,210 : INFO : interpolate sky radiance
+2020-11-09 18:59:58,383 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:59:58,539 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:59:58,676 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:59:58,804 : ERROR : No pictures for this sequence
+2020-11-09 19:00:24,374 : INFO : interpolate sky radiance
+2020-11-09 19:01:17,766 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:01:17,890 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:01:18,021 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:01:18,303 : ERROR : No pictures for this sequence
+2020-11-09 19:01:45,746 : INFO : interpolate sky radiance
+2020-11-09 19:04:36,973 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:04:37,110 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:04:37,232 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:04:37,389 : ERROR : No pictures for this sequence
+2020-11-09 19:05:01,115 : INFO : interpolate sky radiance
+2020-11-09 19:19:14,075 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:19:14,322 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:19:14,496 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:19:14,681 : ERROR : No pictures for this sequence
+2020-11-09 19:19:46,242 : INFO : interpolate sky radiance
+2020-11-09 19:24:45,267 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:24:45,432 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:24:45,605 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:24:45,803 : ERROR : No pictures for this sequence
+2020-11-09 19:25:13,019 : INFO : interpolate sky radiance
+2020-11-09 19:25:24,201 : INFO : interpolate irradiances
+2020-11-09 19:30:59,798 : INFO : all done!

@@ -20,15 +20,15 @@ class WaterNetworkInterpolationLinear:
                     irradiance_intfunc = scipy.interpolate.interp1d(times,
                                                                     variables)
                     out[:,i] = irradiance_intfunc(output_time[i])
-                return out
         else:
             if output_time > max(times):
-                return variables[:,times == max(times)][:,0]
+                out= variables[:,times == max(times)]
             elif output_time < min(times):
-                return variables[:,times == min(times)][:,0]
+                out=  variables[:,times == min(times)]
             else:
                 irradiance_intfunc = scipy.interpolate.interp1d(times,variables)
-                return irradiance_intfunc(output_time)
+                out = irradiance_intfunc(output_time)
+        return out
 
     @staticmethod
     def get_name():
