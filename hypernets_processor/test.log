@@ -1446,3 +1446,28 @@
 2020-11-09 19:25:13,019 : INFO : interpolate sky radiance
 2020-11-09 19:25:24,201 : INFO : interpolate irradiances
 2020-11-09 19:30:59,798 : INFO : all done!
+2020-11-09 19:59:56,797 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:59:56,947 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:59:57,094 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:59:57,265 : ERROR : No pictures for this sequence
+2020-11-09 20:00:32,106 : INFO : interpolate sky radiance
+2020-11-09 20:03:47,399 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 20:03:47,556 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 20:03:47,670 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 20:03:47,801 : ERROR : No pictures for this sequence
+2020-11-09 20:04:12,712 : INFO : interpolate sky radiance
+2020-11-09 20:07:26,367 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 20:07:26,528 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 20:07:26,731 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 20:07:27,135 : ERROR : No pictures for this sequence
+2020-11-09 20:08:02,129 : INFO : interpolate sky radiance
+2020-11-09 20:10:58,227 : INFO : interpolate irradiances

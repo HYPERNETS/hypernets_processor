@@ -195,8 +195,8 @@ class HypernetsProcessor:
         # L1b = rhymer.get_epsilon(L1b)
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
         #
-        print(L1b["corr_systematic_corr_rad_irr_irradiance"])
-        panic
+        # print(L1b["corr_systematic_corr_rad_irr_irradiance"])
+        # panic
         L1c=rhymer.process_l1c(L1b)
         #L1d_irr = cal.average_l1b("irradiance", L1c)
         L1d= surf.process_l1d(L1c)
