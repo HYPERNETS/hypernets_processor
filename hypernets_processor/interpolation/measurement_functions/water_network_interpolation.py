@@ -1,6 +1,7 @@
 
 
 import scipy.interpolate
+import numpy as np
 
 class WaterNetworkInterpolationLinear:
     def function(self,output_time,times,variables):
@@ -8,10 +9,26 @@ class WaterNetworkInterpolationLinear:
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
-        print(times.shape,variables.shape)
-        irradiance_intfunc=scipy.interpolate.interp1d(times,variables, fill_value="extrapolate")
-
-        return irradiance_intfunc(output_time)
+        if hasattr(output_time,'__len__'):
+            out = np.empty((len(variables),len(output_time)))
+            for i in range(len(output_time)):
+                if output_time[i] > max(times):
+                    out[:,i] = variables[:,times == max(times)][:,0]
+                elif output_time[i] < min(times):
+                    out[:,i] = variables[:,times == min(times)][:,0]
+                else:
+                    irradiance_intfunc = scipy.interpolate.interp1d(times,
+                                                                    variables)
+                    out[:,i] = irradiance_intfunc(output_time[i])
+                return out
+        else:
+            if output_time > max(times):
+                return variables[:,times == max(times)][:,0]
+            elif output_time < min(times):
+                return variables[:,times == min(times)][:,0]
+            else:
+                irradiance_intfunc = scipy.interpolate.interp1d(times,variables)
+                return irradiance_intfunc(output_time)
 
     @staticmethod
     def get_name():

@@ -202,6 +202,12 @@ class HypernetsProcessor:
             #     sequence_path)
             # self.context.logger.debug("Done")
 
+            l0_rad["digital_number"].values[:,0]=l0_rad["digital_number"].values[:,0]/1.5
+            l0_irr["digital_number"].values[:,0]=l0_irr["digital_number"].values[:,0]/1.5
+            l0_swir_rad["digital_number"].values[:,0]=l0_swir_rad["digital_number"].values[:,0]/1.5
+            l0_swir_irr["digital_number"].values[:,0]=l0_swir_irr["digital_number"].values[:,0]/1.5
+
+
             #Calibrate to L1a
             self.context.logger.debug("Processing to L1a...")
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla)
