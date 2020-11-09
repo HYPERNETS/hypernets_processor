@@ -53,7 +53,7 @@ class Calibrate:
         dataset_l1a = self.process_measurement_function(measurandstring, dataset_l1a, calibrate_function.function,
                                                         input_qty_l1a,
                                                         u_random_input_qty_l1a, u_systematic_input_qty_l1a)
-        if self.context.get_config_value("write_l1a"):
+        if self.context.get_config_value("write_l1a") & self.context.get_config_value("network") == "l":
             self.writer.write(dataset_l1a, overwrite=True)
 
         if self.context.get_config_value("plot_l1a"):
