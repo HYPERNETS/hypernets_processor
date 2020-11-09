@@ -70,8 +70,11 @@ class HypernetsProcessor:
         seq_dir = server_dir + seq_id+"/"
 
         l0_irr, l0_rad, l0_bla = HypernetsReader(self.context).read_sequence(seq_dir)
-        l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
-
+        #l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
+        l0_irr["integration_time"].values=1024*np.ones(len(l0_irr["integration_time"]))
+        l0_rad["integration_time"].values = 1024*np.ones(
+            len(l0_rad["integration_time"]))
+        l0_bla["integration_time"].values=1024*np.ones(len(l0_bla["integration_time"]))
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ", "")
         print(seq_id)
@@ -192,12 +195,14 @@ class HypernetsProcessor:
         # L1b = rhymer.get_epsilon(L1b)
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
         #
+        print(L1b["corr_systematic_corr_rad_irr_irradiance"])
+        panic
         L1c=rhymer.process_l1c(L1b)
         #L1d_irr = cal.average_l1b("irradiance", L1c)
         L1d= surf.process_l1d(L1c)
         print("rad",L1d["u_random_downwelling_radiance"])
 
-        L2a = surf.process(L1d)
+        L2a = surf.process_l2(L1d)
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
         # wind=RhymerHypstar(context).retrieve_wind(L1c)

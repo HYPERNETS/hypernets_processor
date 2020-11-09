@@ -210,8 +210,8 @@ class TemplateUtil:
 
         # Propagate data
         for common_variable_name in common_variable_names:
-            #print(source_ds[common_variable_name].values)
-            target_ds[common_variable_name].values = source_ds[common_variable_name].values
+            if target_ds[common_variable_name].shape == source_ds[common_variable_name].shape:
+                target_ds[common_variable_name].values = source_ds[common_variable_name].values
 
     # todo - add method to propagate common unpopulated metadata
 

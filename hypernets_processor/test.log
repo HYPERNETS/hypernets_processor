@@ -1,288 +1,1448 @@
-2020-10-30 10:25:29,788 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 10:25:29,809 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 11:33:40,896 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:33:40,897 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 10:25:29,832 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 10:25:29,849 : INFO : Reading Data spectra ...
-2020-10-30 10:25:29,863 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 10:25:29,868 : INFO : Reading Data spectra ...
-2020-10-30 10:25:29,881 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 10:25:29,885 : INFO : Reading Data spectra ...
-2020-10-30 10:25:29,899 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 10:25:29,917 : INFO : Reading Data spectra ...
-2020-10-30 10:25:29,928 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 10:25:29,934 : INFO : Reading Data spectra ...
-2020-10-30 10:25:29,946 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 10:25:29,950 : INFO : Reading Data spectra ...
-2020-10-30 10:25:29,964 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:29,967 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 11:33:40,946 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:33:40,946 : INFO : Reading Data spectra ...
+2020-11-09 11:33:40,963 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:33:40,963 : INFO : Reading Data spectra ...
+2020-11-09 11:33:40,978 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:33:40,979 : INFO : Reading Data spectra ...
+2020-11-09 11:33:40,993 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:33:40,993 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,002 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:33:41,003 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,013 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:33:41,014 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,031 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,032 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 10:25:29,994 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:29,997 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,014 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,018 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,042 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,047 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,058 : ERROR : Spectra length not similar to header length
-2020-10-30 10:25:30,058 : ERROR : Data corrupt go to next line
-2020-10-30 10:25:30,059 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,062 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,074 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,080 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,092 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,096 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,109 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,114 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,126 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,131 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,143 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,148 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,160 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,178 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,192 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,196 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,216 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 10:25:30,221 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,235 : ERROR : Spectra length not similar to header length
-2020-10-30 10:25:30,235 : ERROR : Data corrupt go to next line
-2020-10-30 10:25:30,249 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,253 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 11:33:41,061 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,061 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,075 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,076 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,099 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,100 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,118 : ERROR : Spectra length not similar to header length
+2020-11-09 11:33:41,118 : ERROR : Data corrupt go to next line
+2020-11-09 11:33:41,119 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,119 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,130 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,130 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,145 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,146 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,163 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,163 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,180 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,180 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,192 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,192 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,204 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,204 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,215 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,215 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,229 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:33:41,229 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,246 : ERROR : Spectra length not similar to header length
+2020-11-09 11:33:41,247 : ERROR : Data corrupt go to next line
+2020-11-09 11:33:41,248 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,249 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 10:25:30,268 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,274 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,292 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,296 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,310 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,315 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,328 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,333 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,346 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,351 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,370 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,374 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,388 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,393 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,408 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,414 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,428 : ERROR : Spectra length not similar to header length
-2020-10-30 10:25:30,429 : ERROR : Data corrupt go to next line
-2020-10-30 10:25:30,431 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,449 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,462 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,465 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,478 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,495 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,508 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,512 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,526 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,531 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,546 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 10:25:30,551 : INFO : Reading Data spectra ...
-2020-10-30 10:25:30,564 : ERROR : No pictures for this sequence
-2020-10-30 10:25:50,077 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
-2020-10-30 10:25:50,092 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
-2020-10-30 10:25:50,107 : INFO : No enough irradiance data for sequence SEQ20200312T135926
-2020-10-30 10:26:06,538 : INFO : Default wind speed 2.0
-2020-10-30 10:26:06,542 : INFO : Default wind speed 2.0
-2020-10-30 10:26:06,546 : INFO : Default wind speed 2.0
-2020-10-30 10:26:06,550 : INFO : Default wind speed 2.0
-2020-10-30 10:26:06,555 : INFO : Default wind speed 2.0
-2020-10-30 10:26:06,559 : INFO : Default wind speed 2.0
-2020-10-30 10:26:06,562 : INFO : Apply Ruddick et al., 2006
-2020-10-30 10:26:06,563 : INFO : Apply Ruddick et al., 2006
-2020-10-30 10:26:06,564 : INFO : Apply Ruddick et al., 2006
-2020-10-30 10:26:06,565 : INFO : Apply Ruddick et al., 2006
-2020-10-30 10:26:06,566 : INFO : Apply Ruddick et al., 2006
-2020-10-30 10:26:06,567 : INFO : Apply Ruddick et al., 2006
-2020-10-30 10:26:19,939 : INFO : all done!
-2020-10-30 11:52:16,708 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 11:52:16,710 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 11:33:41,282 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,283 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,294 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,294 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,306 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,306 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,317 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,318 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,329 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,330 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,342 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,342 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,357 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,357 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,369 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,369 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,382 : ERROR : Spectra length not similar to header length
+2020-11-09 11:33:41,382 : ERROR : Data corrupt go to next line
+2020-11-09 11:33:41,384 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,384 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,395 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,395 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,411 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,412 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,436 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,436 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,450 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,450 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,462 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:33:41,462 : INFO : Reading Data spectra ...
+2020-11-09 11:33:41,474 : ERROR : No pictures for this sequence
+2020-11-09 11:37:41,309 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:37:41,310 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 11:52:16,744 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 11:52:16,762 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,773 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 11:52:16,775 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,785 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 11:52:16,803 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,813 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 11:52:16,816 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,826 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 11:52:16,829 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,839 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 11:52:16,853 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,864 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,867 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 11:37:41,351 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:37:41,352 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,363 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:37:41,363 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,375 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:37:41,376 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,386 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:37:41,386 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,396 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:37:41,396 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,407 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 11:37:41,407 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,423 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,424 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 11:52:16,892 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,894 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,904 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,906 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,915 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,919 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,932 : ERROR : Spectra length not similar to header length
-2020-10-30 11:52:16,932 : ERROR : Data corrupt go to next line
-2020-10-30 11:52:16,934 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,935 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,945 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,947 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,956 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,961 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,983 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,985 : INFO : Reading Data spectra ...
-2020-10-30 11:52:16,995 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:16,997 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,008 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:17,009 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,019 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:17,021 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,031 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:17,034 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,043 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 11:52:17,046 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,055 : ERROR : Spectra length not similar to header length
-2020-10-30 11:52:17,055 : ERROR : Data corrupt go to next line
-2020-10-30 11:52:17,057 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,059 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 11:37:41,452 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,452 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,463 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,463 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,472 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,472 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,483 : ERROR : Spectra length not similar to header length
+2020-11-09 11:37:41,483 : ERROR : Data corrupt go to next line
+2020-11-09 11:37:41,484 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,484 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,496 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,496 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,510 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,510 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,519 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,520 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,540 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,541 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,555 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,556 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,568 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,568 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,579 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,579 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,591 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 11:37:41,591 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,606 : ERROR : Spectra length not similar to header length
+2020-11-09 11:37:41,606 : ERROR : Data corrupt go to next line
+2020-11-09 11:37:41,608 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,609 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 11:52:17,084 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,085 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,095 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,098 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,119 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,120 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,129 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,131 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,141 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,144 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,153 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,170 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,181 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,183 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,192 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,194 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,205 : ERROR : Spectra length not similar to header length
-2020-10-30 11:52:17,205 : ERROR : Data corrupt go to next line
-2020-10-30 11:52:17,207 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,209 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,219 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,222 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,232 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,234 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,246 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,248 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,259 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,261 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,279 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 11:52:17,281 : INFO : Reading Data spectra ...
-2020-10-30 11:52:17,291 : ERROR : No pictures for this sequence
-2020-10-30 11:52:27,274 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
-2020-10-30 11:52:27,282 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
-2020-10-30 11:52:27,297 : INFO : No enough irradiance data for sequence SEQ20200312T135926
-2020-10-30 11:52:45,340 : INFO : Default wind speed 2.0
-2020-10-30 11:52:45,345 : INFO : Default wind speed 2.0
-2020-10-30 11:52:45,349 : INFO : Default wind speed 2.0
-2020-10-30 11:52:45,355 : INFO : Default wind speed 2.0
-2020-10-30 11:52:45,359 : INFO : Default wind speed 2.0
-2020-10-30 11:52:45,364 : INFO : Default wind speed 2.0
-2020-10-30 11:52:45,367 : INFO : Apply Ruddick et al., 2006
-2020-10-30 11:52:45,368 : INFO : Apply Ruddick et al., 2006
-2020-10-30 11:52:45,368 : INFO : Apply Ruddick et al., 2006
-2020-10-30 11:52:45,369 : INFO : Apply Ruddick et al., 2006
-2020-10-30 11:52:45,369 : INFO : Apply Ruddick et al., 2006
-2020-10-30 11:52:45,370 : INFO : Apply Ruddick et al., 2006
-2020-10-30 11:52:58,722 : INFO : all done!
-2020-10-30 17:33:29,365 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 17:33:29,368 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 11:37:41,639 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,640 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,650 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,651 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,667 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,667 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,683 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,683 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,697 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,697 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,713 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,713 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,731 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,732 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,749 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,749 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,767 : ERROR : Spectra length not similar to header length
+2020-11-09 11:37:41,768 : ERROR : Data corrupt go to next line
+2020-11-09 11:37:41,770 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,771 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,787 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,788 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,807 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,808 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,831 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,832 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,850 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,850 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,878 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 11:37:41,879 : INFO : Reading Data spectra ...
+2020-11-09 11:37:41,911 : ERROR : No pictures for this sequence
+2020-11-09 11:38:03,756 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:23:02,571 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:23:02,572 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 17:33:29,383 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 17:33:29,385 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,396 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 17:33:29,398 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,417 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 17:33:29,419 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,428 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 17:33:29,430 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,439 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 17:33:29,442 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,452 : INFO : Spectrum Type Info : VIS Irr 
-2020-10-30 17:33:29,454 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,464 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,467 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 12:23:02,613 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:23:02,613 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,628 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:23:02,629 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,655 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:23:02,656 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,671 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:23:02,672 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,681 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:23:02,681 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,698 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:23:02,698 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,717 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,717 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 17:33:29,479 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,481 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,490 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,493 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,502 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,504 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,513 : ERROR : Spectra length not similar to header length
-2020-10-30 17:33:29,513 : ERROR : Data corrupt go to next line
-2020-10-30 17:33:29,515 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,528 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,537 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,539 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,546 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,549 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,562 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,565 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,573 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,576 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,584 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,587 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,597 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,599 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,611 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,613 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,621 : INFO : Spectrum Type Info : VIS Rad 
-2020-10-30 17:33:29,624 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,632 : ERROR : Spectra length not similar to header length
-2020-10-30 17:33:29,633 : ERROR : Data corrupt go to next line
-2020-10-30 17:33:29,634 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,636 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+2020-11-09 12:23:02,752 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,752 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,766 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,766 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,776 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,776 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,786 : ERROR : Spectra length not similar to header length
+2020-11-09 12:23:02,786 : ERROR : Data corrupt go to next line
+2020-11-09 12:23:02,787 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,787 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,797 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,797 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,811 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,812 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,821 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,822 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,831 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,831 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,841 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,842 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,852 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,852 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,862 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,862 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,870 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:23:02,870 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,880 : ERROR : Spectra length not similar to header length
+2020-11-09 12:23:02,880 : ERROR : Data corrupt go to next line
+2020-11-09 12:23:02,882 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,882 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
  2.04699951e+03 2.04800000e+03]
-2020-10-30 17:33:29,648 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,661 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,669 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,671 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,680 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,683 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,693 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,695 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,706 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,709 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,717 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,719 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,729 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,731 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,740 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,743 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,750 : ERROR : Spectra length not similar to header length
-2020-10-30 17:33:29,751 : ERROR : Data corrupt go to next line
-2020-10-30 17:33:29,752 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,754 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,763 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,766 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,774 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,777 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,786 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,788 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,797 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,810 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,818 : INFO : Spectrum Type Info : VIS Dark 
-2020-10-30 17:33:29,820 : INFO : Reading Data spectra ...
-2020-10-30 17:33:29,829 : ERROR : No pictures for this sequence
-2020-10-30 17:33:45,487 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
-2020-10-30 17:33:45,496 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
-2020-10-30 17:33:45,505 : INFO : No enough irradiance data for sequence SEQ20200312T135926
-2020-10-30 17:34:01,580 : INFO : Default wind speed 2.0
-2020-10-30 17:34:01,583 : INFO : Default wind speed 2.0
-2020-10-30 17:34:01,586 : INFO : Default wind speed 2.0
-2020-10-30 17:34:01,589 : INFO : Default wind speed 2.0
-2020-10-30 17:34:01,591 : INFO : Default wind speed 2.0
-2020-10-30 17:34:01,594 : INFO : Default wind speed 2.0
-2020-10-30 17:34:01,596 : INFO : Apply Ruddick et al., 2006
-2020-10-30 17:34:01,596 : INFO : Apply Ruddick et al., 2006
-2020-10-30 17:34:01,597 : INFO : Apply Ruddick et al., 2006
-2020-10-30 17:34:01,598 : INFO : Apply Ruddick et al., 2006
-2020-10-30 17:34:01,598 : INFO : Apply Ruddick et al., 2006
-2020-10-30 17:34:01,599 : INFO : Apply Ruddick et al., 2006
-2020-10-30 17:34:15,154 : INFO : all done!
+2020-11-09 12:23:02,919 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,919 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,934 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,934 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,945 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,946 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,955 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,956 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,965 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,965 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,979 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,980 : INFO : Reading Data spectra ...
+2020-11-09 12:23:02,992 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:02,992 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,002 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:03,002 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,010 : ERROR : Spectra length not similar to header length
+2020-11-09 12:23:03,010 : ERROR : Data corrupt go to next line
+2020-11-09 12:23:03,012 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:03,012 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,020 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:03,020 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,029 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:03,030 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,039 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:03,039 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,051 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:03,052 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,061 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:23:03,061 : INFO : Reading Data spectra ...
+2020-11-09 12:23:03,080 : ERROR : No pictures for this sequence
+2020-11-09 12:23:25,403 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:23:25,545 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:23:25,663 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:23:26,956 : INFO : interpolate sky radiance
+2020-11-09 12:23:45,741 : INFO : interpolate irradiances
+2020-11-09 12:24:06,782 : INFO : Default wind speed 2.0
+2020-11-09 12:24:06,896 : INFO : Default wind speed 2.0
+2020-11-09 12:24:06,992 : INFO : Default wind speed 2.0
+2020-11-09 12:24:07,119 : INFO : Default wind speed 2.0
+2020-11-09 12:24:07,224 : INFO : Default wind speed 2.0
+2020-11-09 12:24:07,318 : INFO : Default wind speed 2.0
+2020-11-09 12:24:07,323 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:24:07,325 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:24:07,327 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:24:07,329 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:24:07,330 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:24:07,331 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:28:55,927 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:28:55,928 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:28:55,973 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:28:55,973 : INFO : Reading Data spectra ...
+2020-11-09 12:28:55,984 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:28:55,984 : INFO : Reading Data spectra ...
+2020-11-09 12:28:55,994 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:28:55,995 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,006 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:28:56,006 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,017 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:28:56,017 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,028 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:28:56,028 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,044 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,044 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:28:56,072 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,072 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,082 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,082 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,092 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,092 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,101 : ERROR : Spectra length not similar to header length
+2020-11-09 12:28:56,101 : ERROR : Data corrupt go to next line
+2020-11-09 12:28:56,102 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,102 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,112 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,112 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,121 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,122 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,131 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,131 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,141 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,141 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,150 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,150 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,165 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,165 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,176 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,176 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,189 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:28:56,190 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,202 : ERROR : Spectra length not similar to header length
+2020-11-09 12:28:56,202 : ERROR : Data corrupt go to next line
+2020-11-09 12:28:56,204 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,205 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:28:56,237 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,237 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,248 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,248 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,258 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,259 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,269 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,270 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,280 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,280 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,290 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,290 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,302 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,302 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,312 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,313 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,325 : ERROR : Spectra length not similar to header length
+2020-11-09 12:28:56,325 : ERROR : Data corrupt go to next line
+2020-11-09 12:28:56,327 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,327 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,337 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,337 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,347 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,347 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,359 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,360 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,370 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,370 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,380 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:28:56,381 : INFO : Reading Data spectra ...
+2020-11-09 12:28:56,392 : ERROR : No pictures for this sequence
+2020-11-09 12:29:14,845 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:29:14,973 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:29:15,106 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:29:16,105 : INFO : interpolate sky radiance
+2020-11-09 12:29:36,052 : INFO : interpolate irradiances
+2020-11-09 12:29:54,694 : INFO : Default wind speed 2.0
+2020-11-09 12:29:54,755 : INFO : Default wind speed 2.0
+2020-11-09 12:29:54,818 : INFO : Default wind speed 2.0
+2020-11-09 12:29:54,876 : INFO : Default wind speed 2.0
+2020-11-09 12:29:54,936 : INFO : Default wind speed 2.0
+2020-11-09 12:29:54,998 : INFO : Default wind speed 2.0
+2020-11-09 12:29:55,001 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:29:55,002 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:29:55,003 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:29:55,004 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:29:55,004 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:29:55,005 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:32:00,609 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:32:00,610 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:32:00,648 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:32:00,648 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,658 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:32:00,658 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,669 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:32:00,670 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,680 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:32:00,681 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,690 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:32:00,690 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,705 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:32:00,705 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,720 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,721 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:32:00,753 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,753 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,763 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,763 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,772 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,773 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,784 : ERROR : Spectra length not similar to header length
+2020-11-09 12:32:00,784 : ERROR : Data corrupt go to next line
+2020-11-09 12:32:00,785 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,785 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,796 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,796 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,807 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,808 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,821 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,821 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,840 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,841 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,856 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,856 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,875 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,875 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,892 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,892 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,905 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:32:00,905 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,915 : ERROR : Spectra length not similar to header length
+2020-11-09 12:32:00,915 : ERROR : Data corrupt go to next line
+2020-11-09 12:32:00,916 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:00,916 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:32:00,961 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:00,962 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,974 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:00,975 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,986 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:00,986 : INFO : Reading Data spectra ...
+2020-11-09 12:32:00,999 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:00,999 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,010 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,010 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,020 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,020 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,033 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,033 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,043 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,044 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,053 : ERROR : Spectra length not similar to header length
+2020-11-09 12:32:01,053 : ERROR : Data corrupt go to next line
+2020-11-09 12:32:01,054 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,054 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,065 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,065 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,075 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,075 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,086 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,086 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,097 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,097 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,111 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:32:01,111 : INFO : Reading Data spectra ...
+2020-11-09 12:32:01,125 : ERROR : No pictures for this sequence
+2020-11-09 12:32:20,810 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:32:20,934 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:32:21,067 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:32:22,217 : INFO : interpolate sky radiance
+2020-11-09 12:32:44,571 : INFO : interpolate irradiances
+2020-11-09 12:33:06,236 : INFO : Default wind speed 2.0
+2020-11-09 12:33:06,296 : INFO : Default wind speed 2.0
+2020-11-09 12:33:06,356 : INFO : Default wind speed 2.0
+2020-11-09 12:33:06,417 : INFO : Default wind speed 2.0
+2020-11-09 12:33:06,475 : INFO : Default wind speed 2.0
+2020-11-09 12:33:06,533 : INFO : Default wind speed 2.0
+2020-11-09 12:33:06,536 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:33:06,537 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:33:06,538 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:33:06,539 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:33:06,540 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:33:06,540 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:36:32,495 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:36:32,496 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:36:32,550 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:36:32,550 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,564 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:36:32,564 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,582 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:36:32,582 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,597 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:36:32,597 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,612 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:36:32,613 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,624 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:36:32,624 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,636 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,636 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:36:32,667 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,667 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,680 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,680 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,692 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,692 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,702 : ERROR : Spectra length not similar to header length
+2020-11-09 12:36:32,703 : ERROR : Data corrupt go to next line
+2020-11-09 12:36:32,704 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,704 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,720 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,720 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,730 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,731 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,741 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,741 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,751 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,751 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,762 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,762 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,774 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,775 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,790 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,790 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,800 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:36:32,800 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,811 : ERROR : Spectra length not similar to header length
+2020-11-09 12:36:32,811 : ERROR : Data corrupt go to next line
+2020-11-09 12:36:32,813 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,813 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:36:32,858 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,858 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,868 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,868 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,879 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,879 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,890 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,890 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,906 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,907 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,916 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,916 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,928 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,928 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,940 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,940 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,954 : ERROR : Spectra length not similar to header length
+2020-11-09 12:36:32,954 : ERROR : Data corrupt go to next line
+2020-11-09 12:36:32,956 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,956 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,966 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,966 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,978 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,978 : INFO : Reading Data spectra ...
+2020-11-09 12:36:32,990 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:32,990 : INFO : Reading Data spectra ...
+2020-11-09 12:36:33,004 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:33,004 : INFO : Reading Data spectra ...
+2020-11-09 12:36:33,015 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:36:33,015 : INFO : Reading Data spectra ...
+2020-11-09 12:36:33,026 : ERROR : No pictures for this sequence
+2020-11-09 12:36:54,317 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:36:54,452 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:36:54,594 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:36:55,828 : INFO : interpolate sky radiance
+2020-11-09 12:37:08,263 : INFO : interpolate irradiances
+2020-11-09 12:37:22,029 : INFO : Default wind speed 2.0
+2020-11-09 12:37:22,130 : INFO : Default wind speed 2.0
+2020-11-09 12:37:22,248 : INFO : Default wind speed 2.0
+2020-11-09 12:37:22,338 : INFO : Default wind speed 2.0
+2020-11-09 12:37:22,434 : INFO : Default wind speed 2.0
+2020-11-09 12:37:22,565 : INFO : Default wind speed 2.0
+2020-11-09 12:37:22,573 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:37:22,575 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:37:22,577 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:37:22,580 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:37:22,582 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:37:22,584 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:39:42,638 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:39:42,639 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:39:42,691 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:39:42,692 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,702 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:39:42,702 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,712 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:39:42,712 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,722 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:39:42,723 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,733 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:39:42,733 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,742 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:39:42,743 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,753 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,754 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:39:42,780 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,780 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,790 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,790 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,802 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,802 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,817 : ERROR : Spectra length not similar to header length
+2020-11-09 12:39:42,817 : ERROR : Data corrupt go to next line
+2020-11-09 12:39:42,818 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,818 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,830 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,830 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,840 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,841 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,851 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,851 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,861 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,861 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,870 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,871 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,882 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,883 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,895 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,896 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,909 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:39:42,909 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,922 : ERROR : Spectra length not similar to header length
+2020-11-09 12:39:42,922 : ERROR : Data corrupt go to next line
+2020-11-09 12:39:42,925 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:42,925 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:39:42,968 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:42,968 : INFO : Reading Data spectra ...
+2020-11-09 12:39:42,984 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:42,985 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,000 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,001 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,020 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,020 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,037 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,037 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,050 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,050 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,062 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,062 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,072 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,072 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,083 : ERROR : Spectra length not similar to header length
+2020-11-09 12:39:43,083 : ERROR : Data corrupt go to next line
+2020-11-09 12:39:43,085 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,085 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,095 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,095 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,105 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,105 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,117 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,118 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,131 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,131 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,144 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:39:43,144 : INFO : Reading Data spectra ...
+2020-11-09 12:39:43,156 : ERROR : No pictures for this sequence
+2020-11-09 12:40:01,870 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:40:01,975 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:40:02,090 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:40:03,143 : INFO : interpolate sky radiance
+2020-11-09 12:40:13,749 : INFO : interpolate irradiances
+2020-11-09 12:40:25,235 : INFO : Default wind speed 2.0
+2020-11-09 12:40:25,296 : INFO : Default wind speed 2.0
+2020-11-09 12:40:25,371 : INFO : Default wind speed 2.0
+2020-11-09 12:40:25,479 : INFO : Default wind speed 2.0
+2020-11-09 12:40:25,564 : INFO : Default wind speed 2.0
+2020-11-09 12:40:25,644 : INFO : Default wind speed 2.0
+2020-11-09 12:40:25,650 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:40:25,652 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:40:25,654 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:40:25,656 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:40:25,657 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:40:25,659 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:47:48,117 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:47:48,119 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:47:48,175 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:47:48,176 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,193 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:47:48,193 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,204 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:47:48,204 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,215 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:47:48,215 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,225 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:47:48,225 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,234 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:47:48,235 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,246 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,247 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:47:48,292 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,292 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,304 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,304 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,315 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,315 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,326 : ERROR : Spectra length not similar to header length
+2020-11-09 12:47:48,326 : ERROR : Data corrupt go to next line
+2020-11-09 12:47:48,327 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,328 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,339 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,339 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,350 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,350 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,362 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,362 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,374 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,375 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,390 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,390 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,408 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,408 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,424 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,425 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,439 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:47:48,439 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,448 : ERROR : Spectra length not similar to header length
+2020-11-09 12:47:48,448 : ERROR : Data corrupt go to next line
+2020-11-09 12:47:48,450 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,451 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:47:48,489 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,489 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,502 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,502 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,517 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,517 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,538 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,538 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,550 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,550 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,561 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,562 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,578 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,579 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,588 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,588 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,599 : ERROR : Spectra length not similar to header length
+2020-11-09 12:47:48,599 : ERROR : Data corrupt go to next line
+2020-11-09 12:47:48,603 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,603 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,613 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,613 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,623 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,623 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,635 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,635 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,646 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,647 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,658 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:47:48,658 : INFO : Reading Data spectra ...
+2020-11-09 12:47:48,669 : ERROR : No pictures for this sequence
+2020-11-09 12:48:07,256 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:48:07,374 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:48:07,502 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:48:08,766 : INFO : interpolate sky radiance
+2020-11-09 12:48:19,470 : INFO : interpolate irradiances
+2020-11-09 12:48:30,230 : INFO : Default wind speed 2.0
+2020-11-09 12:48:30,286 : INFO : Default wind speed 2.0
+2020-11-09 12:48:30,342 : INFO : Default wind speed 2.0
+2020-11-09 12:48:30,402 : INFO : Default wind speed 2.0
+2020-11-09 12:48:30,466 : INFO : Default wind speed 2.0
+2020-11-09 12:48:30,532 : INFO : Default wind speed 2.0
+2020-11-09 12:48:30,534 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:48:30,535 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:48:30,536 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:48:30,537 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:48:30,538 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:48:30,539 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:51:48,249 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:51:48,251 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:51:48,341 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:51:48,341 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,360 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:51:48,360 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,379 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:51:48,379 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,397 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:51:48,397 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,417 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:51:48,417 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,434 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:51:48,435 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,447 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,448 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:51:48,481 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,481 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,494 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,494 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,509 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,509 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,519 : ERROR : Spectra length not similar to header length
+2020-11-09 12:51:48,519 : ERROR : Data corrupt go to next line
+2020-11-09 12:51:48,520 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,521 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,538 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,538 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,552 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,553 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,562 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,563 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,572 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,572 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,582 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,582 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,594 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,594 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,604 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,604 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,615 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:51:48,615 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,625 : ERROR : Spectra length not similar to header length
+2020-11-09 12:51:48,625 : ERROR : Data corrupt go to next line
+2020-11-09 12:51:48,626 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,626 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:51:48,655 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,655 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,665 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,666 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,676 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,676 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,686 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,686 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,696 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,696 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,705 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,705 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,718 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,718 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,729 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,729 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,738 : ERROR : Spectra length not similar to header length
+2020-11-09 12:51:48,738 : ERROR : Data corrupt go to next line
+2020-11-09 12:51:48,739 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,739 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,749 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,749 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,759 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,759 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,769 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,769 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,780 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,780 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,789 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:51:48,789 : INFO : Reading Data spectra ...
+2020-11-09 12:51:48,799 : ERROR : No pictures for this sequence
+2020-11-09 12:52:08,340 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:52:08,453 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:52:08,575 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:52:09,706 : INFO : interpolate sky radiance
+2020-11-09 12:52:24,790 : INFO : interpolate irradiances
+2020-11-09 12:52:37,391 : INFO : Default wind speed 2.0
+2020-11-09 12:52:37,460 : INFO : Default wind speed 2.0
+2020-11-09 12:52:37,522 : INFO : Default wind speed 2.0
+2020-11-09 12:52:37,601 : INFO : Default wind speed 2.0
+2020-11-09 12:52:37,670 : INFO : Default wind speed 2.0
+2020-11-09 12:52:37,735 : INFO : Default wind speed 2.0
+2020-11-09 12:52:37,738 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:52:37,738 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:52:37,740 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:52:37,740 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:52:37,741 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:52:37,741 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:55:04,950 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:04,951 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:55:05,014 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:05,014 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,036 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:05,036 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,048 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:05,048 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,063 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:05,064 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,082 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:05,083 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,098 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:05,098 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,115 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,116 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:55:05,163 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,163 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,176 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,176 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,187 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,187 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,205 : ERROR : Spectra length not similar to header length
+2020-11-09 12:55:05,205 : ERROR : Data corrupt go to next line
+2020-11-09 12:55:05,206 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,206 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,220 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,220 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,234 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,234 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,245 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,245 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,255 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,256 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,269 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,269 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,284 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,284 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,297 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,297 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,308 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:05,308 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,321 : ERROR : Spectra length not similar to header length
+2020-11-09 12:55:05,321 : ERROR : Data corrupt go to next line
+2020-11-09 12:55:05,323 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,324 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:55:05,378 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,378 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,392 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,392 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,405 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,405 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,423 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,423 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,439 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,439 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,451 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,452 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,465 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,465 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,474 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,474 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,486 : ERROR : Spectra length not similar to header length
+2020-11-09 12:55:05,486 : ERROR : Data corrupt go to next line
+2020-11-09 12:55:05,488 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,488 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,501 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,501 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,513 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,514 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,527 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,527 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,540 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,540 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,552 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:05,552 : INFO : Reading Data spectra ...
+2020-11-09 12:55:05,565 : ERROR : No pictures for this sequence
+2020-11-09 12:55:28,742 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:55:28,932 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:55:29,176 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:55:30,404 : INFO : interpolate sky radiance
+2020-11-09 12:55:43,005 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:43,006 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:55:43,073 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:43,073 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,084 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:43,084 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,094 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:43,094 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,107 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:43,107 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,118 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:43,118 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,128 : INFO : Spectrum Type Info : VIS Irr 
+2020-11-09 12:55:43,128 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,140 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,141 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:55:43,167 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,167 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,177 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,177 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,187 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,188 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,198 : ERROR : Spectra length not similar to header length
+2020-11-09 12:55:43,198 : ERROR : Data corrupt go to next line
+2020-11-09 12:55:43,199 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,199 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,209 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,209 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,219 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,219 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,232 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,232 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,242 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,242 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,252 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,252 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,264 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,264 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,274 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,274 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,284 : INFO : Spectrum Type Info : VIS Rad 
+2020-11-09 12:55:43,285 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,295 : ERROR : Spectra length not similar to header length
+2020-11-09 12:55:43,296 : ERROR : Data corrupt go to next line
+2020-11-09 12:55:43,296 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,297 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 12:55:43,322 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,322 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,332 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,332 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,342 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,343 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,353 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,353 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,363 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,363 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,373 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,373 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,385 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,385 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,395 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,396 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,406 : ERROR : Spectra length not similar to header length
+2020-11-09 12:55:43,406 : ERROR : Data corrupt go to next line
+2020-11-09 12:55:43,407 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,408 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,417 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,417 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,427 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,427 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,438 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,438 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,449 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,449 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,459 : INFO : Spectrum Type Info : VIS Dark 
+2020-11-09 12:55:43,460 : INFO : Reading Data spectra ...
+2020-11-09 12:55:43,470 : ERROR : No pictures for this sequence
+2020-11-09 12:56:09,103 : INFO : No enough upwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:56:09,282 : INFO : No enough downwelling radiance data for sequence SEQ20200312T135926
+2020-11-09 12:56:09,471 : INFO : No enough downwelling irradiance data for sequence SEQ20200312T135926
+2020-11-09 12:56:11,087 : INFO : interpolate sky radiance
+2020-11-09 12:56:28,369 : INFO : interpolate irradiances
+2020-11-09 12:56:45,569 : INFO : Default wind speed 2.0
+2020-11-09 12:56:45,677 : INFO : Default wind speed 2.0
+2020-11-09 12:56:45,765 : INFO : Default wind speed 2.0
+2020-11-09 12:56:45,853 : INFO : Default wind speed 2.0
+2020-11-09 12:56:45,946 : INFO : Default wind speed 2.0
+2020-11-09 12:56:46,038 : INFO : Default wind speed 2.0
+2020-11-09 12:56:46,043 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:56:46,044 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:56:46,045 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:56:46,047 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:56:46,048 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:56:46,049 : INFO : Apply Ruddick et al., 2006
+2020-11-09 12:57:21,762 : INFO : all done!
+2020-11-09 16:02:22,319 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:02:22,493 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:02:22,608 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:02:22,735 : ERROR : No pictures for this sequence
+2020-11-09 16:02:42,556 : INFO : interpolate sky radiance
+2020-11-09 16:02:50,437 : INFO : interpolate irradiances
+2020-11-09 16:03:08,117 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,160 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,201 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,241 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,285 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,326 : INFO : Default wind speed 2.0
+2020-11-09 16:03:08,328 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,328 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,329 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,329 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,330 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:08,330 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:03:27,600 : INFO : all done!
+2020-11-09 16:05:30,601 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:05:30,931 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:05:31,117 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:05:31,375 : ERROR : No pictures for this sequence
+2020-11-09 16:05:59,997 : INFO : interpolate sky radiance
+2020-11-09 16:06:10,778 : INFO : interpolate irradiances
+2020-11-09 16:06:31,827 : INFO : Default wind speed 2.0
+2020-11-09 16:06:31,877 : INFO : Default wind speed 2.0
+2020-11-09 16:06:31,945 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,009 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,078 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,135 : INFO : Default wind speed 2.0
+2020-11-09 16:06:32,138 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,139 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,140 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,141 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,141 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:32,142 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:06:57,541 : INFO : all done!
+2020-11-09 16:12:20,991 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:12:21,116 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:12:21,227 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:12:21,349 : ERROR : No pictures for this sequence
+2020-11-09 16:12:37,283 : INFO : interpolate sky radiance
+2020-11-09 16:12:44,479 : INFO : interpolate irradiances
+2020-11-09 16:13:01,266 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,306 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,344 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,381 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,419 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,456 : INFO : Default wind speed 2.0
+2020-11-09 16:13:01,458 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,458 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,459 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,459 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,460 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:01,460 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:13:16,299 : INFO : all done!
+2020-11-09 16:29:36,845 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:29:36,959 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:29:37,065 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:29:37,197 : ERROR : No pictures for this sequence
+2020-11-09 16:29:53,704 : INFO : interpolate sky radiance
+2020-11-09 16:30:01,406 : INFO : interpolate irradiances
+2020-11-09 16:30:20,743 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,793 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,860 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,904 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,951 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,995 : INFO : Default wind speed 2.0
+2020-11-09 16:30:20,997 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,997 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,998 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,998 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,999 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:20,999 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:30:40,096 : INFO : all done!
+2020-11-09 16:31:27,608 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:31:27,809 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:31:27,977 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:31:28,286 : ERROR : No pictures for this sequence
+2020-11-09 16:31:56,656 : INFO : interpolate sky radiance
+2020-11-09 16:32:09,807 : INFO : interpolate irradiances
+2020-11-09 16:32:40,200 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,605 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,646 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,686 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,727 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,767 : INFO : Default wind speed 2.0
+2020-11-09 16:32:40,922 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,940 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,940 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,941 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,942 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:32:40,942 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:33:09,831 : INFO : all done!
+2020-11-09 16:37:24,146 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:37:24,280 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:37:24,460 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:37:24,671 : ERROR : No pictures for this sequence
+2020-11-09 16:37:42,366 : INFO : interpolate sky radiance
+2020-11-09 16:37:51,313 : INFO : interpolate irradiances
+2020-11-09 16:38:08,872 : INFO : Default wind speed 2.0
+2020-11-09 16:38:08,910 : INFO : Default wind speed 2.0
+2020-11-09 16:38:08,947 : INFO : Default wind speed 2.0
+2020-11-09 16:38:08,984 : INFO : Default wind speed 2.0
+2020-11-09 16:38:09,022 : INFO : Default wind speed 2.0
+2020-11-09 16:38:09,060 : INFO : Default wind speed 2.0
+2020-11-09 16:38:09,062 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,062 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,063 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,063 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,064 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:09,064 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:38:24,764 : INFO : all done!
+2020-11-09 16:41:18,657 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:41:18,957 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:41:19,199 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:41:19,420 : ERROR : No pictures for this sequence
+2020-11-09 16:41:47,975 : INFO : interpolate sky radiance
+2020-11-09 16:42:03,508 : INFO : interpolate irradiances
+2020-11-09 16:42:31,222 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,268 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,318 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,383 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,429 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,468 : INFO : Default wind speed 2.0
+2020-11-09 16:42:31,529 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,547 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,547 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,548 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,549 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:42:31,549 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:43:07,601 : INFO : all done!
+2020-11-09 16:46:13,463 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:46:13,607 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:46:13,733 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:46:13,881 : ERROR : No pictures for this sequence
+2020-11-09 16:46:37,957 : INFO : all done!
+2020-11-09 16:46:39,285 : INFO : interpolate sky radiance
+2020-11-09 16:46:48,508 : INFO : interpolate irradiances
+2020-11-09 16:47:07,790 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,829 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,868 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,908 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,947 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,985 : INFO : Default wind speed 2.0
+2020-11-09 16:47:07,987 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,988 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,988 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,989 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,989 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:07,990 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:47:23,951 : INFO : all done!
+2020-11-09 16:51:50,670 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:51:50,768 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:51:50,866 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:51:50,992 : ERROR : No pictures for this sequence
+2020-11-09 16:52:08,507 : INFO : interpolate sky radiance
+2020-11-09 16:54:58,341 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:54:58,439 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:54:58,537 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:54:58,653 : ERROR : No pictures for this sequence
+2020-11-09 16:55:15,764 : INFO : interpolate sky radiance
+2020-11-09 16:56:04,767 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:56:04,868 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:56:04,967 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:56:05,085 : ERROR : No pictures for this sequence
+2020-11-09 16:56:22,556 : INFO : interpolate sky radiance
+2020-11-09 16:57:54,714 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:57:54,810 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:57:54,909 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 16:57:55,020 : ERROR : No pictures for this sequence
+2020-11-09 16:58:11,985 : INFO : interpolate sky radiance
+2020-11-09 16:58:23,429 : INFO : interpolate irradiances
+2020-11-09 16:58:44,474 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,510 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,545 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,582 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,619 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,655 : INFO : Default wind speed 2.0
+2020-11-09 16:58:44,657 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,658 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,658 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,659 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,659 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:58:44,660 : INFO : Apply Ruddick et al., 2006
+2020-11-09 16:59:00,128 : INFO : all done!
+2020-11-09 17:01:01,230 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:01:01,326 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:01:01,426 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:01:01,554 : ERROR : No pictures for this sequence
+2020-11-09 17:01:19,177 : INFO : interpolate sky radiance
+2020-11-09 17:01:32,113 : INFO : interpolate irradiances
+2020-11-09 17:01:53,401 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,438 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,478 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,515 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,552 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,589 : INFO : Default wind speed 2.0
+2020-11-09 17:01:53,591 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,592 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,592 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,593 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,593 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:01:53,594 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:02:09,789 : INFO : all done!
+2020-11-09 17:10:01,320 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:01,415 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:01,512 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:01,637 : ERROR : No pictures for this sequence
+2020-11-09 17:10:17,916 : INFO : interpolate sky radiance
+2020-11-09 17:10:28,412 : INFO : interpolate irradiances
+2020-11-09 17:10:56,005 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:56,100 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:56,220 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:10:56,332 : ERROR : No pictures for this sequence
+2020-11-09 17:11:12,495 : INFO : interpolate sky radiance
+2020-11-09 17:11:24,146 : INFO : interpolate irradiances
+2020-11-09 17:11:45,098 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,145 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,190 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,236 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,279 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,316 : INFO : Default wind speed 2.0
+2020-11-09 17:11:45,319 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,319 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,320 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,320 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,321 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:11:45,321 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:12:03,600 : INFO : all done!
+2020-11-09 17:26:00,328 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:26:00,467 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:26:00,601 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 17:26:00,754 : ERROR : No pictures for this sequence
+2020-11-09 17:26:29,867 : INFO : interpolate sky radiance
+2020-11-09 17:26:40,092 : INFO : interpolate irradiances
+2020-11-09 17:27:11,514 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,607 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,724 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,828 : INFO : Default wind speed 2.0
+2020-11-09 17:27:11,923 : INFO : Default wind speed 2.0
+2020-11-09 17:27:12,011 : INFO : Default wind speed 2.0
+2020-11-09 17:27:12,016 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,017 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,019 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,020 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,021 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:12,022 : INFO : Apply Ruddick et al., 2006
+2020-11-09 17:27:49,671 : INFO : all done!
+2020-11-09 18:04:19,326 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:04:19,473 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:04:19,583 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:04:19,719 : ERROR : No pictures for this sequence
+2020-11-09 18:04:41,089 : INFO : interpolate sky radiance
+2020-11-09 18:18:33,760 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:18:33,883 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:18:33,996 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:18:34,125 : ERROR : No pictures for this sequence
+2020-11-09 18:18:54,596 : INFO : interpolate sky radiance
+2020-11-09 18:21:35,011 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:21:35,154 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:21:35,293 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:21:35,459 : ERROR : No pictures for this sequence
+2020-11-09 18:25:03,214 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:25:03,346 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:25:03,462 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:25:03,590 : ERROR : No pictures for this sequence
+2020-11-09 18:29:55,422 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:29:55,541 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:29:55,650 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:29:55,774 : ERROR : No pictures for this sequence
+2020-11-09 18:30:16,133 : INFO : interpolate sky radiance
+2020-11-09 18:30:52,309 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:30:52,436 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:30:52,549 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:30:52,679 : ERROR : No pictures for this sequence
+2020-11-09 18:31:13,700 : INFO : interpolate sky radiance
+2020-11-09 18:33:02,639 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:33:02,777 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:33:02,886 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:33:03,019 : ERROR : No pictures for this sequence
+2020-11-09 18:33:23,593 : INFO : interpolate sky radiance
+2020-11-09 18:35:31,174 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:35:31,301 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:35:31,417 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:35:31,549 : ERROR : No pictures for this sequence
+2020-11-09 18:35:53,429 : INFO : interpolate sky radiance
+2020-11-09 18:40:38,628 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:40:38,761 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:40:38,879 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:40:39,008 : ERROR : No pictures for this sequence
+2020-11-09 18:40:59,551 : INFO : interpolate sky radiance
+2020-11-09 18:55:42,980 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:55:43,115 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:55:43,225 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:55:43,351 : ERROR : No pictures for this sequence
+2020-11-09 18:56:03,881 : INFO : interpolate sky radiance
+2020-11-09 18:57:57,459 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:57:57,577 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:57:57,683 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:57:57,809 : ERROR : No pictures for this sequence
+2020-11-09 18:58:22,210 : INFO : interpolate sky radiance
+2020-11-09 18:59:58,383 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:59:58,539 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:59:58,676 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 18:59:58,804 : ERROR : No pictures for this sequence
+2020-11-09 19:00:24,374 : INFO : interpolate sky radiance
+2020-11-09 19:01:17,766 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:01:17,890 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:01:18,021 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:01:18,303 : ERROR : No pictures for this sequence
+2020-11-09 19:01:45,746 : INFO : interpolate sky radiance
+2020-11-09 19:04:36,973 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:04:37,110 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:04:37,232 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:04:37,389 : ERROR : No pictures for this sequence
+2020-11-09 19:05:01,115 : INFO : interpolate sky radiance
+2020-11-09 19:19:14,075 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:19:14,322 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:19:14,496 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:19:14,681 : ERROR : No pictures for this sequence
+2020-11-09 19:19:46,242 : INFO : interpolate sky radiance
+2020-11-09 19:24:45,267 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:24:45,432 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:24:45,605 : INFO : Visible spectra, pixel count [0.00000000e+00 1.00048852e+00 2.00097704e+00 ... 2.04599902e+03
+ 2.04699951e+03 2.04800000e+03]
+2020-11-09 19:24:45,803 : ERROR : No pictures for this sequence
+2020-11-09 19:25:13,019 : INFO : interpolate sky radiance
+2020-11-09 19:25:24,201 : INFO : interpolate irradiances
+2020-11-09 19:30:59,798 : INFO : all done!
