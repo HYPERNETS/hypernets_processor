@@ -38,6 +38,13 @@ class Calibrate:
             self.context.logger.error("the measurandstring needs to be either 'radiance' or 'irradiance")
             exit()
 
+
+        if self.context.get_config_value("plot_l0"):
+            if swir:
+                dataset_l0.attrs['product_name'] = dataset_l0.attrs[
+                                                        'product_name']+"_SWIR"
+            self.plot.plot_scans_in_series("digital_number",dataset_l0)
+
         calibrate_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
         input_vars = calibrate_function.get_argument_names()
