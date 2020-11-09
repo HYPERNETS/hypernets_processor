@@ -52,7 +52,7 @@ class HypernetsProcessor:
 
         logger = configure_logging(config=job_config,name=name)
         self.context = Context(job_config,processor_config,logger)
-
+        self.context.set_config_value("site_abbr","OUTD")
 
     def run(self):
         # """
@@ -90,6 +90,8 @@ class HypernetsProcessor:
         l0_rad["digital_number"].values = spec_vis[np.where(ID_vis == 1),5::][0].T
         l0_rad["acquisition_time"].values = spec_vis[np.where(ID_vis == 1),2][0]
         l0_rad["integration_time"].values = spec_vis[np.where(ID_vis == 1),3][0]
+        l0_rad["series_id"].values = np.concatenate((np.ones(int(scanDim/2)),2*np.ones(int(scanDim/2))))
+
         for i in range(scanDim):
             acquisitionTime = times_vis[np.where(ID_vis == 1),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
@@ -106,6 +108,8 @@ class HypernetsProcessor:
         l0_irr["digital_number"].values = spec_vis[np.where(ID_vis == 2),5::][0].T
         l0_irr["acquisition_time"].values = spec_vis[np.where(ID_vis == 2),2][0]
         l0_irr["integration_time"].values = spec_vis[np.where(ID_vis == 2),3][0]
+        l0_irr["series_id"].values = np.concatenate((np.ones(int(scanDim/2)),2*np.ones(int(scanDim/2))))
+
         for i in range(scanDim):
             acquisitionTime = times_vis[np.where(ID_vis == 2),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
@@ -122,6 +126,8 @@ class HypernetsProcessor:
         l0_bla["digital_number"].values = spec_vis[np.where(ID_vis == 0),5::][0].T
         l0_bla["acquisition_time"].values = spec_vis[np.where(ID_vis == 0),2][0]
         l0_bla["integration_time"].values = spec_vis[np.where(ID_vis == 0),3][0]
+        l0_bla["series_id"].values = np.concatenate((np.ones(int(scanDim/2)),2*np.ones(int(scanDim/2))))
+
         for i in range(scanDim):
             acquisitionTime = times_vis[np.where(ID_vis == 0),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
@@ -139,6 +145,8 @@ class HypernetsProcessor:
         l0_swir_rad["digital_number"].values = spec_swir[np.where(ID_swir == 1),5::][0].T
         l0_swir_rad["acquisition_time"].values = spec_swir[np.where(ID_swir == 1),2][0]
         l0_swir_rad["integration_time"].values = spec_swir[np.where(ID_swir == 1),3][0]
+        l0_swir_rad["series_id"].values = np.concatenate((np.ones(int(scanDim/2)),2*np.ones(int(scanDim/2))))
+
         for i in range(scanDim):
             acquisitionTime = times_swir[np.where(ID_swir == 1),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
@@ -154,6 +162,8 @@ class HypernetsProcessor:
         l0_swir_irr["digital_number"].values = spec_swir[np.where(ID_swir == 2),5::][0].T
         l0_swir_irr["acquisition_time"].values = spec_swir[np.where(ID_swir == 2),2][0]
         l0_swir_irr["integration_time"].values = spec_swir[np.where(ID_swir == 2),3][0]
+        l0_swir_irr["series_id"].values = np.concatenate((np.ones(int(scanDim/2)),2*np.ones(int(scanDim/2))))
+
         for i in range(scanDim):
             acquisitionTime = times_swir[np.where(ID_swir == 2),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
@@ -168,6 +178,8 @@ class HypernetsProcessor:
         l0_swir_bla["digital_number"].values = spec_swir[np.where(ID_swir == 0),5::][0].T
         l0_swir_bla["acquisition_time"].values = spec_swir[np.where(ID_swir == 0),2][0]
         l0_swir_bla["integration_time"].values = spec_swir[np.where(ID_swir == 0),3][0]
+        l0_swir_bla["series_id"].values = np.concatenate((np.ones(int(scanDim/2)),2*np.ones(int(scanDim/2))))
+
         for i in range(scanDim):
             acquisitionTime = times_swir[np.where(ID_swir == 0),2][0][i]
             acquisitionTime = datetime.strptime("20200821T"+acquisitionTime+"UTC",
@@ -190,7 +202,7 @@ class HypernetsProcessor:
             #     sequence_path)
             # self.context.logger.debug("Done")
 
-            # Calibrate to L1a
+            #Calibrate to L1a
             self.context.logger.debug("Processing to L1a...")
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla)
@@ -200,20 +212,25 @@ class HypernetsProcessor:
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1b radiance...")
+            print("Processing to L1b radiance...")
             L1b_rad = comb.combine("radiance",L1a_rad,L1a_swir_rad)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1b irradiance...")
             L1b_irr = comb.combine("irradiance",L1a_irr,L1a_swir_irr)
             self.context.logger.debug("Done")
+            print(L1b_irr["wavelength"])
 
+            # L1b_rad=xarray.open_dataset(r"C:\Users\pdv\PycharmProjects\hypernets_processor\hypernets_processor\out\HYPERNETS_L_OUTD_L1B_RAD_v0.1.nc")
+            # L1b_irr=xarray.open_dataset(r"C:\Users\pdv\PycharmProjects\hypernets_processor\hypernets_processor\out\HYPERNETS_L_OUTD_L1B_IRR_v0.1.nc")
             self.context.logger.debug("Processing to L1c...")
             L1c = intp.interpolate_l1c(L1b_rad,L1b_irr)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L2a...")
-            L2a = surf.process(L1c)
+            L2a = surf.process_l2(L1c)
             self.context.logger.debug("Done")
+            print(L2a["wavelength"])
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
         # wind=RhymerHypstar(context).retrieve_wind(L1c)

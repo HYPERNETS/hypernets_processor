@@ -55,15 +55,15 @@ class SurfaceReflectance:
                 dataset_l1d["quality_flag"].values[i] for i in range(len(failSimil))]
 
             input_vars = l1ctol1d_function.get_argument_names()
-            input_qty = self.find_input(input_vars, dataset_l1d)
-            u_random_input_qty = self.find_u_random_input(input_vars, dataset_l1d)
-            u_systematic_input_qty = self.find_u_systematic_input(input_vars, dataset_l1d)
+            input_qty = self.find_input(input_vars, dataset_l1c)
+            u_random_input_qty = self.find_u_random_input(input_vars, dataset_l1c)
+            u_systematic_input_qty,cov_systematic_input_qty = \
+                self.find_u_systematic_input(input_vars,dataset_l1c)
 
             dataset_l1d = self.process_measurement_function(
                 ["water_leaving_radiance", "reflectance_nosc", "reflectance"],
                 dataset_l1d, l1ctol1d_function.function, input_qty,
-                u_random_input_qty,
-                u_systematic_input_qty)
+                u_random_input_qty,u_systematic_input_qty,cov_systematic_input_qty)
 
             if self.context.get_config_value("write_l1d"):
                 self.writer.write(dataset_l1d, overwrite=True)
@@ -76,7 +76,7 @@ class SurfaceReflectance:
             self.context.logger.error("network is not correctly defined")
 
 
-    def process(self, dataset):
+    def process_l2(self, dataset):
         dataset = self.perform_checks(dataset)
         l1tol2_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
@@ -225,6 +225,9 @@ class SurfaceReflectance:
                                                             output_vars=len(measurandstrings))
 
             if len(measurandstrings) > 1:
+                print(input_quantities[0].shape,u_systematic_input_quantities[0].shape)
+                print(input_quantities[1].shape)
+                print(u_systematic_input_quantities[1].shape)
                 u_systematic_measurand, corr_systematic_measurand, corr_between = \
                     self.prop.propagate_systematic(measurement_function,
                                                    input_quantities,
@@ -241,12 +244,13 @@ class SurfaceReflectance:
                     dataset["corr_systematic_" + measurandstring].values = corr_systematic_measurand[im]
 
             else:
-                self.prop.propagate_systematic(measurement_function,input_quantities,
-                                               u_systematic_input_quantities,
-                                               cov_x=cov_systematic_input_quantities,
-                                               return_corr=True,repeat_dims=1,
-                                               corr_axis=0,
-                                               output_vars=len(measurandstrings))
+                u_systematic_measurand,corr_systematic_measurand=\
+                    self.prop.propagate_systematic(measurement_function,input_quantities,
+                                                   u_systematic_input_quantities,
+                                                   cov_x=cov_systematic_input_quantities,
+                                                   return_corr=True,repeat_dims=1,
+                                                   corr_axis=0,
+                                                   output_vars=len(measurandstrings))
                 measurandstring = measurandstrings[0]
                 dataset[measurandstring].values = measurand
                 dataset["u_random_" + measurandstring].values = u_random_measurand

@@ -36,11 +36,9 @@ class Average:
         dataset_l1b["corr_random_" + measurandstring].values = np.eye(
                 len(dataset_l1b["u_random_" + measurandstring].values))
         dataset_l1b["corr_systematic_indep_"+measurandstring].values = \
-            self.calc_mean_masked(dataset_l1a,"corr_systematic_indep_"+
-                                  measurandstring,corr=True)
+                dataset_l1a["corr_systematic_indep_"+measurandstring].values
         dataset_l1b["corr_systematic_corr_rad_irr_"+measurandstring].values = \
-            self.calc_mean_masked(dataset_l1a,"corr_systematic_corr_rad_irr_"+
-                                  measurandstring,corr=True)
+                dataset_l1a["corr_systematic_corr_rad_irr_"+measurandstring].values
 
         return dataset_l1b
 
@@ -49,6 +47,15 @@ class Average:
         if corr:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
+
+            print("corr",dataset[var].values)
+            for i in range(len(series_id)):
+                ids = np.where((dataset['series_id'] == series_id[i]) & np.invert(
+                    DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
+                out[i] = np.mean(dataset[var].values[:,:,ids],axis=3)[:,:,0]
+
+            out = np.mean(out, axis=0)
+
         else:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
 
@@ -57,11 +64,8 @@ class Average:
                            np.invert
                 (DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
             out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
-            print("ids",i,ids,out[i].shape)
 
             if rand_unc:
                 out[i] = out[i] / len(ids[0])
-        if corr:
-            out = np.mean(out, axis=0)
-        print(i,out[0].shape,out.shape,out.T.shape)
+
         return out.T

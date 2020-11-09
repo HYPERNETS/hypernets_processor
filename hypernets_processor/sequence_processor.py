@@ -78,7 +78,7 @@ class SequenceProcessor:
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L2a...")
-            L2a = surf.process(L1d)
+            L2a = surf.process_l2(L1d)
             self.context.logger.debug("Done")
 
         elif self.context.get_config_value("network") == "l":
@@ -111,7 +111,7 @@ class SequenceProcessor:
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L2a...")
-            L2a = surf.process(L1c)
+            L2a = surf.process_l2(L1c)
             self.context.logger.debug("Done")
 
         else:

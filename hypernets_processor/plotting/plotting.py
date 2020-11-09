@@ -3,9 +3,12 @@ Tests for Calibrate class
 """
 
 from hypernets_processor.version import __version__
+from hypernets_processor.data_io.dataset_util import DatasetUtil
+
 import matplotlib.pyplot as plt
 import numpy as np
 import os.path
+
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
 __created__ = "9/10/2020"
@@ -67,17 +70,21 @@ class Plotting():
                        dataset.attrs['product_name']+"_series_"+str(
                 series_id[i])+"."+self.context.get_config_value("plotting_format"))
 
+            ids = np.where(dataset['series_id'] == series_id[i])
 
-            ids = np.where((dataset['series_id'] == series_id[i]))[0]
             ydata_subset=dataset[measurandstring].values[:,ids]
+            mask=DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]
             if dataset_avg is None:
-                avgs=np.tile(np.mean(ydata_subset,axis=1)[...,None],len(ydata_subset[0]))
+                ids_used = np.where((dataset['series_id'] == series_id[i]) & np.invert(
+                    DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
+                ydata_subset_used = dataset[measurandstring].values[:,ids_used]
+                avgs=np.tile(np.mean(ydata_subset_used,axis=1)[...,None],len(ydata_subset[0]))
             else:
                 avg_ids = np.where((dataset_avg['series_id'] == series_id[i]))[0]
                 avgs = np.tile(dataset_avg[measurandstring].values[:,avg_ids],len(ydata_subset[0]))
 
             self.plot_variable("relative difference",plotpath,dataset["wavelength"].values,
-                               (ydata_subset-avgs)/avgs,ylim=[-0.2,0.2])
+                               (ydata_subset-avgs)/avgs,ylim=[-0.2,0.2],mask=mask)
 
     def plot_radiance(self,plotpath,xdata,ydata,labels=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
@@ -89,7 +96,8 @@ class Plotting():
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)")
-        ax1.set_ylim([0,1])
+        ymax = np.percentile(ydata,95)*1.2
+        ax1.set_ylim([0,max(1,ymax)])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
@@ -102,8 +110,9 @@ class Plotting():
                 ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
-        ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}$)")
-        ax1.set_ylim([0,100])
+        ax1.set_ylabel(r"Irradiance ($mW\ nm^{-1}\ m^{-2}$)")
+        ymax = np.percentile(ydata,95)*1.2
+        ax1.set_ylim([0,max(100,ymax)])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
@@ -130,17 +139,24 @@ class Plotting():
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")
-        ax1.set_ylim([0,0.2])
+        ymax=np.percentile(ydata,95)*1.2
+        ax1.set_ylim([0,max(0.2,ymax)])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
-    def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None):
+    def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None,mask=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
-        if labels is None:
+        if labels is None and mask is None:
             ax1.plot(xdata,ydata,alpha=0.3)
-        else:
+        elif mask is None:
             for i in range(len(labels)):
                 ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+        else:
+            print(mask.shape,ydata[:,np.where(mask)].shape)
+            ax1.plot(xdata,ydata[:,np.where(mask)][:,0,0],label="masked",alpha=0.3)
+            ax1.plot(xdata,ydata[:,np.where(np.invert(mask))][:,0,0],label="used",alpha=0.3)
+
+        if labels is not None or mask is not None:
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(measurandstring)
