@@ -67,6 +67,9 @@ class Calibrate:
         if self.context.get_config_value("plot_l1a"):
             self.plot.plot_scans_in_series(measurandstring,dataset_l1a)
 
+        if self.context.get_config_value("plot_l1a_diff"):
+            self.plot.plot_diff_scans(measurandstring,dataset_l1a)
+
         return dataset_l1a
 
     def prepare_calibration_data(self,measurandstring, swir=False):

@@ -197,7 +197,7 @@ class HypernetsProcessor:
         L1d= surf.process_l1d(L1c)
         print("rad",L1d["u_random_downwelling_radiance"])
 
-        L2a = surf.process(L1d)
+        L2a = surf.process_l2(L1d)
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
         # wind=RhymerHypstar(context).retrieve_wind(L1c)
