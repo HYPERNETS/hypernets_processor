@@ -357,9 +357,9 @@ class RhymerHypstar:
         epsilon = (alpha * data[iref2] - data[iref1]) / (alpha - 1.0)
 
         if abs(epsilon) > wp * data[irefr]:
-            return (True, epsilon)
+            return (1, epsilon)
         else:
-            return (False, epsilon)
+            return (0, epsilon)
 
     def process_l1b(self, L1a_rad, L1a_irr):
 
