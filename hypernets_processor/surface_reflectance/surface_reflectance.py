@@ -48,11 +48,9 @@ class SurfaceReflectance:
                                                   dataset_l1d["wavelength"].values)
             dataset_l1d["epsilon"].values = epsilon
 
-            flagval = 2 ** (self.context.get_config_value("simil_fail"))
-
-            dataset_l1d["quality_flag"].values = [
-                flagval + dataset_l1d["quality_flag"].values[i] if failSimil[i] == True else
-                dataset_l1d["quality_flag"].values[i] for i in range(len(failSimil))]
+            dataset_l1d["quality_flag"][dataset_l1d["scan"] == [i for i, x in enumerate(failSimil) if x]] = DatasetUtil.set_flag(
+                dataset_l1d["quality_flag"][dataset_l1d["scan"] == [i for i, x in enumerate(failSimil) if x]],
+                "simil_fail")
 
             input_vars = l1ctol1d_function.get_argument_names()
             input_qty = self.find_input(input_vars, dataset_l1c)
