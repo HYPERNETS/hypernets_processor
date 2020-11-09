@@ -44,8 +44,8 @@ class SurfaceReflectance:
             dataset_l1d = self.templ.l1d_from_l1c_dataset(dataset_l1c)
 
             # add required correction factors here - but better to add them in the function factory???
-            epsilon, failSimil = self.rh.get_epsilon(dataset_l1d["reflectance_nosc"].values,
-                                                  dataset_l1d["wavelength"].values)
+            epsilon, failSimil = self.rh.get_epsilon(dataset_l1c["reflectance_nosc"].values,
+                                                  dataset_l1c["wavelength"].values)
             dataset_l1d["epsilon"].values = epsilon
 
             dataset_l1d["quality_flag"][dataset_l1d["scan"] == [i for i, x in enumerate(failSimil) if x]] = DatasetUtil.set_flag(
@@ -53,10 +53,12 @@ class SurfaceReflectance:
                 "simil_fail")
 
             input_vars = l1ctol1d_function.get_argument_names()
-            input_qty = self.find_input(input_vars, dataset_l1c)
-            u_random_input_qty = self.find_u_random_input(input_vars, dataset_l1c)
+            input_qty = self.find_input(input_vars, dataset_l1d)
+            u_random_input_qty = self.find_u_random_input(input_vars, dataset_l1d)
             u_systematic_input_qty,cov_systematic_input_qty = \
-                self.find_u_systematic_input(input_vars,dataset_l1c)
+                self.find_u_systematic_input(input_vars,dataset_l1d)
+
+            print("inp",input_qty[4],u_random_input_qty[4],u_systematic_input_qty[4],cov_systematic_input_qty[4])
 
             dataset_l1d = self.process_measurement_function(
                 ["water_leaving_radiance", "reflectance_nosc", "reflectance"],
@@ -191,8 +193,8 @@ class SurfaceReflectance:
         covs_indep = []
         for var in variables:
             try:
-                inputs.append(dataset["u_systematic_indep_" + var].values)
                 covs_indep.append(punpy.convert_corr_to_cov(dataset["corr_systematic_indep_" + var].values,dataset["u_systematic_indep_" + var].values))
+                inputs.append(dataset["u_systematic_indep_" + var].values)
             except:
                 inputs.append(None)
                 covs_indep.append(None)
@@ -223,9 +225,6 @@ class SurfaceReflectance:
                                                             output_vars=len(measurandstrings))
 
             if len(measurandstrings) > 1:
-                print(input_quantities[0].shape,u_systematic_input_quantities[0].shape)
-                print(input_quantities[1].shape)
-                print(u_systematic_input_quantities[1].shape)
                 u_systematic_measurand, corr_systematic_measurand, corr_between = \
                     self.prop.propagate_systematic(measurement_function,
                                                    input_quantities,
