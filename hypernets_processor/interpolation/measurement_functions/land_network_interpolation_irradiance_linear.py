@@ -20,15 +20,16 @@ class LandNetworkInterpolationIrradianceLinear:
                     irradiance_intfunc = scipy.interpolate.interp1d(times_irr,
                                                                     irradiances)
                     out[:,i]= irradiance_intfunc(output_time[i])
-                return out
+
         else:
             if output_time > max(times_irr):
-                return irradiances[:,times_irr == max(times_irr)][:,0]
+                out =  irradiances[:,times_irr == max(times_irr)][:,0]
             elif output_time<min(times_irr):
-                return irradiances[:,times_irr==min(times_irr)][:,0]
+                out =  irradiances[:,times_irr==min(times_irr)][:,0]
             else:
                 irradiance_intfunc=scipy.interpolate.interp1d(times_irr,irradiances)
-                return irradiance_intfunc(output_time)
+                out =  irradiance_intfunc(output_time)
+        return out
 
 
     @staticmethod

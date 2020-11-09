@@ -60,13 +60,13 @@ class Interpolate:
         dataset_l1c=self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
         dataset_l1c["acquisition_time"].values = dataset_l1b_rad["acquisition_time"].values
 
-        dataset_l1c["radiance"].values = dataset_l1b_rad["radiance"].values
-        dataset_l1c["u_random_radiance"].values = dataset_l1b_rad["u_random_radiance"].values
-        dataset_l1c["u_systematic_indep_radiance"].values = dataset_l1b_rad["u_systematic_indep_radiance"].values
-        dataset_l1c["u_systematic_corr_rad_irr_radiance"].values = dataset_l1b_rad["u_systematic_corr_rad_irr_radiance"].values
-        dataset_l1c["corr_random_radiance"].values = dataset_l1b_rad["corr_random_radiance"].values
-        dataset_l1c["corr_systematic_indep_radiance"].values = dataset_l1b_rad["corr_systematic_indep_radiance"].values
-        dataset_l1c["corr_systematic_corr_rad_irr_radiance"].values = dataset_l1b_rad["corr_systematic_corr_rad_irr_radiance"].values
+        # dataset_l1c["radiance"].values = dataset_l1b_rad["radiance"].values
+        # dataset_l1c["u_random_radiance"].values = dataset_l1b_rad["u_random_radiance"].values
+        # dataset_l1c["u_systematic_indep_radiance"].values = dataset_l1b_rad["u_systematic_indep_radiance"].values
+        # dataset_l1c["u_systematic_corr_rad_irr_radiance"].values = dataset_l1b_rad["u_systematic_corr_rad_irr_radiance"].values
+        # dataset_l1c["corr_random_radiance"].values = dataset_l1b_rad["corr_random_radiance"].values
+        # dataset_l1c["corr_systematic_indep_radiance"].values = dataset_l1b_rad["corr_systematic_indep_radiance"].values
+        # dataset_l1c["corr_systematic_corr_rad_irr_radiance"].values = dataset_l1b_rad["corr_systematic_corr_rad_irr_radiance"].values
 
         dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr)
 
@@ -161,7 +161,6 @@ class Interpolate:
         #     if u_systematic_input_quantities_corr[i] is not None:
         #         if len(u_systematic_input_quantities_corr[i].shape) < len(datashape):
         #             u_systematic_input_quantities_corr[i] = np.tile(u_systematic_input_quantities_corr[i], (datashape[1], 1)).T
-        print(*input_quantities)
         measurand = measurement_function(*input_quantities)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -170,7 +169,6 @@ class Interpolate:
                                                             u_random_input_quantities,
                                                         param_fixed=[False,True,True],
                                                         repeat_dims=1)
-            print("shapes", cov_systematic_input_quantities_indep[2].shape,input_quantities[2].shape,u_systematic_input_quantities_indep[2].shape)
             u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
                 measurement_function,input_quantities,
                 u_systematic_input_quantities_indep,
@@ -178,7 +176,7 @@ class Interpolate:
                 corr_axis=0,param_fixed=[False,True,True],repeat_dims=1)
             u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
                 measurement_function,input_quantities,u_systematic_input_quantities_corr,
-                cov_x=['rand']*len(u_random_input_quantities),return_corr=True,
+                cov_x= ['rand']*len(u_random_input_quantities),return_corr=True,
                 corr_axis=0,param_fixed=[False,True,True],repeat_dims=1)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand
