@@ -3,7 +3,7 @@ Header definitions for Hypernets '.spe' raw data
 """
 
 HEADER_DEF = [(2, "Total Dataset Length", '<H'),
-             (1, "Spectrum Type Information", '<c'),
+             (1, "Spectrum Type Information", '<B'),
              (8, "acquisition_time", '<Q'),
              (2, "integration_time", '<H'),
              (4, "temperature", '<f'),

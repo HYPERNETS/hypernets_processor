@@ -17,6 +17,7 @@ from hypernets_processor.data_io.format.header import HEADER_DEF
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil as du
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 '''___Authorship___'''
 __author__ = "Clémence Goyens"
@@ -32,6 +33,7 @@ class HypernetsReader:
         self.context = context
         self.model = self.context.get_config_value("model").split(',')
         self.hdsb = HypernetsDSBuilder(context=context)
+        self.writer = HypernetsWriter(context=context)
 
         cckeys = ['mapping_vis_a', 'mapping_vis_b', 'mapping_vis_c', 'mapping_vis_d', 'mapping_vis_e', 'mapping_vis_f']
         ccvalues = []
@@ -50,6 +52,31 @@ class HypernetsReader:
         plt.title(spectra)
         plt.plot([i for i in range(len(dataSpectra))], dataSpectra)
         plt.show()
+
+    # def save(self, path):
+    #     with open(path, 'w') as f:
+    #         f.write('Dataset length: {} bytes\n'
+    #                 'Timestamp: {} ms\n'
+    #                 'CRC32: {} \n'
+    #                 'Entrance: {}\n'
+    #                 'Radiometer: {}\n'
+    #                 'Exposure time: {} ms\n'
+    #                 'Sensor temperature: {} \'C\n'
+    #                 'Pixel count: {}\n'
+    #                 'Tilt:\n'
+    #                 '\tx:{}\u00B1{}\n'
+    #                 '\t y:{}\u00B1{}\n'
+    #                 '\t z:{}\u00B1{}\n'.format(self.header.total_length, self.header.timestamp, hex(self.crc32[0]),
+    #                                            self.header.spectrum_type.optics.name,
+    #                                            self.header.spectrum_type.radiometer.name,
+    #                                            self.header.exposure_time, self.header.temperature,
+    #                                            self.header.pixel_count,
+    #                                            self.header.accel_stats.mean_x,
+    #                                            self.header.accel_stats.std_x,
+    #                                            self.header.accel_stats.mean_y,
+    #                                            self.header.accel_stats.std_y,
+    #                                            self.header.accel_stats.mean_z,
+    #                                            self.header.accel_stats.std_z))
 
     def read_header(self, f, headerDef):
         header = {}
@@ -134,6 +161,7 @@ class HypernetsReader:
         return wvl
 
     def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat):
+        print(series)
 
         model_name = self.model
 
@@ -177,9 +205,7 @@ class HypernetsReader:
 
         header = self.read_header(f, HEADER_DEF)
         self.context.logger.debug(header)
-
         pixCount = header['Pixel Count']
-
         # if bool(header) == False:
         #     print("Data corrupt go to next line")
         #     header = self.read_header(f, HEADER_DEF)
@@ -189,6 +215,7 @@ class HypernetsReader:
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
         eof = f.tell()
+        print(eof)
         f.close()
 
         # 2. Create template dataset
@@ -207,6 +234,7 @@ class HypernetsReader:
 
         # read all spectra (== spe files with concanated files) in a series
         for spectra in series:
+
             model = dict(zip(model_name, spectra.split('_')[:-1]))
             specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + model[
                 'azimuth_ref'] + '_' + model['vza']
@@ -242,6 +270,7 @@ class HypernetsReader:
                     self.context.logger.error("Data corrupt go to next line")
                     break
                     continue
+                # -------------------------------------------------------
                 pixCount = header['Pixel Count']
                 scan = self.read_data(f, pixCount)
                 # should include this back again when crc32 is in the headers!
@@ -283,7 +312,8 @@ class HypernetsReader:
                     ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
                     ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
                 else:
-                    self.context.logger.error("Lattitude is not found, using default values instead for lat, lon, sza and saa.")
+                    self.context.logger.error(
+                        "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
                 ds['quality_flag'][scan_number] = flag
                 ds['integration_time'][scan_number] = header['integration_time']
                 ds['temperature'][scan_number] = header['temperature']
@@ -308,7 +338,7 @@ class HypernetsReader:
                 ds['digital_number'][0:pixCount, scan_number] = scan
 
                 scan_number += 1
-
+                print(f.tell())
                 if f.tell() == eof:
                     nextLine = False
 
@@ -352,7 +382,7 @@ class HypernetsReader:
         #     ACTION_NONE  : 0x03   (03)
 
         metadata = ConfigParser()
-        print("seq",os.path.join(seq_dir, "metadata.txt"))
+        print("seq", os.path.join(seq_dir, "metadata.txt"))
         if os.path.exists(os.path.join(seq_dir, "metadata.txt")):
             metadata.read(os.path.join(seq_dir, "metadata.txt"))
             # ------------------------------
@@ -449,7 +479,7 @@ class HypernetsReader:
             seq_dir)
 
         if seriesIrr:
-            l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR")
+            l0_irr = self.read_series_raw(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_irr, overwrite=True)
             # can't use this when non concatanted spectra
@@ -461,7 +491,7 @@ class HypernetsReader:
             self.context.logger.error("No irradiance data for this sequence")
 
         if seriesRad:
-            l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag, "L0_RAD")
+            l0_rad = self.read_series_raw(seq_dir, seriesRad, lat, lon, metadata, flag, "L0_RAD")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_rad, overwrite=True)
         #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
@@ -472,7 +502,7 @@ class HypernetsReader:
             self.context.logger.error("No radiance data for this sequence")
 
         if seriesBlack:
-            l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag, "L0_BLA")
+            l0_bla = self.read_series_raw(seq_dir, seriesBlack, lat, lon, metadata, flag, "L0_BLA")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_bla, overwrite=True)
             # if all([os.path.isfile(os.path.join(seq_dir, "RADIOMETER/", f)) for f in seriesBlack]):
@@ -495,6 +525,91 @@ class HypernetsReader:
     #         flags.append(int(np.where(flagarray == r)[0]))
     #         flagint -= r
     #     return(flags)
+
+    def raw_read(spectra, n, spectra_length=2048):
+        print("Open %s" % spectra)
+        data_spectra = []
+        with open(spectra, "rb") as f:
+            data = []
+            for i in range(n):
+                data = f.read(2 * int(spectra_length))
+                data = list(unpack('<' + 'H' * spectra_length, data))
+                data_spectra.append(data[:])
+        return data_spectra
+
+    def read_series_raw(self, seq_dir, series, lat, lon, metadata, flag, fileformat, spectra_length=2048):
+
+        model_name = self.model
+
+        # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
+        # ----------------------------------------
+
+        # scan dimension - to have total number of dimensions
+        index_scan_total = model_name.index("scan_total")
+        # series id
+        # ------------------------------------------
+        # added to consider concanated files
+        scanDim = sum([int(re.split('_|\.', i)[index_scan_total]) for i in series])
+        # wvl dimensions
+        FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
+        f = open(FOLDER_NAME + series[1], "rb")
+
+        wvl = self.read_wavelength(spectra_length)
+
+        # 2. Create template dataset
+        # -----------------------------------
+        dim_sizes_dict = {"wavelength": len(wvl), "scan": scanDim}
+
+        # use template from variables and metadata in format
+        ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
+
+        ds["wavelength"] = wvl
+        ds["scan"] = np.linspace(1, scanDim, scanDim)
+        scan_number = 0
+
+        # read all spectra (== spe files with concanated files) in a series
+        for spefile in series:
+
+            model = dict(zip(model_name, spefile.split('_')[:-1]))
+            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + model[
+                'azimuth_ref'] + '_' + model['vza']
+            # spectra attributes from metadata file
+            specattr = dict(metadata[specBlock])
+
+            # name of spectra file
+            acquisitionTime = specattr[spefile]
+            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+            acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
+
+            # -----------------------
+            # read the file
+            # -----------------------
+            with open(FOLDER_NAME + spefile, "rb") as f:
+                n = int(re.split('_|\.', spefile)[index_scan_total])
+                for s in range(n):
+                    data = f.read(2 * int(spectra_length))
+                    scan = list(unpack('<' + 'H' * spectra_length, data))
+                    # fill in dataset
+                    # maybe xarray has a better way to do - check merge, concat, ...
+                    series_id = model['series_id']
+                    ds["series_id"][scan_number] = series_id
+                    ds["viewing_azimuth_angle"][scan_number] = model['vaa']
+                    ds["viewing_zenith_angle"][scan_number] = model['vza']
+                    # estimate time based on timestamp
+                    ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
+
+                    if lat is not None:
+                        ds.attrs["site_latitude"] = lat
+                        ds.attrs["site_longitude"] = lon
+                        ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
+                        ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
+                    else:
+                        self.context.logger.error(
+                            "Latitude is not found, using default values instead for lat, lon, sza and saa.")
+                    ds['quality_flag'][scan_number] = flag
+                    ds['digital_number'][0:spectra_length, scan_number] = scan
+                    scan_number += 1
+        return ds
 
 
 if __name__ == '__main__':
