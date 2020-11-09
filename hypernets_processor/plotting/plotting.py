@@ -76,12 +76,14 @@ class Plotting():
             mask=DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]
             if dataset_avg is None:
                 ids_used = np.where((dataset['series_id'] == series_id[i]) & np.invert(
-                    DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
+                    DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))[0]
                 ydata_subset_used = dataset[measurandstring].values[:,ids_used]
-                avgs=np.tile(np.mean(ydata_subset_used,axis=1)[...,None],len(ydata_subset[0]))
+                avgs=np.tile(np.mean(ydata_subset_used,axis=1)[...,None],len(ids_used))
+                mask=mask[ids_used]
             else:
                 avg_ids = np.where((dataset_avg['series_id'] == series_id[i]))[0]
-                avgs = np.tile(dataset_avg[measurandstring].values[:,avg_ids],len(ydata_subset[0]))
+                avgs = np.tile(dataset_avg[measurandstring].values[:,avg_ids],len(avg_ids))
+                mask=mask[avg_ids]
 
             self.plot_variable("relative difference",plotpath,dataset["wavelength"].values,
                                (ydata_subset-avgs)/avgs,ylim=[-0.2,0.2],mask=mask)
@@ -146,15 +148,16 @@ class Plotting():
 
     def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None,mask=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
-        if labels is None and mask is None:
+        if labels is None and mask is None or len(np.where(mask))==0:
             ax1.plot(xdata,ydata,alpha=0.3)
         elif mask is None:
             for i in range(len(labels)):
                 ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
         else:
-            print(mask.shape,ydata[:,np.where(mask)].shape)
-            ax1.plot(xdata,ydata[:,np.where(mask)][:,0,0],label="masked",alpha=0.3)
-            ax1.plot(xdata,ydata[:,np.where(np.invert(mask))][:,0,0],label="used",alpha=0.3)
+            print(ydata.shape)
+            print(ydata[:,np.where(np.invert(mask))].shape,ydata[:,np.where(np.invert(mask))][:,0].shape)
+            ax1.plot(xdata,ydata[:,np.where(mask)].reshape((len(ydata),len(np.where(mask)[0]))),label="masked",alpha=0.3)
+            ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3)
 
         if labels is not None or mask is not None:
             ax1.legend()

@@ -189,18 +189,18 @@ class RhymerHypstar:
             if lu.scan[lu['quality_flag'] <= 0].count() < nbrlu:
 
                 for i in range(len(lu["scan"])):
-                    lu["quality_flag"][lu["scan"]==i] = du.set_flag(lu["quality_flag"][lu["scan"] == i], "min_nbrlu")
+                    lu["quality_flag"][lu["scan"]==i] = du.set_flag(lu["quality_flag"][lu["scan"] == i], "outliers")
                 self.context.logger.info(
                     "No enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
             if lsky.scan[lsky['quality_flag'] <= 1].count() < nbrlsky:
                 for i in range(len(lsky["scan"])):
-                    lsky["quality_flag"][lsky["scan"] == i] = du.set_flag(lsky["quality_flag"][lsky["scan"] == i], "min_nbrlsky")
+                    lsky["quality_flag"][lsky["scan"] == i] = du.set_flag(lsky["quality_flag"][lsky["scan"] == i], "outliers")
                 self.context.logger.info(
                     "No enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
             if irr.scan[irr['quality_flag'] <= 1].count() < nbred:
                 for i in range(len(irr["scan"])):
                     irr["quality_flag"][irr["scan"] == i] = du.set_flag(irr["quality_flag"][irr["scan"] == i],
-                                                                          "min_nbred")
+                                                                          "outliers")
                 self.context.logger.info(
                     "No enough downwelling irradiance data for sequence {}".format(irr.attrs['sequence_id']))
 
