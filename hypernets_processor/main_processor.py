@@ -166,9 +166,9 @@ class HypernetsProcessor:
         # context.measurement_function_interpolate = "WaterNetworkInterpolationLinear"
         # context.measurement_function_surface_reflectance = "WaterNetworkProtocol"
 
-        cal = Calibrate(self.context, MCsteps=100)
-        intp = Interpolate(self.context, MCsteps=100)
-        surf = SurfaceReflectance(self.context, MCsteps=100)
+        cal = Calibrate(self.context, MCsteps=1000)
+        intp = Interpolate(self.context, MCsteps=1000)
+        surf = SurfaceReflectance(self.context, MCsteps=1000)
         rhymer = RhymerHypstar(self.context)
 
         L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
@@ -195,12 +195,11 @@ class HypernetsProcessor:
         # L1b = rhymer.get_epsilon(L1b)
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
         #
-        print(L1b["corr_systematic_corr_rad_irr_irradiance"])
-        panic
+        # print(L1b["corr_systematic_corr_rad_irr_irradiance"])
+        # panic
         L1c=rhymer.process_l1c(L1b)
         #L1d_irr = cal.average_l1b("irradiance", L1c)
         L1d= surf.process_l1d(L1c)
-        print("rad",L1d["u_random_downwelling_radiance"])
 
         L2a = surf.process_l2(L1d)
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
