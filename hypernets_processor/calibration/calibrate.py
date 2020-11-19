@@ -77,6 +77,9 @@ class Calibrate:
         if self.context.get_config_value("plot_l1a_diff"):
             self.plot.plot_diff_scans(measurandstring,dataset_l1a)
 
+        if self.context.get_config_value("plot_uncertainty"):
+            self.plot.plot_relative_uncertainty(measurandstring,dataset_l1a)
+
         return dataset_l1a
 
     def prepare_calibration_data(self,measurandstring, swir=False):
@@ -153,9 +156,11 @@ class Calibrate:
         return calibration_data, wavids
 
     def find_nearest_black(self, dataset, acq_time, int_time):
-        ids = np.where(
-            (abs(dataset['acquisition_time'] - acq_time) == min(abs(dataset['acquisition_time'] - acq_time))) & (
-                        dataset['integration_time'] == int_time)) #todo check if interation time alwasy has to be same
+        ids = np.where((abs(dataset['acquisition_time'] - acq_time) ==
+                        min(abs(dataset['acquisition_time'] - acq_time))) &
+                       (dataset['integration_time'] == int_time))
+        #todo check if interation time alwasy has to be same
+
         return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
 
     def find_input(self, variables, dataset, datasetbla, ancillary_dataset):
@@ -259,17 +264,24 @@ class Calibrate:
 
         DN_rand = DatasetUtil.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
                                      dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
-        DN_syst = DatasetUtil.create_variable([len(datasetl0["wavelength"]), len(datasetl0["scan"])],
-                                     dim_names=["wavelength", "scan"], dtype=np.uint32, fill_value=0)
 
         datasetl0["u_random_digital_number"] = DN_rand
 
-        std = (datasetl0['digital_number'].where(mask==1)-datasetl0['digital_number'].where(datasetl0.quality_flag == 0)).std(dim="scan")
         rand = np.zeros_like(DN_rand.values)
-        for i in range(len(datasetl0["scan"])):
-            rand[:, i] = std
+        series_ids = np.unique(datasetl0['series_id'])
+        for i in range(len(series_ids)):
+            ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
+            ids_masked = np.where((datasetl0['series_id'] == series_ids[i]) & (mask == 0))[0]
+            dark_signals=np.zeros_like(datasetl0['digital_number'].values[:,ids_masked])
+            for ii,id in enumerate(ids_masked):
+                dark_signals[:,ii] = self.find_nearest_black(datasetl0_bla,
+                datasetl0['acquisition_time'].values[id],
+                datasetl0['integration_time'].values[id])
+            std = np.std((datasetl0['digital_number'].values[:,ids_masked]-dark_signals), axis=1)
+            for ii,id in enumerate(ids):
+                rand[:, id] = std
+
         datasetl0["u_random_digital_number"].values = rand
-        datasetl0["u_systematic_digital_number"] = DN_syst
 
         return datasetl0, datasetl0_bla
 
@@ -280,13 +292,13 @@ class Calibrate:
 
         # check if integrated signal is outlier
         series_ids = np.unique(dataset['series_id'])
-        out = np.empty((len(series_ids), len(dataset['wavelength'])))
         for i in range(len(series_ids)):
             ids = np.where(dataset['series_id'] == series_ids[i])
             dark_signals = self.find_nearest_black(dataset_bla,np.mean(
                 dataset['acquisition_time'].values[ids]),np.mean(
                 dataset['integration_time'].values[ids]))
-            intsig = np.nanmean((dataset["digital_number"].values[:, ids]-dark_signals[:,None,None]), axis=0)[0]
+            intsig = np.nanmean((dataset["digital_number"].values[:, ids]-
+                                 dark_signals[:,None,None]), axis=0)[0]
             noisestd, noiseavg = self.sigma_clip(intsig) # calculate std and avg for non NaN columns
             maski = np.zeros_like(intsig) # mask the columns that have NaN
             maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 1
