@@ -91,6 +91,9 @@ class CombineSWIR:
         if self.context.get_config_value("plot_l1b"):
             self.plot.plot_series_in_sequence(measurandstring,dataset_l1b_comb)
 
+        if self.context.get_config_value("plot_uncertainty"):
+            self.plot.plot_relative_uncertainty(measurandstring,dataset_l1b_comb)
+
         # if self.context.get_config_value("plot_diff"):
         #     self.plot.plot_diff_scans(measurandstring,dataset_l1a,dataset_l1b)
 

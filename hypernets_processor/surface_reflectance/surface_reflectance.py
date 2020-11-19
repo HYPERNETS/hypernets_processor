@@ -10,6 +10,8 @@ from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.dataset_util import DatasetUtil
+from hypernets_processor.data_utils.average import Average
+
 
 import punpy
 import numpy as np
@@ -30,6 +32,7 @@ class SurfaceReflectance:
         self.prop = punpy.MCPropagation(MCsteps, parallel_cores=parallel_cores)
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
+        self.avg = Average(context)
         self.calibrate = Calibrate(context)
         self.plot = Plotting(context)
         self.context = context
@@ -53,11 +56,9 @@ class SurfaceReflectance:
 
             input_vars = l1ctol1d_function.get_argument_names()
             input_qty = self.find_input(input_vars, dataset_l1d)
-            u_random_input_qty = self.find_u_random_input(input_vars, dataset_l1d)
+            u_random_input_qty = self.find_u_random_input(input_vars, dataset_l1c)
             u_systematic_input_qty,cov_systematic_input_qty = \
-                self.find_u_systematic_input(input_vars,dataset_l1d)
-
-            print("inp",input_qty[4],u_random_input_qty[4],u_systematic_input_qty[4],cov_systematic_input_qty[4])
+                self.find_u_systematic_input(input_vars,dataset_l1c)
 
             dataset_l1d = self.process_measurement_function(
                 ["water_leaving_radiance", "reflectance_nosc", "reflectance"],
@@ -84,27 +85,21 @@ class SurfaceReflectance:
         u_random_input_qty = self.find_u_random_input(input_vars, dataset)
         u_systematic_input_qty, cov_systematic_input_qty = self.find_u_systematic_input(input_vars, dataset)
 
-
         if self.context.get_config_value("network").lower() == "w":
-            dataset_l2a = self.templ.l2_from_l1d_dataset(dataset)
-            for measurandstring in ["water_leaving_radiance", "reflectance_nosc", "reflectance"]:
-                dataset_l2a[measurandstring].values = self.calc_mean_masked(dataset, measurandstring)
-                dataset_l2a["u_random_" + measurandstring].values = self.calc_mean_masked(dataset,
-                                                                                                    "u_random_" + measurandstring,
-                                                                                                    rand_unc=True)
-                dataset_l2a["u_systematic_" + measurandstring].values = self.calc_mean_masked(dataset,
-                                                                                                        "u_systematic_" + measurandstring,
-                                                                                                        rand_unc=True)
-                dataset_l2a["corr_random_" + measurandstring].values = np.eye(
-                    len(dataset_l2a["u_systematic_" + measurandstring].values))
-                dataset_l2a["corr_systematic_" + measurandstring].values = self.calc_mean_masked(dataset,
-                                                                                                           "corr_systematic_" + measurandstring,
-                                                                                                           corr=True)
+
+            dataset_l2a = self.avg.average_L2(dataset)
+
+            for measurandstring in ["water_leaving_radiance","reflectance_nosc",
+                                    "reflectance"]:
                 if self.context.get_config_value("plot_l2a"):
                     self.plot.plot_series_in_sequence(measurandstring,dataset_l2a)
 
+                if self.context.get_config_value("plot_uncertainty"):
+                    self.plot.plot_relative_uncertainty(measurandstring,dataset_l2a,L2=True)
+
         elif self.context.get_config_value("network").lower() == "l":
             dataset_l2a = self.templ.l2_from_l1c_dataset(dataset)
+            print(cov_systematic_input_qty)
             dataset_l2a = self.process_measurement_function(["reflectance"], dataset_l2a,
                                                             l1tol2_function.function,
                                                             input_qty, u_random_input_qty,
@@ -112,7 +107,13 @@ class SurfaceReflectance:
                                                             cov_systematic_input_qty)
             if self.context.get_config_value("plot_l2a"):
                 self.plot.plot_series_in_sequence("reflectance",dataset_l2a)
-                print("plotting")
+
+            if self.context.get_config_value("plot_uncertainty"):
+                self.plot.plot_relative_uncertainty("reflectance",dataset_l2a,L2=True)
+        else:
+            self.context.logger.error("network is not correctly defined")
+
+
         if self.context.get_config_value("write_l2a"):
             self.writer.write(dataset_l2a, overwrite=True)
 
@@ -120,27 +121,6 @@ class SurfaceReflectance:
 
         return dataset_l2a
 
-    def calc_mean_masked(self, dataset, var, rand_unc=False, corr=False):
-        series_id = np.unique(dataset['series_id'])
-        if corr:
-            out = np.empty((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
-        else:
-            out = np.empty((len(series_id), len(dataset['wavelength'])))
-        for i in range(len(series_id)):
-            flags = ["saturation","nonlinearity","bad_pointing","outliers",
-                     "angles_missing","lu_eq_missing","fresnel_angle_missing",
-                     "fresnel_default","temp_variability_ed","temp_variability_lu",
-                     "min_nbred","min_nbrlu","min_nbrlsky"]
-            flagged = np.any([DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in flags],axis=0)
-            ids = np.where(
-                (dataset['series_id'] == series_id[i]) & (flagged == False))
-
-            out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
-            if rand_unc:
-                out[i] = out[i] / len(ids[0])
-        if corr:
-            out = np.mean(out, axis=0)
-        return out.T
 
     def find_input(self, variables, dataset):
         """
@@ -192,7 +172,9 @@ class SurfaceReflectance:
         covs_indep = []
         for var in variables:
             try:
-                covs_indep.append(punpy.convert_corr_to_cov(dataset["corr_systematic_indep_" + var].values,dataset["u_systematic_indep_" + var].values))
+                covs_indep.append(punpy.convert_corr_to_cov(
+                    dataset["corr_systematic_indep_" + var].values,
+                    np.mean(dataset["u_systematic_indep_" + var].values,axis=1)))
                 inputs.append(dataset["u_systematic_indep_" + var].values)
             except:
                 inputs.append(None)
