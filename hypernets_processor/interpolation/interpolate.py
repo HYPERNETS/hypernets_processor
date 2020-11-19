@@ -75,6 +75,10 @@ class Interpolate:
 
         if self.context.get_config_value("plot_l1c"):
             self.plot.plot_series_in_sequence("irradiance",dataset_l1c)
+
+        if self.context.get_config_value("plot_uncertainty"):
+            self.plot.plot_relative_uncertainty("irradiance",dataset_l1c)
+
         return dataset_l1c
 
     def interpolate_irradiance(self,dataset_l1c,dataset_l1b_irr):
@@ -172,11 +176,11 @@ class Interpolate:
             u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
                 measurement_function,input_quantities,
                 u_systematic_input_quantities_indep,
-                cov_x=['rand']*len(u_random_input_quantities),return_corr=True,
+                cov_x=cov_systematic_input_quantities_indep,return_corr=True,
                 corr_axis=0,param_fixed=[False,True,True],repeat_dims=1)
             u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
                 measurement_function,input_quantities,u_systematic_input_quantities_corr,
-                cov_x= ['rand']*len(u_random_input_quantities),return_corr=True,
+                cov_x=cov_systematic_input_quantities_corr,return_corr=True,
                 corr_axis=0,param_fixed=[False,True,True],repeat_dims=1)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand

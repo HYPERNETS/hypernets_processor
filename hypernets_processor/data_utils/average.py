@@ -25,13 +25,15 @@ class Average:
 
         dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
 
-        dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring)
+        flags=["outliers"]
+
+        dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring,flags)
         dataset_l1b["u_random_" + measurandstring].values = self.calc_mean_masked(\
-            dataset_l1a,"u_random_" + measurandstring,rand_unc=True)
+            dataset_l1a,"u_random_" + measurandstring,flags,rand_unc=True)
         dataset_l1b["u_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
-        (dataset_l1a,"u_systematic_indep_"+measurandstring)
+        (dataset_l1a,"u_systematic_indep_"+measurandstring,flags)
         dataset_l1b["u_systematic_corr_rad_irr_"+measurandstring].values = self.calc_mean_masked\
-        (dataset_l1a,"u_systematic_corr_rad_irr_"+measurandstring)
+        (dataset_l1a,"u_systematic_corr_rad_irr_"+measurandstring,flags)
 
         dataset_l1b["corr_random_" + measurandstring].values = np.eye(
                 len(dataset_l1b["u_random_" + measurandstring].values))
@@ -42,16 +44,42 @@ class Average:
 
         return dataset_l1b
 
-    def calc_mean_masked(self, dataset, var, rand_unc=False, corr=False):
+    def average_L2(self,dataset):
+
+        dataset_l2a = self.templ.l2_from_l1d_dataset(dataset)
+
+        flags = ["saturation","nonlinearity","bad_pointing","outliers",
+                         "angles_missing","lu_eq_missing","fresnel_angle_missing",
+                         "fresnel_default","temp_variability_ed","temp_variability_lu",
+                         "min_nbred","min_nbrlu","min_nbrlsky"]
+
+        for measurandstring in ["water_leaving_radiance","reflectance_nosc",
+                                "reflectance"]:
+            dataset_l2a[measurandstring].values = self.calc_mean_masked(
+                dataset,measurandstring,flags)
+            dataset_l2a["u_random_"+measurandstring].values = self.calc_mean_masked(
+                dataset,"u_random_"+measurandstring,flags,rand_unc=True)
+            dataset_l2a["u_systematic_"+measurandstring].values = self.calc_mean_masked(
+                dataset,"u_systematic_"+measurandstring,flags)
+            dataset_l2a["corr_random_"+measurandstring].values = np.eye(
+                len(dataset_l2a["u_systematic_"+measurandstring].values))
+            dataset_l2a["corr_systematic_"+measurandstring].values = \
+                dataset["corr_systematic_"+measurandstring].values
+
+        return dataset_l2a
+
+    def calc_mean_masked(self, dataset, var, flags, rand_unc=False, corr=False):
         series_id = np.unique(dataset['series_id'])
         if corr:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
 
-            print("corr",dataset[var].values)
             for i in range(len(series_id)):
-                ids = np.where((dataset['series_id'] == series_id[i]) & np.invert(
-                    DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
+                flagged = np.any(
+                    [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
+                     flags],axis=0)
+                ids = np.where(
+                    (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(dataset[var].values[:,:,ids],axis=3)[:,:,0]
 
             out = np.mean(out, axis=0)
@@ -59,13 +87,15 @@ class Average:
         else:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
 
-        for i in range(len(series_id)):
-            ids = np.where((dataset['series_id'] == series_id[i]) &
-                           np.invert
-                (DatasetUtil.unpack_flags(dataset["quality_flag"])["outliers"]))
-            out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
+            for i in range(len(series_id)):
+                flagged = np.any(
+                    [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
+                     flags],axis=0)
+                ids = np.where(
+                    (dataset['series_id'] == series_id[i]) & (flagged == False))
+                out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
 
-            if rand_unc:
-                out[i] = out[i] / len(ids[0])
+                if rand_unc:
+                    out[i] = out[i] / len(ids[0])
 
         return out.T

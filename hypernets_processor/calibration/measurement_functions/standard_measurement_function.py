@@ -10,6 +10,7 @@ class StandardMeasurementFunction:
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
         DN=digital_number-dark_signal
+        DN[DN==0]=1
         corrected_DN = DN /(non_linear[0]+non_linear[1]*DN+
                                        non_linear[2]*DN**2+
                                        non_linear[3]*DN**3+

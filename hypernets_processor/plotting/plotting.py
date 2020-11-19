@@ -88,6 +88,25 @@ class Plotting():
             self.plot_variable("relative difference",plotpath,dataset["wavelength"].values,
                                (ydata_subset-avgs)/avgs,ylim=[-0.3,0.3],mask=mask)
 
+    def plot_relative_uncertainty(self,measurandstring,dataset,L2=False):
+        plotpath = os.path.join(self.path,"plot_unc_"+dataset.attrs[
+            'product_name']+"."+self.context.get_config_value("plotting_format"))
+
+        yrand=dataset["u_random_"+measurandstring].values/dataset[measurandstring].values
+        if L2:
+            ysyst = dataset["u_systematic_"+measurandstring].values/dataset[measurandstring].values
+            yerr=np.concatenate((yrand,ysyst),axis=1)
+            ylabel=np.concatenate((np.repeat(["random uncertainty"],len(yrand[0])),np.repeat(["systematic uncertainty"],len(ysyst[0]))))
+        else:
+            ysyst_corr=dataset["u_systematic_corr_rad_irr_"+measurandstring].values/dataset[measurandstring].values
+            ysyst_indep=dataset["u_systematic_indep_"+measurandstring].values/dataset[measurandstring].values
+            yerr=np.concatenate((yrand,ysyst_indep,ysyst_corr),axis=1)
+            ylabel=np.concatenate((np.repeat(["random uncertainty"],len(yrand[0])),
+                                   np.repeat(["independent systematic uncertainty"],len(ysyst_indep[0])),
+                                   np.repeat(["correlated (rad-irr) systematic uncertainty"],len(ysyst_corr[0]))))
+        self.plot_variable("relative uncertainty "+measurandstring,plotpath,dataset["wavelength"].values,
+                           yerr,labels=ylabel,ylim=[0,0.2])
+
     def plot_radiance(self,plotpath,xdata,ydata,labels=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
         if labels is None:
@@ -148,20 +167,34 @@ class Plotting():
 
     def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None,mask=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
-        if labels is None and mask is None or len(np.where(mask)[0])==0:
+        if labels is None and mask is None:
             ax1.plot(xdata,ydata,alpha=0.3)
         elif mask is None:
             for i in range(len(labels)):
-                ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.5)
+        elif len(np.where(mask)[0]) == 0:
+            ax1.plot(xdata,ydata,alpha=0.3)
         else:
-            print(len(np.where(mask)[0]))
             ax1.plot(xdata,ydata[:,np.where(mask)].reshape((len(ydata),len(np.where(mask)[0]))),label="masked",alpha=0.3,color="red")
             ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3,color="green")
 
         if labels is not None or mask is not None:
             handles,labels = plt.gca().get_legend_handles_labels()
-            by_label = dict(zip(labels,handles))
-            ax1.legend(by_label.values(),by_label.keys())
+            colors=["red","green","blue","orange","cyan","magenta"]
+            icol=0
+            labelsb=[]
+            for i,p in enumerate(ax1.get_lines()):
+                if p.get_label() in labelsb:  # check for Name already exists
+                    idx = labels.index(p.get_label())  # find ist index
+                    p.set_c(ax1.get_lines()[idx].get_c())  # set color
+                    p.set_label('_'+p.get_label())  # hide label in auto-legend
+
+                elif p.get_label()[0]!="_":
+                    labelsb.append(p.get_label())
+                    p.set_c(colors[icol])
+                    icol+=1
+            ax1.legend()  # correct legend
+
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(measurandstring)
         if ylim is not None:
