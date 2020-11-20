@@ -97,6 +97,9 @@ class SurfaceReflectance:
                 if self.context.get_config_value("plot_uncertainty"):
                     self.plot.plot_relative_uncertainty(measurandstring,dataset_l2a,L2=True)
 
+                if self.context.get_config_value("plot_correlation"):
+                    self.plot.plot_correlation(measurandstring,dataset_l2a,L2=True)
+
         elif self.context.get_config_value("network").lower() == "l":
             dataset_l2a = self.templ.l2_from_l1c_dataset(dataset)
             print(cov_systematic_input_qty)
@@ -110,6 +113,9 @@ class SurfaceReflectance:
 
             if self.context.get_config_value("plot_uncertainty"):
                 self.plot.plot_relative_uncertainty("reflectance",dataset_l2a,L2=True)
+
+            if self.context.get_config_value("plot_correlation"):
+                self.plot.plot_correlation("reflectance",dataset_l2a,L2=True)
         else:
             self.context.logger.error("network is not correctly defined")
 

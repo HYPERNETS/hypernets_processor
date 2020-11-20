@@ -94,6 +94,9 @@ class CombineSWIR:
         if self.context.get_config_value("plot_uncertainty"):
             self.plot.plot_relative_uncertainty(measurandstring,dataset_l1b_comb)
 
+        if self.context.get_config_value("plot_correlation"):
+            self.plot.plot_correlation(measurandstring,dataset_l1b_comb)
+
         # if self.context.get_config_value("plot_diff"):
         #     self.plot.plot_diff_scans(measurandstring,dataset_l1a,dataset_l1b)
 

@@ -107,6 +107,39 @@ class Plotting():
         self.plot_variable("relative uncertainty "+measurandstring,plotpath,dataset["wavelength"].values,
                            yerr,labels=ylabel,ylim=[0,0.2])
 
+    def plot_correlation(self,measurandstring,dataset,L2=False):
+        plotpath = os.path.join(self.path,"plot_corr_"+dataset.attrs[
+            'product_name']+"."+self.context.get_config_value("plotting_format"))
+
+        if L2:
+            ycorr = dataset["corr_systematic_"+measurandstring].values
+            wavs =  dataset["wavelength"].values
+            fig1,ax1 = plt.subplots(figsize=(5,5))
+            im=ax1.pcolormesh(wavs, wavs, ycorr, vmin=0, vmax=1, cmap="gnuplot")
+            ax1.set_ylabel("wavelength (nm)")
+            ax1.set_xlabel("wavelength (nm)")
+            ax1.set_title("systematic correlation matrix")
+            fig1.colorbar(im,ax=ax1)
+            fig1.savefig(plotpath,bbox_inches='tight')
+            plt.close(fig1)
+
+        else:
+            ycorr_indep = dataset["corr_systematic_indep_"+measurandstring].values
+            ycorr_corr=dataset["corr_systematic_corr_rad_irr_"+measurandstring].values
+            wavs =  dataset["wavelength"].values
+            fig1,(ax1,ax2) = plt.subplots(ncols=2,nrows=1,figsize=(10,5))
+            ax1.pcolormesh(wavs, wavs, ycorr_indep, vmin=0, vmax=1, cmap="gnuplot")
+            ax1.set_ylabel("wavelength (nm)")
+            ax1.set_xlabel("wavelength (nm)")
+            ax1.set_title("independent systematic correlation matrix")
+            im=ax2.pcolormesh(wavs, wavs, ycorr_corr, vmin=0, vmax=1, cmap="gnuplot")
+            ax2.set_ylabel("wavelength (nm)")
+            ax2.set_xlabel("wavelength (nm)")
+            ax2.set_title("correlated (rad-irr) systematic correlation matrix")
+            fig1.colorbar(im,ax=ax2)
+            fig1.savefig(plotpath,bbox_inches='tight')
+            plt.close(fig1)
+
     def plot_radiance(self,plotpath,xdata,ydata,labels=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
         if labels is None:
