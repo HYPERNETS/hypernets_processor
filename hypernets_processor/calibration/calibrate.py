@@ -80,6 +80,9 @@ class Calibrate:
         if self.context.get_config_value("plot_uncertainty"):
             self.plot.plot_relative_uncertainty(measurandstring,dataset_l1a)
 
+        if self.context.get_config_value("plot_correlation"):
+            self.plot.plot_correlation(measurandstring,dataset_l1a)
+
         return dataset_l1a
 
     def prepare_calibration_data(self,measurandstring, swir=False):

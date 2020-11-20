@@ -202,10 +202,8 @@ class HypernetsProcessor:
             #     sequence_path)
             # self.context.logger.debug("Done")
 
-            l0_rad["digital_number"].values[:,0]=l0_rad["digital_number"].values[:,0]/1.5
-            l0_irr["digital_number"].values[:,0]=l0_irr["digital_number"].values[:,0]/1.5
-            l0_swir_rad["digital_number"].values[:,0]=l0_swir_rad["digital_number"].values[:,0]/1.5
-            l0_swir_irr["digital_number"].values[:,0]=l0_swir_irr["digital_number"].values[:,0]/1.5
+            l0_rad["digital_number"].values[:,0]=l0_rad["digital_number"].values[:,0]/1.25
+            l0_irr["digital_number"].values[:,0]=l0_irr["digital_number"].values[:,0]/1.25
 
             #Calibrate to L1a
             self.context.logger.debug("Processing to L1a...")
