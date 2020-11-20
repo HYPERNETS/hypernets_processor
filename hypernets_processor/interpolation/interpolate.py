@@ -79,6 +79,9 @@ class Interpolate:
         if self.context.get_config_value("plot_uncertainty"):
             self.plot.plot_relative_uncertainty("irradiance",dataset_l1c)
 
+        if self.context.get_config_value("plot_correlation"):
+            self.plot.plot_correlation("irradiance",dataset_l1c)
+
         return dataset_l1c
 
     def interpolate_irradiance(self,dataset_l1c,dataset_l1b_irr):
