@@ -113,6 +113,7 @@ class DataTemplates:
                                                    propagate_ds=dataset)
         dataset_l1b = dataset_l1b.assign_coords(wavelength=wavs)
         return dataset_l1b
+
     def l1c_from_l1b_dataset(self, dataset_l1b):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
@@ -133,6 +134,33 @@ class DataTemplates:
         elif self.context.get_config_value("network").lower() == "w":
             l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
                                   "scan":len(np.unique(dataset_l1b['scan']))}
+
+            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"W_L1C",
+                                                       propagate_ds=dataset_l1b)
+            dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
+
+        return dataset_l1c
+
+    def l1ctemp_dataset(self, dataset_l1b, dataset_l1b_irr):
+        """
+        Makes a L2 template of the data, and propagates the appropriate keywords from L1.
+
+        :param datasetl0:
+        :type datasetl0:
+        :return:
+        :rtype:
+        """
+        if self.context.get_config_value("network").lower() == "l":
+            l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
+                                  "series":len(dataset_l1b_irr['series'])}
+
+            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"L_L1C",
+                                                       propagate_ds=dataset_l1b)
+            dataset_l1c=dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
+
+        elif self.context.get_config_value("network").lower() == "w":
+            l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
+                                  "scan":len(np.unique(dataset_l1b_irr['series']))}
 
             dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"W_L1C",
                                                        propagate_ds=dataset_l1b)
