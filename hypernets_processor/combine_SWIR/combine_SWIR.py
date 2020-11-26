@@ -37,7 +37,6 @@ class CombineSWIR:
         dataset_l1a = self.perform_checks(dataset_l1a)
         dataset_l1b = self.avg.average_l1b(measurandstring,dataset_l1a)
         dataset_l1b_swir = self.avg.average_l1b(measurandstring,dataset_l1a_swir)
-
         combine_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_combine"))
         input_vars = combine_function.get_argument_names()
@@ -81,7 +80,7 @@ class CombineSWIR:
                                           u_systematic_input_qty_corr,
                                           corr_systematic_input_qty_indep,
                                           corr_systematic_input_qty_corr,
-                                          param_fixed=[False,False,False,False,True])
+                                          param_fixed=[True,False,True,False,True])
 
         if self.context.get_config_value("write_l1b"):
             self.writer.write(dataset_l1b_comb, overwrite=True)

@@ -49,8 +49,8 @@ class Calibrate:
             self.context.get_config_value("measurement_function_calibrate"))
         input_vars = calibrate_function.get_argument_names()
 
-        calibration_data, wavids = self.prepare_calibration_data(measurandstring,swir)
-        dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla,wavids)
+        calibration_data, wavids, wavs = self.prepare_calibration_data(measurandstring,swir)
+        dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla,wavids,wavs)
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0)
         input_qty = self.prop.find_input_l1a(input_vars, dataset_l0, calibration_data)
         u_random_input_qty = self.prop.find_u_random_input_l1a(input_vars, dataset_l0, calibration_data)
@@ -91,7 +91,7 @@ class Calibrate:
         directory=self.context.get_config_value("calibration_directory")
         caldates=[os.path.basename(path) for path in glob.glob
         (os.path.join(directory,"hypstar_"+str(hypstar)+"/radiometric/*"))]
-        caldate=caldates[0]
+        caldate=caldates[-1]
         for f in glob.glob(os.path.join(directory,
                             "hypstar_"+str(hypstar)+"\\radiometric\\"+str(caldate)+
                             "\\hypstar_"+str(hypstar)+"_nonlin_corr_coefs_*.dat")):
@@ -108,15 +108,15 @@ class Calibrate:
                                                 caldate)+"/hypstar_"+str(
                                                 hypstar)+"_radcal_L_*_%s.dat"%(sensortag))):
                 gains = np.genfromtxt(f)
-                wavids=[int(gains[0,0])-1,int(gains[-1,0])]
         else:
             for f in glob.glob(os.path.join(directory,
                                             "hypstar_"+str(hypstar)+"/radiometric/"+str(
                                                 caldate)+"/hypstar_"+str(
                                                 hypstar)+"_radcal_E_*_%s.dat"%(sensortag))):
                 gains = np.genfromtxt(f)
-                wavids=[int(gains[0,0])-1,int(gains[-1,0])]
 
+        wavids=[int(gains[0,0]),int(gains[-1,0])+1]
+        wavs=gains[:,1]
 
         calibration_data = {}
         calibration_data["gains"] = gains[:,2]
@@ -157,7 +157,7 @@ class Calibrate:
         calibration_data["u_random_non_linearity_coefficients"] = None
         calibration_data["u_systematic_non_linearity_coefficients"] = None
 
-        return calibration_data, wavids
+        return calibration_data, wavids, wavs
 
     def find_nearest_black(self, dataset, acq_time, int_time):
         ids = np.where((abs(dataset['acquisition_time'] - acq_time) ==
@@ -167,7 +167,7 @@ class Calibrate:
 
         return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
 
-    def preprocess_l0(self, datasetl0, datasetl0_bla, wavids):
+    def preprocess_l0(self, datasetl0, datasetl0_bla, wavids, wavs):
         """
         Identifies and removes faulty measurements (e.g. due to cloud cover).
 
@@ -179,6 +179,9 @@ class Calibrate:
         datasetl0=datasetl0.isel(wavelength=slice(wavids[0],wavids[1]))
         datasetl0_bla=datasetl0_bla.isel(wavelength=slice(wavids[0],wavids[1]))
         mask = self.clip_and_mask(datasetl0,datasetl0_bla)
+
+        datasetl0 = datasetl0.assign_coords(wavelength=wavs)
+        datasetl0_bla = datasetl0_bla.assign_coords(wavelength=wavs)
 
         datasetl0["quality_flag"][np.where(mask==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask==1)],"outliers") #for i in range(len(mask))]
 
