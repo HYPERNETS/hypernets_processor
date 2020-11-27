@@ -3,7 +3,7 @@
 import scipy.interpolate
 import numpy as np
 
-class LandNetworkInterpolationWavLinear:
+class InterpolationWavLinear:
     def function(self,rad_wavs,irr_wavs,irr):
         '''
         This function implements the measurement function.
@@ -17,7 +17,7 @@ class LandNetworkInterpolationWavLinear:
 
     @staticmethod
     def get_name():
-        return "LandNetworkInterpolationWavLinear"
+        return "InterpolationWavLinear"
 
     def get_argument_names(self):
         return ["radiance_wavelengths","irradiance_wavelengths","irradiances"]
