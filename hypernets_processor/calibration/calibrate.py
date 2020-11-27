@@ -56,7 +56,6 @@ class Calibrate:
         u_random_input_qty = self.prop.find_u_random_input_l1a(input_vars, dataset_l0, calibration_data)
         u_systematic_input_qty_indep,u_systematic_input_qty_corr,\
         corr_systematic_input_qty_indep,corr_systematic_input_qty_corr = self.prop.find_u_systematic_input_l1a(input_vars, dataset_l0, calibration_data)
-
         dataset_l1a = self.prop.process_measurement_function_l1a(measurandstring,
                                                         dataset_l1a,
                                                         calibrate_function.function,
@@ -139,7 +138,6 @@ class Calibrate:
                 gains[:,2]*(gains[:,6]**2)**0.5/100)
 
         calibration_data["cov_systematic_indep_gains"] = cov_diag + cov_other + cov_full + cov_filament
-
 
         calibration_data["u_systematic_corr_rad_irr_gains"] = gains[:,2]*(gains[:,4]**2+
                 gains[:,5]**2+gains[:,18]**2)**0.5/100
