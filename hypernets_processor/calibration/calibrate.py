@@ -91,9 +91,10 @@ class Calibrate:
         (os.path.join(directory, "hypstar_" + str(hypstar) + "/radiometric/*"))]
         caldate = str(caldates[0])
 
-        caldir=os.path.join(directory, "hypstar_" + hypstar, "radiometric", caldate, "hypstar_" + hypstar +"_nonlin_corr_coefs_*.dat" )
+        calfile = os.path.join(directory, "hypstar_" + hypstar, "radiometric", caldate,
+                               "hypstar_" + hypstar + "_nonlin_corr_coefs_*.dat")
 
-        for f in glob.glob(caldir):
+        for f in glob.glob(calfile):
             non_linear_cals = np.genfromtxt(f)
 
         if swir:
