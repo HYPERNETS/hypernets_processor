@@ -161,7 +161,6 @@ class HypernetsReader:
         return wvl
 
     def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat):
-        print(series)
 
         model_name = self.model
 
@@ -215,7 +214,6 @@ class HypernetsReader:
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
         eof = f.tell()
-        print(eof)
         f.close()
 
         # 2. Create template dataset
@@ -274,7 +272,7 @@ class HypernetsReader:
                 pixCount = header['Pixel Count']
                 scan = self.read_data(f, pixCount)
                 # should include this back again when crc32 is in the headers!
-                # crc32 = self.read_footer(f, 4)
+                crc32 = self.read_footer(f, 4)
 
                 # HypernetsReader(self.context).plot_spectra(spectra, scan)
 
@@ -338,7 +336,6 @@ class HypernetsReader:
                 ds['digital_number'][0:pixCount, scan_number] = scan
 
                 scan_number += 1
-                print(f.tell())
                 if f.tell() == eof:
                     nextLine = False
 
@@ -382,7 +379,6 @@ class HypernetsReader:
         #     ACTION_NONE  : 0x03   (03)
 
         metadata = ConfigParser()
-        print("seq", os.path.join(seq_dir, "metadata.txt"))
         if os.path.exists(os.path.join(seq_dir, "metadata.txt")):
             metadata.read(os.path.join(seq_dir, "metadata.txt"))
             # ------------------------------
@@ -479,7 +475,7 @@ class HypernetsReader:
             seq_dir)
 
         if seriesIrr:
-            l0_irr = self.read_series_raw(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR")
+            l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_irr, overwrite=True)
             # can't use this when non concatanted spectra
@@ -491,7 +487,7 @@ class HypernetsReader:
             self.context.logger.error("No irradiance data for this sequence")
 
         if seriesRad:
-            l0_rad = self.read_series_raw(seq_dir, seriesRad, lat, lon, metadata, flag, "L0_RAD")
+            l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag, "L0_RAD")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_rad, overwrite=True)
         #         if all([os.path.isfile(os.path.join(seq_dir,"RADIOMETER/",f)) for f in seriesRad]):
@@ -502,7 +498,7 @@ class HypernetsReader:
             self.context.logger.error("No radiance data for this sequence")
 
         if seriesBlack:
-            l0_bla = self.read_series_raw(seq_dir, seriesBlack, lat, lon, metadata, flag, "L0_BLA")
+            l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag, "L0_BLA")
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_bla, overwrite=True)
             # if all([os.path.isfile(os.path.join(seq_dir, "RADIOMETER/", f)) for f in seriesBlack]):
@@ -527,7 +523,6 @@ class HypernetsReader:
     #     return(flags)
 
     def raw_read(spectra, n, spectra_length=2048):
-        print("Open %s" % spectra)
         data_spectra = []
         with open(spectra, "rb") as f:
             data = []
