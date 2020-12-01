@@ -288,6 +288,62 @@ class TestDatasetUtil(unittest.TestCase):
         self.assertTrue((flags["flag7"].data == empty).all())
         self.assertTrue((flags["flag8"].data == empty).all())
 
+    def test_get_flags_mask_or(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([2,3], meanings, dim_names=["dim1", "dim2"],
+                                                                  attributes={"standard_name": "std"})
+
+        ds["flags"] = flags_vector_variable
+        ds["flags"] = DatasetUtil.set_flag(ds["flags"], "flag4")
+        ds["flags"][0, 1] = DatasetUtil.set_flag(ds["flags"][0, 1], "flag5")
+        ds["flags"][1, 1] = DatasetUtil.set_flag(ds["flags"][1, 1], "flag2")
+        ds["flags"][1, 2] = DatasetUtil.set_flag(ds["flags"][1, 2], "flag7")
+
+        flags_mask = DatasetUtil.get_flags_mask_or(ds["flags"], flags=["flag5", "flag2", "flag7"])
+
+        expected_flags_mask = np.array([[False, True, False], [False, True, True]], dtype=bool)
+
+        np.testing.assert_array_almost_equal(flags_mask, expected_flags_mask)
+
+    def test_get_flags_mask_all(self):
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([2, 3], meanings, dim_names=["dim1", "dim2"],
+                                                                  attributes={"standard_name": "std"})
+
+        ds["flags"] = flags_vector_variable
+        ds["flags"] = DatasetUtil.set_flag(ds["flags"], "flag4")
+        ds["flags"][0, 1] = DatasetUtil.set_flag(ds["flags"][0, 1], "flag5")
+        ds["flags"][1, 1] = DatasetUtil.set_flag(ds["flags"][1, 1], "flag2")
+        ds["flags"][1, 2] = DatasetUtil.set_flag(ds["flags"][1, 2], "flag7")
+
+        flags_mask = DatasetUtil.get_flags_mask_or(ds["flags"])
+
+        expected_flags_mask = np.array([[True, True, True], [True, True, True]], dtype=bool)
+
+        np.testing.assert_array_almost_equal(flags_mask, expected_flags_mask)
+
+    def test_get_flags_mask_and(self):
+
+        ds = Dataset()
+        meanings = ["flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7", "flag8"]
+        flags_vector_variable = DatasetUtil.create_flags_variable([2,3], meanings, dim_names=["dim1", "dim2"],
+                                                                  attributes={"standard_name": "std"})
+
+        ds["flags"] = flags_vector_variable
+        ds["flags"] = DatasetUtil.set_flag(ds["flags"], "flag4")
+        ds["flags"][0, 1] = DatasetUtil.set_flag(ds["flags"][0, 1], "flag5")
+        ds["flags"][1, 1] = DatasetUtil.set_flag(ds["flags"][1, 1], "flag2")
+        ds["flags"][1, 1] = DatasetUtil.set_flag(ds["flags"][1, 1], "flag7")
+
+        flags_mask = DatasetUtil.get_flags_mask_and(ds["flags"], flags=["flag2", "flag7"])
+
+        expected_flags_mask = np.array([[False, False, False], [False, True, False]], dtype=bool)
+
+        np.testing.assert_array_almost_equal(flags_mask, expected_flags_mask)
+
     def test_get_set_flags(self):
 
         ds = Dataset()
