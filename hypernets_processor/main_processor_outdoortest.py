@@ -16,6 +16,8 @@ from hypernets_processor.test.test_functions import setup_test_context, teardown
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_reader import HypernetsReader
+from hypernets_processor.data_io.calibration_converter import CalibrationConverter
+
 import xarray
 import os
 import matplotlib.pyplot as plt
@@ -206,12 +208,19 @@ class HypernetsProcessor:
             l0_irr["digital_number"].values[:,0]=l0_irr["digital_number"].values[:,0]/1.25
 
             #Calibrate to L1a
-            self.context.logger.debug("Processing to L1a...")
-            L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla)
-            L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla)
 
-            L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,swir=True)
-            L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,swir=True)
+            calcon = CalibrationConverter(self.context)
+            calibration_data_rad = calcon.prepare_calibration_data("radiance")
+            calibration_data_irr = calcon.prepare_calibration_data("irradiance")
+            calibration_data_swir_rad = calcon.prepare_calibration_data("radiance",swir=True)
+            calibration_data_swir_irr = calcon.prepare_calibration_data("irradiance",swir=True)
+
+            self.context.logger.debug("Processing to L1a...")
+            L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
+            L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
+
+            L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,calibration_data_swir_rad,swir=True)
+            L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,calibration_data_swir_irr,swir=True)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1b radiance...")
@@ -222,7 +231,6 @@ class HypernetsProcessor:
             self.context.logger.debug("Processing to L1b irradiance...")
             L1b_irr = comb.combine("irradiance",L1a_irr,L1a_swir_irr)
             self.context.logger.debug("Done")
-            print(L1b_irr["wavelength"])
 
             # L1b_rad=xarray.open_dataset(r"C:\Users\pdv\PycharmProjects\hypernets_processor\hypernets_processor\out\HYPERNETS_L_OUTD_L1B_RAD_v0.1.nc")
             # L1b_irr=xarray.open_dataset(r"C:\Users\pdv\PycharmProjects\hypernets_processor\hypernets_processor\out\HYPERNETS_L_OUTD_L1B_IRR_v0.1.nc")
@@ -233,7 +241,6 @@ class HypernetsProcessor:
             self.context.logger.debug("Processing to L2a...")
             L2a = surf.process_l2(L1c)
             self.context.logger.debug("Done")
-            print(L2a["wavelength"])
         # COMPUTE WATER LEAVING RADIANCE LWN, REFLECTANCE RHOW_NOSC FOR EACH Lu SCAN!
 
         # wind=RhymerHypstar(context).retrieve_wind(L1c)

@@ -21,6 +21,7 @@ TIME_FMT_L2B = "%Y%m%d"
 DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
                     "L0_BLA": "L0_BLA",
                     "L0_IRR": "L0_IRR",
+                    "CAL": "CAL",
                     "L_L1A_RAD": "L1A_RAD",
                     "W_L1A_RAD": "L1A_RAD",
                     "L_L1A_IRR": "L1A_IRR",

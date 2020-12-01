@@ -65,6 +65,40 @@ STANDARD_METADATA = {"type": "dataset",
                      "system_id": "HYPSTAR001234",  # key metadata
                      }
 
+CAL_METADATA = {"type": "dataset",
+                     "abstract": "The HYPERNETS project (Horizon 2020 research and innovation, grant agreement "
+                                 "No 775983) has the overall aim to provide high quality in situ measurements to"
+                                 "support the (visible/SWIR) optical Copernicus products. Therefore a new "
+                                 "multi-head hyperspectral spectroradiometer dedicated to land and water surface"
+                                 " reflectance validation with instrument pointing capabilities and embedded "
+                                 "calibration device has been established. The instrument has been deployed at "
+                                 "24 sites covering a range of water and land types and a range of climatic and"
+                                 "logistic conditions (www.hypernets.eu).",
+                     "conventions": "CFv72, NVS2.0",
+                     "format_version": "v01.0",
+                     "netcdf_version": "1.6",
+                     "processor_name": "hypernets_processor",
+                     "processor_version": "v001",
+                     "data_created": "20200423",  # adds on write not working currently
+                     "references": "https://hypernets-processor.readthedocs.io/en/latest/",
+                     "source": "surface observation",
+                     "comment": "Any free-format text is appropriate.",
+                     "acknowledgement": "HYPERNETS project is funded by Horizon 2020 research and innovation program, "
+                                        "Grand Agreement No 775993. Consortium of project  of the Hypernets test sites,"
+                                        " .... are greatly acknowledged.",
+                     "project_name": "H2020 HYPERNETS GN 775993",
+                     "language": "English",
+                     "operational_status": "operational",
+                     "limitations": "no limitations to public access",
+                     "licence": "Attribution-NonCommercial-NoDerivs CC BY-NC-ND",
+                     "conformity": "notEvaluated",
+                     "lineage": "Quality assured following www.hypernets.eu/docs/QC/",
+                     "instrument_configuration_file": "data_io/tests/reader/SEQ20200312T135926/config.txt",
+                     "spectral_range_vnir": "400-1000",
+                     "spectral_resolution_vnir": "3",
+                     "system_id": "HYPSTAR001234",  # key metadata
+                     }
+
 L1A_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file
                     "product_name": "HYPSTAR_W_BSBE_L1A_RAD_202002041130_v01.0.nc",
                     "product_version": "01.0",
@@ -355,6 +389,8 @@ COMMON_METADATA = {**STANDARD_METADATA,
 METADATA_DEFS = {"L0_RAD": {**COMMON_METADATA},
                  "L0_IRR": {**COMMON_METADATA},
                  "L0_BLA": {**COMMON_METADATA},
+                 "CAL": {**CAL_METADATA,**SYSTEM_METADATA,**INSTRUMENT_METADATA, **RAD_HEAD_METADATA, **IRR_HEAD_METADATA,
+                   **CALIBRATION_DEVICE_METADATA,},
                  "L_L1A_RAD": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L1A_RAD_METADATA},
                  "W_L1A_RAD": {**COMMON_METADATA, **WATER_NETWORK_METADATA, **L1A_RAD_METADATA},
                  "L_L1A_IRR": {**COMMON_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA},
