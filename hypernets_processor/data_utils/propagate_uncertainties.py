@@ -22,7 +22,7 @@ class PropagateUnc:
         self.prop = punpy.MCPropagation(MCsteps, parallel_cores=parallel_cores)
         self.context=context
 
-    def find_input_l1a(self, variables, dataset, ancillary_dataset):
+    def find_input_l1a(self, variables, dataset, calib_dataset):
         """
         returns a list of the data for a given list of input variables
 
@@ -38,10 +38,10 @@ class PropagateUnc:
             try:
                 inputs.append(dataset[var].values)
             except:
-                inputs.append(ancillary_dataset[var])
+                inputs.append(calib_dataset[var].values)
         return inputs
 
-    def find_u_random_input_l1a(self, variables, dataset, ancillary_dataset):
+    def find_u_random_input_l1a(self, variables, dataset, calib_dataset):
         """
         returns a list of the random uncertainties on the data for a given list of input variables
 
@@ -58,12 +58,12 @@ class PropagateUnc:
                 inputs.append(dataset["u_random_" + var].values)
             except:
                 try:
-                    inputs.append(ancillary_dataset["u_random_" + var])
+                    inputs.append(calib_dataset["u_random_" + var].values)
                 except:
                     inputs.append(None)
         return inputs
 
-    def find_u_systematic_input_l1a(self, variables, dataset, ancillary_dataset):
+    def find_u_systematic_input_l1a(self, variables, dataset, calib_dataset):
         """
         returns a list of the systematic uncertainties on the data for a given list of input variables
 
@@ -84,18 +84,14 @@ class PropagateUnc:
                 corr_indep.append(dataset["corr_systematic_" + var].values)
             except:
                 try:
-                    inputs_indep.append(ancillary_dataset["u_systematic_indep_"+var])
-                    corr_indep.append(punpy.convert_cov_to_corr(
-                        ancillary_dataset["cov_systematic_indep_"+var],
-                        ancillary_dataset["u_systematic_indep_"+var]))
+                    inputs_indep.append(calib_dataset["u_systematic_indep_"+var].values)
+                    corr_indep.append(calib_dataset["corr_systematic_indep_"+var].values)
                 except:
                     inputs_indep.append(None)
                     corr_indep.append(None)
                 try:
-                    inputs_corr.append(ancillary_dataset["u_systematic_corr_rad_irr_"+var])
-                    corr_corr.append(punpy.convert_cov_to_corr(
-                        ancillary_dataset["cov_systematic_corr_rad_irr_"+var],
-                        ancillary_dataset["u_systematic_corr_rad_irr_"+var]))
+                    inputs_corr.append(calib_dataset["u_systematic_corr_rad_irr_"+var].values)
+                    corr_corr.append(calib_dataset["corr_systematic_corr_rad_irr_"+var].values)
                 except:
                     inputs_corr.append(None)
                     corr_corr.append(None)
