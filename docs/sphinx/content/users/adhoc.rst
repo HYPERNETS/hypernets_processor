@@ -5,8 +5,8 @@
 
 .. _user_adhoc:
 
-User Guide - Ad-hoc Sequence Processing
-=======================================
+Ad-hoc Sequence Processing
+==========================
 
 This section provides a user guide for running the **hypernets_processor** module to process specified field acquisitions, or sequences, on an ad-hoc basis outside of any automated processing.
 
@@ -43,7 +43,7 @@ where:
 
 * `input_directory` - directory of raw sequence product, or directory containing a number of raw sequence products, to process.
 * `output_directory` - directory to write output data to.
-* `network` - network name, land or water. The default configuration for this network is applied for the processing.
+* `network` - network name, `land` or `water`. The default configuration for this network is applied for the processing.
 
 To see more options, try::
 

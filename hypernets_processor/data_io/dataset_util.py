@@ -53,6 +53,8 @@ class DatasetUtil:
 
         if dim_names is not None:
             default_array = DataArray(empty_array, dims=dim_names)
+        elif (dim_names is None) and (dim_sizes == []):
+            default_array = DataArray(empty_array)
         else:
             default_array = DataArray(empty_array, dims=DEFAULT_DIM_NAMES[-len(dim_sizes):])
 
@@ -260,6 +262,50 @@ class DatasetUtil:
         return ds
 
     @staticmethod
+    def get_flags_mask_or(da, flags=None):
+        """
+        Returns boolean mask for set of flags, defined as logical or of flags
+
+        :type da: xarray.DataArray
+        :param da: dataset
+
+        :type flags: list
+        :param flags: list of flags (if unset all data flags selected)
+
+        :return: flag masks
+        :rtype: numpy.ndarray
+        """
+
+        flags_ds = DatasetUtil.unpack_flags(da)
+
+        flags = flags if flags is not None else flags_ds.variables
+        mask_flags = [flags_ds[flag].values for flag in flags]
+
+        return np.logical_or.reduce(mask_flags)
+
+    @staticmethod
+    def get_flags_mask_and(da, flags=None):
+        """
+        Returns boolean mask for set of flags, defined as logical and of flags
+
+        :type da: xarray.DataArray
+        :param da: dataset
+
+        :type flags: list
+        :param flags: list of flags (if unset all data flags selected)
+
+        :return: flag masks
+        :rtype: numpy.ndarray
+        """
+
+        flags_ds = DatasetUtil.unpack_flags(da)
+
+        flags = flags if flags is not None else flags_ds.variables
+        mask_flags = [flags_ds[flag].values for flag in flags]
+
+        return np.logical_and.reduce(mask_flags)
+
+    @staticmethod
     def set_flag(da, flag_name, error_if_set=False):
         """
         Sets named flag for elements in data array
@@ -281,7 +327,9 @@ class DatasetUtil:
         flag_bit = flag_meanings.index(flag_name)
         flag_mask = flag_masks[flag_bit]
 
-        return da | flag_mask
+        da.values = da.values | flag_mask
+
+        return da
 
     @staticmethod
     def unset_flag(da, flag_name, error_if_unset=False):
@@ -305,7 +353,9 @@ class DatasetUtil:
         flag_bit = flag_meanings.index(flag_name)
         flag_mask = flag_masks[flag_bit]
 
-        return da & ~flag_mask
+        da.values = da.values & ~flag_mask
+
+        return da
 
     @staticmethod
     def get_set_flags(da):
