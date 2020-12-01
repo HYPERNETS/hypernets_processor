@@ -33,7 +33,7 @@ class Calibrate:
         self.plot = Plotting(context)
         self.context = context
 
-    def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla, swir=False):
+    def calibrate_l1a(self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data, swir=False):
         if measurandstring != "radiance" and measurandstring != "irradiance":
             self.context.logger.error("the measurandstring needs to be either 'radiance' or 'irradiance")
             exit()
@@ -49,8 +49,7 @@ class Calibrate:
             self.context.get_config_value("measurement_function_calibrate"))
         input_vars = calibrate_function.get_argument_names()
 
-        calibration_data, wavids, wavs = self.prepare_calibration_data(measurandstring,swir)
-        dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla,wavids,wavs)
+        dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0)
         input_qty = self.prop.find_input_l1a(input_vars, dataset_l0, calibration_data)
         u_random_input_qty = self.prop.find_u_random_input_l1a(input_vars, dataset_l0, calibration_data)
@@ -85,78 +84,6 @@ class Calibrate:
 
         return dataset_l1a
 
-    def prepare_calibration_data(self,measurandstring, swir=False):
-        hypstar=self.context.get_config_value("hypstar_cal_number")
-        directory=self.context.get_config_value("calibration_directory")
-        caldates=[os.path.basename(path) for path in glob.glob
-        (os.path.join(directory,"hypstar_"+str(hypstar)+"/radiometric/*"))]
-        caldate=caldates[-1]
-        for f in glob.glob(os.path.join(directory,
-                            "hypstar_"+str(hypstar)+"\\radiometric\\"+str(caldate)+
-                            "\\hypstar_"+str(hypstar)+"_nonlin_corr_coefs_*.dat")):
-            non_linear_cals = np.genfromtxt(f)
-
-        if swir:
-            sensortag="swir"
-        else:
-            sensortag="vnir"
-
-        if measurandstring == "radiance":
-            for f in glob.glob(os.path.join(directory,
-                                            "hypstar_"+str(hypstar)+"/radiometric/"+str(
-                                                caldate)+"/hypstar_"+str(
-                                                hypstar)+"_radcal_L_*_%s.dat"%(sensortag))):
-                gains = np.genfromtxt(f)
-        else:
-            for f in glob.glob(os.path.join(directory,
-                                            "hypstar_"+str(hypstar)+"/radiometric/"+str(
-                                                caldate)+"/hypstar_"+str(
-                                                hypstar)+"_radcal_E_*_%s.dat"%(sensortag))):
-                gains = np.genfromtxt(f)
-
-        wavids=[int(gains[0,0]),int(gains[-1,0])+1]
-        wavs=gains[:,1]
-
-        calibration_data = {}
-        calibration_data["gains"] = gains[:,2]
-        calibration_data["u_random_gains"] = None
-        calibration_data["u_systematic_indep_gains"] = gains[:,2]*(gains[:,6]**2+
-                gains[:,7]**2+gains[:,8]**2+gains[:,9]**2+gains[:,10]**2+gains[:,11]**2+
-                gains[:,12]**2+gains[:,13]**2+gains[:,14]**2+gains[:,15]**2+
-                gains[:,16]**2+gains[:,17]**2+gains[:,19]**2)**0.5/100
-
-        cov_diag=punpy.convert_corr_to_cov(np.eye(len(gains[:,2])),
-                gains[:,2]*(gains[:,19])/100)
-
-        cov_other=punpy.convert_corr_to_cov(np.eye(len(gains[:,2])),
-                gains[:,2]*(gains[:,8]**2+gains[:,9]**2+gains[:,11]**2+gains[:,16]**2+gains[:,17]**2)**0.5/100)
-
-        cov_full=punpy.convert_corr_to_cov(np.ones((len(gains[:,2]),len(gains[:,2]))),
-                gains[:,2]*(gains[:,7]**2+gains[:,10]**2+gains[:,12]**2+gains[:,13]**2+gains[:,14]**2+gains[:,15]**2)**0.5/100)
-
-        cov_filament=punpy.convert_corr_to_cov(np.ones((len(gains[:,2]),len(gains[:,2]))),
-                gains[:,2]*(gains[:,6]**2)**0.5/100)
-
-        calibration_data["cov_systematic_indep_gains"] = cov_diag + cov_other + cov_full + cov_filament
-
-        calibration_data["u_systematic_corr_rad_irr_gains"] = gains[:,2]*(gains[:,4]**2+
-                gains[:,5]**2+gains[:,18]**2)**0.5/100
-
-        cov_other = punpy.convert_corr_to_cov(np.eye(len(gains[:,2])),gains[:,2]*(
-                gains[:,4]**2+gains[:,18]**2)**0.5/100)
-
-        cov_filament = punpy.convert_corr_to_cov(
-            np.ones((len(gains[:,2]),len(gains[:,2]))),
-            gains[:,2]*(gains[:,5]**2)**0.5/100)
-
-        calibration_data["cov_systematic_corr_rad_irr_gains"] = cov_other + cov_filament
-
-        calibration_data["non_linearity_coefficients"] = non_linear_cals[:,0]
-        calibration_data["u_random_non_linearity_coefficients"] = None
-        calibration_data["u_systematic_non_linearity_coefficients"] = None
-
-        return calibration_data, wavids, wavs
-
     def find_nearest_black(self, dataset, acq_time, int_time):
         ids = np.where((abs(dataset['acquisition_time'] - acq_time) ==
                         min(abs(dataset['acquisition_time'] - acq_time))) &
@@ -165,7 +92,7 @@ class Calibrate:
 
         return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
 
-    def preprocess_l0(self, datasetl0, datasetl0_bla, wavids, wavs):
+    def preprocess_l0(self, datasetl0, datasetl0_bla, dataset_calib):
         """
         Identifies and removes faulty measurements (e.g. due to cloud cover).
 
@@ -174,8 +101,11 @@ class Calibrate:
         :return:
         :rtype:
         """
-        datasetl0=datasetl0.isel(wavelength=slice(wavids[0],wavids[1]))
-        datasetl0_bla=datasetl0_bla.isel(wavelength=slice(wavids[0],wavids[1]))
+        wavs=dataset_calib["wavelength"].values
+        wavpix=dataset_calib["wavpix"].values
+
+        datasetl0=datasetl0.isel(wavelength=slice(int(wavpix[0]),int(wavpix[-1])+1))
+        datasetl0_bla=datasetl0_bla.isel(wavelength=slice(int(wavpix[0]),int(wavpix[-1])+1))
         mask = self.clip_and_mask(datasetl0,datasetl0_bla)
 
         datasetl0 = datasetl0.assign_coords(wavelength=wavs)
