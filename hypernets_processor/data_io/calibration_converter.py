@@ -33,8 +33,8 @@ class CalibrationConverter:
             os.path.join(directory,"hypstar_"+str(hypstar)+"/radiometric/*"))]
         caldate = caldates[-1]
         for f in glob.glob(os.path.join(directory,
-                                        "hypstar_"+str(hypstar)+"\\radiometric\\"+str(
-                                            caldate)+"\\hypstar_"+str(
+                                        "hypstar_"+str(hypstar),"radiometric",str(
+                                            caldate),"hypstar_"+str(
                                             hypstar)+"_nonlin_corr_coefs_*.dat")):
             non_linear_cals = np.genfromtxt(f)
 
