@@ -15,6 +15,8 @@ from hypernets_processor.test.test_functions import setup_test_context, teardown
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_reader import HypernetsReader
+from hypernets_processor.data_io.calibration_converter import CalibrationConverter
+
 import xarray
 import os
 import matplotlib.pyplot as plt
@@ -166,13 +168,17 @@ class HypernetsProcessor:
         # context.measurement_function_interpolate = "WaterNetworkInterpolationLinear"
         # context.measurement_function_surface_reflectance = "WaterNetworkProtocol"
 
+        calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context, MCsteps=1000)
         intp = Interpolate(self.context, MCsteps=1000)
         surf = SurfaceReflectance(self.context, MCsteps=1000)
         rhymer = RhymerHypstar(self.context)
 
-        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla)
-        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla)
+        calibration_data_rad = calcon.prepare_calibration_data("radiance")
+        calibration_data_irr = calcon.prepare_calibration_data("irradiance")
+
+        L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla, calibration_data_rad)
+        L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla, calibration_data_irr)
 
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????

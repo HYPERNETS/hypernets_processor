@@ -3,7 +3,7 @@
 import scipy.interpolate
 import numpy as np
 
-class WaterNetworkInterpolationLinear:
+class InterpolationTimeLinear:
     def function(self,output_time,times,variables):
         '''
         This function implements the measurement function.
@@ -32,7 +32,7 @@ class WaterNetworkInterpolationLinear:
 
     @staticmethod
     def get_name():
-        return "WaterNetworkInterpolationLinear"
+        return "InterpolationTimeLinear"
 
     def get_argument_names(self):
         return ["output_time","times","irradiance", "downwelling_radiance"]

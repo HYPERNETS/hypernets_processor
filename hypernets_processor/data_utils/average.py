@@ -96,6 +96,6 @@ class Average:
                 out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
 
                 if rand_unc:
-                    out[i] = out[i] / len(ids[0])
+                    out[i] = (np.sum(dataset[var].values[:, ids]**2, axis=2)[:, 0])**0.5 / len(ids[0])
 
         return out.T
