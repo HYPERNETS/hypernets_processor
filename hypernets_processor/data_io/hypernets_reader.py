@@ -160,7 +160,7 @@ class HypernetsReader:
         else:
             if pixcount == 2048:
                 wvl = cal_data["wavelength"].values
-                self.context.logger.info("Wavelength range:", min(wvl), "-", max(wvl))
+                #self.context.logger.info("Wavelength range:", min(wvl), "-", max(wvl))
             elif pixcount == 256:
                 wvl = cal_data_swir["wavelength"].values
         return wvl
@@ -213,7 +213,7 @@ class HypernetsReader:
         #     print("Data corrupt go to next line")
         #     header = self.read_header(f, HEADER_DEF)
 
-        wvl = self.read_wavelength(pixCount,cal_data=None, cal_data_swir=None)
+        wvl = self.read_wavelength(pixCount,cal_data, cal_data_swir)
 
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
@@ -340,7 +340,6 @@ class HypernetsReader:
                 ds['digital_number'][0:pixCount, scan_number] = scan
 
                 scan_number += 1
-                print(f.tell())
                 if f.tell() == eof:
                     nextLine = False
 
