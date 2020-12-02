@@ -30,25 +30,28 @@ class Interpolate:
         self.plot=Plotting(context)
         self.context=context
 
-    def interpolate_l1b_w(self,dataset_l1a_rad,dataset_l1b_uprad, dataset_l1b_irr):
+    def interpolate_l1b_w(self, dataset_l1b, dataset_l1a_uprad,dataset_l1b_downrad, dataset_l1b_irr):
+
         # chek for upwelling radiance
-        upscan = [i for i, e in enumerate(dataset_l1a_rad['viewing_zenith_angle'].values) if e <= 90]
+        upscan = [i for i, e in enumerate(dataset_l1a_uprad['viewing_zenith_angle'].values) if e < 90]
+        print(dataset_l1a_uprad["scan"].values)
+        print(upscan)
 
-        dataset_l1b=self.templ.l1b_template_from_l1a_dataset_water(dataset_l1a_rad)
+        dataset_l1b=self.templ.l1b_template_from_l1a_dataset_water(dataset_l1a_uprad)
 
-        dataset_l1b["wavelength"] = dataset_l1a_rad["wavelength"]
-        dataset_l1b["upwelling_radiance"] = dataset_l1a_rad["radiance"].sel(scan=upscan)
-        dataset_l1b["acquisition_time"] = dataset_l1a_rad["acquisition_time"].sel(scan=upscan)
+        dataset_l1b["wavelength"] = dataset_l1a_uprad["wavelength"]
+        dataset_l1b["upwelling_radiance"] = dataset_l1a_uprad["radiance"].sel(scan=upscan)
+        dataset_l1b["acquisition_time"] = dataset_l1a_uprad["acquisition_time"].sel(scan=upscan)
         # is this correct????
-        dataset_l1b["u_random_upwelling_radiance"] = dataset_l1a_rad["u_random_radiance"].sel(scan=upscan)
-        dataset_l1b["u_systematic_indep_upwelling_radiance"] = dataset_l1a_rad["u_systematic_indep_radiance"].sel(scan=upscan)
-        dataset_l1b["u_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_rad["u_systematic_corr_rad_irr_radiance"].sel(scan=upscan)
-        dataset_l1b["corr_random_upwelling_radiance"] = dataset_l1a_rad["corr_random_radiance"]
-        dataset_l1b["corr_systematic_indep_upwelling_radiance"] = dataset_l1a_rad["corr_systematic_indep_radiance"]
-        dataset_l1b["corr_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_rad["corr_systematic_corr_rad_irr_radiance"]
+        dataset_l1b["u_random_upwelling_radiance"] = dataset_l1a_uprad["u_random_radiance"].sel(scan=upscan)
+        dataset_l1b["u_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["u_systematic_indep_radiance"].sel(scan=upscan)
+        dataset_l1b["u_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["u_systematic_corr_rad_irr_radiance"].sel(scan=upscan)
+        dataset_l1b["corr_random_upwelling_radiance"] = dataset_l1a_uprad["corr_random_radiance"]
+        dataset_l1b["corr_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["corr_systematic_indep_radiance"]
+        dataset_l1b["corr_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["corr_systematic_corr_rad_irr_radiance"]
 
         self.context.logger.info("interpolate sky radiance")
-        dataset_l1b=self.interpolate_skyradiance(dataset_l1b, dataset_l1b_uprad)
+        dataset_l1b=self.interpolate_skyradiance(dataset_l1b, dataset_l1b_downrad)
         self.context.logger.info("interpolate irradiances")
         dataset_l1b=self.interpolate_irradiance(dataset_l1b, dataset_l1b_irr)
 
