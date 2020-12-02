@@ -34,8 +34,6 @@ class Interpolate:
 
         # chek for upwelling radiance
         upscan = [i for i, e in enumerate(dataset_l1a_uprad['viewing_zenith_angle'].values) if e < 90]
-        print(dataset_l1a_uprad["scan"].values)
-        print(upscan)
 
         dataset_l1b=self.templ.l1b_template_from_l1a_dataset_water(dataset_l1a_uprad)
 

@@ -110,10 +110,6 @@ class RhymerHypstar:
                             ['{}:{}'.format(k, dataset[k][scans[i]].values) for k in ['scan', 'quality_flag']])))
                 id += 1
 
-            plt.plot(dataset['wavelength'].values.T, dataset[measurandstring].values)
-            plt.legend(loc="upper left", labels=range(len(dataset['scan'])))
-            plt.savefig(measurandstring + '.pdf')
-
             return dataset_l1b, flags
 
     def cycleparse(self, rad, irr, dataset_l1b):
