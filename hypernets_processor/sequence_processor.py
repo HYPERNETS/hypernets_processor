@@ -66,7 +66,7 @@ class SequenceProcessor:
 
             # Read L0
             self.context.logger.debug("Reading raw data...")
-            l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path)
+            l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path, calibration_data_rad, calibration_data_irr, calibration_data_swir_rad, calibration_data_swir_irr)
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
