@@ -70,6 +70,9 @@ class HypernetsWriter:
         elif fmt == "csv":
             HypernetsWriter._write_csv(ds, path)
 
+        # Add dataset set to archive db if required
+        self.archive_ds(ds, path)
+
     def return_fmt(self, fmt=None):
         """
         Return product fmt, with respect to context and specified value
@@ -194,12 +197,26 @@ class HypernetsWriter:
 
         for variable in ds.variables.keys():
             idx = np.where(np.isnan(ds[variable].values))
-            if np.sum(idx)>0:
-                print(variable,idx,ds[variable]._FillValue)
-                print(ds[variable][idx])
+
+            if np.sum(idx) > 0:
                 ds[variable][idx] = ds[variable]._FillValue
 
         return ds
+
+    def archive_ds(self, ds, path):
+        """
+        Add dataset to archive database
+
+        :type ds: xarray.Dataset
+        :param ds: dataset
+
+        :type path: str
+        :param path: file path
+        """
+
+        if self.context is not None:
+            if (self.context.get_config_value("to_archive") is True) and (self.context.archive_db is not None):
+                self.context.archive_db.add_ds(ds, path)
 
 
 if __name__ == "__main__":
