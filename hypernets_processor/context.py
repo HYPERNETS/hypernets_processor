@@ -57,7 +57,8 @@ class Context:
                         db_fmt+"_db",
                         open_database(
                             self.get_config_value(db_fmt + "_db_url"),
-                            create_format=db_fmt
+                            db_format=db_fmt,
+                            context=self
                         )
                     )
 
