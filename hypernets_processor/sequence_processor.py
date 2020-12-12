@@ -13,6 +13,7 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.data_io.calibration_converter import CalibrationConverter
 
+import os
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -47,6 +48,9 @@ class SequenceProcessor:
         # update context
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
         self.context.set_config_value("site_abbr", "TEST")
+        self.context.set_config_value("sequence_path", sequence_path)
+        self.context.set_config_value("sequence_name", os.path.basename(sequence_path))
+        writer = HypernetsWriter(self.context)
 
         reader = HypernetsReader(self.context)
         cal = Calibrate(self.context, MCsteps=100)
