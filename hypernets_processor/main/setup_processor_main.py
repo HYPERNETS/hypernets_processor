@@ -57,7 +57,7 @@ def main(settings):
         url = settings[db_fmt + "_db_url"]
 
         if url is not None:
-            new_db = open_database(url, create_format=db_fmt)
+            new_db = open_database(url, db_format=db_fmt)
             new_db.close()
             processor_config["Databases"][db_fmt + "_db_url"] = url
 
