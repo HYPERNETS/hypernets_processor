@@ -56,7 +56,7 @@ def cli():
     settings["network"] = determine_set_value(
         "network",
         context,
-        options=["land", "water"],
+        options=["l", "w"],
         return_existing=True
     )
     settings["network_defaults"] = cli_input_yn("set network default config values (overwrites existing)")
