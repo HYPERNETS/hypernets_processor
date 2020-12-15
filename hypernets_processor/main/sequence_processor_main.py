@@ -112,6 +112,8 @@ def main(processor_config_path, job_config_path, to_archive):
 
     # Run processor
     sp = SequenceProcessor(context=context)
+    target_sequences_passed = 0
+    target_sequences_total = len(target_sequences)
 
     for target_sequence in target_sequences:
 
@@ -119,11 +121,14 @@ def main(processor_config_path, job_config_path, to_archive):
 
         try:
             sp.process_sequence(target_sequence)
+            target_sequences_passed += 1
             context.logger.info("Complete")
         except Exception as e:
             logger.error("Failed: " + repr(e))
 
-    return None
+    msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + " sequences processed"
+
+    return msg
 
 
 if __name__ == "__main__":
