@@ -119,10 +119,9 @@ def main(processor_config_path, job_config_path, to_archive):
 
         try:
             sp.process_sequence(target_sequence)
+            context.logger.info("Complete")
         except Exception as e:
             logger.error("Failed: " + str(e))
-
-        context.logger.info("Complete")
 
     return None
 
