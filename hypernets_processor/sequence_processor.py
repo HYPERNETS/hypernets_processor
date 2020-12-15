@@ -41,8 +41,6 @@ class SequenceProcessor:
         Processes sequence file
         """
 
-        self.context.logger.info("Processing sequence: " + sequence_path)
-
         # update context
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
         self.context.set_config_value("site_abbr", "TEST")
@@ -105,8 +103,6 @@ class SequenceProcessor:
 
         else:
             raise NameError("Invalid network: " + self.context.get_config_value("network"))
-
-        self.context.logger.info("All Done")
 
         return None
 
