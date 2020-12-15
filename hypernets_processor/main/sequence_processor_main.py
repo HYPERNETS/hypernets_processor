@@ -114,7 +114,15 @@ def main(processor_config_path, job_config_path, to_archive):
     sp = SequenceProcessor(context=context)
 
     for target_sequence in target_sequences:
-        sp.process_sequence(target_sequence)
+
+        context.logger.info("Processing sequence: " + target_sequence)
+
+        try:
+            sp.process_sequence(target_sequence)
+        except Exception as e:
+            logger.error("Failed: " + str(e))
+
+        context.logger.info("Complete")
 
     return None
 
