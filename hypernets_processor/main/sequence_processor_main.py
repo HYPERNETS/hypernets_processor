@@ -121,7 +121,7 @@ def main(processor_config_path, job_config_path, to_archive):
             sp.process_sequence(target_sequence)
             context.logger.info("Complete")
         except Exception as e:
-            logger.error("Failed: " + str(e))
+            logger.error("Failed: " + repr(e))
 
     return None
 
