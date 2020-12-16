@@ -134,6 +134,34 @@ class HypernetsWriter:
                     )
         return directory
 
+    def return_plot_directory(self, directory=None):
+        """
+        Return plots directory, with respect to context and specified value
+
+        :type directory: str
+        :param directory: (optional, required if self.context is None) directory to write to.
+        overwrites directory determined from self.context
+
+        :return: directory
+        :rtype: str
+        """
+
+        return os.path.join(self.return_directory(directory), "plots")
+
+    def return_image_directory(self, directory=None):
+        """
+        Return image directory, with respect to context and specified value
+
+        :type directory: str
+        :param directory: (optional, required if self.context is None) directory to write to.
+        overwrites directory determined from self.context
+
+        :return: directory
+        :rtype: str
+        """
+
+        return os.path.join(self.return_directory(directory), "image")
+
     @staticmethod
     def _write_netcdf(ds, path, compression_level=None):
         """
@@ -216,7 +244,7 @@ class HypernetsWriter:
 
         if self.context is not None:
             if (self.context.get_config_value("to_archive") is True) and (self.context.archive_db is not None):
-                self.context.archive_db.add_ds(ds, path)
+                self.context.archive_db.archive_product(ds, path)
 
 
 if __name__ == "__main__":
