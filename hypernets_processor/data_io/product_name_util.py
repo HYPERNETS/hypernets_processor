@@ -96,7 +96,7 @@ class ProductNameUtil:
 
         time_string = time.strftime(TIME_FMT_L12A) if time is not None else None
         network = network.upper() if network is not None else None
-        site = site.upper() if network is not None else None
+        site = site.upper() if site is not None else None
         version = "v" + version if version is not None else None
 
         # Assemble parts

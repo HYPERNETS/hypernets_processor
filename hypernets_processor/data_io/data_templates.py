@@ -24,7 +24,7 @@ class DataTemplates:
         self.context=context
         self.hdsb = HypernetsDSBuilder(context=context)
 
-    def calibration_dataset(self,wavs,nonlinearcals):
+    def calibration_dataset(self,wavs,nonlinearcals,caldates,nonlineardates):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 
@@ -34,11 +34,16 @@ class DataTemplates:
         :rtype:
         """
 
-        cal_dim_sizes_dict = {"wavelength":len(wavs),"nonlinear":len(nonlinearcals)}
+        cal_dim_sizes_dict = {"wavelength":len(wavs),"nonlinearcoef":len(nonlinearcals),
+                              "calibrationdates":len(caldates),
+                              "nonlineardates":len(nonlineardates)}
         dataset_cal = self.hdsb.create_ds_template(cal_dim_sizes_dict,
                                                        ds_format="CAL")
 
         dataset_cal = dataset_cal.assign_coords(wavelength=wavs)
+        dataset_cal = dataset_cal.assign_coords(nonlinearcoef=range(len(nonlinearcals)))
+        dataset_cal = dataset_cal.assign_coords(calibrationtimes=caldates)
+        dataset_cal = dataset_cal.assign_coords(nonlineartimes=nonlineardates)
 
         return dataset_cal
 

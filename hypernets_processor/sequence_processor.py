@@ -49,15 +49,9 @@ class SequenceProcessor:
         self.context.set_config_value("site_abbr", "TEST")
 
         reader = HypernetsReader(self.context)
+        calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=1000)
-
-        calcon = CalibrationConverter(self.context)
-        calibration_data_rad = calcon.prepare_calibration_data("radiance")
-        calibration_data_irr = calcon.prepare_calibration_data("irradiance")
-        calibration_data_swir_rad = calcon.prepare_calibration_data("radiance",swir=True)
-        calibration_data_swir_irr = calcon.prepare_calibration_data("irradiance",
-                                                                    swir=True)
 
         self.context.logger.debug("Processing to L1a...")
 
@@ -70,6 +64,7 @@ class SequenceProcessor:
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
+            calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
             self.context.logger.debug("Processing to L1a...")
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
@@ -102,6 +97,10 @@ class SequenceProcessor:
 
             # Calibrate to L1a
             self.context.logger.debug("Processing to L1a...")
+            (calibration_data_rad,
+             calibration_data_irr,
+             calibration_data_swir_rad,
+             calibration_data_swir_irr)= calcon.read_calib_files()
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
 
