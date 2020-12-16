@@ -28,7 +28,9 @@ from hypernets_processor.data_io.format.flags import FLAG_WATER
 
 # Dimensions
 WL_DIM = "wavelength"
-NL_DIM = "nonlinear"
+CD_DIM = "calibrationdates"
+NL_DIM = "nonlinearcoef"
+ND_DIM = "nonlineardates"
 SERIES_DIM = "series"
 SCAN_DIM = "scan"
 Lu_SCAN_DIM = "scan"
@@ -221,20 +223,20 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
 L0_IRR_VARIABLES = L0_RAD_VARIABLES
 L0_BLA_VARIABLES = L0_RAD_VARIABLES
 
-CAL_VARIABLES = {"wavelength": {"dim": [WL_DIM],
+CAL_VARIABLES = {"wavelengths": {"dim": [CD_DIM,WL_DIM],
                                           "dtype": np.uint32,
                                           "attributes": {"standard_name": "wavelength",
                                                          "long_name": "Wavelength",
                                                          "units": "nm",
                                                          "preferred_symbol": "wv"},
                                           "encoding": {'dtype': np.uint16, "scale_factor": 0.001, "offset": 0.0}},
-                 "wavpix": {"dim": [WL_DIM],
+                 "wavpix": {"dim": [CD_DIM,WL_DIM],
                                           "dtype": np.uint16,
                                           "attributes": {"standard_name": "wavelength pixel",
                                                          "long_name": "Wavelength pixel in L0 data that corresponds to the given wavelength",
                                                          },
                                           "encoding": {'dtype': np.uint16, "scale_factor": 1., "offset": 0.0}},
-                 "gains": {"dim": [WL_DIM],
+                 "gains": {"dim": [CD_DIM,WL_DIM],
                                   "dtype": np.float32,
                                   "attributes": {"standard_name": "gains",
                                                  "long_name": "gains (calibration coefficients)",
@@ -246,13 +248,13 @@ CAL_VARIABLES = {"wavelength": {"dim": [WL_DIM],
                  #                                          "long_name": "random uncertainty on gains (calibration coefficients)",
                  #                                          "units": "mW m^-2 nm^-1 sr^-1"},
                  #                           "encoding": {'dtype': np.uint32, "scale_factor": 0.001, "offset": 0.0}},
-                 "u_systematic_indep_gains": {"dim": [WL_DIM],
+                 "u_systematic_indep_gains": {"dim": [CD_DIM,WL_DIM],
                                            "dtype": np.uint32,
                                            "attributes": {"standard_name": "independent systematic uncertainty on gains",
                                                           "long_name": "the systematic uncertainty component on gains (calibration coefficients) that is not correlated between radiance and irradiance",
                                                           "units": "mW m^-2 nm^-1 sr^-1"},
                                            "encoding": {'dtype': np.uint32, "scale_factor": 0.001, "offset": 0.0}},
-                 "u_systematic_corr_rad_irr_gains": {"dim": [WL_DIM],
+                 "u_systematic_corr_rad_irr_gains": {"dim": [CD_DIM,WL_DIM],
                                            "dtype": np.uint32,
                                            "attributes": {"standard_name": "systematic uncertainty on gains (correlated radiance and irradiance)",
                                                           "long_name": "the systematic uncertainty component on gains (calibration coefficients) that is correlated between radiance and irradiance",
@@ -265,21 +267,21 @@ CAL_VARIABLES = {"wavelength": {"dim": [WL_DIM],
                  #                             "units":"mW m^-2 nm^-1 sr^-1"},
                  #                         "encoding":{'dtype':np.int16,
                  #                                     "scale_factor":0.001,"offset":0.0}},
-                 "corr_systematic_indep_gains":{"dim":[WL_DIM,WL_DIM],
+                 "corr_systematic_indep_gains":{"dim":[CD_DIM,WL_DIM,WL_DIM],
                                                    "dtype":np.int16,"attributes":{
                          "standard_name":"independent correlation matrix of systematic error on gains",
                          "long_name":"Correlation matrix bewtween wavelengths for the systematic error component on gains (calibration coefficients) that is not correlated between radiance and irradiance",
                          "units":"mW m^-2 nm^-1 sr^-1"},"encoding":{'dtype':np.int16,
                                                                     "scale_factor":0.001,
                                                                     "offset":0.0}},
-                 "corr_systematic_corr_rad_irr_gains":{"dim":[WL_DIM,WL_DIM],
+                 "corr_systematic_corr_rad_irr_gains":{"dim":[CD_DIM,WL_DIM,WL_DIM],
                                                           "dtype":np.int16,"attributes":{
                          "standard_name":"correlation matrix of systematic error on gains (correlated radiance and irradiance)",
                          "long_name":"Correlation matrix bewtween wavelengths for the systematic error component on gains (calibration coefficients) that is correlated between radiance and irradiance",
                          "units":"mW m^-2 nm^-1 sr^-1"},"encoding":{'dtype':np.int16,
                                                                     "scale_factor":0.001,
                                                                     "offset":0.0}},
-                 "non_linearity_coefficients": {"dim": [NL_DIM],
+                 "non_linearity_coefficients": {"dim": [ND_DIM,NL_DIM],
                                   "dtype": np.float32,
                                   "attributes": {"standard_name": "non linearity coefficients",
                                                  "long_name": "non linearity coefficients",
