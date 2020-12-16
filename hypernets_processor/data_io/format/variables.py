@@ -31,6 +31,9 @@ WL_DIM = "wavelength"
 CD_DIM = "calibrationdates"
 NL_DIM = "nonlinearcoef"
 ND_DIM = "nonlineardates"
+WC_DIM = "wavcoef"
+WD_DIM = "wavdates"
+
 SERIES_DIM = "series"
 SCAN_DIM = "scan"
 Lu_SCAN_DIM = "scan"
@@ -281,6 +284,12 @@ CAL_VARIABLES = {"wavelengths": {"dim": [CD_DIM,WL_DIM],
                          "units":"mW m^-2 nm^-1 sr^-1"},"encoding":{'dtype':np.int16,
                                                                     "scale_factor":0.001,
                                                                     "offset":0.0}},
+                 "wavelength_coefficients": {"dim": [WD_DIM,WC_DIM],
+                                  "dtype": np.float32,
+                                  "attributes": {"standard_name": "wavelength coefficients",
+                                                 "long_name": "Polynomial coefficients for wavelength scale",
+                                                 "units": "mW m^-2 nm^-1 sr^-1"},
+                                  "encoding": {'dtype': np.float32, "scale_factor": 0.001, "offset": 0.0}},
                  "non_linearity_coefficients": {"dim": [ND_DIM,NL_DIM],
                                   "dtype": np.float32,
                                   "attributes": {"standard_name": "non linearity coefficients",

@@ -44,11 +44,19 @@ class CalibrationConverter:
 
         calibration_data_times=calibration_data_rad["calibrationdates"].values
         nonlin_times=calibration_data_rad["nonlineardates"].values
-        calibration_data_rad=calibration_data_rad.isel(calibrationdates=calibration_data_times[-1])
-        calibration_data_rad=calibration_data_rad.isel(nonlineardates=nonlin_times[-1])
-        calibration_data_irr=calibration_data_irr.isel(calibrationdates=calibration_data_times[-1])
-        calibration_data_irr=calibration_data_irr.isel(nonlineardates=nonlin_times[-1])
-
+        wav_times=calibration_data_rad["wavdates"].values
+        calibration_data_rad=calibration_data_rad.isel(calibrationdates=
+                                                       calibration_data_times[-1])
+        calibration_data_rad = calibration_data_rad.isel(nonlineardates=
+                                                         nonlin_times[-1])
+        calibration_data_rad = calibration_data_rad.isel(wavdates=
+                                                         wav_times[-1])
+        calibration_data_irr=calibration_data_irr.isel(calibrationdates=
+                                                       calibration_data_times[-1])
+        calibration_data_irr=calibration_data_irr.isel(nonlineardates=
+                                                       nonlin_times[-1])
+        calibration_data_irr = calibration_data_irr.isel(wavdates=
+                                                         wav_times[-1])
         if self.context.get_config_value("network") == "l":
             name = "HYPERNETS_CAL_"+hypstar.upper()+"_RAD_SWIR_v"+str(version)+".nc"
             calibration_data_rad_swir = xarray.open_dataset(os.path.join(hypstar_path,name))
@@ -60,10 +68,14 @@ class CalibrationConverter:
                 calibrationdates=calibration_data_times[-1])
             calibration_data_rad_swir = calibration_data_rad_swir.isel(
                 nonlineardates=nonlin_times[-1])
+            calibration_data_rad_swir = calibration_data_rad_swir.isel(
+                wavdates=wav_times[-1])
             calibration_data_irr_swir = calibration_data_irr_swir.isel(
                 calibrationdates=calibration_data_times[-1])
             calibration_data_irr_swir = calibration_data_irr_swir.isel(
                 nonlineardates=nonlin_times[-1])
+            calibration_data_irr_swir = calibration_data_irr_swir.isel(
+                wavdates=wav_times[-1])
             return (calibration_data_rad,
                     calibration_data_irr,
                     calibration_data_rad_swir,
@@ -140,9 +152,23 @@ class CalibrationConverter:
                 gains = np.genfromtxt(calpath)
                 wavs = gains[:,1]
 
+        wavcaldatepaths = [os.path.basename(path) for path in glob.glob(
+            os.path.join(directory,"hypstar_"+str(hypstar)+"/wavelength/*"))]
+        wavcaldates = []
 
-        calibration_data = self.templ.calibration_dataset(wavs,non_linear_cals,
-                                                              caldates,nonlindates)
+        for wavcaldatepath in wavcaldatepaths:
+            wavcaldate = wavcaldatepath
+            wavcalpath = glob.glob(os.path.join(directory,"hypstar_"+str(
+                hypstar)+"\\wavelength\\"+str(wavcaldatepath)+"\\hypstar_"+str(
+                hypstar)+"_wl_coefs_*.dat"))[0]
+            if os.path.exists(wavcalpath):
+                wavcaldates = np.append(wavcaldates,wavcaldate)
+                wav_cals = np.genfromtxt(wavcalpath)[:,0]
+
+
+        calibration_data = self.templ.calibration_dataset(wavs,non_linear_cals,wav_cals,
+                                                    caldates,nonlindates,wavcaldates)
+
 
         i_nonlin=0
         for caldatepath in caldatepaths:
@@ -153,9 +179,26 @@ class CalibrationConverter:
                 non_linear_cals = np.genfromtxt(nonlinpath)[:,0]
                 calibration_data["non_linearity_coefficients"].values[i_nonlin] =  non_linear_cals
                 i_nonlin+=1
-                
-                #calibration_data["u_random_non_linearity_coefficients"].values = None
-                #calibration_data["u_systematic_non_linearity_coefficients"].values = None
+
+        i_wavcoef=0
+        for wavcaldatepath in wavcaldatepaths:
+            wavcaldate = wavcaldatepath
+            wavcalpath = glob.glob(os.path.join(directory,"hypstar_"+str(
+                hypstar)+"\\wavelength\\"+str(wavcaldatepath)+"\\hypstar_"+str(
+                hypstar)+"_wl_coefs_*.dat"))[0]
+            if os.path.exists(wavcalpath):
+                wav_cals = np.genfromtxt(wavcalpath)
+                if measurandstring == "radiance" and not swir:
+                    wav_cals = wav_cals[:,0]
+                if measurandstring == "irradiance" and not swir:
+                    wav_cals = wav_cals[:,1]
+                if measurandstring == "radiance" and swir:
+                    wav_cals=wav_cals[:,2]
+                if measurandstring == "irradiance" and swir:
+                    wav_cals=wav_cals[:,3]
+                calibration_data["wavelength_coefficients"].values[
+                    i_wavcoef] = wav_cals
+                i_wavcoef += 1
 
         i_cal=0
         for caldatepath in caldatepaths:
@@ -221,6 +264,6 @@ class CalibrationConverter:
 
 if __name__ == '__main__':
     context = setup_test_context(archive_directory=path_netcdf)
-    calcov=CalibrationConverter(path_ascii)
+    calcov=CalibrationConverter(context)
     calcov.convert_all_calibration_data()
     teardown_test_context(context)
