@@ -4,6 +4,7 @@ HypernetsDBBuilder class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.database_util import create_template_db
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
 from hypernets_processor.data_io.format.anomalies import ANOMALIES_DICT
 
@@ -124,6 +125,7 @@ class ArchiveDB(dataset.Database):
 
     def __init__(self, url, context):
         self.context = context
+        self.writer = HypernetsWriter(context)
         super().__init__(url)
 
     def archive_product(self, ds, path):
@@ -148,8 +150,8 @@ class ArchiveDB(dataset.Database):
                 sequence_path=self.context.get_config_value("sequence_path"),
                 site_id=ds.attrs["site_id"],
                 system_id=ds.attrs["system_id"],
-                plot_path="",
-                image_path="",
+                plot_path=self.writer.return_plot_directory(),
+                image_path=self.writer.return_image_directory(),
                 solar_zenith_angle_min=ds.attrs["solar_zenith_angle_min"],
                 solar_zenith_angle_max=ds.attrs["solar_zenith_angle_max"],
                 solar_azimuth_angle_min=ds.attrs["solar_azimuth_angle_min"],
