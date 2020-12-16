@@ -71,102 +71,6 @@ class HypernetsProcessor:
         # seq_dir=server_dir+"reader/SEQ20200625T095941/"
         seq_dir = server_dir + seq_id+"/"
 
-        l0_irr, l0_rad, l0_bla = HypernetsReader(self.context).read_sequence(seq_dir)
-        #l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
-        l0_irr["integration_time"].values=1024*np.ones(len(l0_irr["integration_time"]))
-        l0_rad["integration_time"].values = 1024*np.ones(
-            len(l0_rad["integration_time"]))
-        l0_bla["integration_time"].values=1024*np.ones(len(l0_bla["integration_time"]))
-        FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
-        seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ", "")
-        print(seq_id)
-
-        # HYPSTAR_L_GBNA_L1A_RAD_202002041130_v01.0.nc
-        network = "W"
-        site = "VFFR"  # L0_IRR.attrs['site_id']
-        version = "0.0"
-
-        # if L0_IRR:
-        #     # config files?
-        #     # HYPSTAR_L_GBNA_L1A_RAD_202002041130_v01.0.nc
-        #     network = "W"
-        #     site = "VFFR"  # L0_IRR.attrs['site_id']
-        #     version = "0.0"
-        #     time_string = seq_id  # datetime.strptime(seq_id, '%Y%m%dT%H%M%S')
-        #     path = ProductNameUtil().create_product_name("L0_IRR", network=network, site=site,
-        #                                                time=time_string, version=version)
-        #     print(path)
-        #     HypernetsWriter._write_netcdf(L0_IRR, path)
-        #
-        #     data = xarray.open_dataset(path)
-        #     spectra = data['digital_number']
-        #     wvl = data['wavelength']
-        #     plt.clf()
-        #     plt.title("Series ID")
-        #     plt.plot(wvl, spectra)
-        #     plt.legend()
-        #     data.close()
-        #
-        # if L0_RAD:
-        #     # config files?
-        #     # HYPSTAR_L_GBNA_L1A_RAD_202002041130_v01.0.nc
-        #     network = "W"
-        #     site = "VFFR"  # L0_IRR.attrs['site_id']
-        #     version = "0.0"
-        #     time_string = datetime.strptime(seq_id, '%Y%m%dT%H%M%S')
-        #     path = ProductNameUtil().create_product_name("L0_RAD", network=network, site=site,
-        #                                                time=time_string, version=version)
-        #     print(path)
-        #     HypernetsWriter._write_netcdf(L0_RAD, path)
-        #
-        #     data = xarray.open_dataset(path)
-        #     spectra = data['digital_number']
-        #     wvl = data['wavelength']
-        #     plt.clf()
-        #     plt.title("Series ID")
-        #     plt.plot(wvl, spectra)
-        #     plt.legend()
-        #     plt.show()
-        #     data.close()
-        #
-        # if L0_BLA:
-        #     network = "W"
-        #     site = "VFFR"  # L0_IRR.attrs['site_id']
-        #     version = "0.0"
-        #     time_string = seq_id  # datetime.strptime(seq_id, '%Y%m%dT%H%M%S')
-        #     path = ProductNameUtil().create_product_name("L0_BLA",  network=network, site=site,
-        #                                                time=time_string, version=version)
-        #     print(path)
-        #     HypernetsWriter._write_netcdf(L0_BLA, path)
-        #
-        #     data = xarray.open_dataset(path)
-        #     spectra = data['digital_number']
-        #     wvl = data['wavelength']
-        #     plt.clf()
-        #     plt.title("Series ID")
-        #     plt.plot(wvl, spectra)
-        #     plt.legend()
-        #     plt.show()
-        #     data.close()
-
-        # l0_bla = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_BLA", time=seq_id)+".nc")
-        # l0_rad = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_RAD", time=seq_id)+".nc")
-        # l0_irr = xr.open_dataset("../examples/"+ProductNameUtil(self.context).create_product_name(ds_format="L0_IRR", time=seq_id)+".nc")
-
-        #print(datetime.utcfromtimestamp(i) for i in ds_rad['acquisition_time'].values)
-
-        #np.save("wavs_hypernets.npy",ds_rad["wavelength"].values)
-
-        #temp_name = 'test01'
-
-        # context = setup_test_context()
-        # context.write_l1a = False
-        # context.write_l1b = False
-        #
-        # context.network="water"
-        # context.measurement_function_calibrate = "StandardMeasurementFunction"
-        # context.measurement_function_interpolate = "WaterNetworkInterpolationLinear"
-        # context.measurement_function_surface_reflectance = "WaterNetworkProtocol"
 
         calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context, MCsteps=1000)
@@ -175,30 +79,23 @@ class HypernetsProcessor:
         rhymer = RhymerHypstar(self.context)
 
         calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
+
+        l0_irr,l0_rad,l0_bla = HypernetsReader(self.context).read_sequence(seq_dir,calibration_data_rad,calibration_data_irr)
+        #l0_bla["digital_number"].values=l0_bla["digital_number"].values/10.
+        l0_irr["integration_time"].values = 1024*np.ones(len(l0_irr["integration_time"]))
+        l0_rad["integration_time"].values = 1024*np.ones(len(l0_rad["integration_time"]))
+        l0_bla["integration_time"].values = 1024*np.ones(len(l0_bla["integration_time"]))
+        FOLDER_NAME = os.path.join(seq_dir,"RADIOMETER/")
+        seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ","")
+        print(seq_id)
+
         print("L1a")
         t1=time.time()
         L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla, calibration_data_rad)
         L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla, calibration_data_irr)
         print("L1a took: ",t1-time.time())
 
-        # If NAN or INF in spectra: remove spectra or assign FLAG????
 
-        # # QUALITY CHECK: TEMPORAL VARIABILITY IN ED AND LSKY -> ASSIGN FLAG
-        # L1a_rad = RhymerHypstar(context).qc_scan(L1a_rad, measurandstring="radiance", verbosity=10)
-        # L1a_irr = RhymerHypstar(context).qc_scan(L1a_irr, measurandstring="irradiance", verbosity=10)
-        # # QUALITY CHECK: MIN NBR OF SCANS -> ASSIGN FLAG
-        # L1a_uprad, L1a_downrad, L1a_irr = RhymerHypstar(context).cycleparse(L1a_rad, L1a_irr, verbosity=10)
-        #
-        # L1b_downrad = cal.average_l1b("radiance", L1a_downrad)
-        # L1b_irr = cal.average_l1b("irradiance", L1a_irr)
-        #
-        # # print(L1b_downrad)
-        # # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
-        # L1b = intp.interpolate_l1b_w(L1a_uprad, L1b_downrad, L1b_irr, "WaterNetworkInterpolationLinear")
-        #
-        # L1b = rhymer.get_wind(L1b)
-        # L1b = rhymer.get_fresnelrefl(L1b)
-        # L1b = rhymer.get_epsilon(L1b)
         print("L1b")
 
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)

@@ -4024,3 +4024,19 @@
 2020-12-01 10:11:29,775 : INFO : Apply Ruddick et al., 2006
 2020-12-01 10:11:29,776 : INFO : Apply Ruddick et al., 2006
 2020-12-01 10:13:27,284 : INFO : all done!
+2020-12-16 11:51:10,929 : INFO : Spectrum Type Info : Error 
+2020-12-16 11:51:32,797 : INFO : Spectrum Type Info : Error 
+2020-12-16 11:52:54,778 : INFO : Spectrum Type Info : Error 
+2020-12-16 11:59:46,522 : INFO : Spectrum Type Info : Error 
+2020-12-16 12:14:44,423 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 12:14:44,442 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 12:14:44,442 : INFO : Reading Data spectra ...
+2020-12-16 12:14:44,443 : INFO : Reading CRC32 ...
+2020-12-16 12:16:03,817 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 12:16:03,835 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 12:16:03,835 : INFO : Reading Data spectra ...
+2020-12-16 12:16:03,836 : INFO : Reading CRC32 ...
+2020-12-16 12:16:27,311 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 12:16:27,329 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 12:16:27,329 : INFO : Reading Data spectra ...
+2020-12-16 12:16:27,330 : INFO : Reading CRC32 ...
