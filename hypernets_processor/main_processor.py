@@ -22,7 +22,7 @@ import os
 import matplotlib.pyplot as plt
 from datetime import datetime
 from configparser import ConfigParser
-
+import time
 
 import xarray as xr
 import numpy as np
@@ -174,12 +174,12 @@ class HypernetsProcessor:
         surf = SurfaceReflectance(self.context, MCsteps=1000)
         rhymer = RhymerHypstar(self.context)
 
-        calibration_data_rad = calcon.prepare_calibration_data("radiance")
-        calibration_data_irr = calcon.prepare_calibration_data("irradiance")
-
+        calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
+        print("L1a")
+        t1=time.time()
         L1a_rad = cal.calibrate_l1a("radiance", l0_rad, l0_bla, calibration_data_rad)
         L1a_irr = cal.calibrate_l1a("irradiance", l0_irr, l0_bla, calibration_data_irr)
-
+        print("L1a took: ",t1-time.time())
 
         # If NAN or INF in spectra: remove spectra or assign FLAG????
 
@@ -199,6 +199,8 @@ class HypernetsProcessor:
         # L1b = rhymer.get_wind(L1b)
         # L1b = rhymer.get_fresnelrefl(L1b)
         # L1b = rhymer.get_epsilon(L1b)
+        print("L1b")
+
         L1b=rhymer.process_l1b(L1a_rad, L1a_irr)
         #
         # print(L1b["corr_systematic_corr_rad_irr_irradiance"])
