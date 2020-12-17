@@ -80,7 +80,7 @@ class ProductNameUtil:
             network = self.context.get_config_value("network")
 
         if (site is None) and (self.context is not None):
-            site = self.context.get_config_value("site_abbr")
+            site = self.context.get_config_value("site_id")
 
         if (time is None) and (self.context is not None):
             time = self.context.get_config_value("time")
