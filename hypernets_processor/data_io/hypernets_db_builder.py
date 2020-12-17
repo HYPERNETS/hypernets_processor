@@ -45,7 +45,7 @@ def open_database(url, db_format=None, context=None):
 
         if db_format == "archive":
             return ArchiveDB(url, context)
-        elif db_format == "anomoly":
+        elif db_format == "anomaly":
             return AnomolyDB(url, context)
         elif db_format == "metadata":
             return MetadataDB(url, context)
@@ -101,7 +101,7 @@ class HypernetsDBBuilder:
             db.__class__ = ArchiveDB
             db.context = self.context
 
-        elif db_format == "anomoly":
+        elif db_format == "anomaly":
             db.__class__ = AnomolyDB
             db.context = self.context
 
