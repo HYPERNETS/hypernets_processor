@@ -217,6 +217,14 @@ class AnomolyDB(dataset.Database):
             self.context.logger.error(self.anomalies_dict[anomaly_id]["error_msg"])
             raise self.anomalies_dict[anomaly_id]["error"](self.anomalies_dict[anomaly_id]["error_msg"])
 
+    def add_x_anomaly(self):
+        """
+        Adds unexpect error anomaly to anomaly database if expected anomaly not already
+        """
+
+        # todo - add check if expected anomaly already added for sequence
+        self.add_anomaly("x")
+
 
 class MetadataDB(dataset.Database):
     """
