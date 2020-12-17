@@ -28,6 +28,7 @@ def main(settings):
     job_config = read_config_file(JOB_CONFIG_TEMPLATE_PATH)
 
     job_config["Job"]["job_name"] = settings["job_name"]
+    job_config["Job"]["site_id"] = settings["site_id"]
 
     # Create directories (resets with existing if unchanged)
     os.makedirs(settings["job_working_directory"], exist_ok=True)
