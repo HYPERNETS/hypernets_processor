@@ -200,7 +200,7 @@ class AnomolyDB(dataset.Database):
         tbl = self.get_table("anomalies")
         tbl.insert(
             dict(
-                anomoly_id=anomaly_id,
+                anomaly_id=anomaly_id,
                 sequence_name=self.context.get_config_value("sequence_name"),
                 sequence_path=self.context.get_config_value("sequence_path"),
                 site_id=self.context.get_config_value("site_id"),
