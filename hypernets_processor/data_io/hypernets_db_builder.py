@@ -100,10 +100,12 @@ class HypernetsDBBuilder:
         if db_format == "archive":
             db.__class__ = ArchiveDB
             db.context = self.context
+            db.writer = HypernetsWriter(self.context)
 
         elif db_format == "anomaly":
             db.__class__ = AnomolyDB
             db.context = self.context
+            db.anomalies_dict = ANOMALIES_DICT
 
         elif db_format == "metadata":
             db.__class__ = MetadataDB
