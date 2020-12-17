@@ -124,6 +124,7 @@ def main(processor_config_path, job_config_path, to_archive):
             target_sequences_passed += 1
             context.logger.info("Complete")
         except Exception as e:
+            context.anomaly_db.add_anomaly("x")
             logger.error("Failed: " + repr(e))
 
     msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + " sequences processed"

@@ -14,5 +14,10 @@ ANOMALIES_DICT = {
         "description": "angle achieved by pan tilt >5 deg away from target angle during sequence",
         "error": None,
         "error_msg": None
-    }
+    },
+    "x": {
+            "description": "unexpected error during processing",
+            "error": None,
+            "error_msg": None
+        }
 }
