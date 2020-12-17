@@ -130,7 +130,7 @@ def main(processor_config_path, job_config_path, to_archive):
             except Exception as e:
                 logger.error("Failed: " + repr(e))
                 logger.debug(traceback.format_exc())
-                context.anomaly_db.add_anomaly("x")
+                context.anomaly_db.add_x_anomaly()
 
         msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + \
               " sequences successfully processed"
