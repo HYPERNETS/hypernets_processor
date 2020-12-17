@@ -46,6 +46,7 @@ class SequenceProcessor:
         # update context
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
         self.context.set_config_value("site_id", "TEST")
+        self.context.set_config_value("system_id", "220241")
         self.context.set_config_value("sequence_path", sequence_path)
         self.context.set_config_value("sequence_name", os.path.basename(sequence_path))
         writer = HypernetsWriter(self.context)
