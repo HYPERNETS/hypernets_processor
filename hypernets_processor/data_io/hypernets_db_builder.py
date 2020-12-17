@@ -183,12 +183,9 @@ class AnomolyDB(dataset.Database):
         self.anomalies_dict = anomalies_dict
         super().__init__(url)
 
-    def add_anomaly(self, ds, anomaly_id):
+    def add_anomaly(self, anomaly_id):
         """
         Adds anomaly to anomaly database
-
-        :type ds: xarray.dataset
-        :param ds: product to with anomaly
 
         :type anomaly_id: str
         :param anomaly_id: anomaly id, must match name of entry in self.anomalies dict
@@ -206,8 +203,8 @@ class AnomolyDB(dataset.Database):
                 anomoly_id=anomaly_id,
                 sequence_name=self.context.get_config_value("sequence_name"),
                 sequence_path=self.context.get_config_value("sequence_path"),
-                site_id=ds.attrs["site_id"],
-                system_id=ds.attrs["system_id"],
+                site_id=self.context.get_config_value("site_id"),
+                system_id=self.context.get_config_value("system_id"),
                 datetime=self.context.get_config_value("time"),
 
             )
