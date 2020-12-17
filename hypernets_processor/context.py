@@ -37,6 +37,9 @@ class Context:
         self.anomaly_db = None
         self.archive_db = None
 
+        # Set defaults - to be overwritten
+        self.set_defaults()
+
         # Unpack processor_config to set relevant attributes
         if processor_config is not None:
             self.unpack_config(processor_config)
@@ -105,6 +108,14 @@ class Context:
         """
 
         return list(self.config_values.keys())
+
+    def set_defaults(self):
+        """
+        Set defaults config values (to be overwritten by values in configuration files)
+        """
+
+        self.set_config_value("site_id", "TEST")
+        self.set_config_value("system_id", "220241")
 
 
 if __name__ == "__main__":
