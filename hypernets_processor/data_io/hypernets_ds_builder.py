@@ -93,7 +93,7 @@ class HypernetsDSBuilder:
             # Evaluate queries for metadata_db to populate product metadata
             metadata_db_query = None
             if self.context.metadata_db is not None:
-                metadata_db_query = {}
+                metadata_db_query = None
 
         # Set product_name metadata
         pu = ProductNameUtil(context=self.context)
