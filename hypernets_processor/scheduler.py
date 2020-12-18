@@ -97,9 +97,16 @@ class Scheduler:
                     logger.info("Started: " + name)
 
                     try:
-                        result = func(*args, **kwargs)
-                        logger.info("Completed: " + name)
-                        return result
+                        msg = func(*args, **kwargs)
+
+                        log_msg = "Completed: " + name
+                        if type(msg) == str:
+                            log_msg += " (" + msg + ")"
+
+                        logger.info(log_msg)
+
+                        return msg
+
                     except Exception as exception:
 
                         exception_type = type(exception).__name__

@@ -9,7 +9,7 @@ from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.context import Context
 from hypernets_processor.sequence_processor import SequenceProcessor
 import os
-
+import traceback
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -36,7 +36,6 @@ def get_target_sequences(context, to_archive):
     # raw_data_directory may either be a sequence path or directory of sequence paths
 
     raw_paths = []
-    print(context.get_config_value("raw_data_directory"))
 
     if parse_sequence_path(context.get_config_value("raw_data_directory")) is not None:
         raw_paths.append(context.get_config_value("raw_data_directory"))
@@ -52,16 +51,16 @@ def get_target_sequences(context, to_archive):
 
     if to_archive is True:
         processed_products = [
-            product["raw_product_name"]
+            product["sequence_name"]
             for product in context.archive_db["products"].find(
-                site=context.get_config_value("site")
+                site_id=context.get_config_value("site_id")
             )
         ]
 
         failed_products = [
-            product["raw_product_name"]
-            for product in context.anomaly_db["anomalies"].find(
-                site=context.get_config_value("site")
+            anomaly["sequence_name"]
+            for anomaly in context.anomaly_db["anomalies"].find(
+                site_id=context.get_config_value("site_id")
             )
         ]
 
@@ -112,11 +111,30 @@ def main(processor_config_path, job_config_path, to_archive):
 
     # Run processor
     sp = SequenceProcessor(context=context)
+    target_sequences_passed = 0
+    target_sequences_total = len(target_sequences)
 
-    for target_sequence in target_sequences:
-        sp.process_sequence(target_sequence)
+    if target_sequences_total == 0:
+        msg = "No sequences to process"
 
-    return None
+    else:
+        for target_sequence in target_sequences:
+
+            context.logger.info("Processing sequence: " + target_sequence)
+
+            try:
+                sp.process_sequence(target_sequence)
+                target_sequences_passed += 1
+                context.logger.info("Complete")
+            except Exception as e:
+                logger.error("Failed: " + repr(e))
+                logger.debug(traceback.format_exc())
+                context.anomaly_db.add_x_anomaly()
+
+        msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + \
+              " sequences successfully processed"
+
+    return msg
 
 
 if __name__ == "__main__":
