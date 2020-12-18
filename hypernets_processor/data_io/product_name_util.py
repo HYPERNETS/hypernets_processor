@@ -49,7 +49,7 @@ class ProductNameUtil:
         self.context = context
 
     def create_product_name(
-        self, ds_format, network=None, site=None, time=None, version=None):
+        self, ds_format, network=None, site=None, time=None, version=None, swir=None):
         """
         Return a valid product name for Hypernets file
 
@@ -88,6 +88,9 @@ class ProductNameUtil:
         if (version is None) and (self.context is not None):
             version = str(self.context.get_config_value("version"))
 
+        if swir:
+            swir="_SWIR"
+
         # Prepare product name parts
         ptype = DS_FORMAT_FNAMES[ds_format]
 
@@ -100,9 +103,8 @@ class ProductNameUtil:
         version = "v" + version if version is not None else None
 
         # Assemble parts
-        product_name_parts = ["HYPERNETS", network, site, ptype, time_string, version]
+        product_name_parts = ["HYPERNETS", network, site, ptype, time_string, version, swir]
         product_name_parts = filter(None, product_name_parts)
-
         return "_".join(product_name_parts)
 
 
