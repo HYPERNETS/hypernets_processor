@@ -4040,3 +4040,256 @@
 2020-12-16 12:16:27,329 : INFO : Spectrum Type Info : VIS Irr 
 2020-12-16 12:16:27,329 : INFO : Reading Data spectra ...
 2020-12-16 12:16:27,330 : INFO : Reading CRC32 ...
+2020-12-16 13:36:30,608 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:39:13,075 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:29,579 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,135 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,139 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 13:42:53,163 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,163 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,165 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,171 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,171 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,172 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,178 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,178 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,179 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,186 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,186 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,187 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,192 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,192 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,193 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,199 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:42:53,199 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,200 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,238 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 13:42:53,240 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 13:42:53,258 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 13:42:53,258 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,259 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,265 : INFO : Spectrum Type Info : Irr 
+2020-12-16 13:42:53,266 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,267 : INFO : Reading CRC32 ...
+2020-12-16 13:42:53,272 : INFO : Spectrum Type Info : VIS Dark 
+2020-12-16 13:42:53,272 : INFO : Reading Data spectra ...
+2020-12-16 13:42:53,274 : ERROR : Warning : impossible to read 2 bytes
+2020-12-16 13:42:53,274 : INFO : Reading CRC32 ...
+2020-12-16 13:43:47,735 : INFO : Spectrum Type Info : Error 
+2020-12-16 13:43:47,736 : ERROR : The number of wavelength pixels does not match the expected values for VNIR or SWIR.
+2020-12-16 13:51:38,229 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:51:38,231 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 13:51:38,263 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:51:38,264 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,266 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,274 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:51:38,274 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,276 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,285 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:51:38,285 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,287 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,295 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:51:38,295 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,297 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,305 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:51:38,305 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,306 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,314 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:51:38,314 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,316 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,371 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 13:51:38,373 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 13:51:38,397 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 13:51:38,397 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,399 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,407 : INFO : Spectrum Type Info : Irr 
+2020-12-16 13:51:38,407 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,408 : INFO : Reading CRC32 ...
+2020-12-16 13:51:38,417 : INFO : Spectrum Type Info : VIS Dark 
+2020-12-16 13:51:38,417 : INFO : Reading Data spectra ...
+2020-12-16 13:51:38,419 : ERROR : Warning : impossible to read 2 bytes
+2020-12-16 13:51:38,419 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,685 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:10,687 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 13:55:10,717 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:10,717 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,718 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,726 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:10,727 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,732 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,740 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:10,740 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,742 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,751 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:10,751 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,752 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,761 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:10,761 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,763 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,770 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:10,770 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,772 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,823 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 13:55:10,825 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 13:55:10,847 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 13:55:10,847 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,848 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,856 : INFO : Spectrum Type Info : Irr 
+2020-12-16 13:55:10,856 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,857 : INFO : Reading CRC32 ...
+2020-12-16 13:55:10,864 : INFO : Spectrum Type Info : VIS Dark 
+2020-12-16 13:55:10,864 : INFO : Reading Data spectra ...
+2020-12-16 13:55:10,865 : ERROR : Warning : impossible to read 2 bytes
+2020-12-16 13:55:10,865 : INFO : Reading CRC32 ...
+2020-12-16 13:55:27,722 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:27,724 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 13:55:27,758 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 13:55:27,758 : INFO : Reading Data spectra ...
+2020-12-16 13:55:27,768 : INFO : Spectrum Type Info : Error 
+2020-12-16 13:55:27,768 : INFO : Reading Data spectra ...
+2020-12-16 13:55:27,772 : ERROR : Warning : impossible to read 2 bytes
+2020-12-16 16:48:24,756 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 16:48:24,768 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 16:48:44,062 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 16:48:44,064 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 16:58:14,437 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 16:58:14,440 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 16:58:14,498 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 16:58:14,498 : INFO : Reading Data spectra ...
+2020-12-16 16:58:14,521 : ERROR : Spectra length not similar to header length
+2020-12-16 16:58:14,521 : ERROR : Data corrupt go to next line
+2020-12-16 16:58:14,523 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 16:58:14,523 : INFO : Reading Data spectra ...
+2020-12-16 16:58:14,540 : ERROR : Spectra length not similar to header length
+2020-12-16 16:58:14,540 : ERROR : Data corrupt go to next line
+2020-12-16 16:58:14,659 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 16:58:14,662 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 16:58:14,704 : INFO : Spectrum Type Info : Irr 
+2020-12-16 16:58:14,704 : INFO : Reading Data spectra ...
+2020-12-16 16:58:14,715 : INFO : Spectrum Type Info : Error 
+2020-12-16 16:58:14,716 : INFO : Reading Data spectra ...
+2020-12-16 16:58:14,720 : ERROR : Warning : impossible to read 2 bytes
+2020-12-16 17:04:48,636 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:04:48,638 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:04:48,700 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:04:48,701 : INFO : Reading Data spectra ...
+2020-12-16 17:04:48,713 : ERROR : Spectra length not similar to header length
+2020-12-16 17:04:48,713 : ERROR : Data corrupt go to next line
+2020-12-16 17:04:48,715 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:04:48,715 : INFO : Reading Data spectra ...
+2020-12-16 17:04:48,727 : ERROR : Spectra length not similar to header length
+2020-12-16 17:04:48,728 : ERROR : Data corrupt go to next line
+2020-12-16 17:04:48,816 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:04:48,818 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:04:48,861 : INFO : Spectrum Type Info : Irr 
+2020-12-16 17:04:48,861 : INFO : Reading Data spectra ...
+2020-12-16 17:04:48,878 : INFO : Spectrum Type Info : Error 
+2020-12-16 17:04:48,878 : INFO : Reading Data spectra ...
+2020-12-16 17:04:48,884 : ERROR : Warning : impossible to read 2 bytes
+2020-12-16 17:05:49,586 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:05:49,588 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:05:49,632 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:05:49,632 : INFO : Reading Data spectra ...
+2020-12-16 17:05:49,658 : ERROR : Spectra length not similar to header length
+2020-12-16 17:05:49,659 : ERROR : Data corrupt go to next line
+2020-12-16 17:05:49,660 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:05:49,660 : INFO : Reading Data spectra ...
+2020-12-16 17:05:49,674 : ERROR : Spectra length not similar to header length
+2020-12-16 17:05:49,674 : ERROR : Data corrupt go to next line
+2020-12-16 17:05:49,734 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:05:49,736 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:05:49,762 : INFO : Spectrum Type Info : Irr 
+2020-12-16 17:05:49,762 : INFO : Reading Data spectra ...
+2020-12-16 17:05:49,773 : INFO : Spectrum Type Info : Error 
+2020-12-16 17:05:49,773 : INFO : Reading Data spectra ...
+2020-12-16 17:05:49,777 : ERROR : Warning : impossible to read 2 bytes
+2020-12-16 17:08:43,328 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:08:43,331 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:09:22,719 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:09:22,724 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:09:54,862 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:09:54,864 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:09:54,952 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:09:54,954 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:10:31,337 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:10:31,338 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:10:31,439 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:10:31,441 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:11:48,513 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:11:48,515 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:11:48,619 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:11:48,620 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:12:50,144 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:12:50,157 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:12:50,299 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:12:50,301 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:13:21,705 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:13:21,707 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:13:21,818 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:13:21,820 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:13:46,524 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:13:46,526 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:13:46,648 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:13:46,649 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:21:08,294 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:21:08,296 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:21:08,465 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:21:08,468 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:21:43,823 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:21:43,825 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:21:43,860 : INFO : Reading CRC32 ...
+2020-12-16 17:21:43,871 : INFO : Reading CRC32 ...
+2020-12-16 17:21:59,542 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:21:59,545 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:21:59,694 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:21:59,696 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:22:20,809 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:22:20,811 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:22:20,960 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:22:20,961 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:40:05,305 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:40:05,307 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:40:05,447 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:40:05,450 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:43:05,982 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:43:05,985 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:43:06,121 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:43:06,123 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:43:50,530 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:43:50,533 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:43:50,673 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:43:50,675 : INFO : Visible spectra, pixel count range(0, 2048)
+2020-12-16 17:45:15,799 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:45:15,942 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:45:32,531 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:45:32,675 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:46:27,385 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:46:27,391 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 17:46:27,534 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:46:27,539 : INFO : Wavelength range: 167.54620361328125 -1149.0724415753868
+2020-12-16 17:48:52,572 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:48:52,576 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 17:49:20,290 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:49:20,294 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 17:49:20,417 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:49:20,420 : INFO : Wavelength range: 167.54620361328125 -1149.0724415753868
+2020-12-16 17:51:26,156 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:51:26,159 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 17:51:26,267 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:51:26,270 : INFO : Wavelength range: 167.54620361328125 -1149.0724415753868
+2020-12-16 17:52:40,189 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:52:40,194 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 17:52:40,306 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:52:40,311 : INFO : Wavelength range: 167.54620361328125 -1149.0724415753868
+2020-12-16 17:58:06,589 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 17:58:06,592 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 17:58:06,736 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 17:58:06,739 : INFO : Wavelength range: 167.54620361328125 -1149.0724415753868
+2020-12-16 18:25:19,390 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 18:25:19,403 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 18:25:19,850 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 18:25:19,860 : INFO : Wavelength range: 167.54620361328125 -1149.0724415753868
+2020-12-16 18:33:44,046 : INFO : Spectrum Type Info : VIS Irr 
+2020-12-16 18:33:44,050 : INFO : Wavelength range: 167.11569213867188 -1148.9729315770555
+2020-12-16 18:33:44,201 : INFO : Spectrum Type Info : VIS Rad 
+2020-12-16 18:33:44,203 : INFO : Wavelength range: 167.54620361328125 -1149.0724415753868

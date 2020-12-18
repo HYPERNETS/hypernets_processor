@@ -15,6 +15,8 @@ from pysolar.solar import *
 
 from hypernets_processor.data_io.format.header import HEADER_DEF
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.spectrum import Spectrum
+
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil as du
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
@@ -139,29 +141,18 @@ class HypernetsReader:
         data = f.read(datalength)
         unpackData, = unpack('<I', data)
 
-    def read_wavelength(self, pixcount, cal_data, cal_data_swir):
-        pix=range(pixcount)
-        if pixcount == 2048:
-            wav_coef_vnir = np.poly1d(np.flip(wav_coef[:,0]))
-            wav_coef_swir = np.poly1d(np.flip(wav_coef[:,2]))
+    def read_wavelength(self, pixcount, cal_data):
 
-            self.context.logger.info("Visible spectra, pixel count {}".format(pix))
-            cc = self.cc_vis
-            # or rather have it estimated only once for vis and swir?
-            wvl = float(cc['mapping_vis_a']) + pix * float(cc['mapping_vis_b']) + pix ** 2 * float(
-                cc['mapping_vis_c'])
-            +pix ** 3 * float(cc['mapping_vis_d']) + pix ** 4 * float(cc['mapping_vis_e'])
-            +pix ** 5 * float(cc['mapping_vis_f'])
-            self.context.logger.info("Wavelength range:", min(wvl), "-", max(wvl))
-        elif pixcount == 256:
-            file = '/home/cgoyens/OneDrive/BackUpThinkpadClem/Projects/HYPERNETS/NetworkDesign_D52/DataProcChain/hypernets_processor/hypernets_processor/data_io/tests/reader/SWIR_wvl'
-            self.context.logger.info("SWIR spectra, pixel count {}".format(pix))
-            # or rather have it estimated only once for vis and swir?
-            wvl = np.loadtxt(file, delimiter="\t")
+        pix=range(pixcount)
+        wav_coef=cal_data["wavelength_coefficients"]
+        wav_coef_func = np.poly1d(np.flip(wav_coef))
+
+        wvl=wav_coef_func(pix)
+        self.context.logger.info("Wavelength range: %s -%s"%(min(wvl), max(wvl)))
 
         return wvl
 
-    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data=None, cal_data_swir=None):
+    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -199,7 +190,7 @@ class HypernetsReader:
 
         # wvl dimensions
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
-        f = open(FOLDER_NAME + series[1], "rb")
+        f = open(FOLDER_NAME + series[0], "rb")
 
         # Header definition with length, description and decoding format
         header = self.read_header(f, HEADER_DEF)
@@ -210,7 +201,13 @@ class HypernetsReader:
         #     print("Data corrupt go to next line")
         #     header = self.read_header(f, HEADER_DEF)
 
-        wvl = self.read_wavelength(pixCount,cal_data, cal_data_swir)
+        if pixCount==2048:
+            wvl = self.read_wavelength(pixCount,cal_data)
+        elif pixCount==256:
+            wvl = self.read_wavelength(pixCount,cal_data_swir)
+        else:
+            self.context.logger.error("The number of wavelength pixels does not match "
+                                      "the expected values for VNIR or SWIR.")
 
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
@@ -259,90 +256,108 @@ class HypernetsReader:
             # -----------------------
             # read the file
             # -----------------------
-            f = open(FOLDER_NAME + spectra, "rb")
+            with open(FOLDER_NAME+spectra,"rb") as f:
+                f.seek(0,2)
+                file_size = f.tell()
+                f.seek(0)
+                print('file size: {}'.format(file_size))
+                byte_pointer = 0
+                chunk_size = 1
+                chunk_counter = 1
+                while file_size-byte_pointer:
+                    print('Parsing chunk No {}, size {} bytes, bytes left: {}'.format(
+                        chunk_counter,chunk_size,file_size-byte_pointer))
+                    chunk_size = unpack('<H',f.read(2))[0]
+                    if chunk_size == 4119:
+                        chunk_size = 4131
+                    f.seek(byte_pointer)
+                    chunk_body = f.read(chunk_size)
+                    spectrum = Spectrum.parse_raw(chunk_body)
+                    spectrum.print_header()
+                    print(spectra,scan_number,pixCount,chunk_size,len(spectrum.body))
+                    byte_pointer = f.tell()
+                    chunk_counter += 1
 
-            nextLine = True
-            while nextLine:
-                # if no header comment those lines
-                header = self.read_header(f, HEADER_DEF)
-                if bool(header) == False:
-                    self.context.logger.error("Data corrupt go to next line")
-                    break
-                    continue
-                # -------------------------------------------------------
-                pixCount = header['Pixel Count']
-                scan = self.read_data(f, pixCount)
-                # should include this back again when crc32 is in the headers!
-                crc32 = self.read_footer(f, 4)
+                    # if no header comment those lines
+                    # header = self.read_header(f, HEADER_DEF)
+                    # if bool(header) == False:
+                    #     self.context.logger.error("Data corrupt go to next line")
+                    #     break
+                    #     continue
+                    # # -------------------------------------------------------
+                    #pixCount = spectrum.header.pixel_count
+                    scan = spectrum.body
+                    # should include this back again when crc32 is in the headers!
+                    #crc32 = self.read_footer(f, 4)
 
-                # HypernetsReader(self.context).plot_spectra(spectra, scan)
+                    # HypernetsReader(self.context).plot_spectra(spectra, scan)
 
-                # fill in dataset
-                # maybe xarray has a better way to do - check merge, concat, ...
-                series_id = model['series_id']
-                ds["series_id"][scan_number] = series_id
-                ds["viewing_azimuth_angle"][scan_number] = model['vaa']
-                ds["viewing_zenith_angle"][scan_number] = model['vza']
+                    # fill in dataset
+                    # maybe xarray has a better way to do - check merge, concat, ...
+                    series_id = model['series_id']
+                    ds["series_id"][scan_number] = series_id
+                    ds["viewing_azimuth_angle"][scan_number] = model['vaa']
+                    ds["viewing_zenith_angle"][scan_number] = model['vza']
 
-                # estimate time based on timestamp
-                ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
-                #            #print(datetime.fromtimestamp(acquisitionTime))
+                    # estimate time based on timestamp
+                    ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
+                    #            #print(datetime.fromtimestamp(acquisitionTime))
 
-                #             # didn't use acquisition time from instrument
-                #             # possibility that acquisition time is time since reboot, but how to now reboot time?
-                #             # if we use the metadata time header
-                #             timestamp=header['acquisition_time']
-                #             ts = int(timestamp)/1000
+                    #             # didn't use acquisition time from instrument
+                    #             # possibility that acquisition time is time since reboot, but how to now reboot time?
+                    #             # if we use the metadata time header
+                    #             timestamp=header['acquisition_time']
+                    #             ts = int(timestamp)/1000
 
-                #             date_time_str = timereboot+'UTC'
-                #             print(date_time_str)
-                #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
-                #             print(date_time_obj)
+                    #             date_time_str = timereboot+'UTC'
+                    #             print(date_time_str)
+                    #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
+                    #             print(date_time_obj)
 
-                #             timereboot = datetime.timestamp(date_time_obj)
-                #             print("timereboot =", timereboot)
-                #             print(datetime.fromtimestamp(timereboot))
+                    #             timereboot = datetime.timestamp(date_time_obj)
+                    #             print("timereboot =", timereboot)
+                    #             print(datetime.fromtimestamp(timereboot))
 
-                #             print(datetime.fromtimestamp(int(ts+timereboot)))
-                #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
-                if lat is not None:
-                    ds.attrs["site_latitude"] = lat
-                    ds.attrs["site_longitude"] = lon
-                    ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
-                    ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
-                else:
-                    self.context.logger.error(
-                        "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
-                ds['quality_flag'][scan_number] = flag
-                ds['integration_time'][scan_number] = header['integration_time']
-                ds['temperature'][scan_number] = header['temperature']
+                    #             print(datetime.fromtimestamp(int(ts+timereboot)))
+                    #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
+                    if lat is not None:
+                        ds.attrs["site_latitude"] = lat
+                        ds.attrs["site_longitude"] = lon
+                        ds["solar_zenith_angle"][scan_number] = get_altitude(float(lat), float(lon), acquisitionTime)
+                        ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
+                    else:
+                        self.context.logger.error(
+                            "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
+                    ds['quality_flag'][scan_number] = flag
+                    ds['integration_time'][scan_number] = header['integration_time']
+                    ds['temperature'][scan_number] = header['temperature']
 
-                # accelaration:
-                # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
-                # acceleration measurements respectively. These are factory-calibrated steady-state
-                # reference acceleration measurements of the gravity vector when instrument is in
-                # horizontal position. Due to device manufacturing tolerances, these are
-                # device-specific and should be applied, when estimating tilt from the measured
-                # acceleration data. Each measurement is bit count of full range ±19.6 m s−2 .
-                # Acceleration for each axis can be calculated per Eq. (4).
+                    # accelaration:
+                    # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
+                    # acceleration measurements respectively. These are factory-calibrated steady-state
+                    # reference acceleration measurements of the gravity vector when instrument is in
+                    # horizontal position. Due to device manufacturing tolerances, these are
+                    # device-specific and should be applied, when estimating tilt from the measured
+                    # acceleration data. Each measurement is bit count of full range ±19.6 m s−2 .
+                    # Acceleration for each axis can be calculated per Eq. (4).
 
-                a = 19.6
-                b = 2 ** 15
-                ds['acceleration_x_mean'][scan_number] = header['acceleration_x_mean'] * a / b
-                ds['acceleration_x_std'][scan_number] = header['acceleration_x_std'] * a / b
-                ds['acceleration_y_mean'][scan_number] = header['acceleration_y_mean'] * a / b
-                ds['acceleration_y_std'][scan_number] = header['acceleration_y_std'] * a / b
-                ds['acceleration_z_mean'][scan_number] = header['acceleration_z_mean'] * a / b
-                ds['acceleration_z_std'][scan_number] = header['acceleration_z_std'] * a / b
-                ds['digital_number'][0:pixCount, scan_number] = scan
+                    a = 19.6
+                    b = 2 ** 15
+                    ds['acceleration_x_mean'][scan_number] = header['acceleration_x_mean'] * a / b
+                    ds['acceleration_x_std'][scan_number] = header['acceleration_x_std'] * a / b
+                    ds['acceleration_y_mean'][scan_number] = header['acceleration_y_mean'] * a / b
+                    ds['acceleration_y_std'][scan_number] = header['acceleration_y_std'] * a / b
+                    ds['acceleration_z_mean'][scan_number] = header['acceleration_z_mean'] * a / b
+                    ds['acceleration_z_std'][scan_number] = header['acceleration_z_std'] * a / b
+                    #ds['digital_number'][0:pixCount, scan_number] = scan
 
-                scan_number += 1
-                if f.tell() == eof:
-                    nextLine = False
+                    scan_number += 1
+                    if f.tell() == eof:
+                        nextLine = False
 
         return ds
 
-    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data=None, cal_data_swir=None):
+    def read_series_W(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data=None, cal_data_swir=None):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -653,6 +668,9 @@ class HypernetsReader:
         seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag = self.read_metadata(
             seq_dir)
 
+        print(seriesIrr)
+        print(seriesRad)
+        print(seriesBlack)
         if seriesIrr:
             l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR", calibration_data_irr,calibration_data_swir_irr)
             if self.context.get_config_value("write_l0"):
