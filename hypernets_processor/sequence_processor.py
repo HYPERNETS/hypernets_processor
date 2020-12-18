@@ -62,8 +62,7 @@ class SequenceProcessor:
             calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
             # Read L0
             self.context.logger.debug("Reading raw data...")
-            seq_dir=self.context.get_config_value("raw_data_directory")
-            l0_irr,l0_rad,l0_bla = reader.read_sequence(seq_dir,calibration_data_rad,calibration_data_irr)
+            l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
@@ -94,15 +93,13 @@ class SequenceProcessor:
 
             # Read L0
             self.context.logger.debug("Reading raw data...")
-            l0_irr,l0_rad,l0_bla,l0_swir_irr,l0_swir_rad,l0_swir_bla = reader.read_sequence(sequence_path)
+            (calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,
+             calibration_data_swir_irr) = calcon.read_calib_files()
+            l0_irr,l0_rad,l0_bla,l0_swir_irr,l0_swir_rad,l0_swir_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,calibration_data_swir_irr)
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
             self.context.logger.debug("Processing to L1a...")
-            (calibration_data_rad,
-             calibration_data_irr,
-             calibration_data_swir_rad,
-             calibration_data_swir_irr)= calcon.read_calib_files()
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
 
