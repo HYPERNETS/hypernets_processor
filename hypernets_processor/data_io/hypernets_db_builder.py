@@ -194,7 +194,7 @@ class AnomolyDB(dataset.Database):
         """
 
         # Check anomaly defined
-        if anomaly_id not in self.anomalies_dict.keys():
+        if anomaly_id not in self.get_anomaly_ids():
             self.context.logger.debug("Unknown anomaly_id (" + anomaly_id + ") - not add to anomaly database")
             return
 
@@ -213,9 +213,11 @@ class AnomolyDB(dataset.Database):
         )
 
         # Exit if anomaly requires error
-        if self.anomalies_dict[anomaly_id]["error"] is not None:
-            self.context.logger.error(self.anomalies_dict[anomaly_id]["error_msg"])
-            raise self.anomalies_dict[anomaly_id]["error"](self.anomalies_dict[anomaly_id]["error_msg"])
+        error = self.get_anomaly_error(anomaly_id)
+        error_msg = self.get_anomaly_error_msg(anomaly_id)
+        if error is not None:
+            self.context.logger.error(error_msg)
+            raise error(error_msg)
 
     def add_x_anomaly(self):
         """
@@ -224,6 +226,111 @@ class AnomolyDB(dataset.Database):
 
         # todo - add check if expected anomaly already added for sequence
         self.add_anomaly("x")
+
+    def get_anomaly_ids(self):
+        """
+        Returns available anomaly ids
+
+        :rtype: list
+        :return: anomaly ids
+        """
+
+        return list(self.anomalies_dict.keys())
+
+    def get_anomaly_error(self, anomaly_id):
+        """
+        Returns error for anomaly id
+
+        :rtype: Error
+        :return: anomaly error
+        """
+
+        return self.anomalies_dict[anomaly_id]["error"]
+
+    def get_anomaly_error_msg(self, anomaly_id):
+        """
+        Returns error msg for anomaly id
+
+        :rtype: list
+        :return: anomaly error msg
+        """
+
+        return self.anomalies_dict[anomaly_id]["error_msg"]
+
+    def get_crashing_anomaly_ids(self):
+        """
+        Returns available anomaly ids that result in crashes
+
+        :rtype: list
+        :return: crashing anomaly ids
+        """
+
+        crashing_anomalies = []
+
+        for anomaly_id in self.get_anomaly_ids():
+            if self.get_anomaly_error(anomaly_id) is not None:
+                crashing_anomalies.append(anomaly_id)
+
+        return crashing_anomalies
+
+    def get_sequence_anomalies(self, sequence_name=None, site_id=None):
+        """
+        Returns anomaly ids of anomalies currently registered for the processed sequence if context attribute is not
+        None, else define of interest
+
+        :type sequence_name: str
+        :param sequence_name: (optional) name of sequence to lookup anomaly ids for, if omitted gets sequence id from
+        context, if avaiable
+
+        :type site_id: str
+        :param site_id: (optional) name of site to lookup anomaly ids for, if omitted gets site id from
+        context, if avaiable
+
+        :rtype: list
+        :return: sequence anomaly ids
+        """
+
+        if self.context is not None:
+            sequence_name = self.context.get_config_value("sequence_name")
+            site_id = self.context.get_config_value("site_id")
+
+        anomalies = [
+            product["anomaly_id"]
+            for product in self.__getitem__("anomalies").find(
+                site_id=site_id,
+                sequence_name=sequence_name,
+            )
+        ]
+
+        return anomalies
+
+    def get_sequence_crashing_anomalies(self, sequence_name=None, site_id=None):
+        """
+        Returns crashing anomaly ids of anomalies currently registered for the processed sequence if context attribute
+        is not None, else define
+
+        :type sequence_name: str
+        :param sequence_name: (optional) name of sequence to lookup anomaly ids for, if omitted gets sequence id from
+        context, if avaiable
+
+        :type site_id: str
+        :param site_id: (optional) name of site to lookup anomaly ids for, if omitted gets site id from
+        context, if avaiable
+
+        :rtype: list
+        :return: sequence crashing anomaly ids
+        """
+
+        if self.context is not None:
+            sequence_name = self.context.get_config_value("sequence_name")
+            site_id = self.context.get_config_value("site_id")
+
+        crashing_sequence_anomalies = []
+        for anomaly_id in self.get_sequence_anomalies(sequence_name, site_id):
+            if anomaly_id in self.get_crashing_anomaly_ids():
+                crashing_sequence_anomalies.append(anomaly_id)
+
+        return crashing_sequence_anomalies
 
 
 class MetadataDB(dataset.Database):
