@@ -56,7 +56,7 @@ def create_template_dataset(variables_dict, dim_sizes_dict, metadata=None, propa
     if metadata is not None:
 
         # Populate metadata from db
-        if metadata_db is not None:
+        if (metadata_db is not None) and (metadata_db_query is not None):
             metadata = TemplateUtil.find_metadata(metadata, metadata_db, metadata_db_query)
 
         ds = TemplateUtil.add_metadata(ds, metadata)
