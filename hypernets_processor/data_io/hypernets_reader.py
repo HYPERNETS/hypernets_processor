@@ -152,7 +152,7 @@ class HypernetsReader:
 
         return wvl
 
-    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir):
+    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -195,7 +195,6 @@ class HypernetsReader:
         # Header definition with length, description and decoding format
         header = self.read_header(f, HEADER_DEF)
         self.context.logger.debug(header)
-        print(header)
         pixCount = header['Pixel Count']
         # if bool(header) == False:
         #     print("Data corrupt go to next line")
@@ -357,7 +356,7 @@ class HypernetsReader:
 
         return ds
 
-    def read_series_W(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data=None, cal_data_swir=None):
+    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data=None, cal_data_swir=None):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -400,13 +399,18 @@ class HypernetsReader:
         # Header definition with length, description and decoding format
         header = self.read_header(f, HEADER_DEF)
         self.context.logger.debug(header)
-        print(header)
         pixCount = header['Pixel Count']
         # if bool(header) == False:
         #     print("Data corrupt go to next line")
         #     header = self.read_header(f, HEADER_DEF)
 
-        wvl = self.read_wavelength(pixCount,cal_data, cal_data_swir)
+        if pixCount == 2048:
+            wvl = self.read_wavelength(pixCount,cal_data)
+        elif pixCount == 256:
+            wvl = self.read_wavelength(pixCount,cal_data_swir)
+        else:
+            self.context.logger.error("The number of wavelength pixels does not match "
+                                      "the expected values for VNIR or SWIR.")
 
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
@@ -668,9 +672,6 @@ class HypernetsReader:
         seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag = self.read_metadata(
             seq_dir)
 
-        print(seriesIrr)
-        print(seriesRad)
-        print(seriesBlack)
         if seriesIrr:
             l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag, "L0_IRR", calibration_data_irr,calibration_data_swir_irr)
             if self.context.get_config_value("write_l0"):
@@ -695,7 +696,7 @@ class HypernetsReader:
             self.context.logger.error("No radiance data for this sequence")
 
         if seriesBlack:
-            l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag, "L0_BLA")
+            l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag, "L0_BLA", calibration_data_rad,calibration_data_swir_rad)
             if self.context.get_config_value("write_l0"):
                 self.writer.write(l0_bla, overwrite=True)
             # if all([os.path.isfile(os.path.join(seq_dir, "RADIOMETER/", f)) for f in seriesBlack]):
