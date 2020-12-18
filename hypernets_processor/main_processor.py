@@ -66,7 +66,6 @@ class HypernetsProcessor:
         # settings_file = set_dir + '/data/settings/default.txt'
         server_dir = os.path.join(this_directory_path,"data_io/tests/reader/")
         seq_id=self.context.get_config_value("sequence_id")
-        print(self.context.get_config_value("write_l0"))
 
         # seq_dir=server_dir+"reader/SEQ20200625T095941/"
         seq_dir = server_dir + seq_id+"/"
@@ -87,7 +86,6 @@ class HypernetsProcessor:
         l0_bla["integration_time"].values = 1024*np.ones(len(l0_bla["integration_time"]))
         FOLDER_NAME = os.path.join(seq_dir,"RADIOMETER/")
         seq_id = os.path.basename(os.path.normpath(seq_dir)).replace("SEQ","")
-        print(seq_id)
 
         print("L1a")
         t1=time.time()
