@@ -40,9 +40,6 @@ class Calibrate:
 
 
         if self.context.get_config_value("plot_l0"):
-            if swir:
-                dataset_l0.attrs['product_name'] = dataset_l0.attrs[
-                                                        'product_name']+"_SWIR"
             self.plot.plot_scans_in_series("digital_number",dataset_l0)
 
         calibrate_function = self._measurement_function_factory.get_measurement_function(
@@ -64,8 +61,6 @@ class Calibrate:
                                                         u_systematic_input_qty_corr,
                                                         corr_systematic_input_qty_indep,
                                                         corr_systematic_input_qty_corr)
-        if swir:
-            dataset_l1a.attrs['product_name']= dataset_l1a.attrs['product_name']+"_SWIR"
 
         if self.context.get_config_value("write_l1a"):
             self.writer.write(dataset_l1a, overwrite=True)

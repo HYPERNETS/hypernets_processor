@@ -23,7 +23,7 @@ import os
 import matplotlib.pyplot as plt
 from datetime import datetime
 from configparser import ConfigParser
-
+import time
 
 import xarray as xr
 import numpy as np
@@ -191,6 +191,7 @@ class HypernetsProcessor:
 
 
         reader = HypernetsReader(self.context)
+        calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context,MCsteps=100)
         surf = SurfaceReflectance(self.context,MCsteps=1000)
 
@@ -209,18 +210,20 @@ class HypernetsProcessor:
 
             #Calibrate to L1a
 
-            calcon = CalibrationConverter(self.context)
-            calibration_data_rad = calcon.prepare_calibration_data("radiance")
-            calibration_data_irr = calcon.prepare_calibration_data("irradiance")
-            calibration_data_swir_rad = calcon.prepare_calibration_data("radiance",swir=True)
-            calibration_data_swir_irr = calcon.prepare_calibration_data("irradiance",swir=True)
+            (calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,
+             calibration_data_swir_irr) = calcon.read_calib_files()
 
             self.context.logger.debug("Processing to L1a...")
+            print("Processing to L1a radiance...")
+            t1=time.time()
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
-
+            t2=time.time()
+            print(t2-t1)
             L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,calibration_data_swir_rad,swir=True)
             L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,calibration_data_swir_irr,swir=True)
+            t3=time.time()
+            print(t3-t2)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1b radiance...")

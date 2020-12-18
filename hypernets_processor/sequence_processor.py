@@ -50,24 +50,20 @@ class SequenceProcessor:
         writer = HypernetsWriter(self.context)
 
         reader = HypernetsReader(self.context)
+        calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=1000)
-
-        calcon = CalibrationConverter(self.context)
-        calibration_data_rad = calcon.prepare_calibration_data("radiance")
-        calibration_data_irr = calcon.prepare_calibration_data("irradiance")
-        calibration_data_swir_rad = calcon.prepare_calibration_data("radiance",swir=True)
-        calibration_data_swir_irr = calcon.prepare_calibration_data("irradiance",
-                                                                    swir=True)
 
         self.context.logger.debug("Processing to L1a...")
 
         if self.context.get_config_value("network") == "w":
             rhymer = RhymerHypstar(self.context)
 
+            calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
             # Read L0
             self.context.logger.debug("Reading raw data...")
-            l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path, calibration_data_rad, calibration_data_irr, calibration_data_swir_rad, calibration_data_swir_irr)
+            seq_dir=self.context.get_config_value("raw_data_directory")
+            l0_irr,l0_rad,l0_bla = reader.read_sequence(seq_dir,calibration_data_rad,calibration_data_irr)
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
@@ -103,6 +99,10 @@ class SequenceProcessor:
 
             # Calibrate to L1a
             self.context.logger.debug("Processing to L1a...")
+            (calibration_data_rad,
+             calibration_data_irr,
+             calibration_data_swir_rad,
+             calibration_data_swir_irr)= calcon.read_calib_files()
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
 
