@@ -406,8 +406,22 @@ class HypernetsReader:
 
         if pixCount == 2048:
             wvl = self.read_wavelength(pixCount,cal_data)
+            # 2. Create template dataset
+            # -----------------------------------
+            dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
+
+            # use template from variables and metadata in format
+            ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
+                                              ds_format=fileformat)
         elif pixCount == 256:
             wvl = self.read_wavelength(pixCount,cal_data_swir)
+            # 2. Create template dataset
+            # -----------------------------------
+            dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
+
+            # use template from variables and metadata in format
+            ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
+                                              ds_format=fileformat,swir=True)
         else:
             self.context.logger.error("The number of wavelength pixels does not match "
                                       "the expected values for VNIR or SWIR.")
@@ -417,12 +431,7 @@ class HypernetsReader:
         eof = f.tell()
         f.close()
 
-        # 2. Create template dataset
-        # -----------------------------------
-        dim_sizes_dict = {"wavelength": len(wvl), "scan": scanDim}
 
-        # use template from variables and metadata in format
-        ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
 
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
