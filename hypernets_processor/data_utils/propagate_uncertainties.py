@@ -163,7 +163,6 @@ class PropagateUnc:
                                      u_systematic_input_quantities_corr,
                                      corr_systematic_input_quantities_indep,
                                      corr_systematic_input_quantities_corr):
-
         datashape = input_quantities[0].shape
         for i in range(len(input_quantities)):
             if len(input_quantities[i].shape) < len(datashape):

@@ -124,7 +124,7 @@ class HypernetsWriter:
                         "archive_directory"
                     )
 
-                    site = self.context.get_config_value("site")
+                    site = self.context.get_config_value("site_id")
                     year = self.context.get_config_value("time").year
                     month = self.context.get_config_value("time").month
                     day = self.context.get_config_value("time").day

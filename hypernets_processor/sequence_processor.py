@@ -59,13 +59,14 @@ class SequenceProcessor:
         if self.context.get_config_value("network") == "w":
             rhymer = RhymerHypstar(self.context)
 
+            calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
             # Read L0
             self.context.logger.debug("Reading raw data...")
-            l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path)
+            seq_dir=self.context.get_config_value("raw_data_directory")
+            l0_irr,l0_rad,l0_bla = reader.read_sequence(seq_dir,calibration_data_rad,calibration_data_irr)
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
-            calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
             self.context.logger.debug("Processing to L1a...")
             L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)

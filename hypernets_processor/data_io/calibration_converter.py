@@ -76,6 +76,7 @@ class CalibrationConverter:
                 nonlineardates=nonlin_times[-1])
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
                 wavdates=wav_times[-1])
+
             return (calibration_data_rad,
                     calibration_data_irr,
                     calibration_data_rad_swir,
@@ -224,7 +225,7 @@ class CalibrationConverter:
                             gains[:,10]**2+gains[:,11]**2+gains[:,12]**2+gains[:,13]**2+
                             gains[:,14]**2+gains[:,15]**2+gains[:,16]**2+gains[:,17]**2+
                             gains[:,19]**2)**0.5/100
-    
+
                 cov_diag = punpy.convert_corr_to_cov(np.eye(len(gains[:,2])),
                                                      gains[:,2]*(gains[:,19])/100)
     
