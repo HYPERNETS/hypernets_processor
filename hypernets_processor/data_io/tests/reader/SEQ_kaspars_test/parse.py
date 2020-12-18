@@ -2,7 +2,7 @@ import struct
 
 import time
 
-from spectrum import Spectrum
+from hypernets_processor.data_io.spectrum import Spectrum
 
 
 def stringifyBinaryToHex(data):
@@ -11,7 +11,7 @@ def stringifyBinaryToHex(data):
 
 if __name__ == '__main__':
 	# NOK: SWIR-IR, VIS-RAD garbles with len 4119
-	with open('01_002_0090_2_0180_192_00_0000_03_0000.spe', 'rb') as f:
+	with open('RADIOMETER/01_002_0090_2_0180_192_00_0000_03_0000.spe', 'rb') as f:
 	# OK: 3x VIS-IR
 	# with open('01_001_0090_2_0180_128_08_0000_03_0000.spe', 'rb') as f:
 	# NOK: VIS-RAD garbles with len 4119
