@@ -224,7 +224,7 @@ class AnomolyDB(dataset.Database):
         Adds unexpect error anomaly to anomaly database if expected anomaly not already
         """
 
-        if self.get_sequence_crashing_anomalies() is []:
+        if self.get_sequence_crashing_anomalies() == []:
             self.add_anomaly("x")
 
     def get_anomaly_ids(self):
