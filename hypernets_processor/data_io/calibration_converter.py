@@ -45,17 +45,17 @@ class CalibrationConverter:
         calibration_data_times=calibration_data_rad["calibrationdates"].values
         nonlin_times=calibration_data_rad["nonlineardates"].values
         wav_times=calibration_data_rad["wavdates"].values
-        calibration_data_rad=calibration_data_rad.isel(calibrationdates=
+        calibration_data_rad=calibration_data_rad.sel(calibrationdates=
                                                        calibration_data_times[-1])
-        calibration_data_rad = calibration_data_rad.isel(nonlineardates=
+        calibration_data_rad = calibration_data_rad.sel(nonlineardates=
                                                          nonlin_times[-1])
-        calibration_data_rad = calibration_data_rad.isel(wavdates=
+        calibration_data_rad = calibration_data_rad.sel(wavdates=
                                                          wav_times[-1])
-        calibration_data_irr=calibration_data_irr.isel(calibrationdates=
+        calibration_data_irr=calibration_data_irr.sel(calibrationdates=
                                                        calibration_data_times[-1])
-        calibration_data_irr=calibration_data_irr.isel(nonlineardates=
+        calibration_data_irr=calibration_data_irr.sel(nonlineardates=
                                                        nonlin_times[-1])
-        calibration_data_irr = calibration_data_irr.isel(wavdates=
+        calibration_data_irr = calibration_data_irr.sel(wavdates=
                                                          wav_times[-1])
         if self.context.get_config_value("network") == "l":
             name = "HYPERNETS_CAL_"+hypstar.upper()+"_RAD_SWIR_v"+str(version)+".nc"
@@ -64,17 +64,17 @@ class CalibrationConverter:
             calibration_data_irr_swir = xarray.open_dataset(os.path.join(hypstar_path,name))
             calibration_data_times = calibration_data_rad_swir["calibrationdates"].values
             nonlin_times = calibration_data_rad_swir["nonlineardates"].values
-            calibration_data_rad_swir = calibration_data_rad_swir.isel(
+            calibration_data_rad_swir = calibration_data_rad_swir.sel(
                 calibrationdates=calibration_data_times[-1])
-            calibration_data_rad_swir = calibration_data_rad_swir.isel(
+            calibration_data_rad_swir = calibration_data_rad_swir.sel(
                 nonlineardates=nonlin_times[-1])
-            calibration_data_rad_swir = calibration_data_rad_swir.isel(
+            calibration_data_rad_swir = calibration_data_rad_swir.sel(
                 wavdates=wav_times[-1])
-            calibration_data_irr_swir = calibration_data_irr_swir.isel(
+            calibration_data_irr_swir = calibration_data_irr_swir.sel(
                 calibrationdates=calibration_data_times[-1])
-            calibration_data_irr_swir = calibration_data_irr_swir.isel(
+            calibration_data_irr_swir = calibration_data_irr_swir.sel(
                 nonlineardates=nonlin_times[-1])
-            calibration_data_irr_swir = calibration_data_irr_swir.isel(
+            calibration_data_irr_swir = calibration_data_irr_swir.sel(
                 wavdates=wav_times[-1])
             return (calibration_data_rad,
                     calibration_data_irr,
@@ -168,8 +168,6 @@ class CalibrationConverter:
 
         calibration_data = self.templ.calibration_dataset(wavs,non_linear_cals,wav_cals,
                                                     caldates,nonlindates,wavcaldates)
-
-
         i_nonlin=0
         for caldatepath in caldatepaths:
             nonlinpath = glob.glob(os.path.join(directory,"hypstar_"+str(
