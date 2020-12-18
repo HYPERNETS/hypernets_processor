@@ -46,10 +46,9 @@ class DataTemplates:
         dataset_cal = dataset_cal.assign_coords(wavelength=wavs)
         dataset_cal = dataset_cal.assign_coords(nonlinearcoef=range(len(nonlinearcals)))
         dataset_cal = dataset_cal.assign_coords(wavcoef=range(len(wavcoef)))
-        dataset_cal = dataset_cal.assign_coords(calibrationtimes=caldates)
-        dataset_cal = dataset_cal.assign_coords(nonlineartimes=nonlineardates)
+        dataset_cal = dataset_cal.assign_coords(calibrationdates=caldates)
+        dataset_cal = dataset_cal.assign_coords(nonlineardates=nonlineardates)
         dataset_cal = dataset_cal.assign_coords(wavdates=wavdates)
-
         return dataset_cal
 
     def l1a_template_from_l0_dataset(self,measurandstring,dataset_l0):

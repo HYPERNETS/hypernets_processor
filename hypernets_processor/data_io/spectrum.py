@@ -1,3 +1,8 @@
+"""
+Spectrum class, written by Kaspars Laizans at Tartu University
+"""
+
+
 import struct
 from enum import Enum
 
@@ -136,9 +141,9 @@ class Spectrum:
 	def parse_raw(cls, data, save_raw=False, slot=0):
 		s = Spectrum()
 		s.header = Spectrum.SpectrumHeader.parse_header(data)
-		# for i in range(s.header.pixel_count):
-		# 	pixel, = struct.unpack('<H', data[31+i*2:33+i*2])
-		# 	s.body.append(pixel)
+		for i in range(s.header.pixel_count):
+			pixel, = struct.unpack('<H', data[31+i*2:33+i*2])
+			s.body.append(pixel)
 		s.crc32 = struct.unpack('<I', data[len(data)-4:])
 		if save_raw:
 			save_path = os.path.join('..', 'specs', 'run1', time.strftime("%Y_%m_%d_T%H%M%S_") + s.header.spectrum_type.optics.name +'_' + str(slot) + '.bin')
