@@ -43,7 +43,7 @@ class HypernetsDSBuilder:
         self.variables_dict_defs = variables_dict_defs
         self.metadata_defs = metadata_defs
 
-    def create_ds_template(self, dim_sizes_dict, ds_format, propagate_ds=None):
+    def create_ds_template(self, dim_sizes_dict, ds_format, propagate_ds=None, swir=False):
         """
         Returns empty Hypernets dataset
 
@@ -97,7 +97,7 @@ class HypernetsDSBuilder:
 
         # Set product_name metadata
         pu = ProductNameUtil(context=self.context)
-        metadata["product_name"] = pu.create_product_name(ds_format)
+        metadata["product_name"] = pu.create_product_name(ds_format,swir=swir)
 
         return create_template_dataset(
             variables_dict,
