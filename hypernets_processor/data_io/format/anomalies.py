@@ -15,6 +15,11 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None
     },
+    "s": {
+            "description": "sequence data incomplete",
+            "error": IOError,
+            "error_msg": "sequence data incomplete (review log for more details)"
+        },
     "x": {
             "description": "unexpected error during processing",
             "error": None,
