@@ -6,7 +6,7 @@ import os
 import re  # for re.split
 from configparser import ConfigParser
 from struct import unpack
-from sys import exit, version_info  # noqa
+from sys import version_info  # noqa
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -667,7 +667,7 @@ class HypernetsReader:
 
         else:
             self.context.logger.error("Missing metadata file in sequence directory - check sequence directory")
-            exit()
+            self.context.anomaly_db.add_anomaly("s")
 
         return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag
 
