@@ -21,14 +21,13 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
-path_ascii = r"c:\users\pdv\pycharmprojects\hypernets_processor\calibration_files_ascii\HYPSTAR_cal"
-path_netcdf = r"c:\users\pdv\pycharmprojects\hypernets_processor\calibration_files\HYPSTAR_cal"
 version=0.1
 
 class CalibrationConverter:
     def __init__(self,context):
-        self.path_ascii=path_ascii
-        self.path_netcdf=path_netcdf
+        dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+        self.path_ascii=os.path.join(dir_path,'calibration_files_ascii\HYPSTAR_cal')
+        self.path_netcdf=os.path.join(dir_path,'calibration_files\HYPSTAR_cal')
         context.set_config_value("product_format","netcdf")
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context)
@@ -262,7 +261,7 @@ class CalibrationConverter:
         return calibration_data
 
 if __name__ == '__main__':
-    context = setup_test_context(archive_directory=path_netcdf)
+    context = setup_test_context()
     calcov=CalibrationConverter(context)
     calcov.convert_all_calibration_data()
     teardown_test_context(context)
