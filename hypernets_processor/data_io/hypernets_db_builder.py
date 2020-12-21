@@ -158,10 +158,10 @@ class ArchiveDB(dataset.Database):
                 solar_zenith_angle_max=ds.attrs["solar_zenith_angle_max"],
                 solar_azimuth_angle_min=ds.attrs["solar_azimuth_angle_min"],
                 solar_azimuth_angle_max=ds.attrs["solar_azimuth_angle_max"],
-                viewing_zenith_angle_min=ds.attrs["viewing_zenith_angle_min"],
-                viewing_zenith_angle_max=ds.attrs["viewing_zenith_angle_max"],
-                viewing_azimuth_angle_min=ds.attrs["viewing_azimuth_angle_min"],
-                viewing_azimuth_angle_max=ds.attrs["viewing_azimuth_angle_max"],
+                # viewing_zenith_angle_min=ds.attrs["viewing_zenith_angle_min"],
+                # viewing_zenith_angle_max=ds.attrs["viewing_zenith_angle_max"],
+                # viewing_azimuth_angle_min=ds.attrs["viewing_azimuth_angle_min"],
+                # viewing_azimuth_angle_max=ds.attrs["viewing_azimuth_angle_max"],
             )
         )
 
