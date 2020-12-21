@@ -26,8 +26,8 @@ version=0.1
 class CalibrationConverter:
     def __init__(self,context):
         dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-        self.path_ascii=os.path.join(dir_path,'calibration_files_ascii\HYPSTAR_cal')
-        self.path_netcdf=os.path.join(dir_path,'calibration_files\HYPSTAR_cal')
+        self.path_ascii=os.path.join(dir_path,'calibration_files_ascii','HYPSTAR_cal')
+        self.path_netcdf=os.path.join(dir_path,'calibration_files','HYPSTAR_cal')
         context.set_config_value("product_format","netcdf")
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context)
