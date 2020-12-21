@@ -25,8 +25,6 @@ version=0.1
 
 class CalibrationConverter:
     def __init__(self,context):
-        path_ascii = r"c:\users\pdv\pycharmprojects\hypernets_processor\calibration_files_ascii\HYPSTAR_cal"
-        path_netcdf = r"c:\users\pdv\pycharmprojects\hypernets_processor\calibration_files\HYPSTAR_cal"
         dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         self.path_ascii=os.path.join(dir_path,'calibration_files_ascii\HYPSTAR_cal')
         self.path_netcdf=os.path.join(dir_path,'calibration_files\HYPSTAR_cal')
