@@ -54,13 +54,6 @@ class SequenceProcessor:
         cal = Calibrate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=1000)
 
-        calcon = CalibrationConverter(self.context)
-        calibration_data_rad = calcon.prepare_calibration_data("radiance")
-        calibration_data_irr = calcon.prepare_calibration_data("irradiance")
-        calibration_data_swir_rad = calcon.prepare_calibration_data("radiance",swir=True)
-        calibration_data_swir_irr = calcon.prepare_calibration_data("irradiance",
-                                                                    swir=True)
-
         self.context.logger.debug("Processing to L1a...")
 
         if self.context.get_config_value("network") == "w":
