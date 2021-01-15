@@ -33,6 +33,9 @@ def configure_parser():
     parser.add_argument("-n", "--job-name", action="store", required=True,
                         help="Job name")
 
+    parser.add_argument("-s", "--site-id", action="store", required=True,
+                        help="Site ID (four letter abbreviation)")
+
     parser.add_argument("-w", "--job-working-directory", action="store", required=True,
                         help="Working directory of job (will write config here)")
 
@@ -56,6 +59,7 @@ def cli():
 
     settings = dict()
     settings["job_name"] = parsed_args.job_name
+    settings["site_id"] = parsed_args.site_id
     settings["job_working_directory"] = parsed_args.job_working_directory
     settings["raw_data_directory"] = parsed_args.raw_data_directory
     settings["add_to_scheduler"] = parsed_args.add_to_scheduler

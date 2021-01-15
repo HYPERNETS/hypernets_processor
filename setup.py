@@ -85,7 +85,7 @@ setup(
     name="hypernets_processor",
     version=__version__,
     description="Software for processing Hypernets field data",
-    authors=["Sam Hunt", "Clemence Goyens"],
+    authors=["Sam Hunt", "Pieter De Vis", "Clemence Goyens"],
     long_description=long_description,
     author_email="sam.hunt@npl.co.uk",
     url="http://hypernets.eu",
@@ -110,6 +110,7 @@ setup(
         "matplotlib",
         "pysolar",
         "dataset",
+        "sqlalchemy==1.3.20",
         "sqlalchemy-utils",
         "punpy",
         "freezegun"

@@ -4,6 +4,7 @@ Tests for Calibrate class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,10 +24,7 @@ class Plotting():
     def __init__(self,context,path=None):
         self.context = context
         if path is None:
-            if self.context.get_config_value("plotting_directory") is not None:
-                self.path = self.context.get_config_value("plotting_directory")
-            else:
-                self.path = os.path.join(self.context.get_config_value("archive_directory"),"plots")
+            self.path = HypernetsWriter(context).return_plot_directory()
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         pass

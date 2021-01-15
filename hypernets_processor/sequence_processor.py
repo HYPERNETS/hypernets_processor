@@ -13,6 +13,7 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.data_io.calibration_converter import CalibrationConverter
 
+import os
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -42,31 +43,26 @@ class SequenceProcessor:
         Processes sequence file
         """
 
-        self.context.logger.info("Processing sequence: " + sequence_path)
-
         # update context
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
-        self.context.set_config_value("site_abbr", "TEST")
+        self.context.set_config_value("sequence_path", sequence_path)
+        self.context.set_config_value("sequence_name", os.path.basename(sequence_path))
+        writer = HypernetsWriter(self.context)
 
         reader = HypernetsReader(self.context)
+        calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=1000)
-
-        calcon = CalibrationConverter(self.context)
-        calibration_data_rad = calcon.prepare_calibration_data("radiance")
-        calibration_data_irr = calcon.prepare_calibration_data("irradiance")
-        calibration_data_swir_rad = calcon.prepare_calibration_data("radiance",swir=True)
-        calibration_data_swir_irr = calcon.prepare_calibration_data("irradiance",
-                                                                    swir=True)
 
         self.context.logger.debug("Processing to L1a...")
 
         if self.context.get_config_value("network") == "w":
             rhymer = RhymerHypstar(self.context)
 
+            calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
             # Read L0
             self.context.logger.debug("Reading raw data...")
-            l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path, calibration_data_rad, calibration_data_irr, calibration_data_swir_rad, calibration_data_swir_irr)
+            l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
@@ -97,7 +93,9 @@ class SequenceProcessor:
 
             # Read L0
             self.context.logger.debug("Reading raw data...")
-            l0_irr,l0_rad,l0_bla,l0_swir_irr,l0_swir_rad,l0_swir_bla = reader.read_sequence(sequence_path)
+            (calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,
+             calibration_data_swir_irr) = calcon.read_calib_files()
+            l0_irr,l0_rad,l0_bla,l0_swir_irr,l0_swir_rad,l0_swir_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,calibration_data_swir_irr)
             self.context.logger.debug("Done")
 
             # Calibrate to L1a
@@ -129,8 +127,6 @@ class SequenceProcessor:
 
         else:
             raise NameError("Invalid network: " + self.context.get_config_value("network"))
-
-        self.context.logger.info("All Done")
 
         return None
 

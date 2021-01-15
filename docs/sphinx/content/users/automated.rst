@@ -69,11 +69,12 @@ In the context of the `hypernets_processor`, processing a particular data stream
 
 To initialise a new job to run in the processor, run the following::
 
-   $ hypernets_processor_job_init -n <job_name> -w <job_working directory> -i <raw_data_directory> --add-to-scheduler
+   $ hypernets_processor_job_init -n <job_name> -s <site_id> -w <job_working directory> -i <raw_data_directory> --add-to-scheduler
 
 where:
 
-* `job_name` - is the name of the job within the context of the hypernets processor (could, for example, be set as the site name)
+* `job_name` - is the name of the job within the context of the hypernets processor (could, for example, be set as the site name).
+* `site_id` - four letter abbreviation of site name, as defined in format definition document.
 * `job_working_directory` - the working directory of the job. A job configuration file is created in this directory, called `<job_name>.config`.
 * `raw_data_directory` - the directory the field data is synced to.
 * `add_to_scheduler` - option to add the job to the list of scheduled jobs, should be set.
