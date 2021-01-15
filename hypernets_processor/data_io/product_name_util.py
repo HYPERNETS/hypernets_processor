@@ -49,7 +49,7 @@ class ProductNameUtil:
         self.context = context
 
     def create_product_name(
-        self, ds_format, network=None, site=None, time=None, version=None):
+        self, ds_format, network=None, site_id=None, time=None, version=None):
         """
         Return a valid product name for Hypernets file
 
@@ -62,8 +62,8 @@ class ProductNameUtil:
         :type network: str
         :param network: (optional, overrides value in context) abbreviated network name
 
-        :type site: str
-        :param site: (optional, overrides value in context) abbreviated site name
+        :type site_id: str
+        :param site_id: (optional, overrides value in context) abbreviated site name
 
         :type time: datetime.datetime
         :param time: (optional, overrides value in context) acquisition time
@@ -79,8 +79,8 @@ class ProductNameUtil:
         if (network is None) and (self.context is not None):
             network = self.context.get_config_value("network")
 
-        if (site is None) and (self.context is not None):
-            site = self.context.get_config_value("site_abbr")
+        if (site_id is None) and (self.context is not None):
+            site_id = self.context.get_config_value("site_id")
 
         if (time is None) and (self.context is not None):
             time = self.context.get_config_value("time")
@@ -96,11 +96,13 @@ class ProductNameUtil:
 
         time_string = time.strftime(TIME_FMT_L12A) if time is not None else None
         network = network.upper() if network is not None else None
-        site = site.upper() if network is not None else None
+        site_id = site_id.upper() if site_id is not None else None
         version = "v" + version if version is not None else None
 
+        today_time_string = datetime.now().strftime(TIME_FMT_L12A)
         # Assemble parts
-        product_name_parts = ["HYPERNETS", network, site, ptype, time_string, version]
+        product_name_parts = ["HYPERNETS", network, site_id, ptype, time_string, today_time_string, version]
+        product_name_parts = [p for p in product_name_parts if p is not None]
         product_name_parts = filter(None, product_name_parts)
 
         return "_".join(product_name_parts)
