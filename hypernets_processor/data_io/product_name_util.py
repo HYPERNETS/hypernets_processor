@@ -71,6 +71,9 @@ class ProductNameUtil:
         :type version: str
         :param version: (optional, overrides value in context) processing version
 
+        :type swir: bool
+        :param swir: if swir file
+
         :return: product name
         :rtype: str
         """
@@ -103,9 +106,9 @@ class ProductNameUtil:
         version = "v" + version if version is not None else None
 
         today_time_string = datetime.now().strftime(TIME_FMT_L12A)
+
         # Assemble parts
         product_name_parts = ["HYPERNETS", network, site_id, ptype, time_string, today_time_string, version, swir]
-        product_name_parts = [p for p in product_name_parts if p is not None]
         product_name_parts = filter(None, product_name_parts)
         return "_".join(product_name_parts)
 
