@@ -218,7 +218,7 @@ class HypernetsReader:
         dim_sizes_dict = {"wavelength": len(wvl), "scan": scanDim}
 
         # use template from variables and metadata in format
-        ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat)
+        ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat,lat=lat, lon=lon, source=str(seq_dir))
 
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
@@ -432,7 +432,7 @@ class HypernetsReader:
         f.close()
 
 
-
+        ds.attrs["source_file"]= str(os.path.basename(seq_dir))
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
         ds["scan"] = np.linspace(1, scanDim, scanDim)
@@ -634,17 +634,12 @@ class HypernetsReader:
             # check for radiance and irradiance series within the metadata
             series_all = metadata.sections()[1:len(metadata)]
             seriesName = []
+            seriesPict = []
             for i in series_all:
                 seriesattr = dict(metadata[i])
                 seriesName.extend(list(name for name in seriesattr if '.spe' in name))
-            # ----------------
-            # Remove pictures from list of series
-            # ----------------
-            # this could possibly change if action for pictures is included within the filename??
-            seriesPict = [name for name in seriesName if '.jpg' in name]
-            # remove pictures from list
-            for name in seriesPict:
-                seriesName.remove(name)
+                seriesPict.extend(list(name for name in seriesattr if '.jpg' in name))
+
 
             # ----------------
             # Make list per action
