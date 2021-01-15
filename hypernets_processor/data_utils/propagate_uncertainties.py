@@ -163,13 +163,12 @@ class PropagateUnc:
                                      u_systematic_input_quantities_corr,
                                      corr_systematic_input_quantities_indep,
                                      corr_systematic_input_quantities_corr):
-
         datashape = input_quantities[0].shape
         for i in range(len(input_quantities)):
             if len(input_quantities[i].shape) < len(datashape):
                 if input_quantities[i].shape[0]==datashape[1]:
                     input_quantities[i] = np.tile(input_quantities[i],(datashape[0],1))
-                else:
+                elif input_quantities[i].shape[0]==datashape[0]:
                     input_quantities[i] = np.tile(input_quantities[i],(datashape[1],1)).T
 
             if u_random_input_quantities[i] is not None:
@@ -181,20 +180,22 @@ class PropagateUnc:
             if u_systematic_input_quantities_corr[i] is not None:
                 if len(u_systematic_input_quantities_corr[i].shape) < len(datashape):
                     u_systematic_input_quantities_corr[i] = np.tile(u_systematic_input_quantities_corr[i], (datashape[1], 1)).T
-
+        param_fixed=[]
+        for i in range(len(input_quantities)):
+            param_fixed.append(input_quantities[i].shape != input_quantities[0].shape)
         measurand = measurement_function(*input_quantities)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
-                                                            u_random_input_quantities,repeat_dims=1)
+                                                            u_random_input_quantities,repeat_dims=[1],param_fixed=param_fixed)
             u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
                 measurement_function,input_quantities,u_systematic_input_quantities_indep,
                 corr_x=corr_systematic_input_quantities_indep,return_corr=True,
-                repeat_dims=1,corr_axis=0,fixed_corr_var=True)
+                repeat_dims=[1],corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
             u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
                 measurement_function,input_quantities,u_systematic_input_quantities_corr,
                 corr_x=corr_systematic_input_quantities_corr,return_corr=True,
-                repeat_dims=1,corr_axis=0,fixed_corr_var=True)
+                repeat_dims=1,corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
 
         dataset[measurandstring].values = measurand
         dataset["u_random_" + measurandstring].values = u_random_measurand
@@ -220,17 +221,16 @@ class PropagateUnc:
             u_random_measurand = self.prop.propagate_random(measurement_function,
                                                             input_quantities,
                                                             u_random_input_quantities,
-                                                        param_fixed=param_fixed,
-                                                        repeat_dims=1)
+                                                        param_fixed=param_fixed)
             u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
                 measurement_function,input_quantities,
                 u_systematic_input_quantities_indep,
                 corr_x=corr_systematic_input_quantities_indep,return_corr=True,
-                corr_axis=0,param_fixed=param_fixed,repeat_dims=1)
+                corr_axis=0,param_fixed=param_fixed)
             u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
                 measurement_function,input_quantities,u_systematic_input_quantities_corr,
                 corr_x=corr_systematic_input_quantities_corr,return_corr=True,
-                corr_axis=0,param_fixed=param_fixed,repeat_dims=1)
+                corr_axis=0,param_fixed=param_fixed)
         dataset[measurandstring].values = measurand
         dataset["u_random_"+measurandstring].values = u_random_measurand
         dataset["u_systematic_indep_"+measurandstring].values = u_syst_measurand_indep
