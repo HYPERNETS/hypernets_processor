@@ -169,8 +169,8 @@ def setup_test_job_config(raw_data_directory=None):
     """
     job_config = read_config_file(JOB_CONFIG_TEMPLATE_PATH)
 
-    job_config["Job"]["network"] = "land"
-    job_config["Job"]["site"] = "site"
+    job_config["Job"]["network"] = "l"
+    job_config["Job"]["site_id"] = "test"
 
     job_config["Input"]["raw_data_directory"] = (
         raw_data_directory if raw_data_directory is not None else "data"

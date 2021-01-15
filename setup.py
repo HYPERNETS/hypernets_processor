@@ -112,6 +112,7 @@ setup(
         "dataset",
         "sqlalchemy-utils",
         "punpy",
+        "freezegun"
         # "psycopg2",
     ],
     entry_points={
