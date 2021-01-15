@@ -17,14 +17,12 @@ __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
 
-
-
 class DataTemplates:
     def __init__(self, context):
-        self.context=context
+        self.context = context
         self.hdsb = HypernetsDSBuilder(context=context)
 
-    def calibration_dataset(self,wavs,nonlinearcals,wavcoef,caldates,nonlineardates,wavdates):
+    def calibration_dataset(self, wavs, nonlinearcals, wavcoef, caldates, nonlineardates, wavdates):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 
@@ -34,14 +32,14 @@ class DataTemplates:
         :rtype:
         """
 
-        cal_dim_sizes_dict = {"wavelength":len(wavs),
-                              "nonlinearcoef":len(nonlinearcals),
-                              "wavcoef":len(wavcoef),
-                              "calibrationdates":len(caldates),
-                              "nonlineardates":len(nonlineardates),
-                              "wavdates":len(wavdates)}
+        cal_dim_sizes_dict = {"wavelength": len(wavs),
+                              "nonlinearcoef": len(nonlinearcals),
+                              "wavcoef": len(wavcoef),
+                              "calibrationdates": len(caldates),
+                              "nonlineardates": len(nonlineardates),
+                              "wavdates": len(wavdates)}
         dataset_cal = self.hdsb.create_ds_template(cal_dim_sizes_dict,
-                                                       ds_format="CAL")
+                                                   ds_format="CAL")
 
         dataset_cal = dataset_cal.assign_coords(wavelength=wavs)
         dataset_cal = dataset_cal.assign_coords(nonlinearcoef=range(len(nonlinearcals)))
@@ -51,7 +49,7 @@ class DataTemplates:
         dataset_cal = dataset_cal.assign_coords(wavdates=wavdates)
         return dataset_cal
 
-    def l1a_template_from_l0_dataset(self,measurandstring,dataset_l0):
+    def l1a_template_from_l0_dataset(self, measurandstring, dataset_l0):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 
@@ -60,16 +58,16 @@ class DataTemplates:
         :return:
         :rtype:
         """
+        l1a_dim_sizes_dict = {"wavelength": len(dataset_l0["wavelength"]),
+                              "scan": len(dataset_l0["scan"])}
 
-        l1a_dim_sizes_dict = {"wavelength":len(dataset_l0["wavelength"]),
-                              "scan":len(dataset_l0["scan"])}
         if measurandstring == "radiance":
             dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,
                                                        ds_format="L_L1A_RAD",
-                                                       propagate_ds=dataset_l0)
+                                                       propagate_ds=dataset_l0, ds=dataset_l0)
         elif measurandstring == "irradiance":
-            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,"L_L1A_IRR",
-                                                       propagate_ds=dataset_l0)
+            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, "L_L1A_IRR",
+                                                       propagate_ds=dataset_l0, ds= dataset_l0)
 
         dataset_l1a = dataset_l1a.assign_coords(wavelength=dataset_l0.wavelength)
 
@@ -84,13 +82,13 @@ class DataTemplates:
         :rtype:
         """
         upscan = [i for i, e in enumerate(dataset_l1a['viewing_zenith_angle'].values) if e <= 90]
-        l1b_dim_sizes_dict = {"wavelength":len(dataset_l1a["wavelength"]),
-                              "scan":len(upscan)}
+        l1b_dim_sizes_dict = {"wavelength": len(dataset_l1a["wavelength"]),
+                              "scan": len(upscan)}
 
-        dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"W_L1B",
-                                                       propagate_ds=dataset_l1a)
+        dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "W_L1B",
+                                                   propagate_ds=dataset_l1a,ds=dataset_l1a)
         dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
-        #todo check whether here some additional keywords need to propagated (see land version).
+        # todo check whether here some additional keywords need to propagated (see land version).
         return dataset_l1b
 
     def l1b_template_from_l1a_dataset_land(self, measurandstring, dataset_l1a):
@@ -106,11 +104,11 @@ class DataTemplates:
                               "series": len(np.unique(dataset_l1a['series_id']))}
 
         if measurandstring == "radiance":
-            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_RAD", propagate_ds=dataset_l1a)
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_RAD", propagate_ds=dataset_l1a,ds=dataset_l1a)
         elif measurandstring == "irradiance":
-            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset_l1a)
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset_l1a,ds=dataset_l1a)
 
-        dataset_l1b =dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
+        dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
 
         series_id = np.unique(dataset_l1a['series_id'])
         dataset_l1b["series_id"].values = series_id
@@ -126,18 +124,19 @@ class DataTemplates:
 
         return dataset_l1b
 
-    def l1b_template_from_combine(self,measurementstring, dataset, dataset_SWIR):
-        wavs_vis=dataset["wavelength"].values
-        wavs_swir=dataset_SWIR["wavelength"].values
-        wavs=np.append(wavs_vis[np.where(wavs_vis<=self.context.get_config_value("combine_lim_wav"))],wavs_swir[np.where(wavs_swir>self.context.get_config_value("combine_lim_wav"))])
-        l1b_dim_sizes_dict = {"wavelength":len(wavs),
-                              "series":len(dataset['series'])}
+    def l1b_template_from_combine(self, measurementstring, dataset, dataset_SWIR):
+        wavs_vis = dataset["wavelength"].values
+        wavs_swir = dataset_SWIR["wavelength"].values
+        wavs = np.append(wavs_vis[np.where(wavs_vis <= self.context.get_config_value("combine_lim_wav"))],
+                         wavs_swir[np.where(wavs_swir > self.context.get_config_value("combine_lim_wav"))])
+        l1b_dim_sizes_dict = {"wavelength": len(wavs),
+                              "series": len(dataset['series'])}
         if measurementstring is "radiance":
-            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"L_L1B_RAD",
-                                                       propagate_ds=dataset)
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_RAD",
+                                                       propagate_ds=dataset, ds=dataset)
         if measurementstring is "irradiance":
-            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict,"L_L1B_IRR",
-                                                   propagate_ds=dataset)
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR",
+                                                       propagate_ds=dataset, ds=dataset)
         dataset_l1b = dataset_l1b.assign_coords(wavelength=wavs)
         return dataset_l1b
 
@@ -151,19 +150,19 @@ class DataTemplates:
         :rtype:
         """
         if self.context.get_config_value("network").lower() == "l":
-            l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
-                                  "series":len(dataset_l1b['series'])}
+            l1c_dim_sizes_dict = {"wavelength": len(dataset_l1b["wavelength"]),
+                                  "series": len(dataset_l1b['series'])}
 
-            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"L_L1C",
-                                                       propagate_ds=dataset_l1b)
-            dataset_l1c=dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
+            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict, "L_L1C",
+                                                       propagate_ds=dataset_l1b, ds=dataset_l1b)
+            dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
 
         elif self.context.get_config_value("network").lower() == "w":
-            l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
-                                  "scan":len(np.unique(dataset_l1b['scan']))}
+            l1c_dim_sizes_dict = {"wavelength": len(dataset_l1b["wavelength"]),
+                                  "scan": len(np.unique(dataset_l1b['scan']))}
 
-            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"W_L1C",
-                                                       propagate_ds=dataset_l1b)
+            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict, "W_L1C",
+                                                       propagate_ds=dataset_l1b, ds=dataset_l1b)
             dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
 
         return dataset_l1c
@@ -178,19 +177,19 @@ class DataTemplates:
         :rtype:
         """
         if self.context.get_config_value("network").lower() == "l":
-            l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
-                                  "series":len(dataset_l1b_irr['series'])}
+            l1c_dim_sizes_dict = {"wavelength": len(dataset_l1b["wavelength"]),
+                                  "series": len(dataset_l1b_irr['series'])}
 
-            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"L_L1C",
-                                                       propagate_ds=dataset_l1b)
-            dataset_l1c=dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
+            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict, "L_L1C",
+                                                       propagate_ds=dataset_l1b, ds=dataset_l1b)
+            dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
 
         elif self.context.get_config_value("network").lower() == "w":
-            l1c_dim_sizes_dict = {"wavelength":len(dataset_l1b["wavelength"]),
-                                  "scan":len(np.unique(dataset_l1b_irr['series']))}
+            l1c_dim_sizes_dict = {"wavelength": len(dataset_l1b["wavelength"]),
+                                  "scan": len(np.unique(dataset_l1b_irr['series']))}
 
-            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict,"W_L1C",
-                                                       propagate_ds=dataset_l1b)
+            dataset_l1c = self.hdsb.create_ds_template(l1c_dim_sizes_dict, "W_L1C",
+                                                       propagate_ds=dataset_l1b, ds=dataset_l1b)
             dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
 
         return dataset_l1c
@@ -210,8 +209,8 @@ class DataTemplates:
         elif self.context.get_config_value("network").lower() == "w":
             l1d_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
                                   "scan": len(datasetl1c["scan"])}
-            dataset_l1d = self.hdsb.create_ds_template(l1d_dim_sizes_dict, "W_L1D", propagate_ds=datasetl1c)
-            dataset_l1d=dataset_l1d.assign_coords(wavelength=datasetl1c.wavelength)
+            dataset_l1d = self.hdsb.create_ds_template(l1d_dim_sizes_dict, "W_L1D", propagate_ds=datasetl1c, ds=datasetl1c)
+            dataset_l1d = dataset_l1d.assign_coords(wavelength=datasetl1c.wavelength)
 
         return dataset_l1d
 
@@ -220,7 +219,7 @@ class DataTemplates:
         if self.context.get_config_value("network").lower() == "w":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1d["wavelength"]),
                                   "series": len(np.unique(datasetl1d['series_id']))}
-            dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A", propagate_ds=datasetl1d)
+            dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A", propagate_ds=datasetl1d, ds=datasetl1d)
             dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1d.wavelength)
 
             series_id = np.unique(datasetl1d['series_id'])
@@ -250,7 +249,7 @@ class DataTemplates:
         if self.context.get_config_value("network").lower() == "l":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
                                   "series": len(datasetl1c['series_id'])}
-            dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "L_L2A", propagate_ds=datasetl1c)
+            dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "L_L2A", propagate_ds=datasetl1c, ds=datasetl1c)
             dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
 
         return dataset_l2a
