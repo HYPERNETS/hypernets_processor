@@ -35,9 +35,9 @@ def main(settings):
     # Set default config values for chosen network
     config_path = PROCESSOR_CONFIG_PATH
     if settings["network_defaults"]:
-        if settings["network"] == "land":
+        if settings["network"] == "l":
             def_config_path = PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
-        elif settings["network"] == "water":
+        elif settings["network"] == "w":
             def_config_path = PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
         else:
             raise KeyError("Invalid network name ("+settings["network"]+")")
@@ -57,7 +57,7 @@ def main(settings):
         url = settings[db_fmt + "_db_url"]
 
         if url is not None:
-            new_db = open_database(url, create_format=db_fmt)
+            new_db = open_database(url, db_format=db_fmt)
             new_db.close()
             processor_config["Databases"][db_fmt + "_db_url"] = url
 

@@ -9,3 +9,4 @@
 # Documentation specific
 docs/sphinx/_build
 docs/sphinx/content/API
+/hypernets_processor/etc/job_CG.config
