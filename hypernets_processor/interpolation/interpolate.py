@@ -35,7 +35,7 @@ class Interpolate:
         # chek for upwelling radiance
         upscan = [i for i, e in enumerate(dataset_l1a_uprad['viewing_zenith_angle'].values) if e < 90]
 
-        dataset_l1b=self.templ.l1b_template_from_l1a_dataset_water(dataset_l1a_uprad)
+        dataset_l1b=self.templ.l1c_int_template_from_l1a_dataset_water(dataset_l1a_uprad)
 
         dataset_l1b["wavelength"] = dataset_l1a_uprad["wavelength"]
         dataset_l1b["upwelling_radiance"] = dataset_l1a_uprad["radiance"].sel(scan=upscan)
@@ -52,9 +52,6 @@ class Interpolate:
         dataset_l1b=self.interpolate_skyradiance(dataset_l1b, dataset_l1b_downrad)
         self.context.logger.info("interpolate irradiances")
         dataset_l1b=self.interpolate_irradiance(dataset_l1b, dataset_l1b_irr)
-
-        if self.context.get_config_value("write_l1b"):
-            self.writer.write(dataset_l1b,overwrite=True)
         return dataset_l1b
 
     def interpolate_l1c(self,dataset_l1b_rad,dataset_l1b_irr):

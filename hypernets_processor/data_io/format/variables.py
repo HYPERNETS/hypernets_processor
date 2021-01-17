@@ -1104,7 +1104,7 @@ VARIABLES_DICT_DEFS: Any = {"L0_RAD": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN
                             "W_L1B_IRR": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_IRR_VARIABLES},
                             "L_L1C": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_RAD_VARIABLES, **L1B_IRR_VARIABLES},
                             "W_L1C": {**COMMON_VARIABLES_Lu_SCAN, **W_QUALITY_SCAN,
-                                      **W_L1C_VARIABLES, **W_L1D_REFLECTANCE_VARIABLES},
+                                      **W_L1C_VARIABLES, **W_L1C_REFLECTANCE_VARIABLES},
                             "L_L2A": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L_L2A_REFLECTANCE_VARIABLES},
                             "W_L2A": {**COMMON_VARIABLES_SERIES, **W_QUALITY_SERIES, **W_L2A_REFLECTANCE_VARIABLES},
                             "L_L2B": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L_L2B_REFLECTANCE_VARIABLES}
