@@ -5,6 +5,7 @@ Averaging class
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.data_templates import DataTemplates
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 import numpy as np
 
@@ -20,7 +21,10 @@ __status__ = "Development"
 class Average:
     def __init__(self,context):
         self.templ = DataTemplates(context=context)
-    
+        self.context = context
+        self.writer=HypernetsWriter(context)
+
+
     def average_l1b(self, measurandstring, dataset_l1a):
 
         dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
@@ -41,6 +45,10 @@ class Average:
                 dataset_l1a["corr_systematic_indep_"+measurandstring].values
         dataset_l1b["corr_systematic_corr_rad_irr_"+measurandstring].values = \
                 dataset_l1a["corr_systematic_corr_rad_irr_"+measurandstring].values
+
+        if self.context.get_config_value("network") == "w":
+            if self.context.get_config_value("write_l1b"):
+                self.writer.write(dataset_l1b, overwrite=True)
 
         return dataset_l1b
 

@@ -300,7 +300,7 @@ class RhymerHypstar:
     def process_l1c_int(self, l1a_rad, l1a_irr):
 
         # because we average to Lu scan we propagate values from radiance!
-        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(l1a_rad)
+        dataset_l1b = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
         # QUALITY CHECK: TEMPORAL VARIABILITY IN ED AND LSKY -> ASSIGN FLAG
         dataset_l1b, flags_rad = self.qc_scan(l1a_rad, "radiance", dataset_l1b)
         dataset_l1b, flags_irr = self.qc_scan(l1a_irr, "irradiance", dataset_l1b)
