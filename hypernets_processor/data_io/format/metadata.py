@@ -148,13 +148,13 @@ WATER_NETWORK_METADATA = {"topic_category": "oceans, environment, inland waters,
                                                "Directorate Natural Environment, REMSEM",
                           "creator_name": "TBD",
                           "creator_email": "TBD",
-                          "fresnel_option":"NaN",
-                          "similarity_waveref":"NaN",
-                          "similarity_wavethres":"NaN",
+                          "fresnel_option": "NaN",
+                          "similarity_waveref": "NaN",
+                          "similarity_wavethres": "NaN",
                           "similarity_wavelen1": "NaN",
-	              	   "similarity_wavelen2": "NaN",
-	              	   "similarity_alpha":"NaN"
-                        }
+                          "similarity_wavelen2": "NaN",
+                          "similarity_alpha": "NaN"
+                          }
 
 NETWORK_METADATA = {"spectral_range_vnir": "400-1000",
                     "spectral_resolution_vnir": "0.5",
@@ -318,4 +318,3 @@ METADATA_DEFS = {"L0_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA},
                  "L_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA},
                  "W_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA}
                  }
-
