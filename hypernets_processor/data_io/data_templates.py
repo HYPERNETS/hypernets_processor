@@ -100,6 +100,8 @@ class DataTemplates:
         :return:
         :rtype:
         """
+        print(np.unique(dataset_l1a['series_id']))
+
         l1b_dim_sizes_dict = {"wavelength": len(dataset_l1a["wavelength"]),
                               "series": len(np.unique(dataset_l1a['series_id']))}
 

@@ -27,11 +27,18 @@ class Average:
 
     def average_l1b(self, measurandstring, dataset_l1a):
 
-        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
+        if self.context.get_config_value("network") == "w":
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
+        else:
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
 
-        flags=["outliers"]
+        if self.context.get_config_value("network") == "l":
+            flags=["outliers"]
+        else:
+            flags = []
 
         dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring,flags)
+
         dataset_l1b["u_random_" + measurandstring].values = self.calc_mean_masked(\
             dataset_l1a,"u_random_" + measurandstring,flags,rand_unc=True)
         dataset_l1b["u_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
@@ -45,10 +52,6 @@ class Average:
                 dataset_l1a["corr_systematic_indep_"+measurandstring].values
         dataset_l1b["corr_systematic_corr_rad_irr_"+measurandstring].values = \
                 dataset_l1a["corr_systematic_corr_rad_irr_"+measurandstring].values
-
-        if self.context.get_config_value("network") == "w":
-            if self.context.get_config_value("write_l1b"):
-                self.writer.write(dataset_l1b, overwrite=True)
 
         return dataset_l1b
 
@@ -81,6 +84,7 @@ class Average:
         if corr:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
+
 
             for i in range(len(series_id)):
                 flagged = np.any(
