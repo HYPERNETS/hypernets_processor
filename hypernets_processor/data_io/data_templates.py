@@ -73,7 +73,7 @@ class DataTemplates:
 
         return dataset_l1a
 
-    def l1b_template_from_l1a_dataset_water(self, dataset_l1a):
+    def l1c_int_template_from_l1a_dataset_water(self, dataset_l1a):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
         :param datasetl0:
@@ -85,10 +85,43 @@ class DataTemplates:
         l1b_dim_sizes_dict = {"wavelength": len(dataset_l1a["wavelength"]),
                               "scan": len(upscan)}
 
-        dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "W_L1B",
+        dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "W_L1C",
                                                    propagate_ds=dataset_l1a,ds=dataset_l1a)
         dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
         # todo check whether here some additional keywords need to propagated (see land version).
+        return dataset_l1b
+
+    def l1b_template_from_l1a_dataset_water(self, measurandstring, dataset_l1a):
+        """
+        Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
+
+        :param datasetl0:
+        :type datasetl0:
+        :return:
+        :rtype:
+        """
+        l1b_dim_sizes_dict = {"wavelength": len(dataset_l1a["wavelength"]),
+                              "series": len(np.unique(dataset_l1a['series_id']))}
+
+        if measurandstring == "radiance":
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "W_L1B_RAD", propagate_ds=dataset_l1a,ds=dataset_l1a)
+        elif measurandstring == "irradiance":
+            dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "W_L1B_IRR", propagate_ds=dataset_l1a,ds=dataset_l1a)
+
+        dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
+
+        series_id = np.unique(dataset_l1a['series_id'])
+        dataset_l1b["series_id"].values = series_id
+
+        for variablestring in ["acquisition_time", "viewing_azimuth_angle", "viewing_zenith_angle",
+                               "solar_azimuth_angle", "solar_zenith_angle"]:
+            temp_arr = np.empty(len(series_id))
+            for i in range(len(series_id)):
+                ids = np.where((dataset_l1a['series_id'] == series_id[i]) & np.invert(
+                    DatasetUtil.unpack_flags(dataset_l1a["quality_flag"])["outliers"]))
+                temp_arr[i] = np.mean(dataset_l1a[variablestring].values[ids])
+            dataset_l1b[variablestring].values = temp_arr
+
         return dataset_l1b
 
     def l1b_template_from_l1a_dataset_land(self, measurandstring, dataset_l1a):
