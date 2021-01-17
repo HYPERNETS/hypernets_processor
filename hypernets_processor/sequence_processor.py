@@ -55,6 +55,7 @@ class SequenceProcessor:
         surf = SurfaceReflectance(self.context, MCsteps=1000)
         avg = Average(self.context,)
         rhymer=RhymerHypstar(self.context)
+        writer=HypernetsWriter(self.context)
 
         self.context.logger.debug("Processing to L1a...")
 
@@ -74,10 +75,15 @@ class SequenceProcessor:
 
             self.context.logger.debug("Processing to L1b radiance...")
             L1b_rad = avg.average_l1b("radiance", L1a_rad)
+            print(L1b_rad)
+            if self.context.get_config_value("write_l1b"):
+                writer.write(L1b_rad, overwrite=True)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1b irradiance...")
             L1b_irr = avg.average_l1b("irradiance", L1a_irr)
+            if self.context.get_config_value("write_l1b"):
+                writer.write(L1b_irr, overwrite=True)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1c...")
