@@ -29,8 +29,8 @@ class WaterNetworkProtocol:
         w2 = self.context.get_config_value("similarity_w2")
         alpha = self.context.get_config_value("similarity_alpha")
 
-        iref1, wref1 = self.rhs.closest_idx(wavelength, w1)
-        iref2, wref2 = self.rhs.closest_idx(wavelength, w2)
+        iref1, wref1 = self.rhs.closest_idx(list(wavelength), w1)
+        iref2, wref2 = self.rhs.closest_idx(list(wavelength), w2)
 
         ## get pixel index for similarity
         if alpha is None:
@@ -49,5 +49,5 @@ class WaterNetworkProtocol:
         return "WaterNetworkProtocol"
 
     def get_argument_names(self):
-        return ["upwelling_radiance","downwelling_radiance","irradiance","rhof"]
+        return ["upwelling_radiance","downwelling_radiance","irradiance","rhof", "wavelength"]
 

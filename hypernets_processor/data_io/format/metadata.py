@@ -59,6 +59,7 @@ STANDARD_METADATA = {"type": "dataset",
                      "site_latitude": "NaN",
                      "site_longitude": "NaN"
                      }
+
 COMPONENTS_METADATA = {  # "system_id": system_id,
     "instrument_id": "TBD",  # key metadata
     "pointing_system_id": "TBD",  # key metadata

@@ -607,7 +607,7 @@ class HypernetsReader:
             else:
                 # self.context.logger.error("Latitude is not given, use default")
                 lat = self.context.get_config_value("lat")
-                flag = flag + 2 ** self.context.get_config_value("lat_default")  # du.set_flag(flag, "lat_default") #
+                flag = du.set_flag(flag, "lat_default") # flag + 2 ** self.context.get_config_value("lat_default")  #
 
             if 'longitude' in (globalattr.keys()):
                 lon = float(globalattr['longitude'])
@@ -616,7 +616,7 @@ class HypernetsReader:
             else:
                 # self.context.logger.error("Longitude is not given, use default")
                 lon = self.context.get_config_value("lon")
-                flag = flag + 2 ** self.context.get_config_value("lon_default")  # du.set_flag(flag, "lon_default")  #
+                flag = du.set_flag(flag, "lon_default")  # flag + 2 ** self.context.get_config_value("lon_default")  #
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
