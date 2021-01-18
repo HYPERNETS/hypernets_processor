@@ -291,7 +291,7 @@ class RhymerHypstar:
         scans = L1c['scan']
         for i in range(len(scans)):
             data=L1c['reflectance_nosc'].sel(scan=i).values
-            if abs(epsilon) > wp * data[irefr]:
+            if abs(epsilon[i]) > wp * data[irefr]:
                 failSimil.append(1)
             else:
                 failSimil.append(0)

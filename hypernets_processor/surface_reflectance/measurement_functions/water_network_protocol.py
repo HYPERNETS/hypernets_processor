@@ -49,5 +49,5 @@ class WaterNetworkProtocol:
         return "WaterNetworkProtocol"
 
     def get_argument_names(self):
-        return ["upwelling_radiance","downwelling_radiance","irradiance","rhof"]
+        return ["upwelling_radiance","downwelling_radiance","irradiance","rhof","wavelength"]
 
