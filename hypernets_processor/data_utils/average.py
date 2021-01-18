@@ -5,6 +5,7 @@ Averaging class
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.data_templates import DataTemplates
+from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 import numpy as np
 
@@ -20,14 +21,24 @@ __status__ = "Development"
 class Average:
     def __init__(self,context):
         self.templ = DataTemplates(context=context)
-    
+        self.context = context
+        self.writer=HypernetsWriter(context)
+
+
     def average_l1b(self, measurandstring, dataset_l1a):
 
-        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
+        if self.context.get_config_value("network") == "w":
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
+        else:
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
 
-        flags=["outliers"]
+        if self.context.get_config_value("network") == "l":
+            flags=["outliers"]
+        else:
+            flags = []
 
         dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring,flags)
+
         dataset_l1b["u_random_" + measurandstring].values = self.calc_mean_masked(\
             dataset_l1a,"u_random_" + measurandstring,flags,rand_unc=True)
         dataset_l1b["u_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
@@ -73,6 +84,7 @@ class Average:
         if corr:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
+
 
             for i in range(len(series_id)):
                 flagged = np.any(

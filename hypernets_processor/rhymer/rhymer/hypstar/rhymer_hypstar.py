@@ -3,24 +3,19 @@
 ## zenith angle is used to differentiate Lsky and Lu
 ## QV July 2018
 ## Last modifications: 2019-07-10 (QV) renamed from PANTR, added .lower() to sensor ID as it is in some cases uppercase in the current deployment (RBINS ROOF)
-from configparser import ConfigParser
 from datetime import datetime
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.rhymer.rhymer.ancillary.rhymer_ancillary import RhymerAncillary
 from hypernets_processor.rhymer.rhymer.processing.rhymer_processing import RhymerProcessing
-from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.plotting.plotting import Plotting
-from hypernets_processor.data_io.format.metadata import METADATA_DEFS
-from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_io.dataset_util import DatasetUtil as du
 
 import numpy as np
 import math
-import matplotlib.pyplot as plt
 
 
 class RhymerHypstar:
@@ -281,96 +276,31 @@ class RhymerHypstar:
 
         return l1b
 
-    def get_epsilon(self, rhow_nosc, wavelength):
 
-        # wavelength = l1b['wavelength'].values
-        # get length of transposed rhow_nosc (1 epsilon per scan!)
-        epsilon = np.zeros(len(rhow_nosc.T))
-        failSimil = np.zeros(len(rhow_nosc.T))
+    def qc_similarity(self, L1c):
 
-        ## compute similarity epsilon
-        for i in range(len(rhow_nosc.T)):
-            ## compute similarity epsilon
-            fail_simil, eps = self.qc_similarity(wavelength, rhow_nosc.T[i],
-                                                 self.context.get_config_value("similarity_wr"),
-                                                 self.context.get_config_value("similarity_wp"),
-                                                 self.context.get_config_value("similarity_w1"),
-                                                 self.context.get_config_value("similarity_w2"),
-                                                 self.context.get_config_value("similarity_alpha"))
+        wave=L1c["wavelength"]
+        wr=L1c.attrs["similarity_waveref"]
+        wp=L1c.attrs["similarity_wavethres"]
 
-            ## R2005 quality control
-            ## skip spectra not following similarity
-            if self.context.get_config_value("similarity_test") == True:
-                if fail_simil:
-                    if self.context.get_config_value("verbosity") > 2: self.context.logger.info('Failed simil test.')
-                    continue
-                else:
-                    if self.context.get_config_value("verbosity") > 2: self.context.logger.info('Passed simil test.')
-            epsilon[i] = eps
-            failSimil[i] = fail_simil
-        return epsilon, failSimil
-
-    def get_rhow_nosc(self, l1b):
-
-        ## read mobley rho lut
-
-        wavelength = l1b['wavelength'].values
-        fresnel_coeff = l1b['rhof'].values
-        rhow_nosc_all = np.zeros((len(l1b.scan), len(wavelength)))
-        lw_all = np.zeros((len(l1b.scan), len(wavelength)))
-        # rhow_all = np.zeros((len(l1b.scan), len(wavelength)))
-        # epsilon = np.zeros(len(l1b.scan))
-        simil_flag = np.zeros(len(l1b.scan))
-
-        for i in range(len(l1b.scan)):
-            ## compute rhow
-            lu = l1b['upwelling_radiance'][:, i].values
-            # should I average here or take the downwelling radiance per scan???
-            # mls stands for mean sky/downwelling radiance, so need to check if mean is better than interpolated?
-            mls = l1b['downwelling_radiance'][:, i].values
-            # same for ed? Better interpolated or mean Ed???
-            med = l1b['irradiance'][:, i].values
-
-            lw_all[i] = [(lu[w] - (fresnel_coeff[i] * mls[w])) for w in range(len(wavelength))]
-            rhow_nosc_all[i] = [np.pi * (lu[w] - (fresnel_coeff[i] * mls[w])) / med[w] for w in range(len(wavelength))]
-
-        return rhow_nosc_all, lw_all
-
-    ## QC a single rhow scan from PANTHYR
-    ## according to R2005
-    ##
-    ## QV July 2018
-    ## Last modifications: 2019-07-10 (QV) renamed from PANTR, integrated in rhymer
-
-    def qc_similarity(self, wave, data, wr=670, wp=0.05, w1=720, w2=780, alpha=2.35, ssd=None):
-
-        n = len(data)
-        data_retained = []
-
+        epsilon=L1c["epsilon"]
         ## get pixel index for wavelength
         irefr, wrefr = self.rhymershared.closest_idx(wave, wr)
-        iref1, wref1 = self.rhymershared.closest_idx(wave, w1)
-        iref2, wref2 = self.rhymershared.closest_idx(wave, w2)
 
-        ## get pixel index for similarity
-        if alpha is None:
-            if ssd is None: ssd = self.rhymerproc.similarity_read()
-            id1, w1 = self.rhymershared.closest_idx(ssd['wave'], w1 / 1000.)
-            id2, w2 = self.rhymershared.closest_idx(ssd['wave'], w2 / 1000.)
-            alpha = ssd['ave'][id1] / ssd['ave'][id2]
+        failSimil = []
+        scans = L1c['scan']
+        for i in range(len(scans)):
+            data=L1c['reflectance_nosc'].sel(scan=i).values
+            if abs(epsilon) > wp * data[irefr]:
+                failSimil.append(1)
+            else:
+                failSimil.append(0)
+        return failSimil
 
-        ## compute epsilon
-        epsilon = (alpha * data[iref2] - data[iref1]) / (alpha - 1.0)
-
-        if abs(epsilon) > wp * data[irefr]:
-            return (1, epsilon)
-        else:
-            return (0, epsilon)
-
-    def process_l1b(self, l1a_rad, l1a_irr):
+    def process_l1c_int(self, l1a_rad, l1a_irr):
 
         # because we average to Lu scan we propagate values from radiance!
-        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(l1a_rad)
+        dataset_l1b = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
         # QUALITY CHECK: TEMPORAL VARIABILITY IN ED AND LSKY -> ASSIGN FLAG
         dataset_l1b, flags_rad = self.qc_scan(l1a_rad, "radiance", dataset_l1b)
         dataset_l1b, flags_irr = self.qc_scan(l1a_irr, "irradiance", dataset_l1b)
@@ -387,29 +317,5 @@ class RhymerHypstar:
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the
         # irradiance wavelength to the radiance wavelength
-        L1b = self.intp.interpolate_l1b_w(dataset_l1b,L1a_uprad, L1b_downrad, L1b_irr)
-        if self.context.get_config_value("write_l1b") is True:
-            self.writer.write(L1b, overwrite=True)
-        return L1b
-
-    def process_l1c(self, l1b):
-        dataset_l1c = self.templ.l1c_from_l1b_dataset(l1b)
-
-        dataset_l1c = self.get_wind(dataset_l1c)
-        dataset_l1c = self.get_fresnelrefl(dataset_l1c)
-
-        rhow_nosc_all, lw_all = self.get_rhow_nosc(dataset_l1c)
-
-        # dataset_l1c['reflectance'].values = rhow_all.T
-
-        dataset_l1c['reflectance_nosc'].values = rhow_nosc_all.T
-        # dataset_l1c['epsilon'].values = epsilon
-        dataset_l1c['water_leaving_radiance'].values = lw_all.T
-
-        if self.context.get_config_value("write_l1c"):
-            self.writer.write(dataset_l1c, overwrite=True)
-
-        if self.context.get_config_value("plot_l1c"):
-            self.plot.plot_scans_in_series("irradiance", dataset_l1c)
-
-        return dataset_l1c
+        L1c_int = self.intp.interpolate_l1b_w(dataset_l1b,L1a_uprad, L1b_downrad, L1b_irr)
+        return L1c_int
