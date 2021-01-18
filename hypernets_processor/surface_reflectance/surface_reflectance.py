@@ -58,7 +58,7 @@ class SurfaceReflectance:
         L1c = self.prop.process_measurement_function_l2(
             ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
             dataset_l1c, l1ctol1b_function.function, input_qty,
-            u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty)
+            u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
 
         failSimil=self.rh.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
@@ -66,67 +66,78 @@ class SurfaceReflectance:
 
         if self.context.get_config_value("write_l1c"):
             self.writer.write(L1c, overwrite=True)
+        for measurandstring in ["water_leaving_radiance","reflectance_nosc","reflectance","epsilon"]:
+            try:
+                if self.context.get_config_value("plot_l1c"):
+                    self.plot.plot_series_in_sequence(measurandstring, L1c)
 
+                if self.context.get_config_value("plot_uncertainty"):
+                    self.plot.plot_relative_uncertainty(measurandstring, L1c, L2=True)
+            except:
+                print("not plotting ",measurandstring)
         return L1c
 
 
-def process_l2(self, dataset):
-    dataset = self.perform_checks(dataset)
-    l1tol2_function = self._measurement_function_factory.get_measurement_function(
-        self.context.get_config_value("measurement_function_surface_reflectance"))
-    input_vars = l1tol2_function.get_argument_names()
-    input_qty = self.prop.find_input(input_vars, dataset)
-    u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset)
-    u_systematic_input_qty, cov_systematic_input_qty = \
-        self.prop.find_u_systematic_input(input_vars, dataset)
+    def process_l2(self, dataset):
+        dataset = self.perform_checks(dataset)
+        l1tol2_function = self._measurement_function_factory.get_measurement_function(
+            self.context.get_config_value("measurement_function_surface_reflectance"))
+        input_vars = l1tol2_function.get_argument_names()
+        input_qty = self.prop.find_input(input_vars, dataset)
+        u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset)
+        u_systematic_input_qty, cov_systematic_input_qty = \
+            self.prop.find_u_systematic_input(input_vars, dataset)
 
-    if self.context.get_config_value("network").lower() == "w":
+        if self.context.get_config_value("network").lower() == "w":
 
-        dataset_l2a = self.avg.average_L2(dataset)
+            dataset_l2a = self.avg.average_L2(dataset)
 
-        for measurandstring in ["water_leaving_radiance", "reflectance_nosc",
-                                "reflectance"]:
+            for measurandstring in ["water_leaving_radiance", "reflectance_nosc",
+                                    "reflectance", "epsilon"]:
+                try:
+                    if self.context.get_config_value("plot_l2a"):
+                        self.plot.plot_series_in_sequence(measurandstring, dataset_l2a)
+
+                    if self.context.get_config_value("plot_uncertainty"):
+                        self.plot.plot_relative_uncertainty(measurandstring, dataset_l2a, L2=True)
+
+                    if self.context.get_config_value("plot_correlation"):
+                        self.plot.plot_correlation(measurandstring, dataset_l2a, L2=True)
+                except:
+                    print("not plotting ", measurandstring)
+
+        elif self.context.get_config_value("network").lower() == "l":
+            dataset_l2a = self.templ.l2_from_l1c_dataset(dataset)
+            dataset_l2a = self.prop.process_measurement_function_l2(["reflectance"], dataset_l2a,
+                                                                    l1tol2_function.function,
+                                                                    input_qty, u_random_input_qty,
+                                                                    u_systematic_input_qty,
+                                                                    cov_systematic_input_qty)
             if self.context.get_config_value("plot_l2a"):
-                self.plot.plot_series_in_sequence(measurandstring, dataset_l2a)
+                self.plot.plot_series_in_sequence("reflectance", dataset_l2a)
 
             if self.context.get_config_value("plot_uncertainty"):
-                self.plot.plot_relative_uncertainty(measurandstring, dataset_l2a, L2=True)
+                self.plot.plot_relative_uncertainty("reflectance", dataset_l2a, L2=True)
 
             if self.context.get_config_value("plot_correlation"):
-                self.plot.plot_correlation(measurandstring, dataset_l2a, L2=True)
+                self.plot.plot_correlation("reflectance", dataset_l2a, L2=True)
+        else:
+            self.context.logger.error("network is not correctly defined")
 
-    elif self.context.get_config_value("network").lower() == "l":
-        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset)
-        dataset_l2a = self.prop.process_measurement_function_l2(["reflectance"], dataset_l2a,
-                                                                l1tol2_function.function,
-                                                                input_qty, u_random_input_qty,
-                                                                u_systematic_input_qty,
-                                                                cov_systematic_input_qty)
-        if self.context.get_config_value("plot_l2a"):
-            self.plot.plot_series_in_sequence("reflectance", dataset_l2a)
+        if self.context.get_config_value("write_l2a"):
+            self.writer.write(dataset_l2a, overwrite=True)
 
-        if self.context.get_config_value("plot_uncertainty"):
-            self.plot.plot_relative_uncertainty("reflectance", dataset_l2a, L2=True)
-
-        if self.context.get_config_value("plot_correlation"):
-            self.plot.plot_correlation("reflectance", dataset_l2a, L2=True)
-    else:
-        self.context.logger.error("network is not correctly defined")
-
-    if self.context.get_config_value("write_l2a"):
-        self.writer.write(dataset_l2a, overwrite=True)
-
-    return dataset_l2a
+        return dataset_l2a
 
 
-def perform_checks(self, dataset_l1):
-    """
-    Identifies and removes faulty measurements (e.g. due to cloud cover).
+    def perform_checks(self, dataset_l1):
+        """
+        Identifies and removes faulty measurements (e.g. due to cloud cover).
 
-    :param dataset_l0:
-    :type dataset_l0:
-    :return:
-    :rtype:
-    """
+        :param dataset_l0:
+        :type dataset_l0:
+        :return:
+        :rtype:
+        """
 
-    return dataset_l1
+        return dataset_l1
