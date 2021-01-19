@@ -8,6 +8,7 @@ from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceR
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.combine_SWIR.combine_SWIR import CombineSWIR
+from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_io.hypernets_reader import HypernetsReader
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
@@ -47,17 +48,18 @@ class SequenceProcessor:
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
         self.context.set_config_value("sequence_path", sequence_path)
         self.context.set_config_value("sequence_name", os.path.basename(sequence_path))
-        writer = HypernetsWriter(self.context)
 
         reader = HypernetsReader(self.context)
         calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context, MCsteps=100)
         surf = SurfaceReflectance(self.context, MCsteps=1000)
+        avg = Average(self.context,)
+        rhymer=RhymerHypstar(self.context)
+        writer=HypernetsWriter(self.context)
 
         self.context.logger.debug("Processing to L1a...")
 
         if self.context.get_config_value("network") == "w":
-            rhymer = RhymerHypstar(self.context)
 
             calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
             # Read L0
@@ -71,20 +73,26 @@ class SequenceProcessor:
             L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
             self.context.logger.debug("Done")
 
-            self.context.logger.debug("Processing to L1b...")
-            L1b = rhymer.process_l1b(L1a_rad, L1a_irr)
+            self.context.logger.debug("Processing to L1b radiance...")
+            L1b_rad = avg.average_l1b("radiance", L1a_rad)
+            print(L1b_rad)
+            if self.context.get_config_value("write_l1b"):
+                writer.write(L1b_rad, overwrite=True)
+            self.context.logger.debug("Done")
+
+            self.context.logger.debug("Processing to L1b irradiance...")
+            L1b_irr = avg.average_l1b("irradiance", L1a_irr)
+            if self.context.get_config_value("write_l1b"):
+                writer.write(L1b_irr, overwrite=True)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L1c...")
-            L1c = rhymer.process_l1c(L1b)
-            self.context.logger.debug("Done")
-
-            self.context.logger.debug("Processing to L1d...")
-            L1d = surf.process_l1d(L1c)
+            L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)
+            L1c = surf.process_l1c(L1c_int)
             self.context.logger.debug("Done")
 
             self.context.logger.debug("Processing to L2a...")
-            L2a = surf.process_l2(L1d)
+            L2a = surf.process_l2(L1c)
             self.context.logger.debug("Done")
 
         elif self.context.get_config_value("network") == "l":
