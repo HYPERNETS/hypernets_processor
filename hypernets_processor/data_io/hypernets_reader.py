@@ -113,14 +113,14 @@ class HypernetsReader:
                 if specInfo[4] and not specInfo[3]: strInfo += "Rad"  # noqa
                 if specInfo[3] and specInfo[4]: strInfo += "Error"  # noqa
 
-                self.context.logger.info("Spectrum Type Info : %s " % strInfo)
+                self.context.logger.debug("Spectrum Type Info : %s " % strInfo)
 
             header[headName] = var
         return header
 
     def read_data(self, f, data_len):
         prev = 0
-        self.context.logger.info("Reading Data spectra ...")
+        self.context.logger.debug("Reading Data spectra ...")
         dataSpectra = []
         for i in range(int(data_len)):  # Last read data is count
             data = f.read(2)
@@ -137,7 +137,7 @@ class HypernetsReader:
 
     def read_footer(self, f, datalength):
         # print(f)
-        self.context.logger.info("Reading CRC32 ...")
+        self.context.logger.debug("Reading CRC32 ...")
         data = f.read(datalength)
         unpackData, = unpack('<I', data)
 
@@ -148,7 +148,7 @@ class HypernetsReader:
         wav_coef_func = np.poly1d(np.flip(wav_coef))
 
         wvl=wav_coef_func(pix)
-        self.context.logger.info("Wavelength range: %s -%s"%(min(wvl), max(wvl)))
+        self.context.logger.debug("Wavelength range: %s -%s"%(min(wvl), max(wvl)))
 
         return wvl
 
