@@ -45,7 +45,7 @@ class Plotting():
     def plot_scans_in_series(self,measurandstring,dataset):
         series_id = np.unique(dataset['series_id'])
         for i in range(len(series_id)):
-            plotpath = os.path.join(self.path,"plot_"+\
+            plotpath = os.path.join(self.path,"plot_"+ measurandstring+"_"+
                        dataset.attrs['product_name']+"_series_"+str(
                 series_id[i])+"."+self.context.get_config_value("plotting_format"))
 
@@ -55,7 +55,7 @@ class Plotting():
                                ydata_subset)
 
     def plot_series_in_sequence(self,measurandstring,dataset):
-        plotpath = os.path.join(self.path,"plot_"+
+        plotpath = os.path.join(self.path,"plot_"+ measurandstring+"_"+
                    dataset.attrs['product_name']+"."+self.context.get_config_value("plotting_format"))
 
         angle_labels=["vza= {:.2f}, vaa= {:.2f}".format(dataset["viewing_zenith_angle"].values[i],dataset["viewing_azimuth_angle"].values[i]) for i in range(len(dataset["viewing_zenith_angle"].values))]
@@ -65,7 +65,7 @@ class Plotting():
     def plot_diff_scans(self,measurandstring,dataset,dataset_avg=None):
         series_id = np.unique(dataset['series_id'])
         for i in range(len(series_id)):
-            plotpath = os.path.join(self.path,"plot_diff_"+
+            plotpath = os.path.join(self.path,"plot_diff_"+ measurandstring+"_"+
                        dataset.attrs['product_name']+"_series_"+str(
                 series_id[i])+"."+self.context.get_config_value("plotting_format"))
 
@@ -88,7 +88,7 @@ class Plotting():
                                (ydata_subset-avgs)/avgs,ylim=[-0.3,0.3],mask=mask)
 
     def plot_relative_uncertainty(self,measurandstring,dataset,L2=False):
-        plotpath = os.path.join(self.path,"plot_unc_"+dataset.attrs[
+        plotpath = os.path.join(self.path,"plot_unc_"+ measurandstring +"_"+dataset.attrs[
             'product_name']+"."+self.context.get_config_value("plotting_format"))
 
         yrand=dataset["u_random_"+measurandstring].values/dataset[measurandstring].values
@@ -109,7 +109,7 @@ class Plotting():
     def plot_correlation(self,measurandstring,dataset,L2=False):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            plotpath = os.path.join(self.path,"plot_corr_"+dataset.attrs[
+            plotpath = os.path.join(self.path,"plot_corr_"+ measurandstring+"_"+dataset.attrs[
                 'product_name']+"."+self.context.get_config_value("plotting_format"))
 
             if L2:

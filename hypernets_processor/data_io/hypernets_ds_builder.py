@@ -132,7 +132,7 @@ class HypernetsDSBuilder:
                     version) + ".nc"
                 metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(
                     version) + ".nc"
-            if ds_format in ['W_L1C', 'W_L1D','W_L2A']:
+            if ds_format in ['W_L1C','W_L2A']:
                 # W_L1C
                 metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(
                     version) + ".nc"

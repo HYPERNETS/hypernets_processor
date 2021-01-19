@@ -250,46 +250,50 @@ class PropagateUnc:
                                         input_quantities,
                                         u_random_input_quantities,
                                         u_systematic_input_quantities,
-                                        corr_systematic_input_quantities):
+                                        corr_systematic_input_quantities, param_fixed=None):
         measurand = measurement_function(*input_quantities)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
-                                                            u_random_input_quantities, repeat_dims=1,
-                                                            output_vars=len(measurandstrings))
+            u_random_measurand = self.prop.propagate_random(measurement_function,
+                                                            input_quantities,
+                                                            u_random_input_quantities,
+                                                            repeat_dims=1,
+                                                            param_fixed=param_fixed,
+                                                            output_vars=len(
+                                                                measurandstrings))
 
             if len(measurandstrings) > 1:
-                u_systematic_measurand, corr_systematic_measurand, corr_between = \
-                    self.prop.propagate_systematic(measurement_function,
-                                                   input_quantities,
-                                                   u_systematic_input_quantities,
-                                                   corr_x=corr_systematic_input_quantities,
-                                                   return_corr=True,
-                                                   repeat_dims=1,
-                                                   corr_axis=0,
-                                                   output_vars=len(measurandstrings))
-                for im, measurandstring in enumerate(measurandstrings):
+                u_systematic_measurand,corr_systematic_measurand,corr_between = self.prop.propagate_systematic(
+                    measurement_function,input_quantities,u_systematic_input_quantities,
+                    corr_x=corr_systematic_input_quantities,return_corr=True,
+                    repeat_dims=1,param_fixed=param_fixed,corr_axis=0,
+                    output_vars=len(measurandstrings))
+                for im,measurandstring in enumerate(measurandstrings):
                     dataset[measurandstring].values = measurand[im]
-                    dataset["u_random_" + measurandstring].values = u_random_measurand[im]
-                    dataset["u_systematic_" + measurandstring].values = u_systematic_measurand[im]
-                    dataset["corr_random_" + measurandstring].values = np.eye(len(u_random_measurand[im]))
-                    dataset["corr_systematic_" + measurandstring].values = corr_systematic_measurand[im]
+                    dataset["u_random_"+measurandstring].values = u_random_measurand[im]
+                    dataset["u_systematic_"+measurandstring].values =\
+                    u_systematic_measurand[im]
+                    try:
+                        dataset["corr_random_"+measurandstring].values = np.eye(
+                            len(u_random_measurand[im]))
+                        dataset["corr_systematic_"+measurandstring].values =\
+                        corr_systematic_measurand[im]
+                    except:
+                        print("no correlation for ",measurandstring)
 
             else:
-                u_systematic_measurand,corr_systematic_measurand=\
-                    self.prop.propagate_systematic(measurement_function,
-                                                   input_quantities,
-                                                   u_systematic_input_quantities,
-                                                   corr_x=corr_systematic_input_quantities,
-                                                   return_corr=True,
-                                                   repeat_dims=1,
-                                                   corr_axis=0,
-                                                   output_vars=len(measurandstrings))
+                u_systematic_measurand,corr_systematic_measurand = self.prop.propagate_systematic(
+                    measurement_function,input_quantities,u_systematic_input_quantities,
+                    corr_x=corr_systematic_input_quantities,return_corr=True,
+                    repeat_dims=1,param_fixed=param_fixed,corr_axis=0,
+                    output_vars=len(measurandstrings))
                 measurandstring = measurandstrings[0]
                 dataset[measurandstring].values = measurand
-                dataset["u_random_" + measurandstring].values = u_random_measurand
-                dataset["u_systematic_" + measurandstring].values = u_systematic_measurand
-                dataset["corr_random_" + measurandstring].values = np.eye(len(u_random_measurand))
-                dataset["corr_systematic_" + measurandstring].values = corr_systematic_measurand
+                dataset["u_random_"+measurandstring].values = u_random_measurand
+                dataset["u_systematic_"+measurandstring].values = u_systematic_measurand
+                dataset["corr_random_"+measurandstring].values = np.eye(
+                    len(u_random_measurand))
+                dataset[
+                    "corr_systematic_"+measurandstring].values = corr_systematic_measurand
 
         return dataset
