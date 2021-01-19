@@ -61,7 +61,7 @@ class DataTemplates:
         dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
         # use template from variables and metadata in format
         dataset_l0 = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
-                                          ds_format=fileformat)
+                                          ds_format=fileformat,swir=swir)
         dataset_l0.assign_coords(wavelength=wvl)
         dataset_l0.assign_coords(scan=np.linspace(1,scanDim,scanDim))
 
