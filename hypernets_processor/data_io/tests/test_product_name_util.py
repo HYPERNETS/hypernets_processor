@@ -3,7 +3,9 @@ Tests for FilenameUtil class
 """
 
 import unittest
-import datetime
+from unittest.mock import patch
+from freezegun import freeze_time
+from datetime import datetime
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.version import __version__
 from hypernets_processor.test.test_functions import setup_test_context
@@ -21,25 +23,27 @@ __status__ = "Development"
 class TestProductNameUtil(unittest.TestCase):
 
     def test_create_product_name_context(self):
+        with freeze_time("2020/1/8 9:45:30"):
 
-        context = setup_test_context()
-        context.set_config_value("time", datetime.datetime(2018, 4, 3, 11, 0, 0))
-        pnu = ProductNameUtil(context=context)
-        pname = pnu.create_product_name("L_L1A_RAD")
-        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0", pname)
+            context = setup_test_context()
+            context.set_config_value("time", datetime(2018, 4, 3, 11, 0, 0))
+            pnu = ProductNameUtil(context=context)
+            pname = pnu.create_product_name("L_L1A_RAD")
+            self.assertEqual("HYPERNETS_L_TEST_L1A_RAD_201804031100_202001080945_v0.0", pname)
 
     def test_create_product_name_params(self):
+        with freeze_time("2020/1/8 9:45:30"):
 
-        pnu = ProductNameUtil()
-        pname = pnu.create_product_name("L_L1A_RAD", network="land", site="site", version="0.0",
-                                        time=datetime.datetime(2018, 4, 3, 11, 0, 0))
-        self.assertEqual("HYPERNETS_LAND_SITE_L1A_RAD_201804031100_v0.0", pname)
+            pnu = ProductNameUtil()
+            pname = pnu.create_product_name("L_L1A_RAD", network="l", site_id="test", version="0.0",
+                                            time=datetime(2018, 4, 3, 11, 0, 0))
+            self.assertEqual("HYPERNETS_L_TEST_L1A_RAD_201804031100_202001080945_v0.0", pname)
 
     def test_create_product_name_none(self):
-
-        pnu = ProductNameUtil()
-        pname = pnu.create_product_name("L_L1A_RAD")
-        self.assertEqual("HYPERNETS_L1A_RAD", pname)
+        with freeze_time("2020/1/8 9:45:30"):
+            pnu = ProductNameUtil()
+            pname = pnu.create_product_name("L_L1A_RAD")
+            self.assertEqual("HYPERNETS_L1A_RAD_202001080945", pname)
 
 
 if __name__ == '__main__':
