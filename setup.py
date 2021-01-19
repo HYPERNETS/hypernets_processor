@@ -100,6 +100,9 @@ setup(
             os.path.join("etc", "processor.config"),
             os.path.join("etc", "scheduler.config"),
             os.path.join("etc", "jobs.txt"),
+            os.path.join("etc", "jobs_template.config"),
+            os.path.join("etc", "processor_land_defaults.config"),
+            os.path.join("etc", "processor_water_defaults.config")
         ],
     },
     install_requires=[
@@ -113,6 +116,7 @@ setup(
         "sqlalchemy==1.3.20",
         "sqlalchemy-utils",
         "punpy",
+        "freezegun"
         # "psycopg2",
     ],
     entry_points={
