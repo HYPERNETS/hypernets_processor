@@ -88,13 +88,13 @@ class RhymerHypstar:
                     # get flag value for the temporal variability
                     if measurandstring == 'irradiance':
                         flags[id] = 1
-                        dataset_l1b['quality_flag'][range(len(dataset_l1b['scan']))] = du.set_flag(
-                            dataset_l1b["quality_flag"][range(len(dataset_l1b['scan']))],
+                        dataset_l1b['quality_flag'].sel(scan=scans)[i] = du.set_flag(
+                            dataset_l1b["quality_flag"].sel(scan=scans)[i],
                             "temp_variability_ed")
                     else:
                         flags[id] = 1
-                        dataset_l1b['quality_flag'][range(len(dataset_l1b['scan']))] = du.set_flag(
-                            dataset_l1b["quality_flag"][range(len(dataset_l1b['scan']))],
+                        dataset_l1b['quality_flag'].sel(scan=scans)[i] = du.set_flag(
+                            dataset_l1b["quality_flag"].sel(scan=scans)[i],
                             "temp_variability_lu")
 
                     seq = dataset.attrs["sequence_id"]
