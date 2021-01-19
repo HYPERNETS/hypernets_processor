@@ -879,7 +879,6 @@ class HypernetsReader:
             seriesBlack = [x for x, y in zip(seriesName, action) if int(y) == 0]
             seriesRad = [x for x, y in zip(seriesName, action) if int(y) == 16]
 
-
         else:
             self.context.logger.error("Missing metadata file in sequence directory - check sequence directory")
             self.context.anomaly_db.add_anomaly("s")
