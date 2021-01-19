@@ -92,7 +92,7 @@ class ProductNameUtil:
             version = str(self.context.get_config_value("version"))
 
         if swir:
-            swir="_SWIR"
+            swir="SWIR"
 
         # Prepare product name parts
         ptype = DS_FORMAT_FNAMES[ds_format]
