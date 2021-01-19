@@ -14,7 +14,7 @@ import math
 from pysolar.solar import *
 
 from hypernets_processor.data_io.format.header import HEADER_DEF
-from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.spectrum import Spectrum
 
 from hypernets_processor.version import __version__
@@ -34,7 +34,7 @@ class HypernetsReader:
     def __init__(self, context):
         self.context = context
         self.model = self.context.get_config_value("model").split(',')
-        self.hdsb = HypernetsDSBuilder(context=context)
+        self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context=context)
 
         cckeys = ['mapping_vis_a', 'mapping_vis_b', 'mapping_vis_c', 'mapping_vis_d', 'mapping_vis_e', 'mapping_vis_f']
@@ -215,14 +215,8 @@ class HypernetsReader:
 
         # 2. Create template dataset
         # -----------------------------------
-        dim_sizes_dict = {"wavelength": len(wvl), "scan": scanDim}
-
         # use template from variables and metadata in format
-        ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict, ds_format=fileformat,lat=lat, lon=lon, source=str(seq_dir))
-
-        ds["wavelength"] = wvl
-        # ds["bandwidth"]=wvl
-        ds["scan"] = np.linspace(1, scanDim, scanDim)
+        ds = self.templ.l0_template_dataset(wvl, scanDim, fileformat)
 
         # Keep track of scan number!
         scan_number = 0
@@ -408,23 +402,11 @@ class HypernetsReader:
             wvl = self.read_wavelength(pixCount,cal_data)
             # 2. Create template dataset
             # -----------------------------------
-            dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
-
             # use template from variables and metadata in format
-            ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
-                                              ds_format=fileformat)
-        elif pixCount == 256:
-            wvl = self.read_wavelength(pixCount,cal_data_swir)
-            # 2. Create template dataset
-            # -----------------------------------
-            dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
-
-            # use template from variables and metadata in format
-            ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
-                                              ds_format=fileformat,swir=True)
+            ds = self.templ.l0_template_dataset(wvl, scanDim, fileformat)
         else:
             self.context.logger.error("The number of wavelength pixels does not match "
-                                      "the expected values for VNIR or SWIR.")
+                                      "the expected values for VNIR.")
 
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
@@ -610,21 +592,11 @@ class HypernetsReader:
 
         scanDim=vnir.shape[0]
         wvl = self.read_wavelength(vnir.shape[1],cal_data)
-        dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
-        # use template from variables and metadata in format
-        ds = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
-                                          ds_format=fileformat)
-        ds["wavelength"] = wvl
-        ds["scan"] = np.linspace(1,scanDim,scanDim)
+        ds = self.templ.l0_template_dataset(wvl,scanDim,fileformat)
 
         scanDim=swir.shape[0]
         wvl = self.read_wavelength(swir.shape[1],cal_data_swir)
-        dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
-        # use template from variables and metadata in format
-        ds_swir = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
-                                          ds_format=fileformat,swir=True)
-        ds_swir["wavelength"] = wvl
-        ds_swir["scan"] = np.linspace(1,scanDim,scanDim)
+        ds_swir = self.templ.l0_template_dataset(wvl,scanDim,fileformat,swir=True)
 
         scan_number=0
         scan_number_swir=0
