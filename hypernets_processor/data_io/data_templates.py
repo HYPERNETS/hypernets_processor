@@ -49,7 +49,25 @@ class DataTemplates:
         dataset_cal = dataset_cal.assign_coords(wavdates=wavdates)
         return dataset_cal
 
-    def l1a_template_from_l0_dataset(self, measurandstring, dataset_l0):
+    def l0_template_dataset(self, wvl, scanDim, fileformat, swir=False):
+        """
+        Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
+
+        :param datasetl0:
+        :type datasetl0:
+        :return:
+        :rtype:
+        """
+        dim_sizes_dict = {"wavelength":len(wvl),"scan":scanDim}
+        # use template from variables and metadata in format
+        dataset_l0 = self.hdsb.create_ds_template(dim_sizes_dict=dim_sizes_dict,
+                                          ds_format=fileformat)
+        dataset_l0.assign_coords(wavelength=wvl)
+        dataset_l0.assign_coords(scan=np.linspace(1,scanDim,scanDim))
+
+        return dataset_l0
+
+    def l1a_template_from_l0_dataset(self, measurandstring, dataset_l0, swir=False):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 
@@ -64,10 +82,15 @@ class DataTemplates:
         if measurandstring == "radiance":
             dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,
                                                        ds_format="L_L1A_RAD",
-                                                       propagate_ds=dataset_l0, ds=dataset_l0)
+                                                       propagate_ds=dataset_l0,
+                                                       ds=dataset_l0,
+                                                       swir=swir)
         elif measurandstring == "irradiance":
-            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict, "L_L1A_IRR",
-                                                       propagate_ds=dataset_l0, ds= dataset_l0)
+            dataset_l1a = self.hdsb.create_ds_template(l1a_dim_sizes_dict,
+                                                       "L_L1A_IRR",
+                                                       propagate_ds=dataset_l0,
+                                                       ds= dataset_l0,
+                                                       swir=swir)
 
         dataset_l1a = dataset_l1a.assign_coords(wavelength=dataset_l0.wavelength)
 
