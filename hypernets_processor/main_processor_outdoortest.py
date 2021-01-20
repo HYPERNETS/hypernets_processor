@@ -1,7 +1,7 @@
 """
 Contains main class for orchestrating hypernets data processing jobs
 """
-from datetime import datetime, timezone
+from datetime import timezone
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import SurfaceReflectance
@@ -10,22 +10,14 @@ from hypernets_processor.combine_SWIR.combine_SWIR import CombineSWIR
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
 from hypernets_processor.utils.logging import configure_logging
 from hypernets_processor.utils.config import read_config_file
-from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.context import Context
-from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
-from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
-from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_reader import HypernetsReader
-from hypernets_processor.data_io.calibration_converter import CalibrationConverter
+from hypernets_processor.calibration.calibration_converter import CalibrationConverter
 
-import xarray
 import os
-import matplotlib.pyplot as plt
 from datetime import datetime
-from configparser import ConfigParser
 import time
 
-import xarray as xr
 import numpy as np
 
 '''___Authorship___'''
