@@ -46,7 +46,7 @@ def open_database(url, db_format=None, context=None):
         if db_format == "archive":
             return ArchiveDB(url, context)
         elif db_format == "anomaly":
-            return AnomolyDB(url, context)
+            return AnomalyDB(url, context)
         elif db_format == "metadata":
             return MetadataDB(url, context)
         return dataset.connect(url)
@@ -103,7 +103,7 @@ class HypernetsDBBuilder:
             db.writer = HypernetsWriter(self.context)
 
         elif db_format == "anomaly":
-            db.__class__ = AnomolyDB
+            db.__class__ = AnomalyDB
             db.context = self.context
             db.anomalies_dict = ANOMALIES_DICT
 
@@ -166,9 +166,9 @@ class ArchiveDB(dataset.Database):
         )
 
 
-class AnomolyDB(dataset.Database):
+class AnomalyDB(dataset.Database):
     """
-    Class for handling Anomoly Database in memory, inherits from dataset.Databases
+    Class for handling Anomaly Database in memory, inherits from dataset.Databases
 
     :type url: str
     :param url: database url
