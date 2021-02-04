@@ -68,31 +68,36 @@ class SequenceProcessor:
 
             # Calibrate to L1a
             self.context.logger.info("Processing to L1a...")
-            L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
-            L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
+            if l0_rad:
+                L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
+            if l0_irr:
+                L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
             self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L1b radiance...")
-            L1b_rad = avg.average_l1b("radiance", L1a_rad)
-            print(L1b_rad)
-            if self.context.get_config_value("write_l1b"):
-                writer.write(L1b_rad, overwrite=True)
-            self.context.logger.info("Done")
+            if l0_rad and l0_irr:
+                self.context.logger.info("Processing to L1b radiance...")
+                L1b_rad = avg.average_l1b("radiance", L1a_rad)
+                print(L1b_rad)
+                if self.context.get_config_value("write_l1b"):
+                    writer.write(L1b_rad, overwrite=True)
+                self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L1b irradiance...")
-            L1b_irr = avg.average_l1b("irradiance", L1a_irr)
-            if self.context.get_config_value("write_l1b"):
-                writer.write(L1b_irr, overwrite=True)
-            self.context.logger.info("Done")
+                self.context.logger.info("Processing to L1b irradiance...")
+                L1b_irr = avg.average_l1b("irradiance", L1a_irr)
+                if self.context.get_config_value("write_l1b"):
+                    writer.write(L1b_irr, overwrite=True)
+                self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L1c...")
-            L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)
-            L1c = surf.process_l1c(L1c_int)
-            self.context.logger.info("Done")
+                self.context.logger.info("Processing to L1c...")
+                L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)
+                L1c = surf.process_l1c(L1c_int)
+                self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L2a...")
-            L2a = surf.process_l2(L1c)
-            self.context.logger.info("Done")
+                self.context.logger.info("Processing to L2a...")
+                L2a = surf.process_l2(L1c)
+                self.context.logger.info("Done")
+            else:
+                self.context.logger.info("Not a standard sequence")
 
         elif self.context.get_config_value("network") == "l":
             comb = CombineSWIR(self.context,MCsteps=100)
