@@ -5,6 +5,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import get_config_value
 from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
 from hypernets_processor.data_io.hypernets_db_builder import open_database
+from hypernets_processor.anomaly_handler import AnomalyHandler
 
 import configparser
 
@@ -36,6 +37,7 @@ class Context:
         self.metadata_db = None
         self.anomaly_db = None
         self.archive_db = None
+        self.anomaly_handler = AnomalyHandler(self, self.anomaly_db)
 
         # Set defaults - to be overwritten
         self.set_defaults()
