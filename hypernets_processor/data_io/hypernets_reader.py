@@ -575,17 +575,23 @@ class HypernetsReader:
                     #spectrum.print_header()
                     if len(spectrum.body) > 500:
                         if len(vnir)==0:
-                            vnir=spectrum.body
+                            vnir=np.array(spectrum.body)
                         else:
                             vnir = np.vstack([vnir,spectrum.body])
                     else:
                         if len(swir)==0:
-                            swir=spectrum.body
+                            swir=np.array(spectrum.body)
                         else:
                             swir = np.vstack([swir,spectrum.body])
 
                     byte_pointer = f.tell()
                     chunk_counter += 1
+
+        if len(vnir.shape) == 1:
+            vnir = vnir[None,:]
+        if len(swir.shape)==1:
+            swir=swir[None,:]
+
         self.context.logger.debug("vnir data shape in combined raw files: %s \n "
                                   "swir data shape in combined raw files: %s"
                                   %(vnir.shape,swir.shape))
@@ -597,6 +603,7 @@ class HypernetsReader:
         scanDim=swir.shape[0]
         wvl = self.read_wavelength(swir.shape[1],cal_data_swir)
         ds_swir = self.templ.l0_template_dataset(wvl,scanDim,fileformat,swir=True)
+
 
         scan_number=0
         scan_number_swir=0
@@ -892,6 +899,9 @@ class HypernetsReader:
         l0_irr = None
         l0_rad = None
         l0_bla = None
+        l0_swir_irr = None
+        l0_swir_rad = None
+        l0_swir_bla = None
 
         seq,lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag = self.read_metadata(
             seq_dir)
