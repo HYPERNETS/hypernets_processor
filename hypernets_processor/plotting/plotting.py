@@ -203,7 +203,7 @@ class Plotting():
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             fig1,ax1 = plt.subplots(figsize=(10,5))
-            if labels is None and mask is None:
+            if labels is None and mask is None or ydata.shape[1]==1:
                 ax1.plot(xdata,ydata,alpha=0.3)
             elif mask is None:
                 for i in range(len(labels)):
