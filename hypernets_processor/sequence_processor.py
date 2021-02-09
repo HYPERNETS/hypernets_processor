@@ -110,32 +110,37 @@ class SequenceProcessor:
             l0_irr,l0_rad,l0_bla,l0_swir_irr,l0_swir_rad,l0_swir_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,calibration_data_swir_irr)
             self.context.logger.info("Done")
 
-            # Calibrate to L1a
             self.context.logger.info("Processing to L1a...")
-            L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
-            L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
-
-            L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,
+            if l0_rad:
+                L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
+            if l0_irr:
+                L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
+            if l0_swir_rad:
+                L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,
                                              calibration_data_swir_rad,swir=True)
-            L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,
+            if l0_swir_irr:
+                L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,
                                              calibration_data_swir_irr,swir=True)
             self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L1b radiance...")
-            L1b_rad = comb.combine("radiance", L1a_rad, L1a_swir_rad)
-            self.context.logger.info("Done")
+            if l0_rad and l0_irr:
+                self.context.logger.info("Processing to L1b radiance...")
+                L1b_rad = comb.combine("radiance", L1a_rad, L1a_swir_rad)
+                self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L1b irradiance...")
-            L1b_irr = comb.combine("irradiance", L1a_irr, L1a_swir_irr)
-            self.context.logger.info("Done")
+                self.context.logger.info("Processing to L1b irradiance...")
+                L1b_irr = comb.combine("irradiance", L1a_irr, L1a_swir_irr)
+                self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L1c...")
-            L1c = intp.interpolate_l1c(L1b_rad, L1b_irr)
-            self.context.logger.info("Done")
+                self.context.logger.info("Processing to L1c...")
+                L1c = intp.interpolate_l1c(L1b_rad, L1b_irr)
+                self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L2a...")
-            L2a = surf.process_l2(L1c)
-            self.context.logger.info("Done")
+                self.context.logger.info("Processing to L2a...")
+                L2a = surf.process_l2(L1c)
+                self.context.logger.info("Done")
+            else:
+                self.context.logger.info("Not a standard sequence")
 
         else:
             raise NameError("Invalid network: " + self.context.get_config_value("network"))
