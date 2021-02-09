@@ -25,9 +25,9 @@ __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
 class Calibrate:
-    def __init__(self, context, MCsteps=1000, parallel_cores=0):
+    def __init__(self, context, parallel_cores=0):
         self._measurement_function_factory = MeasurementFunctionFactory()
-        self.prop = PropagateUnc(context, MCsteps, parallel_cores=parallel_cores)
+        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context)
         self.plot = Plotting(context)

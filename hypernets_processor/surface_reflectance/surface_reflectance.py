@@ -28,9 +28,9 @@ __status__ = "Development"
 
 
 class SurfaceReflectance:
-    def __init__(self, context, MCsteps=1000, parallel_cores=1):
+    def __init__(self, context, parallel_cores=1):
         self._measurement_function_factory = ProtocolFactory(context=context)
-        self.prop = PropagateUnc(context, MCsteps, parallel_cores=parallel_cores)
+        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
         self.avg = Average(context)

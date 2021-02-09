@@ -24,9 +24,9 @@ __status__ = "Development"
 
 
 class CombineSWIR:
-    def __init__(self,context,MCsteps=1000,parallel_cores=1):
+    def __init__(self,context,parallel_cores=1):
         self._measurement_function_factory = CombineFactory()
-        self.prop = PropagateUnc(context, MCsteps, parallel_cores=parallel_cores)
+        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
         self.avg = Average(context=context)
         self.templ = DataTemplates(context)
         self.writer=HypernetsWriter(context)
