@@ -25,7 +25,7 @@ class RhymerHypstar:
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
         self.avg = Average(context)
-        self.intp = Interpolate(context, MCsteps=1000)
+        self.intp = Interpolate(context)
         self.plot = Plotting(context)
         self.rhymeranc = RhymerAncillary(context)
         self.rhymerproc = RhymerProcessing(context)
