@@ -888,7 +888,7 @@ class HypernetsReader:
 
         else:
             self.context.logger.error("Missing metadata file in sequence directory - check sequence directory")
-            self.context.anomaly_db.add_anomaly("s")
+            self.context.anomaly_handler.add_anomaly("s")
 
         return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag
 
