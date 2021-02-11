@@ -76,6 +76,7 @@ def cli():
     if parsed_args.job_config:
         tmp_job = False
         job_config_path = parsed_args.job_config
+        job_config = read_config_file(job_config_path)
 
     # Else build and write temporary job config from command line arguments
     else:
@@ -110,19 +111,10 @@ def cli():
         job_config["Job"]["job_name"] = "run_" + dt.now().strftime("%Y%m%dT%H%M%S")
         home_directory = os.path.expanduser("~")
         job_config["Job"]["job_working_directory"] = os.path.join(home_directory, ".hypernets", "tmp")
-        job_config_path = os.path.join(
-            job_config["Job"]["job_working_directory"],
-            job_config["Job"]["job_name"] + ".config"
-        )
-        os.makedirs(job_config["Job"]["job_working_directory"], exist_ok=True)
-        with open(job_config_path, "w") as f:
-            job_config.write(f)
 
     # run main
-    main(processor_config_path=PROCESSOR_CONFIG_PATH, job_config_path=job_config_path, to_archive=False)
-
-    if tmp_job:
-        os.remove(job_config_path)
+    processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
+    main(processor_config=processor_config, job_config=job_config, to_archive=False)
 
     return None
 
