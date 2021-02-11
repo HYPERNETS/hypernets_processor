@@ -125,11 +125,19 @@ def main(processor_config_path, job_config_path, to_archive):
             try:
                 sp.process_sequence(target_sequence)
                 target_sequences_passed += 1
+
+                if context.anomaly_handler.anomalies_added is not []:
+                    context.logger.info("Processing Anomalies: " + str(context.anomaly_handler.anomalies_added))
+
                 context.logger.info("Complete")
             except Exception as e:
+
+                context.anomaly_handler.add_x_anomaly()
+                if context.anomaly_handler.anomalies_added is not []:
+                    context.logger.info("Processing Anomalies: " + str(context.anomaly_handler.anomalies_added))
+
                 logger.error("Failed: " + repr(e))
                 logger.debug(traceback.format_exc())
-                context.anomaly_db.add_x_anomaly()
 
         msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + \
               " sequences successfully processed"
