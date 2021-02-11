@@ -37,7 +37,7 @@ class Context:
         self.metadata_db = None
         self.anomaly_db = None
         self.archive_db = None
-        self.anomaly_handler = AnomalyHandler(self, self.anomaly_db)
+        self.anomaly_handler = AnomalyHandler(self)
 
         # Set defaults - to be overwritten
         self.set_defaults()
@@ -66,6 +66,9 @@ class Context:
                             context=self
                         )
                     )
+
+        # If anomaly_db not None, add it to anomaly_handler
+        self.anomaly_handler.anomaly_db = self.anomaly_db
 
     def unpack_config(self, config, protected_values=None):
         """
