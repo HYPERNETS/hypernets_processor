@@ -77,22 +77,19 @@ def get_target_sequences(context, to_archive):
     return raw_paths
 
 
-def main(processor_config_path, job_config_path, to_archive):
+def main(processor_config, job_config, to_archive):
     """
     Main function to run processing chain for sequence files
 
-    :type processor_config_path: str
-    :param processor_config_path: processor configuration file path
+    :type processor_config: configparser.RawConfigParser
+    :param processor_config: processor configuration file path
 
-    :type job_config_path: str
-    :param job_config_path: job configuration file path
+    :type job_config: configparser.RawConfigParser
+    :param job_config: job configuration file path
 
     :type to_archive: bool
     :param to_archive: switch for if to add processed data to data archive
     """
-
-    processor_config = read_config_file(processor_config_path)
-    job_config = read_config_file(job_config_path)
 
     # Configure logging
     name = __name__
