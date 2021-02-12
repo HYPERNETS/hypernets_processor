@@ -10,10 +10,8 @@ from hypernets_processor.utils.config import (
     PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
 )
 from hypernets_processor.utils.cli import configure_std_parser
-from hypernets_processor.utils.config import read_config_file
+from hypernets_processor.utils.config import read_config_file, get_config_value
 from hypernets_processor.main.sequence_processor_main import main
-from datetime import datetime as dt
-import sys
 import os
 
 
@@ -51,7 +49,9 @@ def configure_parser():
     parser.add_argument("--write-all", action="store_true",
                         help="Write all products at intermediate data processing levels before final product")
     parser.add_argument("-j", "--job-config", action="store",
-                        help="Use instead of above arguments to specify job with configuration file")
+                        help="Job configuration file path. May be used to specify job instead of/along with commandline"
+                             "arguments (any fields in both job configuration file overwritten by commandline "
+                             "arguments)")
     return parser
 
 
@@ -59,70 +59,64 @@ parser = configure_parser()
 parsed_args = parser.parse_args()
 
 
-if parsed_args.job_config and (
-        parsed_args.input_directory or parsed_args.output_directory
-        or parsed_args.network or parsed_args.write_all
-):
-    print("-j is mutually exclusive with other input arguments")
-    sys.exit(2)
-
-
 def cli():
     """
     Command line interface to sequence_processor_main for ad-hoc job processing
     """
 
+    network = "land"
+
     # If job config specified use
     if parsed_args.job_config:
-        tmp_job = False
         job_config_path = parsed_args.job_config
 
-    # Else build and write temporary job config from command line arguments
+        job_config = read_config_file(job_config_path)
+        network = get_config_value(job_config, "Job", "network").lower()
+        del job_config
+
+    # Else start with template job config
     else:
-        tmp_job = True
+        job_config_path = JOB_CONFIG_TEMPLATE_PATH
 
+    # Check if network defined in args and overwrite
+    if parsed_args.network is not None:
+        network = parsed_args.network
+
+    # Select appropriate processor defaults
+    if network in ["land", "l"]:
+        processor_defaults = PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
+    elif network in ["water", "w"]:
         processor_defaults = PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
-        if parsed_args.network == "land":
-            processor_defaults = PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
+    else:
+        raise ValueError("Invalid network name - " + network)
 
-        job_config = read_config_file([JOB_CONFIG_TEMPLATE_PATH, processor_defaults])
-        if parsed_args.input_directory is not None:
-            job_config["Input"]["raw_data_directory"] = os.path.abspath(parsed_args.input_directory)
-        else:
-            print("-i required")
-            sys.exit(2)
+    # Read config file
+    job_config = read_config_file([job_config_path, processor_defaults])
 
-        if parsed_args.output_directory is not None:
-            job_config["Output"]["archive_directory"] = os.path.abspath(parsed_args.output_directory)
-        else:
-            print("-o required")
-            sys.exit(2)
+    # Overwrite config values with any args from commandline
+    if parsed_args.input_directory is not None:
+        job_config["Input"]["raw_data_directory"] = os.path.abspath(parsed_args.input_directory)
 
-        if parsed_args.write_all:
-            for key in job_config["Output"].keys():
-                if key[:5] == "write":
-                    job_config["Output"][key] = "True"
+    if parsed_args.output_directory is not None:
+        job_config["Output"]["archive_directory"] = os.path.abspath(parsed_args.output_directory)
 
-        job_config["Log"]["log_path"] = os.path.abspath(parsed_args.log) if parsed_args.log is not None else ""
-        job_config["Log"]["verbose"] = str(parsed_args.verbose) if parsed_args.verbose is not None else ""
-        job_config["Log"]["quiet"] = str(parsed_args.quiet) if parsed_args.verbose is not None else ""
+    if parsed_args.write_all:
+        for key in job_config["Output"].keys():
+            if key[:5] == "write":
+                job_config["Output"][key] = "True"
 
-        job_config["Job"]["job_name"] = "run_" + dt.now().strftime("%Y%m%dT%H%M%S")
-        home_directory = os.path.expanduser("~")
-        job_config["Job"]["job_working_directory"] = os.path.join(home_directory, ".hypernets", "tmp")
-        job_config_path = os.path.join(
-            job_config["Job"]["job_working_directory"],
-            job_config["Job"]["job_name"] + ".config"
-        )
-        os.makedirs(job_config["Job"]["job_working_directory"], exist_ok=True)
-        with open(job_config_path, "w") as f:
-            job_config.write(f)
+    if parsed_args.log is not None:
+        job_config["Log"]["log_path"] = os.path.abspath(parsed_args.log)
+
+    if parsed_args.verbose is not None:
+        job_config["Log"]["verbose"] = str(parsed_args.verbose)
+
+    if parsed_args.verbose is not None:
+        job_config["Log"]["quiet"] = str(parsed_args.quiet)
 
     # run main
-    main(processor_config_path=PROCESSOR_CONFIG_PATH, job_config_path=job_config_path, to_archive=False)
-
-    if tmp_job:
-        os.remove(job_config_path)
+    processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
+    main(processor_config=processor_config, job_config=job_config, to_archive=False)
 
     return None
 
