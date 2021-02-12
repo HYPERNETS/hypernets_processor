@@ -83,7 +83,7 @@ class Calibrate:
         ids = np.where((abs(dataset['acquisition_time'] - acq_time) ==
                         min(abs(dataset['acquisition_time'] - acq_time))) &
                        (dataset['integration_time'] == int_time))
-        #todo check if interation time alwasy has to be same
+        #todo check if integration time always has to be same
 
         return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
 
