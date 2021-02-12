@@ -46,7 +46,7 @@ def open_database(url, db_format=None, context=None):
         if db_format == "archive":
             return ArchiveDB(url, context)
         elif db_format == "anomaly":
-            return AnomolyDB(url, context)
+            return AnomalyDB(url, context)
         elif db_format == "metadata":
             return MetadataDB(url, context)
         return dataset.connect(url)
@@ -103,7 +103,7 @@ class HypernetsDBBuilder:
             db.writer = HypernetsWriter(self.context)
 
         elif db_format == "anomaly":
-            db.__class__ = AnomolyDB
+            db.__class__ = AnomalyDB
             db.context = self.context
             db.anomalies_dict = ANOMALIES_DICT
 
@@ -166,23 +166,19 @@ class ArchiveDB(dataset.Database):
         )
 
 
-class AnomolyDB(dataset.Database):
+class AnomalyDB(dataset.Database):
     """
-    Class for handling Anomoly Database in memory, inherits from dataset.Databases
+    Class for handling Anomaly Database in memory, inherits from dataset.Databases
 
     :type url: str
     :param url: database url
 
     :type context: hypernets_processor.context.Context
     :param context: processor context
-
-    :type anomalies_dict: dict
-    :param anomalies_dict: anomaly definitions
     """
 
-    def __init__(self, url, context, anomalies_dict=ANOMALIES_DICT):
+    def __init__(self, url, context):
         self.context = context
-        self.anomalies_dict = anomalies_dict
         super().__init__(url)
 
     def add_anomaly(self, anomaly_id):
@@ -192,11 +188,6 @@ class AnomolyDB(dataset.Database):
         :type anomaly_id: str
         :param anomaly_id: anomaly id, must match name of entry in self.anomalies dict
         """
-
-        # Check anomaly defined
-        if anomaly_id not in self.get_anomaly_ids():
-            self.context.logger.debug("Unknown anomaly_id (" + anomaly_id + ") - not add to anomaly database")
-            return
 
         # Add anomaly to db
         tbl = self.get_table("anomalies")
@@ -211,67 +202,6 @@ class AnomolyDB(dataset.Database):
 
             )
         )
-
-        # Exit if anomaly requires error
-        error = self.get_anomaly_error(anomaly_id)
-        error_msg = self.get_anomaly_error_msg(anomaly_id)
-        if error is not None:
-            self.context.logger.error(error_msg)
-            raise error(error_msg)
-
-    def add_x_anomaly(self):
-        """
-        Adds unexpect error anomaly to anomaly database if expected anomaly not already
-        """
-
-        if self.get_sequence_crashing_anomalies() == []:
-            self.add_anomaly("x")
-
-    def get_anomaly_ids(self):
-        """
-        Returns available anomaly ids
-
-        :rtype: list
-        :return: anomaly ids
-        """
-
-        return list(self.anomalies_dict.keys())
-
-    def get_anomaly_error(self, anomaly_id):
-        """
-        Returns error for anomaly id
-
-        :rtype: Error
-        :return: anomaly error
-        """
-
-        return self.anomalies_dict[anomaly_id]["error"]
-
-    def get_anomaly_error_msg(self, anomaly_id):
-        """
-        Returns error msg for anomaly id
-
-        :rtype: list
-        :return: anomaly error msg
-        """
-
-        return self.anomalies_dict[anomaly_id]["error_msg"]
-
-    def get_crashing_anomaly_ids(self):
-        """
-        Returns available anomaly ids that result in crashes
-
-        :rtype: list
-        :return: crashing anomaly ids
-        """
-
-        crashing_anomalies = []
-
-        for anomaly_id in self.get_anomaly_ids():
-            if self.get_anomaly_error(anomaly_id) is not None:
-                crashing_anomalies.append(anomaly_id)
-
-        return crashing_anomalies
 
     def get_sequence_anomalies(self, sequence_name=None, site_id=None):
         """
@@ -303,34 +233,6 @@ class AnomolyDB(dataset.Database):
         ]
 
         return anomalies
-
-    def get_sequence_crashing_anomalies(self, sequence_name=None, site_id=None):
-        """
-        Returns crashing anomaly ids of anomalies currently registered for the processed sequence if context attribute
-        is not None, else define
-
-        :type sequence_name: str
-        :param sequence_name: (optional) name of sequence to lookup anomaly ids for, if omitted gets sequence id from
-        context, if avaiable
-
-        :type site_id: str
-        :param site_id: (optional) name of site to lookup anomaly ids for, if omitted gets site id from
-        context, if avaiable
-
-        :rtype: list
-        :return: sequence crashing anomaly ids
-        """
-
-        if self.context is not None:
-            sequence_name = self.context.get_config_value("sequence_name")
-            site_id = self.context.get_config_value("site_id")
-
-        crashing_sequence_anomalies = []
-        for anomaly_id in self.get_sequence_anomalies(sequence_name, site_id):
-            if anomaly_id in self.get_crashing_anomaly_ids():
-                crashing_sequence_anomalies.append(anomaly_id)
-
-        return crashing_sequence_anomalies
 
 
 class MetadataDB(dataset.Database):
