@@ -77,7 +77,6 @@ class SequenceProcessor:
             if l0_rad and l0_irr:
                 self.context.logger.info("Processing to L1b radiance...")
                 L1b_rad = avg.average_l1b("radiance", L1a_rad)
-                print(L1b_rad)
                 if self.context.get_config_value("write_l1b"):
                     writer.write(L1b_rad, overwrite=True)
                 self.context.logger.info("Done")
