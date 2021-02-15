@@ -84,7 +84,7 @@ def cli():
         settings[db_fmt + "_db_url"] = determine_set_value(
             db_fmt+"_db_url",
             context,
-            default="sqlite:///"+os.path.join(settings["working_directory"], db_fmt+".db"),
+            default="sqlite:///"+os.path.join(settings["archive_directory"], db_fmt+".db"),
         )
 
     settings["log_path"] = os.path.join(settings["working_directory"], "scheduler.log")
