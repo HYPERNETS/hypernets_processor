@@ -289,7 +289,7 @@ class HypernetsReader:
                     # maybe xarray has a better way to do - check merge, concat, ...
                     series_id = model['series_id']
                     ds["series_id"][scan_number] = series_id
-                    ds["viewing_azimuth_angle"][scan_number] = model['vaa']
+                    ds["viewing_azimuth_angle"][scan_number] =  model['vaa']
                     ds["viewing_zenith_angle"][scan_number] = model['vza']
 
                     # estimate time based on timestamp
@@ -472,7 +472,7 @@ class HypernetsReader:
                 # maybe xarray has a better way to do - check merge, concat, ...
                 series_id = model['series_id']
                 ds["series_id"][scan_number] = series_id
-                ds["viewing_azimuth_angle"][scan_number] = model['vaa']
+                ds["viewing_azimuth_angle"][scan_number] =  model['vaa']
                 ds["viewing_zenith_angle"][scan_number] = model['vza']
 
                 # estimate time based on timestamp
@@ -713,7 +713,7 @@ class HypernetsReader:
 
                         series_id = model['series_id']
                         ds_swir["series_id"][scan_number_swir] = series_id
-                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = model['vaa']
+                        ds_swir["viewing_azimuth_angle"][scan_number_swir] =  model['vaa']
                         ds_swir["viewing_zenith_angle"][scan_number_swir] = model['vza']
 
                         # estimate time based on timestamp
