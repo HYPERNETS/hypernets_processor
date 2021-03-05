@@ -4,7 +4,8 @@ cli for job scheduler
 
 from hypernets_processor.version import __version__
 from hypernets_processor.main.scheduler_main import main
-from hypernets_processor.utils.config import SCHEDULER_CONFIG_PATH
+from hypernets_processor.utils.config import read_config_file
+from hypernets_processor.utils.config import SCHEDULER_CONFIG_PATH, PROCESSOR_CONFIG_PATH
 import argparse
 
 
@@ -44,8 +45,14 @@ def cli():
     Command line interface function for scheduler_main
     """
 
+    scheduler_config = read_config_file(SCHEDULER_CONFIG_PATH)
+    processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
+
     # run main
-    main(scheduler_config_path=SCHEDULER_CONFIG_PATH)
+    main(
+        scheduler_config=scheduler_config,
+        processor_config=processor_config
+    )
 
     return None
 
