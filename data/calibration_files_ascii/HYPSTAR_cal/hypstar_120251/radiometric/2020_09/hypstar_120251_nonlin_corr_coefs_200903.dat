@@ -1,0 +1,21 @@
+# hypstar_120251_nonlin_corr_coefs_200903.dat	
+# Polynomial coefficients for nonlinearity correction factor	
+# Corrected_DN = DN / (c0 + c1 * DN + c2 * DN^2 + ...)	
+# Uncertainty related to nonlinearity (percent, k=2):	
+# u_VNIR	0.31
+# u_SWIR	NA
+# row1 - c0, row2 - c1, ...	
+#VNIR	SWIR
+0.999940955956867	0
+-1.06787496116849e-10	0
+2.68394564801857e-12	0
+4.87828899911291e-16	0
+-4.93442534564553e-20	0
+1.04386118956008e-24	0
+-7.21068881022043e-30	0
+0	0
+0	0
+0	0
+0	0
+0	0
+0	0
