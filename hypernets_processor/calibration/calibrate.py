@@ -11,10 +11,8 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.plotting.plotting import Plotting
 
-import punpy
 import numpy as np
-import os
-import glob
+import matplotlib.pyplot as plt
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -82,10 +80,17 @@ class Calibrate:
     def find_nearest_black(self, dataset, acq_time, int_time):
         ids = np.where((abs(dataset['acquisition_time'] - acq_time) ==
                         min(abs(dataset['acquisition_time'] - acq_time))) &
-                       (dataset['integration_time'] == int_time))
-        #todo check if integration time always has to be same
+                       (dataset['integration_time'] == int_time))[0]
 
-        return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
+        dark_mask=self.quality_checks(dataset["digital_number"].values[:,ids])
+        if np.sum(dark_mask)>0:
+            dark_outlier=1
+        else:
+            dark_outlier=0
+        ids2=ids[np.where(dark_mask==0)]
+        avg_black_series = np.mean(dataset["digital_number"].values[:,ids[np.where(dark_mask==0)]], axis=1)
+        #todo check if integration time always has to be same
+        return avg_black_series,dark_outlier
 
     def preprocess_l0(self, datasetl0, datasetl0_bla, dataset_calib):
         """
@@ -101,12 +106,25 @@ class Calibrate:
 
         datasetl0=datasetl0.isel(wavelength=slice(int(wavpix[0]),int(wavpix[-1])+1))
         datasetl0_bla=datasetl0_bla.isel(wavelength=slice(int(wavpix[0]),int(wavpix[-1])+1))
-        mask = self.clip_and_mask(datasetl0,datasetl0_bla)
-
         datasetl0 = datasetl0.assign_coords(wavelength=wavs)
         datasetl0_bla = datasetl0_bla.assign_coords(wavelength=wavs)
 
+        series_ids = np.unique(datasetl0['series_id'])
+        dark_signals = np.zeros_like(datasetl0['digital_number'].values)
+        dark_outliers= np.zeros_like(datasetl0['quality_flag'].values)
+        mask = []
+        for i in range(len(series_ids)):
+            ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
+            for ii,id in enumerate(ids):
+                dark_signals[:,id],dark_outliers[id] = self.find_nearest_black(datasetl0_bla,
+                datasetl0['acquisition_time'].values[id],
+                datasetl0['integration_time'].values[id])
+            maski=self.quality_checks((datasetl0["digital_number"].values[:, ids]-
+                                 dark_signals[:,ids]))
+            mask = np.append(mask, maski)
+
         datasetl0["quality_flag"][np.where(mask==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask==1)],"outliers") #for i in range(len(mask))]
+        datasetl0["quality_flag"][np.where(dark_outliers==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(dark_outliers==1)],"dark_outliers") #for i in range(len(mask))]
 
         DN_rand = DatasetUtil.create_variable(
             [len(datasetl0["wavelength"]),len(datasetl0["scan"])],
@@ -115,16 +133,11 @@ class Calibrate:
         datasetl0["u_random_digital_number"] = DN_rand
 
         rand = np.zeros_like(DN_rand.values)
-        series_ids = np.unique(datasetl0['series_id'])
         for i in range(len(series_ids)):
             ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
             ids_masked = np.where((datasetl0['series_id'] == series_ids[i]) & (mask == 0))[0]
-            dark_signals=np.zeros_like(datasetl0['digital_number'].values[:,ids_masked])
-            for ii,id in enumerate(ids_masked):
-                dark_signals[:,ii] = self.find_nearest_black(datasetl0_bla,
-                datasetl0['acquisition_time'].values[id],
-                datasetl0['integration_time'].values[id])
-            std = np.std((datasetl0['digital_number'].values[:,ids_masked]-dark_signals), axis=1)
+            std = np.std((datasetl0['digital_number'].values[:,ids_masked]-dark_signals[:,ids_masked]), axis=1)
+
             for ii,id in enumerate(ids):
                 rand[:, id] = std
 
@@ -135,43 +148,20 @@ class Calibrate:
             dim_names=["wavelength","scan"],dtype=np.uint32,fill_value=0)
 
         datasetl0["dark_signal"] = DN_dark
-
-        dark_signals = []
-        acqui = datasetl0['acquisition_time'].values
-        inttimes = datasetl0['integration_time'].values
-        for i in range(len(acqui)):
-            dark_signals.append(self.find_nearest_black(datasetl0_bla,acqui[i],inttimes[i]))
-
-        datasetl0["dark_signal"].values = np.array(dark_signals).T
+        datasetl0["dark_signal"].values = dark_signals
 
         return datasetl0
 
-    def clip_and_mask(self, dataset, dataset_bla, k_unc=3):
-        mask = []
-
-        # check if zeros, max, fillvalue:
-
-        # check if integrated signal is outlier
-        series_ids = np.unique(dataset['series_id'])
-        for i in range(len(series_ids)):
-            ids = np.where(dataset['series_id'] == series_ids[i])
-            dark_signals = self.find_nearest_black(dataset_bla,np.mean(
-                dataset['acquisition_time'].values[ids]),np.mean(
-                dataset['integration_time'].values[ids]))
-            intsig = np.nanmean((dataset["digital_number"].values[:, ids]-
-                                 dark_signals[:,None,None]), axis=0)[0]
-            noisestd, noiseavg = self.sigma_clip(intsig) # calculate std and avg for non NaN columns
-            maski = np.zeros_like(intsig) # mask the columns that have NaN
-            maski[np.where(np.abs(intsig - noiseavg) >= k_unc * noisestd)] = 1
-            mask = np.append(mask, maski)
-
-
-        # check if 10% of pixels are outiers
-
-        # mask_wvl = np.zeros((len(datasetl0["wavelength"]),len(datasetl0["scan"])))
-        # for i in range(len(dataset["wavelength"])):
-
+    def quality_checks(self,data_subset, k_unc=3):
+        intsig =np.nanmean(data_subset,axis=0)
+        mask = np.zeros_like(intsig)  # mask the columns that have NaN
+        if len(intsig)>1:
+            noisestd,noiseavg = self.sigma_clip(
+                intsig)  # calculate std and avg for non NaN columns
+            mask[np.where(np.abs(intsig-noiseavg) >= k_unc*noisestd)] = 1
+            mask[np.where(np.abs(intsig-noiseavg) >= 0.25*intsig)] = 1
         return mask
+
 
     def sigma_clip(self,values,tolerance=0.01,median=True,sigma_thresh=3.0):
         # Remove NaNs from input values

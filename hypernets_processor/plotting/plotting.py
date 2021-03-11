@@ -7,9 +7,11 @@ from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 import matplotlib.pyplot as plt
+plt.style.use('tableau-colorblind10')
 import numpy as np
 import os.path
 import warnings
+
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -212,13 +214,14 @@ class Plotting():
                 ax1.plot(xdata,ydata,alpha=0.3)
             else:
                 ax1.plot(xdata,ydata[:,np.where(mask)].reshape((len(ydata),len(np.where(mask)[0]))),label="masked",alpha=0.3,color="red")
-                ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3,color="green")
+                ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3,color="blue")
 
             if labels is not None or mask is not None:
                 handles,labels = plt.gca().get_legend_handles_labels()
-                colors=["red","green","blue","orange","cyan","magenta"]
+                colors=["red","blue","orange","cyan","magenta","green"]
                 icol=0
                 labelsb=[]
+                handlesb=[]
                 for i,p in enumerate(ax1.get_lines()):
                     if p.get_label() in labelsb:  # check for Name already exists
                         idx = labels.index(p.get_label())  # find ist index
@@ -227,9 +230,10 @@ class Plotting():
 
                     elif p.get_label()[0]!="_":
                         labelsb.append(p.get_label())
+                        handlesb.append(p)
                         p.set_c(colors[icol])
                         icol+=1
-                ax1.legend()  # correct legend
+                ax1.legend(handlesb,labelsb)  # correct legend
 
             ax1.set_xlabel("Wavelength (nm)")
             ax1.set_ylabel(measurandstring)

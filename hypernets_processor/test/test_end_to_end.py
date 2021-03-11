@@ -12,6 +12,7 @@ from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.context import Context
 from hypernets_processor import HypernetsDSBuilder
 from hypernets_processor.test.test_functions import setup_test_context, teardown_test_context
+from hypernets_processor.calibration.calibration_converter import CalibrationConverter
 
 import os.path
 import matplotlib.pyplot as plt
@@ -115,6 +116,7 @@ class TestEndToEnd(unittest.TestCase):
         context.set_config_value("processor_directory",this_directory_path)
         context.set_config_value("calibration_directory",os.path.join(this_directory_path,"..\\calibration_files\\HYPSTAR_cal\\"))
         context.set_config_value("archive_directory", os.path.join(tmpdir,"out"))
+        context.set_config_value("mcsteps", 100)
 
         context.set_config_value('version','0.1')
         context.set_config_value('site_abbr','test')
@@ -133,15 +135,18 @@ class TestEndToEnd(unittest.TestCase):
         context.set_config_value('plotting_directory',os.path.join(tmpdir,"out/plots/"))
         context.set_config_value('plotting_format',"png")
 
-        cal = Calibrate(context,MCsteps=100)
+        calcon = CalibrationConverter(context)
+        cal = Calibrate(context)
         avg = Average(context)
-        intp = Interpolate(context,MCsteps=1000)
-        surf = SurfaceReflectance(context,MCsteps=1000)
+        intp = Interpolate(context)
+        surf = SurfaceReflectance(context)
 
+        (calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,
+         calibration_data_swir_irr) = calcon.read_calib_files()
         test_l0_rad,test_l0_irr,test_l0_bla,test_l1a_rad,test_l1a_irr,test_l1b_rad,test_l1b_irr,test_l2a,test_l2a_avg=setup_test_files(context)
 
-        L1a_rad = cal.calibrate_l1a("radiance",test_l0_rad,test_l0_bla)
-        L1a_irr = cal.calibrate_l1a("irradiance",test_l0_irr,test_l0_bla)
+        L1a_rad = cal.calibrate_l1a("radiance",test_l0_rad,test_l0_bla,calibration_data_rad)
+        L1a_irr = cal.calibrate_l1a("irradiance",test_l0_irr,test_l0_bla,calibration_data_irr)
         L1b_rad = avg.average_l1b("radiance",L1a_rad)
         L1b_irr = avg.average_l1b("irradiance",L1a_irr)
         L1c = intp.interpolate_l1c(L1b_rad,L1b_irr)

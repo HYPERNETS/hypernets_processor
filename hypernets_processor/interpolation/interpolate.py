@@ -101,7 +101,7 @@ class Interpolate:
             [None,None,dataset_l1b_irr['u_systematic_corr_rad_irr_irradiance'].values],
             [None,None,dataset_l1b_irr["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1b_irr["corr_systematic_corr_rad_irr_irradiance"].values],
-            )
+            param_fixed=[True,True,False])
 
         # Interpolate in time to radiance times
         acqui_irr = dataset_l1b_irr['acquisition_time'].values

@@ -1,7 +1,3 @@
-
-
-
-
 class StandardMeasurementFunction:
 
     def function(self,digital_number,gains,dark_signal,non_linear,int_time):

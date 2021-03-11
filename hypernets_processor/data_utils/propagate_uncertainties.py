@@ -20,7 +20,8 @@ __status__ = "Development"
 class PropagateUnc:
     def __init__(self,context,parallel_cores):
         if context.get_config_value("mcsteps")>1:
-            self.prop = punpy.MCPropagation(context.get_config_value("mcsteps"), parallel_cores=parallel_cores)
+            self.prop = punpy.MCPropagation(context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
+            self.prop2 = punpy.MCPropagation(context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
         self.context=context
 
     def find_input_l1a(self, variables, dataset, calib_dataset):
@@ -37,9 +38,9 @@ class PropagateUnc:
         inputs = []
         for var in variables:
             try:
-                inputs.append(dataset[var].values)
+                inputs.append(dataset[var].values.astype("float32"))
             except:
-                inputs.append(calib_dataset[var].values)
+                inputs.append(calib_dataset[var].values.astype("float32"))
         return inputs
 
     def find_u_random_input_l1a(self, variables, dataset, calib_dataset):
@@ -191,15 +192,15 @@ class PropagateUnc:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
-                                                                u_random_input_quantities,repeat_dims=[1],param_fixed=param_fixed)
+                                                                u_random_input_quantities,param_fixed=param_fixed)
                 u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
                     measurement_function,input_quantities,u_systematic_input_quantities_indep,
                     corr_x=corr_systematic_input_quantities_indep,return_corr=True,
-                    repeat_dims=[1],corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
+                    corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
                 u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
                     measurement_function,input_quantities,u_systematic_input_quantities_corr,
                     corr_x=corr_systematic_input_quantities_corr,return_corr=True,
-                    repeat_dims=1,corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
+                    corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
 
             dataset["u_random_" + measurandstring].values = u_random_measurand
             dataset["u_systematic_indep_" + measurandstring].values = u_syst_measurand_indep
@@ -225,16 +226,16 @@ class PropagateUnc:
 
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                u_random_measurand = self.prop.propagate_random(measurement_function,
+                u_random_measurand = self.prop2.propagate_random(measurement_function,
                                                                 input_quantities,
                                                                 u_random_input_quantities,
-                                                            param_fixed=param_fixed)
-                u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
+                                                                param_fixed=param_fixed)
+                u_syst_measurand_indep,corr_syst_measurand_indep = self.prop2.propagate_systematic(
                     measurement_function,input_quantities,
                     u_systematic_input_quantities_indep,
                     corr_x=corr_systematic_input_quantities_indep,return_corr=True,
                     corr_axis=0,param_fixed=param_fixed)
-                u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
+                u_syst_measurand_corr,corr_syst_measurand_corr = self.prop2.propagate_systematic(
                     measurement_function,input_quantities,u_systematic_input_quantities_corr,
                     corr_x=corr_systematic_input_quantities_corr,return_corr=True,
                     corr_axis=0,param_fixed=param_fixed)
