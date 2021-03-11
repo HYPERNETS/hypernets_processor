@@ -80,6 +80,7 @@ class Calibrate:
     def find_nearest_black(self, dataset, acq_time, int_time):
         ids = np.where((abs(dataset['acquisition_time'] - acq_time) ==
                         min(abs(dataset['acquisition_time'] - acq_time))) &
+<<<<<<< HEAD
                        (dataset['integration_time'] == int_time))[0]
 
         dark_mask=self.quality_checks(dataset["digital_number"].values[:,ids])
@@ -91,6 +92,12 @@ class Calibrate:
         avg_black_series = np.mean(dataset["digital_number"].values[:,ids[np.where(dark_mask==0)]], axis=1)
         #todo check if integration time always has to be same
         return avg_black_series,dark_outlier
+=======
+                       (dataset['integration_time'] == int_time))
+        #todo check if integration time always has to be same
+
+        return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
+>>>>>>> 6ac33ca4c468c21a5bc632a917895a8ecc897ac7
 
     def preprocess_l0(self, datasetl0, datasetl0_bla, dataset_calib):
         """
