@@ -38,7 +38,6 @@ class Calibrate:
             self.context.logger.error("the measurandstring needs to be either 'radiance' or 'irradiance")
             exit()
 
-
         if self.context.get_config_value("plot_l0"):
             self.plot.plot_scans_in_series("digital_number",dataset_l0)
 
@@ -47,7 +46,10 @@ class Calibrate:
         input_vars = calibrate_function.get_argument_names()
 
         dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
+
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0, swir)
+        print(dataset_l1a.attrs)
+
         input_qty = self.prop.find_input_l1a(input_vars, dataset_l0, calibration_data)
         u_random_input_qty = self.prop.find_u_random_input_l1a(input_vars, dataset_l0, calibration_data)
         u_systematic_input_qty_indep,u_systematic_input_qty_corr,\
