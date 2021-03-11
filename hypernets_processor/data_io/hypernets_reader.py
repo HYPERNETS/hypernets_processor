@@ -350,7 +350,7 @@ class HypernetsReader:
 
         return ds
 
-    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data=None, cal_data_swir=None):
+    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, instrument_id, site_id):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -415,6 +415,10 @@ class HypernetsReader:
 
 
         ds.attrs["source_file"]= str(os.path.basename(seq_dir))
+        ds.attrs["instrument_id"]= str(instrument_id)
+        ds.attrs["site_id"]= str(site_id)
+
+
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
         ds["scan"] = np.linspace(1, scanDim, scanDim)
@@ -531,9 +535,10 @@ class HypernetsReader:
                 if f.tell() == eof:
                     nextLine = False
 
+
         return ds
 
-    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir):
+    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir,instrument_id, site_id):
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         model_name = self.model
 
@@ -674,6 +679,8 @@ class HypernetsReader:
                         if lat is not None:
                             ds.attrs["site_latitude"] = lat
                             ds.attrs["site_longitude"] = lon
+                            ds.attrs["instrument_id"] = str(instrument_id)
+                            ds.attrs["site_id"] = str(site_id)
                             ds["solar_zenith_angle"][scan_number] = get_altitude(
                                 float(lat),float(lon),acquisitionTime)
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
@@ -849,7 +856,12 @@ class HypernetsReader:
                 instrument_id = int(globalattr['hypstar_sn'])
             else:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
-            print(instrument_id)
+            if 'site_name' in (globalattr.keys()):
+                site_id = str(globalattr['site_name']).strip()
+            else:
+                site_id = self.context.get_config_value("site_id")
+            print(site_id)
+
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
@@ -896,7 +908,7 @@ class HypernetsReader:
             self.context.logger.error("Missing metadata file in sequence directory - check sequence directory")
             self.context.anomaly_handler.add_anomaly("s")
 
-        return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id
+        return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id
 
     def read_sequence(self,seq_dir,calibration_data_rad,calibration_data_irr,
                       calibration_data_swir_rad=None,calibration_data_swir_irr=None):
@@ -909,20 +921,20 @@ class HypernetsReader:
         l0_swir_rad = None
         l0_swir_bla = None
 
-        seq,lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag, instrument_id = self.read_metadata(
+        seq,lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag, instrument_id, site_id = self.read_metadata(
             seq_dir)
 
         if seriesIrr:
             if self.context.get_config_value("network") == "w":
                 l0_irr = self.read_series(seq_dir,seriesIrr,lat,lon,metadata,flag,
-                                          "L0_IRR",calibration_data_irr)
+                                          "L0_IRR",calibration_data_irr,instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_irr,overwrite=True)
             else:
                 l0_irr,l0_swir_irr = self.read_series_L(seq_dir,seriesIrr,lat,lon,
                                                         metadata,flag,"L0_IRR",
                                                         calibration_data_irr,
-                                                        calibration_data_swir_irr)
+                                                        calibration_data_swir_irr,instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_irr,overwrite=True)
                     self.writer.write(l0_swir_irr,overwrite=True)
@@ -933,14 +945,14 @@ class HypernetsReader:
         if seriesRad:
             if self.context.get_config_value("network") == "w":
                 l0_rad = self.read_series(seq_dir,seriesRad,lat,lon,metadata,flag,
-                                          "L0_RAD",calibration_data_rad)
+                                          "L0_RAD",calibration_data_rad,instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_rad,overwrite=True)
             else:
                 l0_rad,l0_swir_rad = self.read_series_L(seq_dir,seriesRad,lat,lon,
                                                         metadata,flag,"L0_RAD",
                                                         calibration_data_rad,
-                                                        calibration_data_swir_rad)
+                                                        calibration_data_swir_rad,instrument_id, site_id)
 
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_rad,overwrite=True)
@@ -952,14 +964,14 @@ class HypernetsReader:
         if seriesBlack:
             if self.context.get_config_value("network") == "w":
                 l0_bla = self.read_series(seq_dir,seriesBlack,lat,lon,metadata,flag,
-                                          "L0_BLA",calibration_data_rad)
+                                          "L0_BLA",calibration_data_rad,instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_bla,overwrite=True)
             else:
                 l0_bla,l0_swir_bla = self.read_series_L(seq_dir,seriesBlack,lat,lon,
                                                         metadata,flag,"L0_BLA",
                                                         calibration_data_rad,
-                                                        calibration_data_swir_rad)
+                                                        calibration_data_swir_rad,instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_bla,overwrite=True)
                     self.writer.write(l0_swir_bla,overwrite=True)
