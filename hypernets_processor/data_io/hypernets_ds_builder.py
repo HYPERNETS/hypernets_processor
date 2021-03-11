@@ -108,17 +108,18 @@ class HypernetsDSBuilder:
             # calibration metadata
             metadata["data_created"] = "TBD"  # should be the calibration data
         else:
-            hypstar = "hypstar_" + str(self.context.get_config_value("hypstar_cal_number"))
+            hypstar = "hypstar_"+ str(self.context.get_config_value("hypstar_cal_number"))
             if ds is not None:
+                hypstar = "hypstar_" + str(ds.attrs["instrument_id"])
                 metadata["site_latitude"] =ds.attrs["site_latitude"]
                 metadata["site_longitude"] =ds.attrs["site_longitude"]
                 metadata["source_file"] = ds.attrs["source_file"]
-
-            # standard metadata
+                metadata["instrument_id"] = ds.attrs["instrument_id"]
+                metadata["site_id"] = ds.attrs["site_id"]
+                # standard metadata
             metadata["processor_version"] = str(version)
             metadata["processor_configuration_file"] = "TBD"
             metadata["system_id"] = hypstar.upper()
-            metadata["site_id"] = self.context.get_config_value("site_id")
             # take lat and lon from GPS data from the raw data???? of shouldcome from metadata database?
 
             if ds_format in ['L_L1A_RAD', 'W_L1A_RAD', 'L_L1B_RAD']:

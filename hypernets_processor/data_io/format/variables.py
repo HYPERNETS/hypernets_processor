@@ -119,12 +119,7 @@ COMMON_VARIABLES_SERIES = {"wavelength": {"dim": [WL_DIM],
                                                                               " the local vertical.",
                                                                  "units": "degrees",
                                                                  "preferred_symbol": "sza"},
-<<<<<<< HEAD
-                                                  "encoding": {'dtype': np.float32, "scale_factor": 1,
-                                                               "offset": 0.0}},
-=======
                                                   "encoding": {'dtype': np.uint16, "scale_factor": 0.001, "offset": 0.0}},
->>>>>>> 6ac33ca4c468c21a5bc632a917895a8ecc897ac7
                            "acquisition_time": {"dim": [SERIES_DIM],
                                                 "dtype": np.uint32,
                                                 "attributes": {"standard_name": "time",
