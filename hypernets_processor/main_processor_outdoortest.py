@@ -184,12 +184,12 @@ class HypernetsProcessor:
 
         reader = HypernetsReader(self.context)
         calcon = CalibrationConverter(self.context)
-        cal = Calibrate(self.context,MCsteps=100)
-        surf = SurfaceReflectance(self.context,MCsteps=1000)
+        cal = Calibrate(self.context)
+        surf = SurfaceReflectance(self.context)
 
         if self.context.get_config_value("network") == "l":
-            comb = CombineSWIR(self.context,MCsteps=100)
-            intp = Interpolate(self.context,MCsteps=1000)
+            comb = CombineSWIR(self.context)
+            intp = Interpolate(self.context)
 
             # Read L0
             # self.context.logger.debug("Reading raw data...")
