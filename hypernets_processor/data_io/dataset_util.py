@@ -78,15 +78,18 @@ class DatasetUtil:
         :param attributes: (optional) dictionary of variable attributes, e.g. standard_name
 
         :type fill_value: int/float
-        :param fill_value: (optional) fill value (if None CF compliant value used)
+        :param fill_value: (optional) fill value for data array (if None CF compliant _FillValue used)
 
         :return: Default empty variable
         :rtype: xarray.Variable
         """
-        
+
+        # Get CF Compliant fill value for data type
+        _FillValue = DatasetUtil.get_default_fill_value(dtype)
+
         if fill_value is None:
-            fill_value = DatasetUtil.get_default_fill_value(dtype)
-        
+            fill_value = _FillValue
+
         default_array = DatasetUtil.create_default_array(dim_sizes, dtype, fill_value=fill_value)
 
         if dim_names is None:
@@ -94,7 +97,7 @@ class DatasetUtil:
         else:
             variable = Variable(dim_names, default_array)
 
-        variable.attrs["_FillValue"] = fill_value
+        variable.attrs["_FillValue"] = _FillValue
 
         if attributes is not None:
             variable.attrs = {**variable.attrs, **attributes}
@@ -123,8 +126,8 @@ class DatasetUtil:
 
         data_type = DatasetUtil.return_flags_dtype(n_masks)
 
-        variable = DatasetUtil.create_variable(dim_sizes, data_type, dim_names=dim_names, fill_value=0,
-                                               attributes=attributes)
+        variable = DatasetUtil.create_variable(dim_sizes, data_type, dim_names=dim_names,
+                                               attributes=attributes, fill_value=0)
 
         # add flag attributes
         variable.attrs["flag_meanings"] = str(meanings)[1:-1].replace("'","").replace(",","")
@@ -147,13 +150,13 @@ class DatasetUtil:
         """
 
         if n_masks <= 8:
-            return np.uint8
+            return np.int8
         elif n_masks <= 16:
-            return np.uint16
+            return np.int16
         elif n_masks <= 32:
-            return np.uint32
+            return np.int32
         else:
-            return np.uint64
+            return np.int64
 
     @staticmethod
     def add_encoding(variable, dtype, scale_factor=1.0, offset=0.0, fill_value=None, chunksizes=None):
