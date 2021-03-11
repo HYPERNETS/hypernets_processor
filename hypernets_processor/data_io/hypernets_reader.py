@@ -845,6 +845,12 @@ class HypernetsReader:
                 lon = self.context.get_config_value("lon")
                 flag = flag + 2 ** self.context.get_config_value("lon_default")  # du.set_flag(flag, "lon_default")  #
 
+            if 'hypstar_sn' in (globalattr.keys()):
+                instrument_id = int(globalattr['hypstar_sn'])
+            else:
+                instrument_id = self.context.get_config_value("hypstar_cal_number")
+            print(instrument_id)
+
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
             # from 1 to 14 cause only able to read the visible wavelengths.... how to read the swir once?
@@ -890,7 +896,7 @@ class HypernetsReader:
             self.context.logger.error("Missing metadata file in sequence directory - check sequence directory")
             self.context.anomaly_handler.add_anomaly("s")
 
-        return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag
+        return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id
 
     def read_sequence(self,seq_dir,calibration_data_rad,calibration_data_irr,
                       calibration_data_swir_rad=None,calibration_data_swir_irr=None):
@@ -903,7 +909,7 @@ class HypernetsReader:
         l0_swir_rad = None
         l0_swir_bla = None
 
-        seq,lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag = self.read_metadata(
+        seq,lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag, instrument_id = self.read_metadata(
             seq_dir)
 
         if seriesIrr:

@@ -51,8 +51,8 @@ class SequenceProcessor:
 
         reader = HypernetsReader(self.context)
         calcon = CalibrationConverter(self.context)
-        cal = Calibrate(self.context, MCsteps=100)
-        surf = SurfaceReflectance(self.context, MCsteps=1000)
+        cal = Calibrate(self.context, MCsteps=0)
+        surf = SurfaceReflectance(self.context, MCsteps=0)
         avg = Average(self.context,)
         rhymer=RhymerHypstar(self.context)
         writer=HypernetsWriter(self.context)
@@ -60,7 +60,7 @@ class SequenceProcessor:
 
         if self.context.get_config_value("network") == "w":
 
-            calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
+            calibration_data_rad,calibration_data_irr = calcon.read_calib_files(sequence_path)
             # Read L0
             self.context.logger.info("Reading raw data...")
             l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)

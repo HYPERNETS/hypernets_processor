@@ -12,6 +12,7 @@ import os
 import glob
 import punpy
 import xarray
+from configparser import ConfigParser
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -33,8 +34,21 @@ class CalibrationConverter:
         self.writer = HypernetsWriter(context)
         self.context=context
 
-    def read_calib_files(self):
-        hypstar = "hypstar_"+str(self.context.get_config_value("hypstar_cal_number"))
+    def read_calib_files(self, sequence_path):
+
+        metadata = ConfigParser()
+        if os.path.exists(os.path.join(sequence_path, "metadata.txt")):
+            metadata.read(os.path.join(sequence_path, "metadata.txt"))
+            # ------------------------------
+            # global attributes + wavelengths -> need to check for swir
+            # ----------------------------------
+            globalattr = dict(metadata['Metadata'])
+            if 'hypstar_sn' in (globalattr.keys()):
+                instrument_id = int(globalattr['hypstar_sn'])
+            else:
+                instrument_id = self.context.get_config_value("hypstar_cal_number")
+
+        hypstar = "hypstar_"+str(instrument_id) #self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf,hypstar)
         name = "HYPERNETS_CAL_"+hypstar.upper()+"_RAD_v"+str(version)+".nc"
         calibration_data_rad = xarray.open_dataset(os.path.join(hypstar_path,name))
