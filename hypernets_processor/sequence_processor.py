@@ -51,8 +51,13 @@ class SequenceProcessor:
 
         reader = HypernetsReader(self.context)
         calcon = CalibrationConverter(self.context)
+<<<<<<< HEAD
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
+=======
+        cal = Calibrate(self.context, MCsteps=0)
+        surf = SurfaceReflectance(self.context, MCsteps=0)
+>>>>>>> 6ac33ca4c468c21a5bc632a917895a8ecc897ac7
         avg = Average(self.context,)
         rhymer=RhymerHypstar(self.context)
         writer=HypernetsWriter(self.context)
@@ -60,7 +65,7 @@ class SequenceProcessor:
 
         if self.context.get_config_value("network") == "w":
 
-            calibration_data_rad,calibration_data_irr = calcon.read_calib_files()
+            calibration_data_rad,calibration_data_irr = calcon.read_calib_files(sequence_path)
             # Read L0
             self.context.logger.info("Reading raw data...")
             l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)
@@ -77,7 +82,6 @@ class SequenceProcessor:
             if l0_rad and l0_irr:
                 self.context.logger.info("Processing to L1b radiance...")
                 L1b_rad = avg.average_l1b("radiance", L1a_rad)
-                print(L1b_rad)
                 if self.context.get_config_value("write_l1b"):
                     writer.write(L1b_rad, overwrite=True)
                 self.context.logger.info("Done")
