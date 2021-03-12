@@ -10,6 +10,7 @@ from hypernets_processor.context import Context
 from hypernets_processor.sequence_processor import SequenceProcessor
 import os
 import traceback
+import cProfile,pstats
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -120,7 +121,12 @@ def main(processor_config, job_config, to_archive):
             context.logger.info("Processing sequence: " + target_sequence)
 
             try:
+                # profiler = cProfile.Profile()
+                # profiler.enable()
                 sp.process_sequence(target_sequence)
+                # profiler.disable()
+                # stats = pstats.Stats(profiler).sort_stats('tottime')
+                # stats.print_stats(100)
                 target_sequences_passed += 1
 
                 if context.anomaly_handler.anomalies_added is not []:

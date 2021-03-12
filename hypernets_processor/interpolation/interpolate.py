@@ -22,9 +22,9 @@ __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
 class Interpolate:
-    def __init__(self,context,MCsteps=1000,parallel_cores=1):
+    def __init__(self,context,parallel_cores=1):
         self._measurement_function_factory = InterpolationFactory()
-        self.prop = PropagateUnc(context, MCsteps, parallel_cores=parallel_cores)
+        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
         self.templ = DataTemplates(context=context)
         self.writer=HypernetsWriter(context)
         self.plot=Plotting(context)
@@ -101,7 +101,7 @@ class Interpolate:
             [None,None,dataset_l1b_irr['u_systematic_corr_rad_irr_irradiance'].values],
             [None,None,dataset_l1b_irr["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1b_irr["corr_systematic_corr_rad_irr_irradiance"].values],
-            )
+            param_fixed=[True,True,False])
 
         # Interpolate in time to radiance times
         acqui_irr = dataset_l1b_irr['acquisition_time'].values
