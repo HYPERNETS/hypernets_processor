@@ -44,10 +44,14 @@ def configure_parser():
                         help="Directory to write output data to")
     parser.add_argument("-n", "--network", action="store", choices=["land", "water"],
                         help="Network to process file for")
+    parser.add_argument("-ml","--max-level",action="store",choices=["L1A","L1B","L1C","L2A"],
+                        help="Network to process file for")
     # parser.add_argument("--plot", action="store_true",
     #                     help="Generate plots of processed data")
-    parser.add_argument("--write-all", action="store_true",
+    parser.add_argument("--write-all",action="store_true",
                         help="Write all products at intermediate data processing levels before final product")
+    parser.add_argument("--no-unc",action="store_true",
+                        help="Do not include uncertainty propagation")
     parser.add_argument("-j", "--job-config", action="store",
                         help="Job configuration file path. May be used to specify job instead of/along with commandline"
                              "arguments (any fields in both job configuration file overwritten by commandline "
@@ -100,10 +104,16 @@ def cli():
     if parsed_args.output_directory is not None:
         job_config["Output"]["archive_directory"] = os.path.abspath(parsed_args.output_directory)
 
+    if parsed_args.max_level is not None:
+        job_config["Processor"]["max_level"] = parsed_args.max_level
+
     if parsed_args.write_all:
         for key in job_config["Output"].keys():
             if key[:5] == "write":
                 job_config["Output"][key] = "True"
+
+    if parsed_args.no_unc:
+        job_config["Processor"]["mcsteps"] = "0"
 
     if parsed_args.log is not None:
         job_config["Log"]["log_path"] = os.path.abspath(parsed_args.log)
