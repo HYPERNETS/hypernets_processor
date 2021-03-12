@@ -46,7 +46,6 @@ class Calibrate:
         dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
 
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0, swir)
-        print(dataset_l1a.attrs)
 
         input_qty = self.prop.find_input_l1a(input_vars, dataset_l0, calibration_data)
         u_random_input_qty = self.prop.find_u_random_input_l1a(input_vars, dataset_l0, calibration_data)
@@ -82,24 +81,17 @@ class Calibrate:
     def find_nearest_black(self, dataset, acq_time, int_time):
         ids = np.where((abs(dataset['acquisition_time'] - acq_time) ==
                         min(abs(dataset['acquisition_time'] - acq_time))) &
-<<<<<<< HEAD
                        (dataset['integration_time'] == int_time))[0]
+        #todo check if integration time always has to be same
 
         dark_mask=self.quality_checks(dataset["digital_number"].values[:,ids])
         if np.sum(dark_mask)>0:
             dark_outlier=1
         else:
             dark_outlier=0
-        ids2=ids[np.where(dark_mask==0)]
         avg_black_series = np.mean(dataset["digital_number"].values[:,ids[np.where(dark_mask==0)]], axis=1)
-        #todo check if integration time always has to be same
         return avg_black_series,dark_outlier
-=======
-                       (dataset['integration_time'] == int_time))
-        #todo check if integration time always has to be same
 
-        return np.mean(dataset["digital_number"].values[:, ids], axis=2)[:, 0]
->>>>>>> 6ac33ca4c468c21a5bc632a917895a8ecc897ac7
 
     def preprocess_l0(self, datasetl0, datasetl0_bla, dataset_calib):
         """
