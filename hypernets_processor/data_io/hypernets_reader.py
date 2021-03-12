@@ -867,7 +867,6 @@ class HypernetsReader:
                 site_id = str(globalattr['site_name']).strip()
             else:
                 site_id = self.context.get_config_value("site_id")
-            print(site_id)
 
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
