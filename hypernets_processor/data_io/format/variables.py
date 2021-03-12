@@ -165,7 +165,7 @@ L0_RAD_VARIABLES = {"integration_time": {"dim": [SCAN_DIM],
                                                         "long_name": "Integration time during measurement",
                                                         "units": "s"}},
                     "temperature": {"dim": [SCAN_DIM],
-                                    "dtype": np.float16,
+                                    "dtype": np.float32,
                                     "attributes": {"standard_name": "temperature",
                                                    "long_name": "temperature of instrument",
                                                    "units": "degrees"}},
@@ -680,7 +680,7 @@ W_L1C_VARIABLES = {"u_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM
                                                  "long_name": "downwelling irradiance",
                                                  "units": "mW m^-2 nm^-1 sr^-1"}},
                    "rhof": {"dim": [Lu_SCAN_DIM],
-                            "dtype": np.float16,
+                            "dtype": np.float32,
                             "attributes": {"standard_name": "fresnel_reflectance",
                                            "long_name": "Fraction of downwelling sky radiance reflected at the "
                                                         "air-water interface",
@@ -688,7 +688,7 @@ W_L1C_VARIABLES = {"u_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM
                                            "units": "-",
                                            "preferred_symbol": "rhof"}},
                    "fresnel_wind": {"dim": [Lu_SCAN_DIM],
-                                    "dtype": np.float16,
+                                    "dtype": np.float32,
                                     "attributes": {"standard_name": "fresnel_wind",
                                                    "long_name": "Surface wind speed used for the retrieval of the "
                                                                 "fraction of downwelling sky radiance reflected at "

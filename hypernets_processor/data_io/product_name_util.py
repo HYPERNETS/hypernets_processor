@@ -37,7 +37,8 @@ DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
                     "L_L2A": "L2A_REF",
                     "W_L2A": "L2A_REF",
                     "L_L2B": "L2B_REF",
-                    "W_L2B": "L2B_REF"}
+                    "W_L2B": "L2B_REF",
+                    "IMG": "IMG"}
 
 
 class ProductNameUtil:
