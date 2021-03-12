@@ -605,10 +605,17 @@ class HypernetsReader:
         wvl = self.read_wavelength(vnir.shape[1],cal_data)
         ds = self.templ.l0_template_dataset(wvl,scanDim,fileformat)
 
+        ds.attrs["source_file"] = str(os.path.basename(seq_dir))
+        ds.attrs["instrument_id"] = str(instrument_id)
+        ds.attrs["site_id"] = str(site_id)
+
         scanDim=swir.shape[0]
         wvl = self.read_wavelength(swir.shape[1],cal_data_swir)
         ds_swir = self.templ.l0_template_dataset(wvl,scanDim,fileformat,swir=True)
 
+        ds_swir.attrs["source_file"] = str(os.path.basename(seq_dir))
+        ds_swir.attrs["instrument_id"] = str(instrument_id)
+        ds_swir.attrs["site_id"] = str(site_id)
 
         scan_number=0
         scan_number_swir=0
