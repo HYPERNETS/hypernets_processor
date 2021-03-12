@@ -9,9 +9,14 @@ class InterpolationWavLinear:
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         '''
-        irradiance_intfunc = scipy.interpolate.interp1d(irr_wavs,irr,axis=0,
+        if len(irr_wavs.shape) > 1:
+            irradiance_intfunc = scipy.interpolate.interp1d(irr_wavs[:,0],irr,axis=0,
                                                         fill_value="extrapolate")
-        out = irradiance_intfunc(rad_wavs)
+            out = irradiance_intfunc(rad_wavs[:,0])
+        else:
+            irradiance_intfunc = scipy.interpolate.interp1d(irr_wavs,irr,axis=0,
+                                                            fill_value="extrapolate")
+            out = irradiance_intfunc(rad_wavs)
         return out
 
 
