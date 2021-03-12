@@ -987,9 +987,9 @@ class HypernetsReader:
 
         if seriesPict:
             for i in seriesPict:
-
-                va=(i).split("_", 5)[2]
-                aa=(i).split("_", 5)[2]
+                seriesid=(i.replace(".jpg", "")).split("_", 5)[1]
+                va=(i.replace(".jpg", "")).split("_", 5)[2]
+                aa=(i.replace(".jpg", "")).split("_", 5)[4]
                 date_time_obj = datetime.datetime.strptime(seq, '%Y%m%dT%H%M%S')
                 date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
 
@@ -997,16 +997,15 @@ class HypernetsReader:
                     aa=get_azimuth(float(lat), float(lon), date_time_obj,)
                 if va =="-001":
                     va = get_altitude(float(lat), float(lon), date_time_obj)
-                angles= '{}_{}'.format(round(float(aa)),round(float(va)))
+                angles= '{}_{}_{}'.format(seriesid, round(float(aa)),round(float(va)))
                 imagename= self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
                                                 site_id="BSBE", time=seq,version=None,swir=None, angles=angles)
                 directory = self.writer.return_directory()
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 path = os.path.join(directory,imagename) + ".jpg"
-                # print(os.path.join(seq_dir, i))
-                # print(path)
-                shutil.move(os.path.join(seq_dir, i), path)
+                if os.path.exists(os.path.join(seq_dir, "RADIOMETER/"+i)):
+                    shutil.copy(os.path.join(seq_dir, "RADIOMETER/"+i), path)
 
         else:
             self.context.logger.error("No pictures for this sequence")
