@@ -129,20 +129,21 @@ class Calibrate:
 
         DN_rand = DatasetUtil.create_variable(
             [len(datasetl0["wavelength"]),len(datasetl0["scan"])],
-            dim_names=["wavelength","scan"],dtype=np.uint32,fill_value=0)
+            dim_names=["wavelength","scan"],dtype=np.float32,fill_value=0)
 
-        datasetl0["u_random_digital_number"] = DN_rand
+        datasetl0["u_rel_random_digital_number"] = DN_rand
 
         rand = np.zeros_like(DN_rand.values)
         for i in range(len(series_ids)):
             ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
             ids_masked = np.where((datasetl0['series_id'] == series_ids[i]) & (mask == 0))[0]
             std = np.std((datasetl0['digital_number'].values[:,ids_masked]-dark_signals[:,ids_masked]), axis=1)
+            avg = np.mean((datasetl0['digital_number'].values[:,ids_masked]-dark_signals[:,ids_masked]), axis=1)
 
             for ii,id in enumerate(ids):
-                rand[:, id] = std
+                rand[:, id] = std/avg
 
-        datasetl0["u_random_digital_number"].values = rand
+        datasetl0["u_rel_random_digital_number"].values = rand
 
         DN_dark = DatasetUtil.create_variable(
             [len(datasetl0["wavelength"]),len(datasetl0["scan"])],

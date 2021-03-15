@@ -113,18 +113,19 @@ class SequenceProcessor:
             l0_irr,l0_rad,l0_bla,l0_swir_irr,l0_swir_rad,l0_swir_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr,calibration_data_swir_rad,calibration_data_swir_irr)
             self.context.logger.info("Done")
 
-            self.context.logger.info("Processing to L1a...")
-            if l0_rad:
-                L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
-            if l0_irr:
-                L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
-            if l0_swir_rad:
-                L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,
-                                             calibration_data_swir_rad,swir=True)
-            if l0_swir_irr:
-                L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,
-                                             calibration_data_swir_irr,swir=True)
-            self.context.logger.info("Done")
+            if self.context.get_config_value("max_level") in ["L1A","L1B","L1C","L2A"]:
+                self.context.logger.info("Processing to L1a...")
+                if l0_rad:
+                    L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
+                if l0_irr:
+                    L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
+                if l0_swir_rad:
+                    L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,
+                                                 calibration_data_swir_rad,swir=True)
+                if l0_swir_irr:
+                    L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,
+                                                 calibration_data_swir_irr,swir=True)
+                self.context.logger.info("Done")
 
             if l0_rad and l0_irr:
                 if self.context.get_config_value("max_level") in ["L1B","L1C","L2A"]:
