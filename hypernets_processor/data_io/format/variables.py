@@ -270,14 +270,14 @@ CAL_VARIABLES = {"wavelengths": {"dim": [CD_DIM,WL_DIM],
                          "standard_name":"independent correlation matrix of systematic error on gains",
                          "long_name":"Correlation matrix bewtween wavelengths for the systematic error component on gains (calibration coefficients) that is not correlated between radiance and irradiance",
                          "units":"-"},
-                         #"encoding":{'dtype':np.int16,"scale_factor":0.0001,"offset":0.0}
+                         "encoding":{'dtype':np.int16,"scale_factor":0.0001,"offset":0.0}
                                                 },
                  "corr_systematic_corr_rad_irr_gains":{"dim":[CD_DIM,WL_DIM,WL_DIM],
                                                           "dtype":np.float32,"attributes":{
                          "standard_name":"correlation matrix of systematic error on gains (correlated radiance and irradiance)",
                          "long_name":"Correlation matrix bewtween wavelengths for the systematic error component on gains (calibration coefficients) that is correlated between radiance and irradiance",
                          "units":"-"},
-                         #"encoding":{'dtype':np.int16,"scale_factor":0.0001,"offset":0.0}
+                         "encoding":{'dtype':np.int16,"scale_factor":0.0001,"offset":0.0}
                                                        },
                  "wavelength_coefficients": {"dim": [WD_DIM,WC_DIM],
                                   "dtype": np.float32,
