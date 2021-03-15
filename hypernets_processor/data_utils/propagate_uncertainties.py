@@ -94,8 +94,6 @@ class PropagateUnc:
                 try:
                     inputs_corr.append((calib_dataset["u_rel_systematic_corr_rad_irr_"+var].values*calib_dataset[var].values).astype("float32"))
                     corr_corr.append(calib_dataset["corr_systematic_corr_rad_irr_"+var].values)
-                    print("this",calib_dataset["u_rel_systematic_corr_rad_irr_"+var].values*calib_dataset[var].values)
-                    print(calib_dataset["corr_systematic_corr_rad_irr_"+var].values)
                 except:
                     inputs_corr.append(None)
                     corr_corr.append(None)
