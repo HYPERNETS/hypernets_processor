@@ -93,14 +93,14 @@ class Plotting():
         plotpath = os.path.join(self.path,"plot_unc_"+ measurandstring +"_"+dataset.attrs[
             'product_name']+"."+self.context.get_config_value("plotting_format"))
 
-        yrand=dataset["u_random_"+measurandstring].values/dataset[measurandstring].values
+        yrand=dataset["u_rel_random_"+measurandstring].values
         if L2:
-            ysyst = dataset["u_systematic_"+measurandstring].values/dataset[measurandstring].values
+            ysyst = dataset["u_rel_systematic_"+measurandstring].values
             yerr=np.concatenate((yrand,ysyst),axis=1)
             ylabel=np.concatenate((np.repeat(["random uncertainty"],len(yrand[0])),np.repeat(["systematic uncertainty"],len(ysyst[0]))))
         else:
-            ysyst_corr=dataset["u_systematic_corr_rad_irr_"+measurandstring].values/dataset[measurandstring].values
-            ysyst_indep=dataset["u_systematic_indep_"+measurandstring].values/dataset[measurandstring].values
+            ysyst_corr=dataset["u_rel_systematic_corr_rad_irr_"+measurandstring].values
+            ysyst_indep=dataset["u_rel_systematic_indep_"+measurandstring].values
             yerr=np.concatenate((yrand,ysyst_indep,ysyst_corr),axis=1)
             ylabel=np.concatenate((np.repeat(["random uncertainty"],len(yrand[0])),
                                    np.repeat(["independent systematic uncertainty"],len(ysyst_indep[0])),

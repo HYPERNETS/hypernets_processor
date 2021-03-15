@@ -46,19 +46,19 @@ class CombineSWIR:
                      dataset_l1b_swir[measurandstring].values,
                      self.context.get_config_value("combine_lim_wav")]
         u_random_input_qty = [None,
-                     dataset_l1b["u_random_"+measurandstring].values,
+                     dataset_l1b["u_rel_random_"+measurandstring].values*dataset_l1b[measurandstring].values,
                      None,
-                     dataset_l1b_swir["u_random_"+measurandstring].values,
+                     dataset_l1b_swir["u_rel_random_"+measurandstring].values*dataset_l1b_swir[measurandstring].values,
                      None]
         u_systematic_input_qty_indep =  [None,
-                     dataset_l1b["u_systematic_indep_"+measurandstring].values,
+                     dataset_l1b["u_rel_systematic_indep_"+measurandstring].values*dataset_l1b[measurandstring].values,
                      None,
-                     dataset_l1b_swir["u_systematic_indep_"+measurandstring].values,
+                     dataset_l1b_swir["u_rel_systematic_indep_"+measurandstring].values*dataset_l1b_swir[measurandstring].values,
                      None]
         u_systematic_input_qty_corr =  [None,
-                     dataset_l1b["u_systematic_corr_rad_irr_"+measurandstring].values,
+                     dataset_l1b["u_rel_systematic_corr_rad_irr_"+measurandstring].values*dataset_l1b[measurandstring].values,
                      None,
-                     dataset_l1b_swir["u_systematic_corr_rad_irr_"+measurandstring].values,
+                     dataset_l1b_swir["u_rel_systematic_corr_rad_irr_"+measurandstring].values*dataset_l1b_swir[measurandstring].values,
                      None]
         corr_systematic_input_qty_indep =  [None,
                      dataset_l1b["corr_systematic_indep_" + measurandstring].values,
