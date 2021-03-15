@@ -2,7 +2,7 @@
 Module with functions and classes to read Hypernets data
 """
 from datetime import datetime, timezone
-import os
+import os, shutil
 import re  # for re.split
 from configparser import ConfigParser
 from struct import unpack
@@ -18,7 +18,7 @@ from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.spectrum import Spectrum
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.dataset_util import DatasetUtil as du
+from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 '''___Authorship___'''
@@ -36,7 +36,7 @@ class HypernetsReader:
         self.model = self.context.get_config_value("model").split(',')
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context=context)
-
+        self.produt = ProductNameUtil(context=context)
         cckeys = ['mapping_vis_a', 'mapping_vis_b', 'mapping_vis_c', 'mapping_vis_d', 'mapping_vis_e', 'mapping_vis_f']
         ccvalues = []
         for i in range(len(cckeys)):
@@ -986,7 +986,27 @@ class HypernetsReader:
             self.context.logger.error("No black data for this sequence")
 
         if seriesPict:
-            print("Here we should move the pictures to some place???")
+            for i in seriesPict:
+                seriesid=(i.replace(".jpg", "")).split("_", 5)[1]
+                va=(i.replace(".jpg", "")).split("_", 5)[2]
+                aa=(i.replace(".jpg", "")).split("_", 5)[4]
+                date_time_obj = datetime.datetime.strptime(seq, '%Y%m%dT%H%M%S')
+                date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
+
+                if aa=="-001":
+                    aa=get_azimuth(float(lat), float(lon), date_time_obj,)
+                if va =="-001":
+                    va = get_altitude(float(lat), float(lon), date_time_obj)
+                angles= '{}_{}_{}'.format(seriesid, round(float(aa)),round(float(va)))
+                imagename= self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
+                                                site_id="BSBE", time=seq,version=None,swir=None, angles=angles)
+                directory = self.writer.return_directory()
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                path = os.path.join(directory,imagename) + ".jpg"
+                if os.path.exists(os.path.join(seq_dir, "RADIOMETER/"+i)):
+                    shutil.copy(os.path.join(seq_dir, "RADIOMETER/"+i), path)
+
         else:
             self.context.logger.error("No pictures for this sequence")
         if self.context.get_config_value("network") == "w":
