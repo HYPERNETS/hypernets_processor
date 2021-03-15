@@ -86,7 +86,7 @@ class PropagateUnc:
                 corr_indep.append(dataset["corr_systematic_" + var].values)
             except:
                 try:
-                    inputs_indep.append((calib_dataset["u_rel_systematic_indep_"+var].values*dataset[var].values).astype("float32"))
+                    inputs_indep.append((calib_dataset["u_rel_systematic_indep_"+var].values*calib_dataset[var].values).astype("float32"))
                     corr_indep.append(calib_dataset["corr_systematic_indep_"+var].values)
                 except:
                     inputs_indep.append(None)
@@ -94,6 +94,8 @@ class PropagateUnc:
                 try:
                     inputs_corr.append((calib_dataset["u_rel_systematic_corr_rad_irr_"+var].values*calib_dataset[var].values).astype("float32"))
                     corr_corr.append(calib_dataset["corr_systematic_corr_rad_irr_"+var].values)
+                    print("this",calib_dataset["u_rel_systematic_corr_rad_irr_"+var].values*calib_dataset[var].values)
+                    print(calib_dataset["corr_systematic_corr_rad_irr_"+var].values)
                 except:
                     inputs_corr.append(None)
                     corr_corr.append(None)
@@ -201,7 +203,6 @@ class PropagateUnc:
                     measurement_function,input_quantities,u_systematic_input_quantities_corr,
                     corr_x=corr_systematic_input_quantities_corr,return_corr=True,
                     corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
-
             dataset["u_rel_random_" + measurandstring].values = u_random_measurand/measurand
             dataset["u_rel_systematic_indep_" + measurandstring].values = u_syst_measurand_indep/measurand
             dataset["u_rel_systematic_corr_rad_irr_" + measurandstring].values = u_syst_measurand_corr/measurand
