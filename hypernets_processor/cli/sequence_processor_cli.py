@@ -114,6 +114,8 @@ def cli():
 
     if parsed_args.no_unc:
         job_config["Processor"]["mcsteps"] = "0"
+        job_config["Output"]["plot_uncertainty"] = "False"
+        job_config["Output"]["plot_correlation"] = "False"
 
     if parsed_args.log is not None:
         job_config["Log"]["log_path"] = os.path.abspath(parsed_args.log)

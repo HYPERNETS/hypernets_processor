@@ -191,6 +191,8 @@ class DatasetUtil:
 
         if fill_value is not None:
             encoding_dict.update({'_FillValue': fill_value})
+        else:
+            encoding_dict.update({'_FillValue': DatasetUtil.get_default_fill_value(dtype)})
 
         variable.encoding = encoding_dict
 
@@ -207,7 +209,7 @@ class DatasetUtil:
         """
 
         if dtype == np.int8:
-            return np.int8(-127)
+            return np.int8(-128)
         if dtype == np.uint8:
             return np.uint8(-1)
         elif dtype == np.int16:
