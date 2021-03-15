@@ -98,7 +98,7 @@ class Interpolate:
             [wavs_rad,wavs_irr,dataset_l1b_irr['irradiance'].values],
             [None,None,dataset_l1b_irr['u_rel_random_irradiance'].values*dataset_l1b_irr['irradiance'].values],
             [None,None,dataset_l1b_irr['u_rel_systematic_indep_irradiance'].values*dataset_l1b_irr['irradiance'].values],
-            [None,None,dataset_l1b_irr['u_rel_systematic_corr_rad_irr_irradiance'].values]*dataset_l1b_irr['irradiance'].values,
+            [None,None,dataset_l1b_irr['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1b_irr['irradiance'].values],
             [None,None,dataset_l1b_irr["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1b_irr["corr_systematic_corr_rad_irr_irradiance"].values],
             param_fixed=[True,True,False])
