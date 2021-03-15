@@ -44,8 +44,8 @@ def configure_parser():
                         help="Directory to write output data to")
     parser.add_argument("-n", "--network", action="store", choices=["land", "water"],
                         help="Network to process file for")
-    parser.add_argument("-ml","--max-level",action="store",choices=["L1A","L1B","L1C","L2A"],
-                        help="Network to process file for")
+    parser.add_argument("-ml","--max-level",action="store",choices=["L0","L1A","L1B","L1C","L2A"],
+                        help="Only process the data to the specified level.")
     # parser.add_argument("--plot", action="store_true",
     #                     help="Generate plots of processed data")
     parser.add_argument("--write-all",action="store_true",
@@ -114,6 +114,8 @@ def cli():
 
     if parsed_args.no_unc:
         job_config["Processor"]["mcsteps"] = "0"
+        job_config["Output"]["plot_uncertainty"] = "False"
+        job_config["Output"]["plot_correlation"] = "False"
 
     if parsed_args.log is not None:
         job_config["Log"]["log_path"] = os.path.abspath(parsed_args.log)

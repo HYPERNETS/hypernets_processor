@@ -230,10 +230,10 @@ class CalibrationConverter:
                 calibration_data["wavelengths"].values[i_cal] = gains[:,1]
                 calibration_data["wavpix"].values[i_cal] = gains[:,0]
                 calibration_data["gains"].values[i_cal] = gains[:,2]
-                #calibration_data["u_random_gains"].values = None
+                #calibration_data["u_rel_random_gains"].values = None
                 #calibration_data["corr_random_gains"].values = None
     
-                calibration_data["u_systematic_indep_gains"].values[i_cal] = gains[:,2]*(
+                calibration_data["u_rel_systematic_indep_gains"].values[i_cal] = (
                             gains[:,6]**2+gains[:,7]**2+gains[:,8]**2+gains[:,9]**2+
                             gains[:,10]**2+gains[:,11]**2+gains[:,12]**2+gains[:,13]**2+
                             gains[:,14]**2+gains[:,15]**2+gains[:,16]**2+gains[:,17]**2+
@@ -258,7 +258,7 @@ class CalibrationConverter:
                 calibration_data["corr_systematic_indep_gains"].values[i_cal] = \
                     punpy.correlation_from_covariance(cov_diag+cov_other+cov_full+cov_filament)
     
-                calibration_data["u_systematic_corr_rad_irr_gains"].values[i_cal] = gains[:,2]*(
+                calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[i_cal] = (
                             gains[:,4]**2+gains[:,5]**2+gains[:,18]**2)**0.5/100
     
                 cov_other = punpy.convert_corr_to_cov(np.eye(len(gains[:,2])),gains[:,2]*(
