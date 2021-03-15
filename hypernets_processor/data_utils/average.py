@@ -39,15 +39,15 @@ class Average:
 
         dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring,flags)
 
-        dataset_l1b["u_random_" + measurandstring].values = self.calc_mean_masked(\
-            dataset_l1a,"u_random_" + measurandstring,flags,rand_unc=True)
-        dataset_l1b["u_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
-        (dataset_l1a,"u_systematic_indep_"+measurandstring,flags)
-        dataset_l1b["u_systematic_corr_rad_irr_"+measurandstring].values = self.calc_mean_masked\
-        (dataset_l1a,"u_systematic_corr_rad_irr_"+measurandstring,flags)
+        dataset_l1b["u_rel_random_" + measurandstring].values = self.calc_mean_masked(\
+            dataset_l1a,"u_rel_random_" + measurandstring,flags,rand_unc=True)
+        dataset_l1b["u_rel_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
+        (dataset_l1a,"u_rel_systematic_indep_"+measurandstring,flags)
+        dataset_l1b["u_rel_systematic_corr_rad_irr_"+measurandstring].values = self.calc_mean_masked\
+        (dataset_l1a,"u_rel_systematic_corr_rad_irr_"+measurandstring,flags)
 
         dataset_l1b["corr_random_" + measurandstring].values = np.eye(
-                len(dataset_l1b["u_random_" + measurandstring].values))
+                len(dataset_l1b["u_rel_random_" + measurandstring].values))
         dataset_l1b["corr_systematic_indep_"+measurandstring].values = \
                 dataset_l1a["corr_systematic_indep_"+measurandstring].values
         dataset_l1b["corr_systematic_corr_rad_irr_"+measurandstring].values = \
@@ -68,12 +68,12 @@ class Average:
                                 "reflectance"]:
             dataset_l2a[measurandstring].values = self.calc_mean_masked(
                 dataset,measurandstring,flags)
-            dataset_l2a["u_random_"+measurandstring].values = self.calc_mean_masked(
-                dataset,"u_random_"+measurandstring,flags,rand_unc=True)
-            dataset_l2a["u_systematic_"+measurandstring].values = self.calc_mean_masked(
-                dataset,"u_systematic_"+measurandstring,flags)
+            dataset_l2a["u_rel_random_"+measurandstring].values = self.calc_mean_masked(
+                dataset,"u_rel_random_"+measurandstring,flags,rand_unc=True)
+            dataset_l2a["u_rel_systematic_"+measurandstring].values = self.calc_mean_masked(
+                dataset,"u_rel_systematic_"+measurandstring,flags)
             dataset_l2a["corr_random_"+measurandstring].values = np.eye(
-                len(dataset_l2a["u_systematic_"+measurandstring].values))
+                len(dataset_l2a["u_rel_systematic_"+measurandstring].values))
             dataset_l2a["corr_systematic_"+measurandstring].values = \
                 dataset["corr_systematic_"+measurandstring].values
 
