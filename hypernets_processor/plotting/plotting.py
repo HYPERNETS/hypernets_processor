@@ -6,8 +6,11 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 plt.style.use('tableau-colorblind10')
+
 import numpy as np
 import os.path
 import warnings
