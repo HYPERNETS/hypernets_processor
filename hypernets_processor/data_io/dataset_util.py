@@ -85,7 +85,7 @@ class DatasetUtil:
         """
 
         # Get CF Compliant fill value for data type
-        _FillValue = DatasetUtil.get_default_fill_value(dtype)
+        _FillValue = False #DatasetUtil.get_default_fill_value(dtype)
 
         if fill_value is None:
             fill_value = _FillValue
@@ -191,8 +191,6 @@ class DatasetUtil:
 
         if fill_value is not None:
             encoding_dict.update({'_FillValue': fill_value})
-        else:
-            encoding_dict.update({'_FillValue': DatasetUtil.get_default_fill_value(dtype)})
 
         variable.encoding = encoding_dict
 
@@ -209,19 +207,19 @@ class DatasetUtil:
         """
 
         if dtype == np.int8:
-            return np.int8(-128)
+            return np.int8(-129)
         if dtype == np.uint8:
             return np.uint8(-1)
         elif dtype == np.int16:
-            return np.int16(-32767)
+            return np.int16(-32769)
         elif dtype == np.uint16:
             return np.uint16(-1)
         elif dtype == np.int32:
-            return np.int32(-2147483647)
+            return np.int32(-2147483649)
         elif dtype == np.uint32:
             return np.uint32(-1)
         elif dtype == np.int64:
-            return np.int64(-9223372036854775806)
+            return np.int64(-9223372036854775808)
         elif dtype == np.float32:
             return np.float32(9.96921E36)
         elif dtype == np.float64:
