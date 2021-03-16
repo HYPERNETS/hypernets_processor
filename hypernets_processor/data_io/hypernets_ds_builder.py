@@ -114,6 +114,7 @@ class HypernetsDSBuilder:
                 metadata["site_latitude"] =ds.attrs["site_latitude"]
                 metadata["site_longitude"] =ds.attrs["site_longitude"]
                 metadata["source_file"] = ds.attrs["source_file"]
+                metadata["sequence_id"] = ds.attrs["sequence_id"]
                 metadata["instrument_id"] = ds.attrs["instrument_id"]
                 metadata["site_id"] = ds.attrs["site_id"]
                 # standard metadata
