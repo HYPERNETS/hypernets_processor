@@ -41,9 +41,9 @@ class Interpolate:
         dataset_l1b["upwelling_radiance"] = dataset_l1a_uprad["radiance"].sel(scan=upscan)
         dataset_l1b["acquisition_time"] = dataset_l1a_uprad["acquisition_time"].sel(scan=upscan)
         # is this correct????
-        dataset_l1b["u_random_upwelling_radiance"] = dataset_l1a_uprad["u_random_radiance"].sel(scan=upscan)
-        dataset_l1b["u_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["u_systematic_indep_radiance"].sel(scan=upscan)
-        dataset_l1b["u_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["u_systematic_corr_rad_irr_radiance"].sel(scan=upscan)
+        dataset_l1b["u_rel_random_upwelling_radiance"] = dataset_l1a_uprad["u_rel_random_radiance"].sel(scan=upscan)
+        dataset_l1b["u_rel_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["u_rel_systematic_indep_radiance"].sel(scan=upscan)
+        dataset_l1b["u_rel_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["u_rel_systematic_corr_rad_irr_radiance"].sel(scan=upscan)
         dataset_l1b["corr_random_upwelling_radiance"] = dataset_l1a_uprad["corr_random_radiance"]
         dataset_l1b["corr_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["corr_systematic_indep_radiance"]
         dataset_l1b["corr_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["corr_systematic_corr_rad_irr_radiance"]
