@@ -192,15 +192,15 @@ class PropagateUnc:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 u_random_measurand = self.prop.propagate_random(measurement_function, input_quantities,
-                                                                u_random_input_quantities,param_fixed=param_fixed)
+                                                                u_random_input_quantities,repeat_dims=1,param_fixed=param_fixed)
                 u_syst_measurand_indep,corr_syst_measurand_indep = self.prop.propagate_systematic(
                     measurement_function,input_quantities,u_systematic_input_quantities_indep,
                     corr_x=corr_systematic_input_quantities_indep,return_corr=True,
-                    corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
+                    corr_axis=0,fixed_corr_var=True,repeat_dims=1,param_fixed=param_fixed)
                 u_syst_measurand_corr,corr_syst_measurand_corr = self.prop.propagate_systematic(
                     measurement_function,input_quantities,u_systematic_input_quantities_corr,
                     corr_x=corr_systematic_input_quantities_corr,return_corr=True,
-                    corr_axis=0,fixed_corr_var=True,param_fixed=param_fixed)
+                    corr_axis=0,fixed_corr_var=True,repeat_dims=1,param_fixed=param_fixed)
             dataset["u_rel_random_" + measurandstring].values = u_random_measurand/measurand
             dataset["u_rel_systematic_indep_" + measurandstring].values = u_syst_measurand_indep/measurand
             dataset["u_rel_systematic_corr_rad_irr_" + measurandstring].values = u_syst_measurand_corr/measurand
@@ -228,16 +228,16 @@ class PropagateUnc:
                 u_random_measurand = self.prop2.propagate_random(measurement_function,
                                                                 input_quantities,
                                                                 u_random_input_quantities,
-                                                                param_fixed=param_fixed)
+                                                                repeat_dims=1,param_fixed=param_fixed)
                 u_syst_measurand_indep,corr_syst_measurand_indep = self.prop2.propagate_systematic(
                     measurement_function,input_quantities,
                     u_systematic_input_quantities_indep,
                     corr_x=corr_systematic_input_quantities_indep,return_corr=True,
-                    corr_axis=0,param_fixed=param_fixed)
+                    corr_axis=0,repeat_dims=1,param_fixed=param_fixed)
                 u_syst_measurand_corr,corr_syst_measurand_corr = self.prop2.propagate_systematic(
                     measurement_function,input_quantities,u_systematic_input_quantities_corr,
                     corr_x=corr_systematic_input_quantities_corr,return_corr=True,
-                    corr_axis=0,param_fixed=param_fixed)
+                    corr_axis=0,repeat_dims=1,param_fixed=param_fixed)
             dataset["u_rel_random_"+measurandstring].values = u_random_measurand/measurand
             dataset["u_rel_systematic_indep_"+measurandstring].values = u_syst_measurand_indep/measurand
             dataset[
