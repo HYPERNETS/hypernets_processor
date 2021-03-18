@@ -191,19 +191,19 @@ class RhymerHypstar:
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlu")
                 self.context.logger.info(
-                    "No enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
+                    "Not enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
             if lsky.scan[lsky['quality_flag'] <= 1].count() < nbrlsky:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlsky")
                 self.context.logger.info(
-                    "No enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
+                    "Not enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
             if irr.scan[irr['quality_flag'] <= 1].count() < nbred:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbred")
                 self.context.logger.info(
-                    "No enough downwelling irradiance data for sequence {}".format(irr.attrs['sequence_id']))
+                    "Not enough downwelling irradiance data for sequence {}".format(irr.attrs['sequence_id']))
 
             return lu, lsky, irr, dataset_l1b
 
