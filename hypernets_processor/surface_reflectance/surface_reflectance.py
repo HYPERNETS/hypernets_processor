@@ -65,7 +65,7 @@ class SurfaceReflectance:
             L1c["quality_flag"][np.where(failSimil == 1)], "simil_fail")  # for i in range(len(mask))]
 
         if self.context.get_config_value("write_l1c"):
-            self.writer.write(L1c, overwrite=True)
+            self.writer.write(L1c, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
         for measurandstring in ["water_leaving_radiance","reflectance_nosc","reflectance","epsilon"]:
             try:
                 if self.context.get_config_value("plot_l1c"):
@@ -125,7 +125,7 @@ class SurfaceReflectance:
             self.context.logger.error("network is not correctly defined")
 
         if self.context.get_config_value("write_l2a"):
-            self.writer.write(dataset_l2a, overwrite=True)
+            self.writer.write(dataset_l2a, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
 
         return dataset_l2a
 

@@ -83,7 +83,7 @@ class CombineSWIR:
                                           param_fixed=[True,False,True,False,True])
 
         if self.context.get_config_value("write_l1b"):
-            self.writer.write(dataset_l1b_comb, overwrite=True)
+            self.writer.write(dataset_l1b_comb, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
 
         if self.context.get_config_value("plot_l1b"):
             self.plot.plot_series_in_sequence(measurandstring,dataset_l1b_comb)
