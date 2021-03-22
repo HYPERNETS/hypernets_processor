@@ -742,8 +742,7 @@ L_L2A_REFLECTANCE_VARIABLES = {"u_rel_random_reflectance": {"dim": [WL_DIM, SERI
                                                                            "radiation_wavelength or radiation_frequency "
                                                                            "can be used to specify the wavelength or "
                                                                            "frequency, respectively, of the radiation.",
-                                                              "units": "-"},
-                                               "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}}
+                                                              "units": "-"}}
                                }
 
 # W_L2A_REFLECTANCE_VARIABLES - Reflectance variables required for L2A water data product
@@ -789,9 +788,7 @@ W_L1C_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                                 "similarity spectrum "
                                                                                 "(see Ruddick et al., 2006)",
                                                                    "units": "-",
-                                                                   "preferred_symbol": "rhow_nosc"},
-                                                    "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                 "offset": 0.0}},
+                                                                   "preferred_symbol": "rhow_nosc"}},
                                "u_rel_random_water_leaving_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                    "dtype": np.float32,
                                                                    "attributes": {
@@ -980,8 +977,8 @@ L_L2B_REFLECTANCE_VARIABLES = {"u_rel_random_reflectance": {"dim": [WL_DIM, SERI
                                                                            "radiation_wavelength or radiation_frequency "
                                                                            "can be used to specify the wavelength or "
                                                                            "frequency, respectively, of the radiation.",
-                                                              "units": "-"},
-                                               "encoding": {'dtype': np.uint16, "scale_factor": 0.0001, "offset": 0.0}}}
+                                                              "units": "-"}}
+                               }
 
 # W_L2B_REFLECTANCE_VARIABLES - Reflectance variables required for L2A land data product
 W_L2B_REFLECTANCE_VARIABLES = {}
