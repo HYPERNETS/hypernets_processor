@@ -62,7 +62,7 @@ class Calibrate:
                                                         corr_systematic_input_qty_corr)
 
         if self.context.get_config_value("write_l1a"):
-            self.writer.write(dataset_l1a, overwrite=True)
+            self.writer.write(dataset_l1a, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
 
         if self.context.get_config_value("plot_l1a"):
             self.plot.plot_scans_in_series(measurandstring,dataset_l1a)

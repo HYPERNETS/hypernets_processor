@@ -63,7 +63,7 @@ class Interpolate:
         dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr)
 
         if self.context.get_config_value("write_l1c"):
-            self.writer.write(dataset_l1c,overwrite=True)
+            self.writer.write(dataset_l1c,overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
 
         if self.context.get_config_value("plot_l1c"):
             self.plot.plot_series_in_sequence("irradiance",dataset_l1c)
