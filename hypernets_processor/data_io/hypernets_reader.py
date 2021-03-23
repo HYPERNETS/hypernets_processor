@@ -1003,7 +1003,7 @@ class HypernetsReader:
                     va = get_altitude(float(lat), float(lon), date_time_obj)
                 angles= '{}_{}_{}'.format(seriesid, round(float(aa)),round(float(va)))
                 imagename= self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
-                                                site_id="BSBE", time=seq,version=None,swir=None, angles=angles)
+                                                site_id=site_id, time=seq,version=None,swir=None, angles=angles)
                 directory = self.writer.return_directory()
                 if not os.path.exists(directory):
                     os.makedirs(directory)
