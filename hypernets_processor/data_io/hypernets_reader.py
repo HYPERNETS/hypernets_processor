@@ -867,10 +867,10 @@ class HypernetsReader:
                 instrument_id = int(globalattr['hypstar_sn'])
             else:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
-            if 'site_name' in (globalattr.keys()):
-                site_id = str(globalattr['site_name']).strip()
-            else:
-                site_id = self.context.get_config_value("site_id")
+            # if 'site_name' in (globalattr.keys()):
+            #     site_id = str(globalattr['site_name']).strip()
+            # else:
+            site_id = self.context.get_config_value("site_id")
 
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
