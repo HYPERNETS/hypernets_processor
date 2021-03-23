@@ -80,13 +80,13 @@ class SequenceProcessor:
                     self.context.logger.info("Processing to L1b radiance...")
                     L1b_rad = avg.average_l1b("radiance", L1a_rad)
                     if self.context.get_config_value("write_l1b"):
-                        writer.write(L1b_rad, overwrite=True)
+                        writer.write(L1b_rad, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
                     self.context.logger.info("Done")
 
                     self.context.logger.info("Processing to L1b irradiance...")
                     L1b_irr = avg.average_l1b("irradiance", L1a_irr)
                     if self.context.get_config_value("write_l1b"):
-                        writer.write(L1b_irr, overwrite=True)
+                        writer.write(L1b_irr, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
                     self.context.logger.info("Done")
 
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:
@@ -148,6 +148,7 @@ class SequenceProcessor:
                     self.context.logger.info("Done")
             else:
                 self.context.logger.info("Not a standard sequence")
+                self.context.anomaly_handler.add_anomaly("s")
 
         else:
             raise NameError("Invalid network: " + self.context.get_config_value("network"))
