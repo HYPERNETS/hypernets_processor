@@ -840,8 +840,11 @@ class HypernetsReader:
             # ------------------------------
             # global attributes + wavelengths -> need to check for swir
             # ----------------------------------
-            globalattr = dict(metadata['Metadata'])
-            seq = globalattr['datetime']
+            if metadata.has_option('Metadata'):
+                globalattr = dict(metadata['Metadata'])
+            else:
+                globalattr=[]
+
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
             # look for latitude and longitude or lat and lon , more elegant way??
@@ -918,7 +921,7 @@ class HypernetsReader:
             self.context.logger.error("Missing metadata file in sequence directory - check sequence directory")
             self.context.anomaly_handler.add_anomaly("s")
 
-        return seq, lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id
+        return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id
 
     def read_sequence(self,seq_dir,calibration_data_rad,calibration_data_irr,
                       calibration_data_swir_rad=None,calibration_data_swir_irr=None):
@@ -931,7 +934,7 @@ class HypernetsReader:
         l0_swir_rad = None
         l0_swir_bla = None
 
-        seq,lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag, instrument_id, site_id = self.read_metadata(
+        lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag, instrument_id, site_id = self.read_metadata(
             seq_dir)
 
         if seriesIrr:
@@ -994,7 +997,7 @@ class HypernetsReader:
                 seriesid=(i.replace(".jpg", "")).split("_", 5)[1]
                 va=(i.replace(".jpg", "")).split("_", 5)[2]
                 aa=(i.replace(".jpg", "")).split("_", 5)[4]
-                date_time_obj = datetime.datetime.strptime(seq, '%Y%m%dT%H%M%S')
+                date_time_obj = datetime.datetime.strptime(seq_dir.replace('SEQ', ''), '%Y%m%dT%H%M%S')
                 date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
 
                 if aa=="-001":
@@ -1003,7 +1006,7 @@ class HypernetsReader:
                     va = get_altitude(float(lat), float(lon), date_time_obj)
                 angles= '{}_{}_{}'.format(seriesid, round(float(aa)),round(float(va)))
                 imagename= self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
-                                                site_id=site_id, time=seq,version=None,swir=None, angles=angles)
+                                                site_id=site_id, time=seq_dir.replace('SEQ', ''),version=None,swir=None, angles=angles)
                 directory = self.writer.return_directory()
                 if not os.path.exists(directory):
                     os.makedirs(directory)
