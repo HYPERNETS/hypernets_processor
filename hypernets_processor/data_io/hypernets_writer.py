@@ -6,6 +6,7 @@ from hypernets_processor.version import __version__
 import os
 import numpy as np
 
+import xarray as xr
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -25,7 +26,7 @@ class HypernetsWriter:
         self.context = context
 
     def write(
-        self, ds, directory=None, overwrite=False, fmt=None, compression_level=None
+        self, ds, directory=None, overwrite=False, fmt=None, compression_level=None, remove_vars_strings=None
     ):
         """
         Write xarray dataset to file
@@ -62,8 +63,13 @@ class HypernetsWriter:
             else:
                 raise IOError("The file already exists: " + path)
 
-        #ds = HypernetsWriter.fill_ds(ds)
+        if remove_vars_strings is not None:
+            for remove_var_string in remove_vars_strings.split(','):
+                for var_name in ds.data_vars:
+                    if remove_var_string.strip() in var_name:
+                        ds = ds.drop_vars(var_name)
 
+        #ds = HypernetsWriter.fill_ds(ds)
         if fmt == "nc":
             HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
 
@@ -245,7 +251,6 @@ class HypernetsWriter:
         if self.context is not None:
             if (self.context.get_config_value("to_archive") is True) and (self.context.archive_db is not None):
                 self.context.archive_db.archive_product(ds, path)
-
 
 if __name__ == "__main__":
     pass
