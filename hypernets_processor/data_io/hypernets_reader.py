@@ -840,7 +840,7 @@ class HypernetsReader:
             # ------------------------------
             # global attributes + wavelengths -> need to check for swir
             # ----------------------------------
-            if metadata.has_option('Metadata'):
+            if metadata.has_section('Metadata'):
                 globalattr = dict(metadata['Metadata'])
             else:
                 globalattr=[]
@@ -997,7 +997,7 @@ class HypernetsReader:
                 seriesid=(i.replace(".jpg", "")).split("_", 5)[1]
                 va=(i.replace(".jpg", "")).split("_", 5)[2]
                 aa=(i.replace(".jpg", "")).split("_", 5)[4]
-                date_time_obj = datetime.datetime.strptime(seq_dir.replace('SEQ', ''), '%Y%m%dT%H%M%S')
+                date_time_obj = datetime.datetime.strptime(os.path.basename(seq_dir).replace('SEQ', ''), '%Y%m%dT%H%M%S')
                 date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
 
                 if aa=="-001":
@@ -1006,7 +1006,7 @@ class HypernetsReader:
                     va = get_altitude(float(lat), float(lon), date_time_obj)
                 angles= '{}_{}_{}'.format(seriesid, round(float(aa)),round(float(va)))
                 imagename= self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
-                                                site_id=site_id, time=seq_dir.replace('SEQ', ''),version=None,swir=None, angles=angles)
+                                                site_id=site_id, time=os.path.basename(seq_dir).replace('SEQ', ''),version=None,swir=None, angles=angles)
                 directory = self.writer.return_directory()
                 if not os.path.exists(directory):
                     os.makedirs(directory)
