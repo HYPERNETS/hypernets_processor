@@ -230,6 +230,7 @@ class HypernetsReader:
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
+            # np.genfromtxt(txt,delimiter=',',dtype=None, encoding=None)
             # name of spectra file
             acquisitionTime = specattr[spectra]
             acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
@@ -435,7 +436,7 @@ class HypernetsReader:
                 'azimuth_ref'] + '_' + model['vza']
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
-
+            vaa, vza=map(float, specattr['pt_abs'].split(";"))
             # name of spectra file
             acquisitionTime = specattr[spectra]
             acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
@@ -477,8 +478,8 @@ class HypernetsReader:
                 # maybe xarray has a better way to do - check merge, concat, ...
                 series_id = model['series_id']
                 ds["series_id"][scan_number] = series_id
-                ds["viewing_azimuth_angle"][scan_number] =  model['vaa']
-                ds["viewing_zenith_angle"][scan_number] = model['vza']
+                ds["viewing_azimuth_angle"][scan_number] = vaa
+                ds["viewing_zenith_angle"][scan_number] = vza
 
                 # estimate time based on timestamp
                 ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
@@ -553,6 +554,7 @@ class HypernetsReader:
                         model['azimuth_ref']+'_'+model['vza']
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
+            vaa, vza=map(float, specattr['pt_abs'].split(";"))
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
@@ -662,8 +664,8 @@ class HypernetsReader:
 
                         series_id = model['series_id']
                         ds["series_id"][scan_number] = series_id
-                        ds["viewing_azimuth_angle"][scan_number] = model['vaa']
-                        ds["viewing_zenith_angle"][scan_number] = model['vza']
+                        ds["viewing_azimuth_angle"][scan_number] = vaa
+                        ds["viewing_zenith_angle"][scan_number] = vza
 
                         # estimate time based on timestamp
                         ds["acquisition_time"][
