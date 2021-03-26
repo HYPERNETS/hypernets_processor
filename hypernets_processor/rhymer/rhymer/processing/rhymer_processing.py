@@ -1,7 +1,7 @@
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.rhymer.rhymer.ancillary.rhymer_ancillary import RhymerAncillary
 import numpy as np
-
+import os
 
 ## interpolate Mobley sky reflectance LUT
 ## ths is sun zenith angle
@@ -16,9 +16,10 @@ class RhymerProcessing:
         self.context = context
         self.rhymeranc = RhymerAncillary(context)
         self.rhymershared=RhymerShared(context)
+        self.dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+        #self.path_ascii = os.path.join(dir_path, 'data', 'calibration_files_ascii', 'HYPSTAR_cal')
 
     def mobley_lut_interp(self, ths, thv, phi, wind=2.):
-
         rholut = self.mobley_lut_read()
         dval = rholut['header']
 
@@ -45,7 +46,7 @@ class RhymerProcessing:
 
     def mobley_lut_read(self):
         vf = self.context.get_config_value("rholut")
-        ifile = '{}/{}'.format(self.context.get_config_value("rhymer_data_dir"), 'Shared/Mobley/{}.txt'.format(vf))
+        ifile = '{}/{}'.format(self.dir_path, '../rhymer/data/Shared/Mobley/{}.txt'.format(vf))
 
         header = '   I   J    Theta      Phi  Phi-view       rho'.split()
         data, cur = {}, None
