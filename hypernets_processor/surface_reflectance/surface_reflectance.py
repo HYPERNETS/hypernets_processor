@@ -90,8 +90,7 @@ class SurfaceReflectance:
 
         if self.context.get_config_value("network").lower() == "w":
 
-            dataset_l2a = self.avg.average_L2(dataset)
-
+            dataset_l2a = self.avg.average_L2(dataset) # template and propagation is in average_L2
             for measurandstring in ["water_leaving_radiance", "reflectance_nosc",
                                     "reflectance", "epsilon"]:
                 try:

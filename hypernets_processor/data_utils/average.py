@@ -35,7 +35,7 @@ class Average:
         if self.context.get_config_value("network") == "l":
             flags=["outliers"]
         else:
-            flags = []
+            flags = ["outliers"]
 
         dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring,flags)
 
@@ -57,7 +57,7 @@ class Average:
 
     def average_L2(self,dataset):
 
-        dataset_l2a = self.templ.l2_from_l1d_dataset(dataset)
+        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset)
 
         flags = ["saturation","nonlinearity","bad_pointing","outliers",
                          "angles_missing","lu_eq_missing","fresnel_angle_missing",
@@ -84,8 +84,6 @@ class Average:
         if corr:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
-
-
             for i in range(len(series_id)):
                 flagged = np.any(
                     [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in

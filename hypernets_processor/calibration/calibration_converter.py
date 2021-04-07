@@ -45,8 +45,11 @@ class CalibrationConverter:
             globalattr = dict(metadata['Metadata'])
             if 'hypstar_sn' in (globalattr.keys()):
                 instrument_id = int(globalattr['hypstar_sn'])
+            elif 'sn_hypstar' in (globalattr.keys()):
+                instrument_id = int(globalattr['sn_hypstar'])
             else:
-                instrument_id = self.context.get_config_value("hypstar_cal_number")
+                # instrument_id = self.context.get_config_value("hypstar_cal_number")
+                print("No SN for hypstar instrument!")
 
         hypstar = "hypstar_"+str(instrument_id) #self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf,hypstar)
