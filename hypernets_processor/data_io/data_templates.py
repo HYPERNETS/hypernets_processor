@@ -270,38 +270,35 @@ class DataTemplates:
 
         return dataset_l1d
 
-    def l2_from_l1d_dataset(self, datasetl1d):
-
-        if self.context.get_config_value("network").lower() == "w":
-            l2a_dim_sizes_dict = {"wavelength": len(datasetl1d["wavelength"]),
-                                  "series": len(np.unique(datasetl1d['series_id']))}
-            dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A", propagate_ds=datasetl1d, ds=datasetl1d)
-            dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1d.wavelength)
-
-            series_id = np.unique(datasetl1d['series_id'])
-            dataset_l2a["series_id"].values = series_id
-
-            for variablestring in ["acquisition_time", "viewing_azimuth_angle",
-                                   "viewing_zenith_angle", "solar_azimuth_angle",
-                                   "solar_zenith_angle"]:
-                temp_arr = np.empty(len(series_id))
-                for i in range(len(series_id)):
-                    ids = np.where((datasetl1d['series_id'] == series_id[i]) & (
-                            datasetl1d['quality_flag'] == 1))
-                    temp_arr[i] = np.mean(datasetl1d[variablestring].values[ids])
-                dataset_l2a[variablestring].values = temp_arr
-
-        return dataset_l2a
 
     def l2_from_l1c_dataset(self, datasetl1c):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
-
         :param datasetl0:
         :type datasetl0:
         :return:
         :rtype:
         """
+        if self.context.get_config_value("network").lower() == "w":
+            l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
+                                  "series": len(np.unique(datasetl1c['series_id']))}
+            dataset_l2a = self.hdsb.create_ds_template(l2a_dim_sizes_dict, "W_L2A", propagate_ds=datasetl1c, ds=datasetl1c)
+            dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
+
+            series_id = np.unique(datasetl1c['series_id'])
+            dataset_l2a["series_id"].values = series_id
+            print(dataset_l2a["series_id"].values)
+            for variablestring in ["acquisition_time", "viewing_azimuth_angle",
+                                   "viewing_zenith_angle", "solar_azimuth_angle",
+                                   "solar_zenith_angle", "epsilon", "rhof"]:
+                temp_arr = np.empty(len(series_id))
+                for i in range(len(series_id)):
+                    ids = np.where((datasetl1c['series_id'] == series_id[i]) & (
+                            datasetl1c['quality_flag'] == 0))
+                    temp_arr[i] = np.mean(datasetl1c[variablestring].values[ids])
+                dataset_l2a[variablestring].values = temp_arr
+
+
         if self.context.get_config_value("network").lower() == "l":
             l2a_dim_sizes_dict = {"wavelength": len(datasetl1c["wavelength"]),
                                   "series": len(datasetl1c['series_id'])}
