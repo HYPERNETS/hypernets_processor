@@ -47,7 +47,8 @@ class CalibrationConverter:
                 instrument_id = int(globalattr['hypstar_sn'])
             else:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
-
+        else:
+            instrument_id = self.context.get_config_value("hypstar_cal_number")
         hypstar = "hypstar_"+str(instrument_id) #self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf,hypstar)
         name = "HYPERNETS_CAL_"+hypstar.upper()+"_RAD_v"+str(version)+".nc"
