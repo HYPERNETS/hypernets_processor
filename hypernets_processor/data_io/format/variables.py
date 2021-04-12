@@ -651,7 +651,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                  "long_name": "downwelling irradiance",
                                                  "units": "mW m^-2 nm^-1 sr^-1"}},
                    "rhof": {"dim": [Lu_SCAN_DIM],
-                            "dtype": np.float16,
+                            "dtype": np.float32,
                             "attributes": {"standard_name": "fresnel_reflectance",
                                            "long_name": "Fraction of downwelling sky radiance reflected at the "
                                                         "air-water interface",
@@ -904,8 +904,7 @@ W_L1C_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                            "attributes": {"standard_name": "simil_epsilon",
                                                           "long_name": "Similarity spectrum ratio at two wavelengths see Ruddick et al. (2016)",
                                                           "reference": "",
-                                                          "units": "-"},
-                                           "encoding": {'dtype': np.uint16, "scale_factor": 0.001, "offset": 0.0}},
+                                                          "units": "-"}},
                                "u_rel_random_epsilon": {"dim": [Lu_SCAN_DIM],
                                                         "dtype": np.float32,
                                                         "attributes": {
@@ -922,7 +921,15 @@ W_L1C_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                 "long_name": "Systematic epsilon relative uncertainty",
                                                                 "units": "%"},
                                                             "encoding": {'dtype': np.uint16, "scale_factor": 0.0001,
-                                                                         "offset": 0.0}}
+                                                                         "offset": 0.0}},
+                                "rhof": {"dim": [Lu_SCAN_DIM],
+                                                            "dtype": np.float32,
+                                                            "attributes": {"standard_name": "fresnel_reflectance",
+                                                                           "long_name": "Fraction of downwelling sky radiance reflected at the "
+                                                                                        "air-water interface",
+                                                                           "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",
+                                                                           "units": "-",
+                                                                           "preferred_symbol": "rhof"}},
                               }
 W_L2A_REFLECTANCE_VARIABLES = deepcopy(W_L1C_REFLECTANCE_VARIABLES)
 

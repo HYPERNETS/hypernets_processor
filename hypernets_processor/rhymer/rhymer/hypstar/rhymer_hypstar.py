@@ -157,7 +157,7 @@ class RhymerHypstar:
             sena_lu = np.unique(lu["viewing_azimuth_angle"].values)
             sena_lsky = np.unique(lsky["viewing_azimuth_angle"].values)
             for i in sena_lu:
-                if i not in sena_lsky:
+                if np.round(i) not in np.round(sena_lsky):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "lu_eq_missing")
                     if self.context.get_config_value("verbosity") > 2:
@@ -212,12 +212,16 @@ class RhymerHypstar:
         lat = l1b.attrs['site_latitude']
         lon = l1b.attrs['site_latitude']
         wind = []
+
+        wa = self.context.get_config_value("wind_ancillary")
+        if not wa:
+            self.context.logger.info("Default wind speed {}".format(self.context.get_config_value("wind_default")))
+
         for i in range(len(l1b.scan)):
             wa = self.context.get_config_value("wind_ancillary")
             if not wa:
                 l1b["quality_flag"][l1b["scan"] == i] = du.set_flag(l1b["quality_flag"][l1b["scan"] == i],
                                                                     "def_wind_flag")
-                self.context.logger.info("Default wind speed {}".format(self.context.get_config_value("wind_default")))
                 wind.append(self.context.get_config_value("wind_default"))
             else:
                 isodate = datetime.utcfromtimestamp(l1b['acquisition_time'].values[i]).strftime('%Y-%m-%d')
@@ -235,6 +239,12 @@ class RhymerHypstar:
         fresnel_vza = np.zeros(len(l1b.scan))
         fresnel_raa = np.zeros(len(l1b.scan))
         fresnel_sza = np.zeros(len(l1b.scan))
+
+        ## inform
+        if self.context.get_config_value("fresnel_option") == 'Ruddick2006':
+            self.context.logger.info("Apply Ruddick et al., 2006")
+        if self.context.get_config_value("fresnel_option") == 'Mobley':
+            self.context.logger.info("Apply Mobley 1999")
 
         wind = l1b["fresnel_wind"].values
         for i in range(len(l1b.scan)):
@@ -263,12 +273,10 @@ class RhymerHypstar:
                     rhof = self.context.get_config_value("rhof_default")
             if self.context.get_config_value("fresnel_option") == 'Ruddick2006':
                 rhof = self.context.get_config_value("rhof_default")
-                self.context.logger.info("Apply Ruddick et al., 2006")
                 if wind[i] is not None:
                     rhof = rhof + 0.00039 * wind[i] + 0.000034 * wind[i] ** 2
 
             fresnel_coeff[i] = rhof
-
         l1b["rhof"].values = fresnel_coeff
         l1b["fresnel_vza"].values = fresnel_vza
         l1b["fresnel_raa"].values = fresnel_raa
