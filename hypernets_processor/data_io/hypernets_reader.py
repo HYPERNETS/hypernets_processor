@@ -7,6 +7,7 @@ import re  # for re.split
 from configparser import ConfigParser
 from struct import unpack
 from sys import version_info  # noqa
+import pandas as pd
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -85,7 +86,7 @@ class HypernetsReader:
         for headLen, headName, headFormat in headerDef:
             data = f.read(headLen)
             if len(data) != headLen:
-                #self.context.logger.error("Spectra length not similar to header length")
+                # self.context.logger.error("Spectra length not similar to header length")
                 break
                 continue
             # if version_info > (3, 0):
@@ -143,12 +144,12 @@ class HypernetsReader:
 
     def read_wavelength(self, pixcount, cal_data):
 
-        pix=range(pixcount)
-        wav_coef=cal_data["wavelength_coefficients"]
+        pix = range(pixcount)
+        wav_coef = cal_data["wavelength_coefficients"]
         wav_coef_func = np.poly1d(np.flip(wav_coef))
 
-        wvl=wav_coef_func(pix)
-        self.context.logger.debug("Wavelength range: %s -%s"%(min(wvl), max(wvl)))
+        wvl = wav_coef_func(pix)
+        self.context.logger.debug("Wavelength range: %s -%s" % (min(wvl), max(wvl)))
 
         return wvl
 
@@ -400,7 +401,7 @@ class HypernetsReader:
         #     header = self.read_header(f, HEADER_DEF)
 
         if pixCount == 2048:
-            wvl = self.read_wavelength(pixCount,cal_data)
+            wvl = self.read_wavelength(pixCount, cal_data)
             # 2. Create template dataset
             # -----------------------------------
             # use template from variables and metadata in format
@@ -414,16 +415,21 @@ class HypernetsReader:
         eof = f.tell()
         f.close()
 
-
-        ds.attrs["sequence_id"]= str(os.path.basename(seq_dir))
-        ds.attrs["instrument_id"]= str(instrument_id)
-        ds.attrs["site_id"]= str(site_id)
+        ds.attrs["sequence_id"] = str(os.path.basename(seq_dir))
+        ds.attrs["instrument_id"] = str(instrument_id)
+        ds.attrs["site_id"] = str(site_id)
         ds.attrs["source_file"] = str(os.path.basename(seq_dir))
-
 
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
         ds["scan"] = np.linspace(1, scanDim, scanDim)
+
+        # add auxiliary data to the L0 data
+        temp, RH , pressure, lux=self.read_aux(seq_dir)
+        ds.attrs["system_temperature"] = temp.values
+        ds.attrs["system_relative_humidity"] = RH.values
+        ds.attrs["system_pressure"] = pressure.values
+        ds.attrs["illuminance"] = lux.values
 
         # Keep track of scan number!
         scan_number = 0
@@ -436,7 +442,7 @@ class HypernetsReader:
                 'azimuth_ref'] + '_' + model['vza']
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
-            vaa, vza=map(float, specattr['pt_abs'].split(";"))
+            vaa, vza = map(float, specattr['pt_abs'].split(";"))
             # name of spectra file
             acquisitionTime = specattr[spectra]
             acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
@@ -463,7 +469,7 @@ class HypernetsReader:
                 # if no header comment those lines
                 header = self.read_header(f, HEADER_DEF)
                 if bool(header) == False:
-                    #self.context.logger.error("Data corrupt go to next line")
+                    # self.context.logger.error("Data corrupt go to next line")
                     break
                     continue
                 # -------------------------------------------------------
@@ -505,7 +511,7 @@ class HypernetsReader:
                 if lat is not None:
                     ds.attrs["site_latitude"] = lat
                     ds.attrs["site_longitude"] = lon
-                    ds["solar_zenith_angle"][scan_number] = 90-get_altitude(float(lat), float(lon), acquisitionTime)
+                    ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
                     ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
                 else:
                     self.context.logger.error(
@@ -537,124 +543,123 @@ class HypernetsReader:
                 if f.tell() == eof:
                     nextLine = False
 
-
         return ds
 
-    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir,instrument_id, site_id):
+    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir,
+                      instrument_id, site_id):
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         model_name = self.model
 
         # read all spectra (== spe files with concanated files) in a series
-        vnir=[]
-        swir=[]
+        vnir = []
+        swir = []
         for spectra in series:
-            self.context.logger.debug("processing "+spectra)
-            model = dict(zip(model_name,spectra.split('_')[:-1]))
-            specBlock = model['series_rep']+'_'+model['series_id']+'_'+model['vaa']+'_'+\
-                        model['azimuth_ref']+'_'+model['vza']
+            self.context.logger.debug("processing " + spectra)
+            model = dict(zip(model_name, spectra.split('_')[:-1]))
+            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + \
+                        model['azimuth_ref'] + '_' + model['vza']
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
-            vaa, vza=map(float, specattr['pt_abs'].split(";"))
+            vaa, vza = map(float, specattr['pt_abs'].split(";"))
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
-            acquisitionTime = datetime.datetime.strptime(acquisitionTime+"UTC",
+            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC",
                                                          '%Y%m%dT%H%M%S%Z')
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             # -----------------------
             # read the file
             # -----------------------
-            with open(FOLDER_NAME+spectra,"rb") as f:
-                f.seek(0,2)
+            with open(FOLDER_NAME + spectra, "rb") as f:
+                f.seek(0, 2)
                 file_size = f.tell()
                 f.seek(0)
                 byte_pointer = 0
                 chunk_size = 1
                 chunk_counter = 1
-                while file_size-byte_pointer:
+                while file_size - byte_pointer:
                     self.context.logger.debug('Parsing chunk No {}, size {} bytes, bytes left: {}'.format(
-                         chunk_counter,chunk_size,file_size-byte_pointer))
-                    chunk_size = unpack('<H',f.read(2))[0]
+                        chunk_counter, chunk_size, file_size - byte_pointer))
+                    chunk_size = unpack('<H', f.read(2))[0]
                     if chunk_size == 4119:
                         chunk_size = 4131
                     f.seek(byte_pointer)
                     chunk_body = f.read(chunk_size)
                     spectrum = Spectrum.parse_raw(chunk_body)
-                    #spectrum.print_header()
+                    # spectrum.print_header()
                     if len(spectrum.body) > 500:
-                        if len(vnir)==0:
-                            vnir=np.array(spectrum.body)
+                        if len(vnir) == 0:
+                            vnir = np.array(spectrum.body)
                         else:
-                            vnir = np.vstack([vnir,spectrum.body])
+                            vnir = np.vstack([vnir, spectrum.body])
                     else:
-                        if len(swir)==0:
-                            swir=np.array(spectrum.body)
+                        if len(swir) == 0:
+                            swir = np.array(spectrum.body)
                         else:
-                            swir = np.vstack([swir,spectrum.body])
+                            swir = np.vstack([swir, spectrum.body])
 
                     byte_pointer = f.tell()
                     chunk_counter += 1
 
         if len(vnir.shape) == 1:
-            vnir = vnir[None,:]
-        if len(swir.shape)==1:
-            swir=swir[None,:]
+            vnir = vnir[None, :]
+        if len(swir.shape) == 1:
+            swir = swir[None, :]
 
         self.context.logger.debug("vnir data shape in combined raw files: %s \n "
                                   "swir data shape in combined raw files: %s"
-                                  %(vnir.shape,swir.shape))
+                                  % (vnir.shape, swir.shape))
 
-        scanDim=vnir.shape[0]
-        wvl = self.read_wavelength(vnir.shape[1],cal_data)
-        ds = self.templ.l0_template_dataset(wvl,scanDim,fileformat)
+        scanDim = vnir.shape[0]
+        wvl = self.read_wavelength(vnir.shape[1], cal_data)
+        ds = self.templ.l0_template_dataset(wvl, scanDim, fileformat)
 
         ds.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds.attrs["instrument_id"] = str(instrument_id)
         ds.attrs["site_id"] = str(site_id)
         ds.attrs["source_file"] = str(os.path.basename(seq_dir))
 
-        scanDim=swir.shape[0]
-        wvl = self.read_wavelength(swir.shape[1],cal_data_swir)
-        ds_swir = self.templ.l0_template_dataset(wvl,scanDim,fileformat,swir=True)
+        scanDim = swir.shape[0]
+        wvl = self.read_wavelength(swir.shape[1], cal_data_swir)
+        ds_swir = self.templ.l0_template_dataset(wvl, scanDim, fileformat, swir=True)
 
         ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds_swir.attrs["instrument_id"] = str(instrument_id)
         ds_swir.attrs["site_id"] = str(site_id)
         ds.attrs["source_file"] = str(os.path.basename(seq_dir))
 
-
-        scan_number=0
-        scan_number_swir=0
+        scan_number = 0
+        scan_number_swir = 0
         for spectra in series:
-            model = dict(zip(model_name,spectra.split('_')[:-1]))
-            specBlock = model['series_rep']+'_'+model['series_id']+'_'+model[
-                'vaa']+'_'+model['azimuth_ref']+'_'+model['vza']
+            model = dict(zip(model_name, spectra.split('_')[:-1]))
+            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model[
+                'vaa'] + '_' + model['azimuth_ref'] + '_' + model['vza']
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
             acquisitionTime = datetime.datetime.strptime(
-                acquisitionTime+"UTC",'%Y%m%dT%H%M%S%Z')
+                acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             # -----------------------
             # read the file
             # -----------------------
-            with open(FOLDER_NAME+spectra,"rb") as f:
-                f.seek(0,2)
+            with open(FOLDER_NAME + spectra, "rb") as f:
+                f.seek(0, 2)
                 file_size = f.tell()
                 f.seek(0)
                 byte_pointer = 0
                 chunk_size = 1
                 chunk_counter = 1
-                while file_size-byte_pointer:
-                    chunk_size = unpack('<H',f.read(2))[0]
+                while file_size - byte_pointer:
+                    chunk_size = unpack('<H', f.read(2))[0]
                     if chunk_size == 4119:
                         chunk_size = 4131
                     f.seek(byte_pointer)
                     chunk_body = f.read(chunk_size)
                     spectrum = Spectrum.parse_raw(chunk_body)
-                    #spectrum.print_header()
+                    # spectrum.print_header()
                     if len(spectrum.body) > 500:
                         scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
@@ -694,10 +699,10 @@ class HypernetsReader:
                             ds.attrs["site_longitude"] = lon
                             ds.attrs["instrument_id"] = str(instrument_id)
                             ds.attrs["site_id"] = str(site_id)
-                            ds["solar_zenith_angle"][scan_number] = 90-get_altitude(
-                                float(lat),float(lon),acquisitionTime)
+                            ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
+                                float(lat), float(lon), acquisitionTime)
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                                float(lat),float(lon),acquisitionTime)
+                                float(lat), float(lon), acquisitionTime)
                         else:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
@@ -715,14 +720,14 @@ class HypernetsReader:
                         # Acceleration for each axis can be calculated per Eq. (4).
 
                         a = 19.6
-                        b = 2**15
-                        ds['acceleration_x_mean'][scan_number] = spectrum.header.accel_stats.mean_x*a/b
-                        ds['acceleration_x_std'][scan_number] = spectrum.header.accel_stats.std_x*a/b
-                        ds['acceleration_y_mean'][scan_number] = spectrum.header.accel_stats.mean_y*a/b
-                        ds['acceleration_y_std'][scan_number] = spectrum.header.accel_stats.std_y*a/b
-                        ds['acceleration_z_mean'][scan_number] = spectrum.header.accel_stats.mean_z*a/b
-                        ds['acceleration_z_std'][scan_number] = spectrum.header.accel_stats.std_z*a/b
-                        ds['digital_number'][:,scan_number] = scan
+                        b = 2 ** 15
+                        ds['acceleration_x_mean'][scan_number] = spectrum.header.accel_stats.mean_x * a / b
+                        ds['acceleration_x_std'][scan_number] = spectrum.header.accel_stats.std_x * a / b
+                        ds['acceleration_y_mean'][scan_number] = spectrum.header.accel_stats.mean_y * a / b
+                        ds['acceleration_y_std'][scan_number] = spectrum.header.accel_stats.std_y * a / b
+                        ds['acceleration_z_mean'][scan_number] = spectrum.header.accel_stats.mean_z * a / b
+                        ds['acceleration_z_std'][scan_number] = spectrum.header.accel_stats.std_z * a / b
+                        ds['digital_number'][:, scan_number] = scan
                         scan_number += 1
                     else:
                         scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
@@ -761,10 +766,10 @@ class HypernetsReader:
                         if lat is not None:
                             ds_swir.attrs["site_latitude"] = lat
                             ds_swir.attrs["site_longitude"] = lon
-                            ds_swir["solar_zenith_angle"][scan_number_swir] = 90-get_altitude(
-                                float(lat),float(lon),acquisitionTime)
+                            ds_swir["solar_zenith_angle"][scan_number_swir] = 90 - get_altitude(
+                                float(lat), float(lon), acquisitionTime)
                             ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
-                                float(lat),float(lon),acquisitionTime)
+                                float(lat), float(lon), acquisitionTime)
                         else:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
@@ -782,19 +787,18 @@ class HypernetsReader:
                         # Acceleration for each axis can be calculated per Eq. (4).
 
                         a = 19.6
-                        b = 2**15
-                        ds_swir['acceleration_x_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_x*a/b
-                        ds_swir['acceleration_x_std'][scan_number_swir] = spectrum.header.accel_stats.std_x*a/b
-                        ds_swir['acceleration_y_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_y*a/b
-                        ds_swir['acceleration_y_std'][scan_number_swir] = spectrum.header.accel_stats.std_y*a/b
-                        ds_swir['acceleration_z_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_z*a/b
-                        ds_swir['acceleration_z_std'][scan_number_swir] = spectrum.header.accel_stats.std_z*a/b
-                        ds_swir['digital_number'][:,scan_number_swir] = scan
+                        b = 2 ** 15
+                        ds_swir['acceleration_x_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_x * a / b
+                        ds_swir['acceleration_x_std'][scan_number_swir] = spectrum.header.accel_stats.std_x * a / b
+                        ds_swir['acceleration_y_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_y * a / b
+                        ds_swir['acceleration_y_std'][scan_number_swir] = spectrum.header.accel_stats.std_y * a / b
+                        ds_swir['acceleration_z_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_z * a / b
+                        ds_swir['acceleration_z_std'][scan_number_swir] = spectrum.header.accel_stats.std_z * a / b
+                        ds_swir['digital_number'][:, scan_number_swir] = scan
                         scan_number_swir += 1
 
                     byte_pointer = f.tell()
                     chunk_counter += 1
-
 
         return ds, ds_swir
 
@@ -836,7 +840,6 @@ class HypernetsReader:
         #     ACTION_NONE  : 0x03   (03)
 
         metadata = ConfigParser()
-        print("seq", os.path.join(seq_dir, "metadata.txt"))
         if os.path.exists(os.path.join(seq_dir, "metadata.txt")):
             metadata.read(os.path.join(seq_dir, "metadata.txt"))
             # ------------------------------
@@ -845,7 +848,7 @@ class HypernetsReader:
             if metadata.has_section('Metadata'):
                 globalattr = dict(metadata['Metadata'])
             else:
-                globalattr=[]
+                globalattr = []
 
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
@@ -873,13 +876,12 @@ class HypernetsReader:
             elif 'sn_hypstar' in (globalattr.keys()):
                 instrument_id = int(globalattr['sn_hypstar'])
             else:
-                #instrument_id = self.context.get_config_value("hypstar_cal_number")
+                # instrument_id = self.context.get_config_value("hypstar_cal_number")
                 print("No SN for hypstar instrument!")
             # if 'site_name' in (globalattr.keys()):
             #     site_id = str(globalattr['site_name']).strip()
             # else:
             site_id = self.context.get_config_value("site_id")
-
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
@@ -903,7 +905,6 @@ class HypernetsReader:
                 seriesName.extend(list(name for name in seriesattr if '.spe' in name))
                 seriesPict.extend(list(name for name in seriesattr if '.jpg' in name))
 
-
             # ----------------
             # Make list per action
             # ----------------
@@ -923,13 +924,25 @@ class HypernetsReader:
             seriesRad = [x for x, y in zip(seriesName, action) if int(y) == 16]
 
         else:
-            self.context.logger.error("Missing metadata file in sequence directory - check sequence directory")
-            self.context.anomaly_handler.add_anomaly("s")
+            raise IOError(os.path.join(seq_dir, "metadata.txt") + " does not exist! Check your input directory!")
 
         return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id
 
-    def read_sequence(self,seq_dir,calibration_data_rad,calibration_data_irr,
-                      calibration_data_swir_rad=None,calibration_data_swir_irr=None):
+    def read_aux(self, seq_dir):
+        if os.path.exists(os.path.join(seq_dir, "meteo.csv")):
+            aux = pd.read_csv(os.path.join(seq_dir, "meteo.csv"), sep=";", header=None)
+            data = pd.concat(
+                [pd.DataFrame(aux.iloc[:, i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
+                axis=1, ignore_index=True)
+            data.columns = ['temp', 'RH', 'pressure', 'lux']
+        else:
+            self.context.logger.error("Missing meteo file in sequence directory. No meteo data added to your output file.")
+            self.context.anomaly_handler.add_anomaly("s")
+
+        return data['temp'],data['RH'],data['pressure'],data['lux']
+
+    def read_sequence(self, seq_dir, calibration_data_rad, calibration_data_irr,
+                      calibration_data_swir_rad=None, calibration_data_swir_irr=None):
 
         # define data to return none at end of method if does not exist
         l0_irr = None
@@ -939,92 +952,95 @@ class HypernetsReader:
         l0_swir_rad = None
         l0_swir_bla = None
 
-        lat,lon,cc,metadata,seriesIrr,seriesRad,seriesBlack,seriesPict,flag, instrument_id, site_id = self.read_metadata(
+        lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id = self.read_metadata(
             seq_dir)
 
         if seriesIrr:
             if self.context.get_config_value("network") == "w":
-                l0_irr = self.read_series(seq_dir,seriesIrr,lat,lon,metadata,flag,
-                                          "L0_IRR",calibration_data_irr,instrument_id, site_id)
+                l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
+                                          "L0_IRR", calibration_data_irr, instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_irr,overwrite=True)
+                    self.writer.write(l0_irr, overwrite=True)
             else:
-                l0_irr,l0_swir_irr = self.read_series_L(seq_dir,seriesIrr,lat,lon,
-                                                        metadata,flag,"L0_IRR",
-                                                        calibration_data_irr,
-                                                        calibration_data_swir_irr,instrument_id, site_id)
+                l0_irr, l0_swir_irr = self.read_series_L(seq_dir, seriesIrr, lat, lon,
+                                                         metadata, flag, "L0_IRR",
+                                                         calibration_data_irr,
+                                                         calibration_data_swir_irr, instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_irr,overwrite=True)
-                    self.writer.write(l0_swir_irr,overwrite=True)
+                    self.writer.write(l0_irr, overwrite=True)
+                    self.writer.write(l0_swir_irr, overwrite=True)
 
         else:
             self.context.logger.error("No irradiance data for this sequence")
 
         if seriesRad:
             if self.context.get_config_value("network") == "w":
-                l0_rad = self.read_series(seq_dir,seriesRad,lat,lon,metadata,flag,
-                                          "L0_RAD",calibration_data_rad,instrument_id, site_id)
+                l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
+                                          "L0_RAD", calibration_data_rad, instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_rad,overwrite=True)
+                    self.writer.write(l0_rad, overwrite=True)
             else:
-                l0_rad,l0_swir_rad = self.read_series_L(seq_dir,seriesRad,lat,lon,
-                                                        metadata,flag,"L0_RAD",
-                                                        calibration_data_rad,
-                                                        calibration_data_swir_rad,instrument_id, site_id)
+                l0_rad, l0_swir_rad = self.read_series_L(seq_dir, seriesRad, lat, lon,
+                                                         metadata, flag, "L0_RAD",
+                                                         calibration_data_rad,
+                                                         calibration_data_swir_rad, instrument_id, site_id)
 
                 if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_rad,overwrite=True)
-                    self.writer.write(l0_swir_rad,overwrite=True)
+                    self.writer.write(l0_rad, overwrite=True)
+                    self.writer.write(l0_swir_rad, overwrite=True)
 
         else:
             self.context.logger.error("No radiance data for this sequence")
 
         if seriesBlack:
             if self.context.get_config_value("network") == "w":
-                l0_bla = self.read_series(seq_dir,seriesBlack,lat,lon,metadata,flag,
-                                          "L0_BLA",calibration_data_rad,instrument_id, site_id)
+                l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag,
+                                          "L0_BLA", calibration_data_rad, instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_bla,overwrite=True)
+                    self.writer.write(l0_bla, overwrite=True)
             else:
-                l0_bla,l0_swir_bla = self.read_series_L(seq_dir,seriesBlack,lat,lon,
-                                                        metadata,flag,"L0_BLA",
-                                                        calibration_data_rad,
-                                                        calibration_data_swir_rad,instrument_id, site_id)
+                l0_bla, l0_swir_bla = self.read_series_L(seq_dir, seriesBlack, lat, lon,
+                                                         metadata, flag, "L0_BLA",
+                                                         calibration_data_rad,
+                                                         calibration_data_swir_rad, instrument_id, site_id)
                 if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_bla,overwrite=True)
-                    self.writer.write(l0_swir_bla,overwrite=True)
+                    self.writer.write(l0_bla, overwrite=True)
+                    self.writer.write(l0_swir_bla, overwrite=True)
 
         else:
             self.context.logger.error("No black data for this sequence")
 
         if seriesPict:
             for i in seriesPict:
-                seriesid=(i.replace(".jpg", "")).split("_", 5)[1]
-                va=(i.replace(".jpg", "")).split("_", 5)[2]
-                aa=(i.replace(".jpg", "")).split("_", 5)[4]
-                date_time_obj = datetime.datetime.strptime(os.path.basename(seq_dir).replace('SEQ', ''), '%Y%m%dT%H%M%S')
+                seriesid = (i.replace(".jpg", "")).split("_", 5)[1]
+                va = (i.replace(".jpg", "")).split("_", 5)[2]
+                aa = (i.replace(".jpg", "")).split("_", 5)[4]
+                date_time_obj = datetime.datetime.strptime(os.path.basename(seq_dir).replace('SEQ', ''),
+                                                           '%Y%m%dT%H%M%S')
                 date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
 
-                if aa=="-001":
-                    aa=get_azimuth(float(lat), float(lon), date_time_obj,)
-                if va =="-001":
-                    va = 90-get_altitude(float(lat), float(lon), date_time_obj)
-                angles= '{}_{}_{}'.format(seriesid, round(float(aa)),round(float(va)))
-                imagename= self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
-                                                site_id=site_id, time=os.path.basename(seq_dir).replace('SEQ', ''),version=None,swir=None, angles=angles)
+                if aa == "-001":
+                    aa = get_azimuth(float(lat), float(lon), date_time_obj, )
+                if va == "-001":
+                    va = 90 - get_altitude(float(lat), float(lon), date_time_obj)
+                angles = '{}_{}_{}'.format(seriesid, round(float(aa)), round(float(va)))
+                imagename = self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
+                                                            site_id=site_id,
+                                                            time=os.path.basename(seq_dir).replace('SEQ', ''),
+                                                            version=None, swir=None, angles=angles)
                 directory = self.writer.return_directory()
                 if not os.path.exists(directory):
                     os.makedirs(directory)
-                path = os.path.join(directory,imagename) + ".jpg"
-                if os.path.exists(os.path.join(seq_dir, "RADIOMETER/"+i)):
-                    shutil.copy(os.path.join(seq_dir, "RADIOMETER/"+i), path)
+                path = os.path.join(directory, imagename) + ".jpg"
+                if os.path.exists(os.path.join(seq_dir, "RADIOMETER/" + i)):
+                    shutil.copy(os.path.join(seq_dir, "RADIOMETER/" + i), path)
 
         else:
             self.context.logger.error("No pictures for this sequence")
         if self.context.get_config_value("network") == "w":
-            return l0_irr,l0_rad,l0_bla
+            return l0_irr, l0_rad, l0_bla
         else:
-            return l0_irr,l0_rad,l0_bla,l0_swir_irr,l0_swir_rad,l0_swir_bla
+            return l0_irr, l0_rad, l0_bla, l0_swir_irr, l0_swir_rad, l0_swir_bla
 
 
 if __name__ == '__main__':
