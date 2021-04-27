@@ -117,7 +117,11 @@ class HypernetsDSBuilder:
                 metadata["sequence_id"] = ds.attrs["sequence_id"]
                 metadata["instrument_id"] = ds.attrs["instrument_id"]
                 metadata["site_id"] = ds.attrs["site_id"]
-                # standard metadata
+                metadata["system_temperature"] = ds.attrs["system_temperature"]
+                metadata["system_relative_humidity"] = ds.attrs["system_relative_humidity"]
+                metadata["system_pressure"] = ds.attrs["system_pressure"]
+                metadata["illuminance"] = ds.attrs["illuminance"]
+
             metadata["processor_version"] = str(version)
             metadata["processor_configuration_file"] = "TBD"
             metadata["system_id"] = hypstar.upper()
