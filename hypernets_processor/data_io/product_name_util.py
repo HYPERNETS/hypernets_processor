@@ -14,7 +14,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-TIME_FMT_L12A = "%Y%m%d%H%M"
+TIME_FMT_L12A = "%Y%m%dT%H%M"
 TIME_FMT_L2B = "%Y%m%d"
 
 
@@ -27,12 +27,12 @@ DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
                     "L_L1A_IRR": "L1A_IRR",
                     "W_L1A_IRR": "L1A_IRR",
                     "L_L1B_RAD": "L1B_RAD",
-                    "W_L1B_RAD": "L1B_RAD",
                     "L_L1B_IRR": "L1B_IRR",
+                    "W_L1B_RAD": "L1B_RAD",
                     "W_L1B_IRR": "L1B_IRR",
                     "W_L1B": "L1B",
                     "L_L1C": "L1C",
-                    "W_L1C": "L1C",
+                    "W_L1C": "L1C_ALL",
                     "W_L1D": "L1D",
                     "L_L2A": "L2A_REF",
                     "W_L2A": "L2A_REF",

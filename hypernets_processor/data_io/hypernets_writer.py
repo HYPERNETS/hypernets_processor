@@ -136,7 +136,7 @@ class HypernetsWriter:
                     day = self.context.get_config_value("time").day
 
                     directory = os.path.join(
-                        archive_directory, site, str(year), str(month), str(day)
+                        archive_directory, site, str(year), str('{:02d}'.format(month)), str('{:02d}'.format(day))
                     )
         return directory
 

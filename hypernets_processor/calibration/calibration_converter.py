@@ -49,14 +49,25 @@ class CalibrationConverter:
                 instrument_id = int(globalattr['sn_hypstar'])
             else:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
+                print("No SN for hypstar instrument!")
         else:
-            instrument_id = self.context.get_config_value("hypstar_cal_number")
+            raise IOError(os.path.join(sequence_path, "metadata.txt") + " does not exist")
+
         hypstar = "hypstar_"+str(instrument_id) #self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf,hypstar)
         name = "HYPERNETS_CAL_"+hypstar.upper()+"_RAD_v"+str(version)+".nc"
-        calibration_data_rad = xarray.open_dataset(os.path.join(hypstar_path,name))
+
+        if os.path.exists(os.path.join(hypstar_path, name)):
+            calibration_data_rad = xarray.open_dataset(os.path.join(hypstar_path, name))
+        else:
+            raise IOError(os.path.join(hypstar_path, name) + " calibration file does not exist")
+
         name = "HYPERNETS_CAL_"+hypstar.upper()+"_IRR_v"+str(version)+".nc"
-        calibration_data_irr = xarray.open_dataset(os.path.join(hypstar_path,name))
+
+        if os.path.exists(os.path.join(hypstar_path, name)):
+            calibration_data_irr = xarray.open_dataset(os.path.join(hypstar_path, name))
+        else:
+            raise IOError(os.path.join(hypstar_path, name) + " calibration file does not exist")
 
         calibration_data_times=calibration_data_rad["calibrationdates"].values
         nonlin_times=calibration_data_rad["nonlineardates"].values
@@ -75,9 +86,17 @@ class CalibrationConverter:
                                                          wav_times[-1])
         if self.context.get_config_value("network") == "l":
             name = "HYPERNETS_CAL_"+hypstar.upper()+"_RAD_SWIR_v"+str(version)+".nc"
-            calibration_data_rad_swir = xarray.open_dataset(os.path.join(hypstar_path,name))
+            if os.path.exists(os.path.join(hypstar_path, name)):
+                calibration_data_rad_swir = xarray.open_dataset(os.path.join(hypstar_path, name))
+            else:
+                raise IOError(os.path.join(hypstar_path, name) + " calibration file does not exist")
+
             name = "HYPERNETS_CAL_"+hypstar.upper()+"_IRR_SWIR_v"+str(version)+".nc"
-            calibration_data_irr_swir = xarray.open_dataset(os.path.join(hypstar_path,name))
+            if os.path.exists(os.path.join(hypstar_path, name)):
+                calibration_data_irr_swir = xarray.open_dataset(os.path.join(hypstar_path, name))
+            else:
+                raise IOError(os.path.join(hypstar_path, name) + " calibration file does not exist")
+
             calibration_data_times = calibration_data_rad_swir["calibrationdates"].values
             nonlin_times = calibration_data_rad_swir["nonlineardates"].values
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
