@@ -49,9 +49,10 @@ class CalibrationConverter:
                 instrument_id = int(globalattr['sn_hypstar'])
             else:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
-                print("No SN for hypstar instrument!")
+                print("No SN set for hypstar instrument! using hypstar_cal_number from config file instead.")
         else:
             raise IOError(os.path.join(sequence_path, "metadata.txt") + " does not exist")
+
 
         hypstar = "hypstar_"+str(instrument_id) #self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf,hypstar)

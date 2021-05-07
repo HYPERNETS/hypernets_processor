@@ -876,9 +876,9 @@ class HypernetsReader:
             elif 'sn_hypstar' in (globalattr.keys()):
                 instrument_id = int(globalattr['sn_hypstar'])
             else:
-                # instrument_id = self.context.get_config_value("hypstar_cal_number")
+                instrument_id = self.context.get_config_value("hypstar_cal_number")
                 self.context.logger.error("No SN for hypstar instrument!")
-                self.context.anomaly_handler.add_anomaly("x")
+                #self.context.anomaly_handler.add_anomaly("x")
             # if 'site_name' in (globalattr.keys()):
             #     site_id = str(globalattr['site_name']).strip()
             # else:
