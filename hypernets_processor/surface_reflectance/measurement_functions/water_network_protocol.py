@@ -39,7 +39,7 @@ class WaterNetworkProtocol:
             id2, w2 = self.rhs.closest_idx(ssd['wave'], w2 / 1000.)
             alpha = ssd['ave'][id1] / ssd['ave'][id2]
 
-        epsilon = (alpha * reflectance_nosc[iref1] - reflectance_nosc[iref2]) / (alpha - 1.0)
+        epsilon = (alpha * reflectance_nosc[iref2] - reflectance_nosc[iref1]) / (alpha - 1.0)
         reflectance = [r - epsilon for r in reflectance_nosc]
 
         return water_leaving_radiance, reflectance_nosc, reflectance, epsilon
