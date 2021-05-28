@@ -858,16 +858,15 @@ class HypernetsReader:
             elif 'lat' in (globalattr.keys()):
                 lat = float(globalattr['lat'])
             else:
-                # self.context.logger.error("Latitude is not given, use default")
+                print("Latitude is not given, use default or add it in metadata.txt")
                 lat = self.context.get_config_value("lat")
                 flag = flag + 2 ** self.context.get_config_value("lat_default")  # du.set_flag(flag, "lat_default") #
-
             if 'longitude' in (globalattr.keys()):
                 lon = float(globalattr['longitude'])
             elif 'lon' in (globalattr.keys()):
                 lon = float(globalattr['lon'])
             else:
-                # self.context.logger.error("Longitude is not given, use default")
+                print("Longitude is not given, use default or add it in metadata.txt")
                 lon = self.context.get_config_value("lon")
                 flag = flag + 2 ** self.context.get_config_value("lon_default")  # du.set_flag(flag, "lon_default")  #
 
