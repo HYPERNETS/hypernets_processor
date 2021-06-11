@@ -924,7 +924,8 @@ class HypernetsReader:
             seriesRad = [x for x, y in zip(seriesName, action) if int(y) == 16]
 
         else:
-            raise IOError(os.path.join(seq_dir, "metadata.txt") + " does not exist! Check your input directory!")
+            self.context.logger.error("Metadata missing")
+            self.context.anomaly_handler.add_anomaly("m")
 
         return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id
 
