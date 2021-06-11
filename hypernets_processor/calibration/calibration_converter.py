@@ -51,7 +51,8 @@ class CalibrationConverter:
                 # instrument_id = self.context.get_config_value("hypstar_cal_number")
                 print("No SN for hypstar instrument!")
         else:
-            raise IOError(os.path.join(sequence_path, "metadata.txt") + " does not exist")
+            self.context.logger.error("Metadata missing")
+            self.context.anomaly_handler.add_anomaly("m")
 
         hypstar = "hypstar_"+str(instrument_id) #self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf,hypstar)
