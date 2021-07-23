@@ -24,5 +24,10 @@ ANOMALIES_DICT = {
             "description": "unexpected error during processing",
             "error": None,
             "error_msg": None
-        }
+        },
+    "m": {
+                "description": "Metadata file missing",
+                "error": IOError,
+                "error_msg": None
+            }
 }
