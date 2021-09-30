@@ -20,8 +20,8 @@ __status__ = "Development"
 class PropagateUnc:
     def __init__(self,context,parallel_cores):
         if context.get_config_value("mcsteps")>1:
-            self.prop = punpy.MCPropagation(context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
-            self.prop2 = punpy.MCPropagation(context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
+            self.prop = punpy.MCPropagation(context.get_config_value("mcsteps"),dtype="float32")
+            self.prop2 = punpy.MCPropagation(context.get_config_value("mcsteps"),dtype="float32")
         self.context=context
 
     def find_input_l1a(self, variables, dataset, calib_dataset):

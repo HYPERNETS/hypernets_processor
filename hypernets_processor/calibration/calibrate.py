@@ -122,6 +122,10 @@ class Calibrate:
                 datasetl0['integration_time'].values[id])
             maski=self.quality_checks((datasetl0["digital_number"].values[:, ids]-
                                  dark_signals[:,ids]))
+            if all(maski==1):
+                self.context.logger.error(
+                    "None of the scans for series passed the quality control criteria")
+                self.context.anomaly_handler.add_anomaly("q")
             mask = np.append(mask, maski)
 
         datasetl0["quality_flag"][np.where(mask==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask==1)],"outliers") #for i in range(len(mask))]
@@ -158,6 +162,7 @@ class Calibrate:
         intsig =np.nanmean(data_subset,axis=0)
         mask = np.zeros_like(intsig)  # mask the columns that have NaN
         if len(intsig)>1:
+            mask[np.where(intsig >= 1e7)] = 1
             noisestd,noiseavg = self.sigma_clip(
                 intsig)  # calculate std and avg for non NaN columns
             mask[np.where(np.abs(intsig-noiseavg) >= k_unc*noisestd)] = 1
