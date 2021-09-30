@@ -297,9 +297,9 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (userguide, 'hypernets_processor_userguide.tex', u'Hypernets Processor User Guide',
-     u'Hypernets Project Team', 'manual'),
     (atbd, 'hypernets_processor_atbd.tex', u'Hypernets Processor Algorithm Theoretical Basis Document',
+     u'Hypernets Project Team', 'manual'),
+    (userguide, 'hypernets_processor_userguide.tex', u'Hypernets Processor User Guide',
      u'Hypernets Project Team', 'manual'),
 ]
 
