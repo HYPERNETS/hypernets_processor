@@ -1,12 +1,12 @@
-.. calibrate - algorithm theoretical basis
+.. files - algorithm theoretical basis
    Author: seh2
    Email: sam.hunt@npl.co.uk
    Created: 6/11/20
 
-.. _calibrate:
+.. _files:
 
 
-Calibrate - process to L1A
+HYPERNETS Product files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC - Pieter
+TBC - Clemence

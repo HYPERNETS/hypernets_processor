@@ -1,12 +1,12 @@
-.. calibrate - algorithm theoretical basis
+.. metadata - algorithm theoretical basis
    Author: seh2
    Email: sam.hunt@npl.co.uk
    Created: 6/11/20
 
-.. _calibrate:
+.. _metadata:
 
 
-Calibrate - process to L1A
+Metadata description
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC - Pieter
+TBC - Clemence/Sam
