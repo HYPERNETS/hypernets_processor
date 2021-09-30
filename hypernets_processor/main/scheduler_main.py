@@ -52,7 +52,7 @@ def unpack_scheduler_config(scheduler_config):
         scheduler_config_dict[sch]["minutes"] = get_config_value(scheduler_config, sch, "minutes", dtype=int)
         scheduler_config_dict[sch]["hours"] = get_config_value(scheduler_config, sch, "hours", dtype=int)
         scheduler_config_dict[sch]["start_time"] = get_config_value(scheduler_config, sch, "start_time", dtype=str)
-        scheduler_config_dict[sch]["parallel"] = get_config_value(scheduler_config, sch, "seconds", dtype=bool)
+        scheduler_config_dict[sch]["parallel"] = get_config_value(scheduler_config, sch, "parallel", dtype=bool)
 
         # Use custom jobs list provided, else use default
         scheduler_config_dict[sch]["jobs_list"] = get_config_value(scheduler_config, sch, "jobs_list", dtype=str)
