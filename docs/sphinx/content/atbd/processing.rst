@@ -14,7 +14,6 @@ TBC - Pieter
 
 .. toctree::
    :maxdepth: 1
-   :caption: Processing Algorithm Description
 
    processing/hypernets_reader
    processing/calibrate

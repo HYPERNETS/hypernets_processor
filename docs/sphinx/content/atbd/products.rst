@@ -14,7 +14,6 @@ TBC - Pieter
 
 .. toctree::
    :maxdepth: 1
-   :caption: 
 
    products/product_files
    products/SQL_databases 
