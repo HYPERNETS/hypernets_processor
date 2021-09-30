@@ -24,6 +24,8 @@ This documentation aimed at both users and developers of the software, find the 
    :caption: ATBD
 
    content/atbd/atbd
+   content/atbd/processing
+   content/atbd/products
 
 .. toctree::
    :maxdepth: 1

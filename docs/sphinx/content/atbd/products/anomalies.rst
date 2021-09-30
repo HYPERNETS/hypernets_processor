@@ -1,12 +1,12 @@
-.. calibrate - algorithm theoretical basis
+.. anomalies - algorithm theoretical basis
    Author: seh2
    Email: sam.hunt@npl.co.uk
    Created: 6/11/20
 
-.. _calibrate:
+.. _anomalies:
 
 
-Calibrate - process to L1A
+Anomalies (processing errors)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC - Pieter
+TBC - Sam

@@ -20,23 +20,10 @@ practical implementation of the methods used. This documentation has been divide
 
 .. toctree::
    :maxdepth: 1
-   :caption: Processing Algorithm Description
+   :caption: 
 
-   processing/hypernets_reader
-   processing/calibrate
-   processing/average
-   processing/interpolate
-   processing/surface_reflectance
-   processing/uncertainty_propagation
-   processing/processing_config
-   
-
-Product description
-	product files
-	metadata 
-	flags 
-	SQL databases
-
+   processing
+   products
 
 
 
