@@ -6,7 +6,7 @@
 hypernets_processor: Hypernets water and land network data processor
 ====================================================================
 
-The **hypernets_processor** module is a Python software package to process the `Hypernets <http://hypernets.eu/from_cms/summary>`_ land and water network in-situ hyperspectral data to surface reflectance products for distribution to users.
+The **hypernets_processor** module is a Python software package to process the `HYPERNETS <http://hypernets.eu/from_cms/summary>`_ land and water network in-situ hyperspectral data to surface reflectance products for distribution to users.
 
 There are two main use cases for the **hypernets_processor** module. The primary function of the software is the automated preparation of data retrieved from network sites for distribution to users. Additionally, the software may also be used for ad-hoc processing of particular field acquisitions, for example for testing instrument operation in the field.
 

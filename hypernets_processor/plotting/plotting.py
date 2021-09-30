@@ -157,7 +157,8 @@ class Plotting():
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)")
         ymax = np.percentile(ydata,95)*1.2
-        ax1.set_ylim([0,ymax])
+        if np.isfinite(ymax):
+            ax1.set_ylim([0,ymax])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
@@ -172,7 +173,8 @@ class Plotting():
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Irradiance ($mW\ nm^{-1}\ m^{-2}$)")
         ymax = np.percentile(ydata,95)*1.2
-        ax1.set_ylim([0,ymax])
+        if np.isfinite(ymax):
+            ax1.set_ylim([0,ymax])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
@@ -200,7 +202,8 @@ class Plotting():
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")
         ymax=np.percentile(ydata,95)*1.2
-        ax1.set_ylim([0,ymax])
+        if np.isfinite(ymax):
+            ax1.set_ylim([0,ymax])
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
@@ -244,6 +247,7 @@ class Plotting():
                 ax1.set_ylim(ylim)
             else:
                 ymax = np.percentile(ydata,95)*1.2
-                ax1.set_ylim([0,ymax])
+                if np.isfinite(ymax):
+                    ax1.set_ylim([0,ymax])
             fig1.savefig(plotpath,bbox_inches='tight')
             plt.close(fig1)

@@ -29,5 +29,10 @@ ANOMALIES_DICT = {
                 "description": "Metadata file missing",
                 "error": IOError,
                 "error_msg": None
+            },
+    "q": {
+                "description": "None of the scans in a series passed the quality controll",
+                "error": None,
+                "error_msg": None
             }
 }
