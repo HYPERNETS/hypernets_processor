@@ -19,7 +19,8 @@ practical implementation of the methods used. This documentation has been divide
 
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :caption: 
 
    processing
    products
