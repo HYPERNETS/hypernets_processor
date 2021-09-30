@@ -9,18 +9,18 @@
 Hypernets Products specification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+TBC - Pieter
 
 
 .. toctree::
    :maxdepth: 1
    :caption: 
 
-   product files
-   SQL databases 
-   metadata 
-   flags 
-   anomalies 
+   products/product_files
+   products/SQL_databases 
+   products/metadata 
+   products/flags 
+   products/anomalies 
    
 
 
