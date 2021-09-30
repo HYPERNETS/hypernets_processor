@@ -6,7 +6,7 @@
 .. _calibrate:
 
 
-Calibrate - L1A
+Calibrate - process to L1A
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TBC - Pieter

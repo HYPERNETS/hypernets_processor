@@ -1,12 +1,12 @@
-.. atbd - algorithm theoretical basis
+.. processing - algorithm theoretical basis
    Author: Pieter De Vis
    Email: Pieter.De.Vis@npl.co.uk
    Created: 01/10/21
 
-.. _atbd:
+.. _processing:
 
 
-Algorithm Theoretical Basis
+Processing Algorithm Description
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The processing algorithm for the `HYPERNETS <http://hypernets.eu/from_cms/summary>`_ network is called hypernets_processor. The hypernets_processor 
@@ -18,12 +18,21 @@ being produced, as well as the manner of their production. This document details
 practical implementation of the methods used. This documentation has been divided into multiple sections:
 
 
+
 .. toctree::
    :maxdepth: 1
-   :caption: 
+   :caption: Processing Algorithm Description
 
-   processing
-   products
+   processing/hypernets_reader
+   processing/calibrate
+   processing/average
+   processing/interpolate
+   processing/surface_reflectance
+   processing/uncertainty_propagation
+   processing/processing_config
+   
+
+
 
 
 
