@@ -1,15 +1,15 @@
-.. atbd - algorithm theoretical basis
+.. products - algorithm theoretical basis
    Author: Pieter De Vis
    Email: Pieter.De.Vis@npl.co.uk
    Created: 01/10/21
 
-.. _atbd:
+.. _products:
 
 
 Hypernets Products specification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC - Pieter
+TBC - Clemence
 
 
 .. toctree::
