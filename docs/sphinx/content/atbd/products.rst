@@ -9,7 +9,7 @@
 Hypernets Products specification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC - Clemence
+TBC - Sam/Clemence
 
 
 .. toctree::
