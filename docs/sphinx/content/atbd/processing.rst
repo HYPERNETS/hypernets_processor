@@ -15,6 +15,7 @@ TBC - Pieter
 .. toctree::
    :maxdepth: 1
 
+   processing/data_structure
    processing/hypernets_reader
    processing/calibrate
    processing/average
