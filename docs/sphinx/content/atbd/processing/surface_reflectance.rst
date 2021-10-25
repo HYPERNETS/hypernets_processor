@@ -12,7 +12,7 @@ Surface Reflectance - Process to L2A
 Water Network
 --------------
 
-TBC - Clemence
+
 
 Land Network
 --------------
