@@ -62,7 +62,7 @@ class Average:
         flags = ["saturation","nonlinearity","bad_pointing","outliers",
                          "angles_missing","lu_eq_missing","fresnel_angle_missing",
                          "fresnel_default","temp_variability_ed","temp_variability_lu",
-                         "min_nbred","min_nbrlu","min_nbrlsky"]
+                         "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
 
         for measurandstring in ["water_leaving_radiance","reflectance_nosc",
                                 "reflectance"]:
