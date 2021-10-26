@@ -8,22 +8,30 @@
 
 HYPERNETS Reader - Process to L0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Radiometer measurements are taken in a defined set of geometries called a sequence.
+Each geometry in a sequence is called a series (see Fig. XXX), as it is composed of a set of repeat
+measurements called scans that are averaged. A suite of different series thus creates a sequence.
+A sequence scheduler is used to order the different sequences that need to be executed during the day.
+Within the sequence scheduler each sequence is executed according to a start and end time
+(HH:MM UTC with a 24 hours format and an automatic update of the system to UTC time when
+connecting to the internet), the time-lapse between each sequence (in minutes),
+the filename in which the sequence is defined and the number of times the sequence needs to be repeated.
 
-Once the sequence has been completed succesfully, the data arrives on the server with the following data format, name convention and data structure:
+Once a sequence has been completed succesfully, the data is sent to the server with the following data format, name convention and data structure:
    * Sequence directory:
-      Data from a single sequence are contained in a SEQUENCE directory with the following name convention *SEQ[date of acquisition with format %Y%m%d]T[time of acquisition with format %H%M%S]*
-   * Data structure: The raw data that comes into the sequence directory contains the following files
+      Data from a single sequence (see data structure) are contained in a SEQUENCE directory with the following name convention *SEQ[date of acquisition with format %Y%m%d]T[time of acquisition with format %H%M%S]*
+   * Data structure:
       * *metadata.txt*:
-         1. This files contains a header with PyxisVersion, DateTime, PI, Site Name, Latitude, Longitude, and, SN of the sensor
-         2. A full description of the sequence with for each series, the number of scans, the type of measurement (radiance/irradiance), wavelength range (VNIR/SWIR), and, the viewing geometry (relative to the sun, to its park position and the North), followed by the name of the file containing the spectra.
+         1. This files contains a header with PyxisVersion, DateTime, PI, Site Name, Latitude, Longitude, and, SN of the sensor, followed by,
+         2. A full description of the sequence with for each series, the number of scans, the type of measurement (radiance/irradiance), wavelength range (VNIR/SWIR), and, the viewing geometry (relative to the sun, to the park position of the sensor and the North), followed by the name of the file containing the spectra.
       * *SPE files*:
-         File containing the spectra (as mentioned in the metadata file)
+         File containing the spectra concatenated per series (as mentioned in the metadata file)
       * *meteo.csv*:
-         File with the measured relative humidity, light and temperature
+         File with the measured relative humidity, light and temperature (auxilliary sensors)
 
 
-Figure XX shows the processing from the raw dataset (in spe-binary datafile format) to
-the L0 data product (data_io.hypernets_reader). The main function in this module is  read_sequence.
+The *data_io.hypernets_reader* module processes the raw dataset (in spe-binary datafile format) to
+the L0 data product (readable netcdf file). The main function in this module is  read_sequence.
 It calls (1) read_metadata to read the metadata file of the sequence (ASCII file),
 (2) read_series to read the different scans concatenated per series in a single spe-binary data file.
 According to the metadata file and the filename of the spe-binary file the processing reorders the
