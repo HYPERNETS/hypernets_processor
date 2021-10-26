@@ -732,10 +732,17 @@ class HypernetsReader:
 
     def read_aux(self, seq_dir):
         if os.path.exists(os.path.join(seq_dir, "meteo.csv")):
-            aux = pd.read_csv(os.path.join(seq_dir, "meteo.csv"), sep=";", header=None)
-            data = pd.concat(
-                [pd.DataFrame(aux.iloc[:, i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
-                axis=1, ignore_index=True)
+            met = open(os.path.join(seq_dir, "meteo.csv"))
+            for line in met.readlines():
+                aux = pd.DataFrame(line.replace("&#039;C", "°C").split(";"))
+                data = pd.concat(
+                    [pd.DataFrame(aux.iloc[i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
+                    axis=1, ignore_index=True)
+
+            # aux = pd.read_csv(os.path.join(seq_dir, "meteo.csv"), sep=";", header=None)
+            # data = pd.concat(
+            #     [pd.DataFrame(aux.iloc[:, i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
+            #     axis=1, ignore_index=True)
             data.columns = ['temp', 'RH', 'pressure', 'lux']
         else:
             self.context.logger.error("Missing meteo file in sequence directory. No meteo data added to your output file.")
