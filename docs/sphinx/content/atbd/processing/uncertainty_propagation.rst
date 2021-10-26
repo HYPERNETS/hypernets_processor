@@ -6,7 +6,7 @@
 .. _uncertainty:
 
 
-Uncertainty propagation 
+Uncertainty Propagation 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TBC - Pieter

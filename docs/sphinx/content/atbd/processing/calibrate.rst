@@ -17,9 +17,9 @@ This measurement function is defined by::
 
 	def function(digital_number,gains,dark_signal,non_linear,int_time):
         
-        DN=digital_number-dark_signal
-        DN[DN==0]=1
-        corrected_DN = DN /(non_linear[0]+non_linear[1]*DN+
+        	DN=digital_number-dark_signal
+        	DN[DN==0]=1
+        	corrected_DN = DN /(non_linear[0]+non_linear[1]*DN+
                                        non_linear[2]*DN**2+
                                        non_linear[3]*DN**3+
                                        non_linear[4]*DN**4+
@@ -27,7 +27,7 @@ This measurement function is defined by::
                                        non_linear[6]*DN**6+
                                        non_linear[7]*DN**7)
 
-        return gains*corrected_DN/int_time*1000
+        	return gains*corrected_DN/int_time*1000
 
 where digital_number gives the measured signal (in digital numbers), dark_signal gives the dark signal in digital numbers, 
 gains gives the calibration coefficients, non_linear has the (8th order polynomial) non-linearity coefficients, and int_time 
