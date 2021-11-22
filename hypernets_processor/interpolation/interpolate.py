@@ -8,10 +8,8 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.interpolation.measurement_functions.interpolation_factory import InterpolationFactory
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
+from hypernets_processor.data_utils.quality_checks import QualityChecks
 
-import punpy
-import numpy as np
-import warnings
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -25,6 +23,7 @@ class Interpolate:
     def __init__(self,context,parallel_cores=1):
         self._measurement_function_factory = InterpolationFactory()
         self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
+        self.qual = QualityChecks(context)
         self.templ = DataTemplates(context=context)
         self.writer=HypernetsWriter(context)
         self.plot=Plotting(context)
@@ -59,6 +58,8 @@ class Interpolate:
 
         dataset_l1c=self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
         dataset_l1c["acquisition_time"].values = dataset_l1b_rad["acquisition_time"].values
+
+        dataset_l1b_rad,dataset_l1b_irr=self.qual.perform_quality_check_interpolate(dataset_l1b_rad,dataset_l1b_irr)
 
         dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr)
 
