@@ -9,10 +9,7 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.combine_SWIR.measurement_functions.combine_factory import CombineFactory
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
-
-import punpy
-import numpy as np
-import warnings
+from hypernets_processor.data_utils.quality_checks import QualityChecks
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -27,6 +24,7 @@ class CombineSWIR:
     def __init__(self,context,parallel_cores=1):
         self._measurement_function_factory = CombineFactory()
         self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
+        self.qual = QualityChecks(context)
         self.avg = Average(context=context)
         self.templ = DataTemplates(context)
         self.writer=HypernetsWriter(context)
@@ -34,9 +32,9 @@ class CombineSWIR:
         self.context = context
 
     def combine(self,measurandstring,dataset_l1a,dataset_l1a_swir):
-        dataset_l1a = self.perform_checks(dataset_l1a)
         dataset_l1b = self.avg.average_l1b(measurandstring,dataset_l1a)
         dataset_l1b_swir = self.avg.average_l1b(measurandstring,dataset_l1a_swir)
+        dataset_l1b,dataset_l1b_swir=self.qual.perform_quality_check_comb(dataset_l1b,dataset_l1b_swir)
         combine_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_combine"))
         input_vars = combine_function.get_argument_names()
@@ -73,6 +71,10 @@ class CombineSWIR:
         #todo do this more consistently with other modules, and do a direct copy for ranges that don't overlap
         dataset_l1b_comb = self.templ.l1b_template_from_combine(measurandstring,dataset_l1b,dataset_l1b_swir)
 
+        print(u_random_input_qty,u_systematic_input_qty_indep,
+              u_systematic_input_qty_corr,corr_systematic_input_qty_indep,
+              corr_systematic_input_qty_corr,)
+
         self.prop.process_measurement_function_l1(measurandstring,dataset_l1b_comb,
                                           combine_function.function,input_qty,
                                           u_random_input_qty,
@@ -98,15 +100,3 @@ class CombineSWIR:
         #     self.plot.plot_diff_scans(measurandstring,dataset_l1a,dataset_l1b)
 
         return dataset_l1b_comb
-
-    def perform_checks(self,dataset_l1):
-        """
-        Identifies and removes faulty measurements (e.g. due to cloud cover).
-
-        :param dataset_l0:
-        :type dataset_l0:
-        :return:
-        :rtype:
-        """
-
-        return dataset_l1
