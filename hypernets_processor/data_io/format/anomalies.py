@@ -30,6 +30,16 @@ ANOMALIES_DICT = {
                 "error": IOError,
                 "error_msg": None
             },
+    "e": {
+        "description": "Meteo file missing",
+        "error": IOError,
+        "error_msg": None
+    },
+    "l": {
+        "description": "Ld missing for fresnel correction",
+        "error": IOError,
+        "error_msg": None
+    },
     "q": {
                 "description": "None of the scans in a series passed the quality controll",
                 "error": None,
