@@ -243,10 +243,11 @@ class HypernetsReader:
                 'azimuth_ref'] + '_' + model['vza']
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
-            vaa, vza = map(float, specattr['pt_abs'].split(";"))
+
             # name of spectra file
             acquisitionTime = specattr[spectra]
             acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+            acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
 
             # -------------------------------------
@@ -285,8 +286,7 @@ class HypernetsReader:
                 # maybe xarray has a better way to do - check merge, concat, ...
                 series_id = model['series_id']
                 ds["series_id"][scan_number] = series_id
-                ds["viewing_azimuth_angle"][scan_number] = vaa
-                ds["viewing_zenith_angle"][scan_number] = vza
+
 
                 # estimate time based on timestamp
                 ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
@@ -314,6 +314,8 @@ class HypernetsReader:
                     ds.attrs["site_longitude"] = lon
                     ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
                     ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
+                    vaa_rel, vza = map(float, specattr['pt_ask'].split(";"))
+                    vaa = ((ds["solar_azimuth_angle"][scan_number] + vaa_rel)/360-int(ds["solar_azimuth_angle"][scan_number] + vaa_rel))/360
                 else:
                     self.context.logger.error(
                         "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
@@ -321,6 +323,9 @@ class HypernetsReader:
                 ds['integration_time'][scan_number] = header['integration_time']
                 ds['temperature'][scan_number] = header['temperature']
 
+                ds["viewing_azimuth_angle"][scan_number] = vaa
+                ds["viewing_zenith_angle"][scan_number] = vza
+                print(vza)
                 # accelaration:
                 # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
                 # acceleration measurements respectively. These are factory-calibrated steady-state
