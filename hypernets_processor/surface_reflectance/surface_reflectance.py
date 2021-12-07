@@ -14,6 +14,7 @@ from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
+from hypernets_processor.data_utils.quality_checks import QualityChecks
 
 import punpy
 import numpy as np
@@ -31,6 +32,7 @@ class SurfaceReflectance:
     def __init__(self, context, parallel_cores=1):
         self._measurement_function_factory = ProtocolFactory(context=context)
         self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
+        self.qual = QualityChecks(context)
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
         self.avg = Average(context)
@@ -79,7 +81,7 @@ class SurfaceReflectance:
 
 
     def process_l2(self, dataset):
-        dataset = self.perform_checks(dataset)
+        dataset = self.qual.perform_quality_check_L2a(dataset)
         l1tol2_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
         input_vars = l1tol2_function.get_argument_names()
@@ -127,16 +129,3 @@ class SurfaceReflectance:
             self.writer.write(dataset_l2a, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
 
         return dataset_l2a
-
-
-    def perform_checks(self, dataset_l1):
-        """
-        Identifies and removes faulty measurements (e.g. due to cloud cover).
-
-        :param dataset_l0:
-        :type dataset_l0:
-        :return:
-        :rtype:
-        """
-
-        return dataset_l1

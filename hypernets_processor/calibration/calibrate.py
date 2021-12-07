@@ -6,6 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.calibration.measurement_functions.measurement_function_factory import \
     MeasurementFunctionFactory
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
+from hypernets_processor.data_utils.quality_checks import QualityChecks
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.dataset_util import DatasetUtil
@@ -26,6 +27,7 @@ class Calibrate:
     def __init__(self, context, parallel_cores=0):
         self._measurement_function_factory = MeasurementFunctionFactory()
         self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
+        self.qual = QualityChecks(context)
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context)
         self.plot = Plotting(context)
@@ -84,7 +86,7 @@ class Calibrate:
                        (dataset['integration_time'] == int_time))[0]
         #todo check if integration time always has to be same
 
-        dark_mask=self.quality_checks(dataset["digital_number"].values[:,ids])
+        dark_mask=self.qual.outlier_checks(dataset["digital_number"].values[:,ids])
         if np.sum(dark_mask)>0:
             dark_outlier=1
         else:
@@ -113,23 +115,15 @@ class Calibrate:
         series_ids = np.unique(datasetl0['series_id'])
         dark_signals = np.zeros_like(datasetl0['digital_number'].values)
         dark_outliers= np.zeros_like(datasetl0['quality_flag'].values)
-        mask = []
+
         for i in range(len(series_ids)):
             ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
-            for ii,id in enumerate(ids):
+            for id in ids:
                 dark_signals[:,id],dark_outliers[id] = self.find_nearest_black(datasetl0_bla,
                 datasetl0['acquisition_time'].values[id],
                 datasetl0['integration_time'].values[id])
-            maski=self.quality_checks((datasetl0["digital_number"].values[:, ids]-
-                                 dark_signals[:,ids]))
-            if all(maski==1):
-                self.context.logger.error(
-                    "None of the scans for series passed the quality control criteria")
-                self.context.anomaly_handler.add_anomaly("q")
-            mask = np.append(mask, maski)
 
-        datasetl0["quality_flag"][np.where(mask==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask==1)],"outliers") #for i in range(len(mask))]
-        datasetl0["quality_flag"][np.where(dark_outliers==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(dark_outliers==1)],"dark_outliers") #for i in range(len(mask))]
+        datasetl0,mask=self.qual.perform_quality_check_L0(datasetl0,series_ids,dark_signals,dark_outliers)
 
         DN_rand = DatasetUtil.create_variable(
             [len(datasetl0["wavelength"]),len(datasetl0["scan"])],
@@ -157,52 +151,5 @@ class Calibrate:
         datasetl0["dark_signal"].values = dark_signals
 
         return datasetl0
-
-    def quality_checks(self,data_subset, k_unc=3):
-        intsig =np.nanmean(data_subset,axis=0)
-        mask = np.zeros_like(intsig)  # mask the columns that have NaN
-        if len(intsig)>1:
-            mask[np.where(intsig >= 1e7)] = 1
-            noisestd,noiseavg = self.sigma_clip(
-                intsig)  # calculate std and avg for non NaN columns
-            mask[np.where(np.abs(intsig-noiseavg) >= k_unc*noisestd)] = 1
-            mask[np.where(np.abs(intsig-noiseavg) >= 0.25*intsig)] = 1
-        return mask
-
-
-    def sigma_clip(self,values,tolerance=0.01,median=True,sigma_thresh=3.0):
-        # Remove NaNs from input values
-        values = np.array(values)
-        values = values[np.where(np.isnan(values) == False)]
-        values_original = np.copy(values)
-
-        # Continue loop until result converges
-        diff = 10E10
-        while diff > tolerance:
-            # Assess current input iteration
-            if median == False:
-                average = np.mean(values)
-            elif median == True:
-                average = np.median(values)
-            sigma_old = np.std(values)
-
-            # Mask those pixels that lie more than 3 stdev away from mean
-            check = np.zeros([len(values)])
-            check[np.where(values > (average+(sigma_thresh*sigma_old)))] = 1
-            # check[ np.where( values<(average-(sigma_thresh*sigma_old)) ) ] = 1
-            values = values[np.where(check < 1)]
-
-            # Re-measure sigma and test for convergence
-            sigma_new = np.std(values)
-            diff = abs(sigma_old-sigma_new)/sigma_old
-
-        # Perform final mask
-        check = np.zeros([len(values)])
-        check[np.where(values > (average+(sigma_thresh*sigma_old)))] = 1
-        check[np.where(values < (average-(sigma_thresh*sigma_old)))] = 1
-        values = values[np.where(check < 1)]
-
-        # Return results
-        return sigma_new,average
 
 

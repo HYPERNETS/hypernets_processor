@@ -198,7 +198,7 @@ class Plotting():
         else:
             for i in range(len(labels)):
                 ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
-            ax1.legend()
+            ax1.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")
         ymax=np.percentile(ydata,95)*1.2
