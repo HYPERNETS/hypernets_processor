@@ -1,9 +1,9 @@
-.. reader - algorithm theoretical basis
+.. hypernets_reader - algorithm theoretical basis
    Author: seh2
    Email: sam.hunt@npl.co.uk
    Created: 6/11/20
 
-.. _reader:
+.. _hypernets_reader:
 
 
 HYPERNETS Reader - Process to L0
