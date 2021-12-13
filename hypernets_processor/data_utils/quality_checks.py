@@ -37,9 +37,9 @@ class QualityChecks:
             mask_threshold_i = self.threshold_checks(data_subset)
             mask_outliers_i = self.outlier_checks(data_subset)
             mask_discontinuity_i = self.discontinuity_checks(data_subset)
-            mask_all_i[np.where(mask_threshold_i==1)] = 1
+            #mask_all_i[np.where(mask_threshold_i==1)] = 1
             mask_all_i[np.where(mask_outliers_i==1)] = 1
-            mask_all_i[np.where(mask_discontinuity_i==1)] = 1
+            #mask_all_i[np.where(mask_discontinuity_i==1)] = 1
 
             if all(mask_all_i==1):
                 self.context.logger.error(

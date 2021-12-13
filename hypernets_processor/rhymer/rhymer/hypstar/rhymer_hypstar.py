@@ -168,6 +168,8 @@ class RhymerHypstar:
                                 ts, ', '.join(
                                     ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k in
                                      ['scan', 'quality_flag']])))
+                        self.context.logger.error("Ld missing for fresnel correction")
+                        self.context.anomaly_handler.add_anomaly("l")
 
             # check if we have the required fresnel angle for lsky
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
@@ -183,22 +185,42 @@ class RhymerHypstar:
                             ts, ', '.join(
                                 ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k
                                  in ['scan', 'quality_flag']])))
+                    self.context.logger.error("Ld missing for fresnel correction")
+                    self.context.anomaly_handler.add_anomaly("l")
 
             # check if correct number of radiance and irradiance data
+            flags = ["saturation", "nonlinearity", "bad_pointing", "outliers"]
 
-            if lu.scan[lu['quality_flag'] <= 0].count() < nbrlu:
+            flagged = np.any(
+                [du.unpack_flags(lu['quality_flag'])[x] for x in
+                 flags], axis=0)
+            ids = np.where(flagged == False)[0]
+
+            if len(ids) < nbrlu:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlu")
                 self.context.logger.info(
                     "Not enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
-            if lsky.scan[lsky['quality_flag'] <= 1].count() < nbrlsky:
+
+            flagged = np.any(
+                [du.unpack_flags(lsky['quality_flag'])[x] for x in
+                 flags], axis=0)
+            ids = np.where(flagged == False)[0]
+
+            if len(ids) < nbrlsky:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlsky")
                 self.context.logger.info(
                     "Not enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
-            if irr.scan[irr['quality_flag'] <= 1].count() < nbred:
+
+            flagged = np.any(
+                [du.unpack_flags(irr['quality_flag'])[x] for x in
+                 flags], axis=0)
+            ids = np.where(flagged == False)[0]
+
+            if len(ids) < nbred:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbred")
