@@ -8,11 +8,11 @@
 
 Interpolating - Process to L1C
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Wavelength + time interpolation
 
 Water Network
 --------------
-
-TBC - Clemence
+Same as for land - interpolate Ld and Ed to Lu times
 
 Land Network
 --------------
