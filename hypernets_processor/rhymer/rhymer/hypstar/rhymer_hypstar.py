@@ -156,6 +156,12 @@ class RhymerHypstar:
             # check if we have the same azimuth for lu and lsky
             sena_lu = np.unique(lu["viewing_azimuth_angle"].values)
             sena_lsky = np.unique(lsky["viewing_azimuth_angle"].values)
+            sena_lu=np.array([sena_lu[i] + 360 if sena_lu[i] < 0 else sena_lu[i] for i in range(0, len(sena_lu))])
+            sena_lsky=np.array([sena_lsky[i] + 360 if sena_lsky[i] < 0 else sena_lsky[i] for i in range(0, len(sena_lsky))])
+            print(sena_lsky)
+            print(sena_lu)
+            print(du.unpack_flags(lu['quality_flag']))
+
             for i in sena_lu:
                 if np.round(i) not in np.round(sena_lsky):
                 #if np.min(np.round(sena_lsky)) > np.round(i) or np.max(np.round(sena_lsky)) < np.round(i):
@@ -196,7 +202,7 @@ class RhymerHypstar:
                 [du.unpack_flags(lu['quality_flag'])[x] for x in
                  flags], axis=0)
             ids = np.where(flagged == False)[0]
-
+            print(nbrlu)
             if len(ids) < nbrlu:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
@@ -208,7 +214,7 @@ class RhymerHypstar:
                 [du.unpack_flags(lsky['quality_flag'])[x] for x in
                  flags], axis=0)
             ids = np.where(flagged == False)[0]
-
+            print(nbrlsky)
             if len(ids) < nbrlsky:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
