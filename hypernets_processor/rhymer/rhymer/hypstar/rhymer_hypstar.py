@@ -209,6 +209,7 @@ class RhymerHypstar:
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlu")
                 self.context.logger.info(
                     "Not enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
+                self.context.anomaly_handler.add_anomaly("nlu")
 
             flagged = np.any(
                 [du.unpack_flags(lsky['quality_flag'])[x] for x in
@@ -221,6 +222,7 @@ class RhymerHypstar:
                         dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlsky")
                 self.context.logger.info(
                     "Not enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
+                self.context.anomaly_handler.add_anomaly("nls")
 
             flagged = np.any(
                 [du.unpack_flags(irr['quality_flag'])[x] for x in
