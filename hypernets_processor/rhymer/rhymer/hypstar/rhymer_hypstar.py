@@ -158,6 +158,7 @@ class RhymerHypstar:
             sena_lsky = np.unique(lsky["viewing_azimuth_angle"].values)
             for i in sena_lu:
                 if np.round(i) not in np.round(sena_lsky):
+                #if np.min(np.round(sena_lsky)) > np.round(i) or np.max(np.round(sena_lsky)) < np.round(i):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "lu_eq_missing")
                     if self.context.get_config_value("verbosity") > 2:

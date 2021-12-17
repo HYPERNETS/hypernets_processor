@@ -10,3 +10,15 @@
 docs/sphinx/_build
 docs/sphinx/content/API
 /hypernets_processor/etc/job_CG.config
+/hypernets_processor/anomaly.db
+/hypernets_processor/anomaly.db-shm
+/hypernets_processor/archive.db
+/hypernets_processor/archive.db-shm
+/hypernets_processor/archive.db-wal
+/hypernets_processor/metadata.db
+/.gitignore
+/hypernets_processor/data_utils/average.py
+/hypernets_processor/etc/job_CG.config
+/hypernets_processor/etc/jobs.txt
+/hypernets_processor/etc/processor.config
+/hypernets_processor/etc/scheduler.config
