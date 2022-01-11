@@ -842,7 +842,7 @@ class HypernetsReader:
                                                             site_id=site_id,
                                                             time=os.path.basename(seq_dir).replace('SEQ', ''),
                                                             version=None, swir=None, angles=angles)
-                directory = self.writer.return_directory()
+                directory = self.writer.return_image_directory()
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 path = os.path.join(directory, imagename) + ".jpg"
