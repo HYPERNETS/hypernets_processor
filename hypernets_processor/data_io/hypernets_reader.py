@@ -481,40 +481,27 @@ class HypernetsReader:
                         # estimate time based on timestamp
                         ds["acquisition_time"][
                             scan_number] = datetime.datetime.timestamp(acquisitionTime)
-                        #            #print(datetime.fromtimestamp(acquisitionTime))
-
-                        #             # didn't use acquisition time from instrument
-                        #             # possibility that acquisition time is time since reboot, but how to now reboot time?
-                        #             # if we use the metadata time header
-                        #             timestamp=header['acquisition_time']
-                        #             ts = int(timestamp)/1000
-
-                        #             date_time_str = timereboot+'UTC'
-                        #             print(date_time_str)
-                        #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
-                        #             print(date_time_obj)
-
-                        #             timereboot = datetime.timestamp(date_time_obj)
-                        #             print("timereboot =", timereboot)
-                        #             print(datetime.fromtimestamp(timereboot))
-
-                        #             print(datetime.fromtimestamp(int(ts+timereboot)))
-                        #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
                         if lat is not None:
                             ds.attrs["site_latitude"] = lat
                             ds.attrs["site_longitude"] = lon
-                            ds.attrs["instrument_id"] = str(instrument_id)
-                            ds.attrs["site_id"] = str(site_id)
-                            ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
-                                float(lat), float(lon), acquisitionTime)
+                            ds["solar_zenith_angle"][scan_number] = 90-get_altitude(
+                                float(lat),float(lon),acquisitionTime)
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                                float(lat), float(lon), acquisitionTime)
+                                float(lat),float(lon),acquisitionTime)
+                            vaa_rel,vza = map(float,specattr['pt_ask'].split(";"))
+                            vaa = ((ds["solar_azimuth_angle"][
+                                        scan_number]+vaa_rel)/360-int(
+                                ds["solar_azimuth_angle"][scan_number]+vaa_rel))/360
                         else:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
                         ds['quality_flag'][scan_number] = flag
-                        ds['integration_time'][scan_number] = spectrum.header.exposure_time
-                        ds['temperature'][scan_number] = spectrum.header.temperature
+                        ds['integration_time'][scan_number] = header['integration_time']
+                        ds['temperature'][scan_number] = header['temperature']
+
+                        ds["viewing_azimuth_angle"][scan_number] = vaa
+                        ds["viewing_zenith_angle"][scan_number] = vza
+                        print(vza)
 
                         # accelaration:
                         # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
@@ -570,18 +557,26 @@ class HypernetsReader:
                         #             print(datetime.fromtimestamp(int(ts+timereboot)))
                         #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
                         if lat is not None:
-                            ds_swir.attrs["site_latitude"] = lat
-                            ds_swir.attrs["site_longitude"] = lon
-                            ds_swir["solar_zenith_angle"][scan_number_swir] = 90 - get_altitude(
-                                float(lat), float(lon), acquisitionTime)
-                            ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
-                                float(lat), float(lon), acquisitionTime)
+                            ds.attrs["site_latitude"] = lat
+                            ds.attrs["site_longitude"] = lon
+                            ds["solar_zenith_angle"][scan_number] = 90-get_altitude(
+                                float(lat),float(lon),acquisitionTime)
+                            ds["solar_azimuth_angle"][scan_number] = get_azimuth(
+                                float(lat),float(lon),acquisitionTime)
+                            vaa_rel,vza = map(float,specattr['pt_ask'].split(";"))
+                            vaa = ((ds["solar_azimuth_angle"][
+                                        scan_number]+vaa_rel)/360-int(
+                                ds["solar_azimuth_angle"][scan_number]+vaa_rel))/360
                         else:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
-                        ds_swir['quality_flag'][scan_number_swir] = flag
-                        ds_swir['integration_time'][scan_number_swir] = spectrum.header.exposure_time
-                        ds_swir['temperature'][scan_number_swir] = spectrum.header.temperature
+                        ds['quality_flag'][scan_number] = flag
+                        ds['integration_time'][scan_number] = header['integration_time']
+                        ds['temperature'][scan_number] = header['temperature']
+
+                        ds["viewing_azimuth_angle"][scan_number] = vaa
+                        ds["viewing_zenith_angle"][scan_number] = vza
+                        print(vza)
 
                         # accelaration:
                         # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
