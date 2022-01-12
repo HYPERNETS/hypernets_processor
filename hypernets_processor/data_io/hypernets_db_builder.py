@@ -146,7 +146,7 @@ class ArchiveDB(dataset.Database):
             dict(
                 product_name=ds.attrs["product_name"],
                 product_path=path,
-                product_level="",
+                product_level=ds.attrs["product_level"],
                 datetime=self.context.get_config_value("time"),
                 sequence_name=self.context.get_config_value("sequence_name"),
                 sequence_path=self.context.get_config_value("sequence_path"),
@@ -154,14 +154,14 @@ class ArchiveDB(dataset.Database):
                 system_id=ds.attrs["system_id"],
                 plot_path=self.writer.return_plot_directory(),
                 image_path=self.writer.return_image_directory(),
-                # solar_zenith_angle_min=ds.attrs["solar_zenith_angle_min"],
-                # solar_zenith_angle_max=ds.attrs["solar_zenith_angle_max"],
-                # solar_azimuth_angle_min=ds.attrs["solar_azimuth_angle_min"],
-                # solar_azimuth_angle_max=ds.attrs["solar_azimuth_angle_max"],
-                # viewing_zenith_angle_min=ds.attrs["viewing_zenith_angle_min"],
-                # viewing_zenith_angle_max=ds.attrs["viewing_zenith_angle_max"],
-                # viewing_azimuth_angle_min=ds.attrs["viewing_azimuth_angle_min"],
-                # viewing_azimuth_angle_max=ds.attrs["viewing_azimuth_angle_max"],
+                solar_zenith_angle_min=np.min(ds["solar_zenith_angle"].values),
+                solar_zenith_angle_max=np.max(ds["solar_zenith_angle"].values),
+                solar_azimuth_angle_min=np.min(ds["solar_azimuth_angle"].values),
+                solar_azimuth_angle_max=np.max(ds["solar_azimuth_angle"].values),
+                viewing_zenith_angle_min=np.min(ds["viewing_zenith_angle"].values),
+                viewing_zenith_angle_max=np.max(ds["viewing_zenith_angle"].values),
+                viewing_azimuth_angle_min=np.min(ds["viewing_azimuth_angle"].values),
+                viewing_azimuth_angle_max=np.max(ds["viewing_azimuth_angle"].values),
             )
         )
 
