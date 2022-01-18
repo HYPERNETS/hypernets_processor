@@ -13,7 +13,7 @@ from sqlalchemy.engine.url import make_url
 import dataset
 from os import makedirs
 from os.path import dirname
-
+import numpy as np
 
 """___Authorship___"""
 __author__ = "Sam Hunt"

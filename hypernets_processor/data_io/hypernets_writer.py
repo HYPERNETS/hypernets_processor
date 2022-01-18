@@ -137,7 +137,7 @@ class HypernetsWriter:
                     seq = self.context.get_config_value("sequence_name")
 
                     directory = os.path.join(
-                        archive_directory, site, str(year), str('{:02d}'.format(month)), str('{:02d}'.format(day), seq)
+                        archive_directory, site, str(year), str('{:02d}'.format(month)), str('{:02d}'.format(day)), seq
                     )
 
         return directory
