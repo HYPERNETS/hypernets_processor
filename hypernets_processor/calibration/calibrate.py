@@ -46,7 +46,7 @@ class Calibrate:
         input_vars = calibrate_function.get_argument_names()
 
         dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
-
+        print("preprocessing done")
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0, swir)
 
         input_qty = self.prop.find_input_l1a(input_vars, dataset_l0, calibration_data)
@@ -135,20 +135,23 @@ class Calibrate:
         for i in range(len(series_ids)):
             ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
             ids_masked = np.where((datasetl0['series_id'] == series_ids[i]) & (mask == 0))[0]
-            std = np.std((datasetl0['digital_number'].values[:,ids_masked]-dark_signals[:,ids_masked]), axis=1)
-            avg = np.mean((datasetl0['digital_number'].values[:,ids_masked]-dark_signals[:,ids_masked]), axis=1)
+            if len(ids_masked) > 0 :
+                std = np.std((datasetl0['digital_number'].values[:,ids_masked]-dark_signals[:,ids_masked]), axis=1)
+                avg = np.mean((datasetl0['digital_number'].values[:,ids_masked]-dark_signals[:,ids_masked]), axis=1)
+                for ii,id in enumerate(ids):
+                    rand[:, id] = std/avg
+            else:
+                for ii,id in enumerate(ids):
+                    rand[:, id] = np.nan
 
-            for ii,id in enumerate(ids):
-                rand[:, id] = std/avg
+            datasetl0["u_rel_random_digital_number"].values = rand
 
-        datasetl0["u_rel_random_digital_number"].values = rand
+            DN_dark = DatasetUtil.create_variable(
+                [len(datasetl0["wavelength"]),len(datasetl0["scan"])],
+                dim_names=["wavelength","scan"],dtype=np.uint32,fill_value=0)
 
-        DN_dark = DatasetUtil.create_variable(
-            [len(datasetl0["wavelength"]),len(datasetl0["scan"])],
-            dim_names=["wavelength","scan"],dtype=np.uint32,fill_value=0)
-
-        datasetl0["dark_signal"] = DN_dark
-        datasetl0["dark_signal"].values = dark_signals
+            datasetl0["dark_signal"] = DN_dark
+            datasetl0["dark_signal"].values = dark_signals
 
         return datasetl0
 
