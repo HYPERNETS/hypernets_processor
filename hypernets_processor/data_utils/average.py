@@ -56,13 +56,17 @@ class Average:
         return dataset_l1b
 
     def average_L2(self,dataset):
-
-        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset)
+        # flags = ["saturation","nonlinearity","bad_pointing","outliers",
+        #                  "angles_missing","lu_eq_missing","fresnel_angle_missing",
+        #                  "fresnel_default","temp_variability_ed","temp_variability_lu",
+        #                  "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
 
         flags = ["saturation","nonlinearity","bad_pointing","outliers",
                          "angles_missing","lu_eq_missing","fresnel_angle_missing",
-                         "fresnel_default","temp_variability_ed","temp_variability_lu",
-                         "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
+                         "fresnel_default","temp_variability_ed","temp_variability_lu", "simil_fail"]
+
+        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags)
+
 
         for measurandstring in ["water_leaving_radiance","reflectance_nosc",
                                 "reflectance"]:
