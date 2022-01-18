@@ -89,6 +89,7 @@ class SequenceProcessor:
                         writer.write(L1b_irr, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
                     self.context.logger.info("Done")
 
+            if L1b_rad and L1b_irr:
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:
                     self.context.logger.info("Processing to L1c...")
                     L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)

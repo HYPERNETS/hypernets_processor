@@ -187,10 +187,10 @@ class DataTemplates:
                          wavs_swir[np.where(wavs_swir > self.context.get_config_value("combine_lim_wav"))])
         l1b_dim_sizes_dict = {"wavelength": len(wavs),
                               "series": len(dataset['series'])}
-        if measurementstring is "radiance":
+        if measurementstring == "radiance":
             dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_RAD",
                                                        propagate_ds=dataset, ds=dataset)
-        if measurementstring is "irradiance":
+        if measurementstring == "irradiance":
             dataset_l1b = self.hdsb.create_ds_template(l1b_dim_sizes_dict, "L_L1B_IRR",
                                                        propagate_ds=dataset, ds=dataset)
         dataset_l1b = dataset_l1b.assign_coords(wavelength=wavs)
@@ -271,7 +271,7 @@ class DataTemplates:
         return dataset_l1d
 
 
-    def l2_from_l1c_dataset(self, datasetl1c):
+    def l2_from_l1c_dataset(self, datasetl1c, flags):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
         :param datasetl0:
@@ -287,14 +287,18 @@ class DataTemplates:
 
             series_id = np.unique(datasetl1c['series_id'])
             dataset_l2a["series_id"].values = series_id
-            print(dataset_l2a["series_id"].values)
             for variablestring in ["acquisition_time", "viewing_azimuth_angle",
                                    "viewing_zenith_angle", "solar_azimuth_angle",
                                    "solar_zenith_angle", "epsilon", "rhof"]:
                 temp_arr = np.empty(len(series_id))
                 for i in range(len(series_id)):
-                    ids = np.where((datasetl1c['series_id'] == series_id[i]) & (
-                            datasetl1c['quality_flag'] == 0))
+                    flagged = np.any(
+                        [DatasetUtil.unpack_flags(datasetl1c['quality_flag'])[x] for x in
+                         flags], axis=0)
+                    ids = np.where(
+                        (datasetl1c['series_id'] == series_id[i]) & (flagged == False))
+                    # ids = np.where((datasetl1c['series_id'] == series_id[i]) & (
+                    #         datasetl1c['quality_flag'] == 0))
                     temp_arr[i] = np.mean(datasetl1c[variablestring].values[ids])
                 dataset_l2a[variablestring].values = temp_arr
 
