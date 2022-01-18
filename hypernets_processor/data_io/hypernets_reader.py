@@ -23,10 +23,10 @@ from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 '''___Authorship___'''
-__author__ = "Clémence Goyens"
+__author__ = "ClÃ©mence Goyens"
 __created__ = "12/2/2020"
 __version__ = __version__
-__maintainer__ = "Clémence Goyens"
+__maintainer__ = "ClÃ©mence Goyens"
 __status__ = "Development"
 
 
@@ -325,14 +325,13 @@ class HypernetsReader:
 
                 ds["viewing_azimuth_angle"][scan_number] = vaa
                 ds["viewing_zenith_angle"][scan_number] = vza
-                print(vza)
                 # accelaration:
                 # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
                 # acceleration measurements respectively. These are factory-calibrated steady-state
                 # reference acceleration measurements of the gravity vector when instrument is in
                 # horizontal position. Due to device manufacturing tolerances, these are
                 # device-specific and should be applied, when estimating tilt from the measured
-                # acceleration data. Each measurement is bit count of full range ±19.6 m s−2 .
+                # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
                 # Acceleration for each axis can be calculated per Eq. (4).
 
                 a = 19.6
@@ -511,7 +510,6 @@ class HypernetsReader:
 
                         ds["viewing_azimuth_angle"][scan_number] = vaa
                         ds["viewing_zenith_angle"][scan_number] = vza
-                        print(vza)
 
                         # accelaration:
                         # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
@@ -519,7 +517,7 @@ class HypernetsReader:
                         # reference acceleration measurements of the gravity vector when instrument is in
                         # horizontal position. Due to device manufacturing tolerances, these are
                         # device-specific and should be applied, when estimating tilt from the measured
-                        # acceleration data. Each measurement is bit count of full range ±19.6 m s−2 .
+                        # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
                         # Acceleration for each axis can be calculated per Eq. (4).
 
                         a = 19.6
@@ -594,7 +592,7 @@ class HypernetsReader:
                         # reference acceleration measurements of the gravity vector when instrument is in
                         # horizontal position. Due to device manufacturing tolerances, these are
                         # device-specific and should be applied, when estimating tilt from the measured
-                        # acceleration data. Each measurement is bit count of full range ±19.6 m s−2 .
+                        # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
                         # Acceleration for each axis can be calculated per Eq. (4).
 
                         a = 19.6
@@ -744,7 +742,7 @@ class HypernetsReader:
         if os.path.exists(os.path.join(seq_dir, "meteo.csv")):
             met = open(os.path.join(seq_dir, "meteo.csv"))
             for line in met.readlines():
-                aux = pd.DataFrame(line.replace("&#039;C", "°C").split(";"))
+                aux = pd.DataFrame(line.replace("&#039;C", "Â°C").split(";"))
                 data = pd.concat(
                     [pd.DataFrame(aux.iloc[i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
                     axis=1, ignore_index=True)
