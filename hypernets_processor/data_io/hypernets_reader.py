@@ -315,7 +315,7 @@ class HypernetsReader:
                     ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
                     ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
                     vaa_rel, vza = map(float, specattr['pt_ask'].split(";"))
-                    vaa = ((ds["solar_azimuth_angle"][scan_number] + vaa_rel)/360-int(ds["solar_azimuth_angle"][scan_number] + vaa_rel))/360
+                    vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360-int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360))*360
                 else:
                     self.context.logger.error(
                         "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
@@ -325,7 +325,6 @@ class HypernetsReader:
 
                 ds["viewing_azimuth_angle"][scan_number] = vaa
                 ds["viewing_zenith_angle"][scan_number] = vza
-                print(vza)
                 # accelaration:
                 # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
                 # acceleration measurements respectively. These are factory-calibrated steady-state
