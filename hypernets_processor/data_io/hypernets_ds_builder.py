@@ -102,6 +102,7 @@ class HypernetsDSBuilder:
         # Set product_name metadata
         pu = ProductNameUtil(context=self.context)
         metadata["product_name"] = pu.create_product_name(ds_format, swir=swir)
+        metadata["product_level"] = str(ds_format)
         metadata["data_created"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
         if ds_format == "CAL":

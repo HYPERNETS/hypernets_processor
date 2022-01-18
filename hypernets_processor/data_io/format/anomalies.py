@@ -44,5 +44,15 @@ ANOMALIES_DICT = {
                 "description": "None of the scans in a series passed the quality controll",
                 "error": None,
                 "error_msg": None
-            }
+            },
+    "nlu": {
+        "description": "Not enough Lu scans",
+        "error": IOError,
+        "error_msg": None
+    },
+    "nls": {
+        "description": "Not enough Lsky scans",
+        "error": IOError,
+        "error_msg": None
+    }
 }

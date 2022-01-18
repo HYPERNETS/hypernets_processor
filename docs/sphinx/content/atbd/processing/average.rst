@@ -19,6 +19,14 @@ The L1B data processing takes calibrated radiance and irradiance data as input a
 4. L1A irradiance scans taken at the start of the sequence (standard protocol requires minimum 3 scans), and finally,
 5. L1A irradiance scans taken at the end of the sequence (standard protocol requires minimum 3 scans).
 
+average L1B -> calc mean all except outliers + saturation (TBD)
+average L2A -> calc mean all except
+        flags = ["saturation","nonlinearity","bad_pointing","outliers",
+                         "angles_missing","lu_eq_missing","fresnel_angle_missing",
+                         "fresnel_default","temp_variability_ed","temp_variability_lu",
+                         "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
+
+TBC - Clemence
 
 Land Network
 --------------
