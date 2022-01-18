@@ -12,7 +12,13 @@ Averaging - Process to L1B
 Water Network
 --------------
 
-TBC - Clemence
+The L1B data processing takes calibrated radiance and irradiance data as input and computes the mean and standard deviation for each series in a sequence. For a standard water protocol the series are the following:
+1. L1A irradiance scans taken at the start of the sequence (standard protocol requires minimum 3 scans),
+2. L1A downwelling radiance following (1) (standard protocol requires minimum 3 scans),
+3. L1A upwelling radiance scans (standard protocol requires minimum 6 scans),
+4. L1A irradiance scans taken at the start of the sequence (standard protocol requires minimum 3 scans), and finally,
+5. L1A irradiance scans taken at the end of the sequence (standard protocol requires minimum 3 scans).
+
 
 Land Network
 --------------
