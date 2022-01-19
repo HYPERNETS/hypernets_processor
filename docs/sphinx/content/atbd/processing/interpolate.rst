@@ -61,7 +61,7 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 
    The water leaving radiance is then converted into water reflectance as follows:
 
-   .. :math:: \rho_w_nosc =\pi\\frac{L_w}{E_d}
+   .. math:: \rho_w_nosc =\pi L_w /E_d
 
    with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. 
 
@@ -69,12 +69,15 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 
    Although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied. :math:`\epsilon` is estimated using two wavelengths in the NIR (Ruddick et al., 2006), where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm.
 
-   .. :math: \epsilon =\frac{\alpha\rho_w_nosc(\lambda_2)-\rho_w_nosc(\lambda_1)}{(\lambda_2-\lambda_1)}
+   .. math:: \epsilon = [ \alpha\rho_w_nosc(\lambda_2)-\rho_w_nosc(\lambda_1)]/[(\lambda_2-\lambda_1)]
    
    If :math:`\epsilon` exceeds x * :math:`\rho_nosc(\lambda_[ref])` with x a given percentage (default: 5%) and :math:`\lambda_ref` a reference wavelength (default: 670 nm) the *simil_fail* flag is raised.
+   
    Next the *similarity corrected* reflectance product is computed as follows:
    
-   .. :math:: \rho_w(\lambda) =\rho^{nosc}_w(\lambda)-\epsilon
+   .. math:: \rho_w(\lambda) =\rho_wnosc(\lambda)-\epsilon
+      
+  
 
 Land Network
 --------------
