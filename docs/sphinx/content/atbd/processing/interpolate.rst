@@ -56,11 +56,29 @@ All the required parameters for the computation of the water leaving radiance an
 
 7. Intermediate L1C surface reflectance:
 
-L1C processing also includes the retrieval of the water leaving radiance and reflectance for each single upwelling radiance scan. 
+L1C processing also includes the retrieval of the water leaving radiance and reflectance for each single upwelling radiance scan. From the above water upwelling radiance :math:`L_u` and the above water downwelling radiance :math:`L_d`, the water leaving radiance :math:`L_w` is approximated as:
 
+.. math:: L_w(\theta,\Delta\phi,\lambda,\theta_0)=L_u(\theta,\Delta\phi,\lambda,\theta_0)-\rho(\theta,\Delta\phi,\lambda,\theta_0,e)L_d(\theta,\Delta\phi,\lambda,\theta_0)
+with
+   * :math:`\theta` being the viewing zenith angle (0° is pointing vertically down, measuring upwelling light and 180° is pointing vertically upward, measuring downwelling light),
+   * :math:`\theta_0` is the sun zenith angle (equals 0°  when the sun is at zenith and 90° when the sun is at sunset), and,
+   * :math:`\Delta\phi` is the relative azimuth angle between sun and sensor measured with respect to sun and clockwise from sun to target (0° means that the radiance sensors are pointing into the sun glint direction, while 180° corresponds to a viewing azimuth with the sun behind).
 
+The term :math:`\rho` is the air-water interface reflectance coefficient expressed as a function of viewing geometry and sun zenith angle and environmental factors (:math:`e`). When the water surface is perfectly flat, :math:`\rho` is the Fresnel reflectance and the environmental factor only depends on the relative refractive index of the air-water interface. When the water is not perfectly flat, :math:`\rho` needs to account, in addition to the fresnel reflectance, for the geometric effects of the wave facets created by the roughened water surface (often called the “effective Fresnel reflectance coefficient”, Ruddick et al., 2019). Therefore, :math:`\rho` is commonly approximated as a function of the viewing and illumination geometry and wind speed, ws, and can be written as :math:`\rho(\theta,\theta_0,\Delta\phi,ws)` (Mobley, 1999 and 2015).
 
+The water leaving radiance is then converted into water reflectance as follows:
 
+.. math:: \rho_w_nosc =\pi\frac{L_w}{E_d}
+
+with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. 
+
+7. Intermediate L1C similarity corrected reflectance:
+
+Although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied. :math:`\epsilon` is estimated using two wavelengths in the NIR (Ruddick et al., 2006), where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm.
+
+.. math:: \epsilon =\frac{\alpha\rho_w_nosc(\lambda_2)-\rho_w_nosc(\lambda_1)}{(\lambda_2-\lambda_1)}
+
+.. math:: \rho_w(\lambda) =\rho_w_nosc(\lambda)-\epsilon
 
 
 Land Network
