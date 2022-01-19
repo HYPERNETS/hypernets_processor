@@ -23,13 +23,13 @@ The term :math:`\rho` is the air-water interface reflectance coefficient express
 
 The water leaving radiance is then converted into water reflectance as follows:
 
-.. math:: \rho_w_nosc =\pi\frac{L_w}{E_d}
+.. :math:: \rho_w_nosc =\pi\frac{L_w}{E_d}
 
 with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. Indeed, although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied. :math:`\epsilon` is estimated using two wavelengths in the NIR (Ruddick et al., 2006), where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm. The :math:`\epsilon` correction factor is calculated in the L1C processing, see :ref:`interpolate`.
 
 The final L2a product is the averaged water reflectance corrected for the NIR similarity spectrum:
 
-.. math:: \rho_w(\lambda)=\rho_wnosc(\lambda)-\epsilon
+.. :math:: \rho_w(\lambda)=\rho_wnosc(\lambda)-\epsilon
 
 Note, the final L2A average product is only computed for sequences that does not show any of the following flags : "outliers", "angles_missing","lu_eq_missing","fresnel_angle_missing", "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"
 
