@@ -12,22 +12,15 @@ Averaging - Process to L1B
 Water Network
 --------------
 
-The L1B data processing takes calibrated radiance and irradiance data as input and computes the mean and standard deviation for each series in a sequence. For a standard water protocol the series are the following:
+The L1B data processing takes calibrated radiance and irradiance scans as input and computes the mean and standard deviation per series excluding scans flagged as saturated (see :ref:`calibrate`). For a standard water protocol the series are the following:
+
    1. L1A irradiance scans taken at the start of the sequence (standard protocol requires minimum 3 scans),
    2. L1A downwelling radiance following (1) (standard protocol requires minimum 3 scans),
    3. L1A upwelling radiance scans (standard protocol requires minimum 6 scans),
    4. L1A irradiance scans taken at the start of the sequence (standard protocol requires minimum 3 scans), and finally,
    5. L1A irradiance scans taken at the end of the sequence (standard protocol requires minimum 3 scans).
 
-
-average L1B -> calc mean all except outliers + saturation (TBD)
-average L2A -> calc mean all except
-        flags = ["saturation","nonlinearity","bad_pointing","outliers",
-                         "angles_missing","lu_eq_missing","fresnel_angle_missing",
-                         "fresnel_default","temp_variability_ed","temp_variability_lu",
-                         "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
-
-TBC - Clemence
+The L1B output is an average and standard deviation per series.
 
 Land Network
 --------------
