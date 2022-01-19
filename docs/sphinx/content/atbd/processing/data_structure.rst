@@ -21,7 +21,7 @@ Figures 3 and 4 illustrate the different terms which are defined as follows:
    * **Relative azimuth angle**: :math:`\Delta \phi` is the relative azimuth angle between sun and sensor. It is measured with respect to sun and clockwise from sun to target (sensor viewing direction). :math:`\Delta \phi` equals 0 means that the radiance sensors are pointing into the sun glint direction. :math:`\Delta \phi` =180° corresponding to viewing with the sun behind. :math:`\Delta \phi` ranges between 0 and 360° (see Fig. 3).
    * **Integration time of a single scan**: is the time required by a single radiometer to make one hyperspectral scan.
 
-.. figure:: sequence.jpg
+.. figure:: geometry.png
    :scale: 50 %
    :alt: map to buried treasure
 
@@ -32,6 +32,6 @@ Figures 3 and 4 illustrate the different terms which are defined as follows:
    :scale: 50 %
    :alt: map to buried treasure
 
-   Illustration of a scan, a series of scans, a measurement and a sequence. Time related terms are included. See previous paragraph for the definitions of the symbols.
+   Illustration of a scan, a series of scans, a measurement and a sequence for a standard water protocol.
 
 
