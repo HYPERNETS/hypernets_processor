@@ -31,10 +31,14 @@ It calls (1) read_metadata to read the metadata file of the sequence (ASCII file
 According to the metadata file and the filename of the spe-binary file the processing reorders the
 scans to L0 radiance, irradiance and black data and outputs for each of those a netcdf with the different scans. The *data_io.hypernets_reader* module also copies and renames the RGB images taken from the target and/or the sky during the sequence with the time of acquisition, the series number and the viewing and (relative) azimuth angle. All the L0 outputs also includes the processing time and the version number of the processor, for instance:
 
-/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_RAD_20220101T1316_20220101T1615_v1.2.nc
-/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_BLA_20220101T1316_20220101T1615_v1.2.nc
-/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_IRR_20220101T1316_20220101T1615_v1.2.nc
-/BSBE/2022/01/01/HYPERNETS_W_BSBE_IMG_20220101T1316_20220101T1615_006_140_90_v1.2.jpg
-/BSBE/2022/01/01/HYPERNETS_W_BSBE_IMG_20220101T1316_20220101T1615_003_180_90_v1.2.jpg
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_RAD_20220101T1316_20220101T1615_v1.2.nc'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_BLA_20220101T1316_20220101T1615_v1.2.nc'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_IRR_20220101T1316_20220101T1615_v1.2.nc'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_IMG_20220101T1316_20220101T1615_006_140_90_v1.2.jpg'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_IMG_20220101T1316_20220101T1615_003_180_90_v1.2.jpg'*
 
 
