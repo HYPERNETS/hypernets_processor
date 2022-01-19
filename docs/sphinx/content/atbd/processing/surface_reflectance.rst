@@ -31,6 +31,8 @@ The final L2a product is the averaged water reflectance corrected for the NIR si
 
 .. math:: \rho_w(\lambda)=\rho_wnosc(\lambda)-\epsilon
 
+Note, the final L2A average product is only computed for sequences that does not show any of the following flags : "outliers", "angles_missing","lu_eq_missing","fresnel_angle_missing", "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"
+
 Land Network
 --------------
 
