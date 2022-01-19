@@ -12,20 +12,6 @@ Interpolating - Process to L1C
 Water Network
 --------------
 
-.. surface_reflectance - algorithm theoretical basis
-   Author: Pieter De Vis
-   Email: Pieter.De.Vis@npl.co.uk
-   Created: 01/10/2021
-
-.. _surface_reflectance:
-
-
-Surface Reflectance - Process to L2A
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Water Network
---------------
-
 To process the water network data, the hypernets processor includes RHYMER ("Reliable processing of HYperspectral MEasurement of Radiance", version 20190718 on 16/10/2020, written by Quinten Vanhellemont and adapted for the HYPSTAR by Clémence Goyens). RHYMER provides all the required functions to process the above water measurements (currently including Mobley 1999 and 2015 and Ruddick et al., 2006 for the Fresnel correction). 
 **Note the funtion process to L1C takes as input the L1A files and not the L1B as it checks for additional quality flags and scans are averaged per series afterwards**
 
@@ -41,7 +27,7 @@ The second function parses the cycle, i.e., it separates downwelling and upwelli
 
 Next, since the irradiance and radiance measurements have a slight shift in wavelength, first a spectral interpolation is performed to fit the irradiance measurements to the radiance wavelengths. 
 
-4. Averaging downwelling irradiance and radiance series:
+4. Averaging downwelling irradiance and radiance series to upwelling radiance scans:
 
 Downwelling radiance and irradiance (as well as uncertainties) are averaged per series.
 
