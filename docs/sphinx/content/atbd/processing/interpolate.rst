@@ -56,7 +56,7 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 
    The water leaving radiance is then converted into water reflectance as follows:
 
-   .. math:: \rho_w_nosc =\pi\frac{L_w}{E_d}
+   .. :math:: \rho_w_nosc =\pi\frac{L_w}{E_d}
 
    with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. 
 
@@ -69,7 +69,7 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
    If :math:`epsilon` exceeds x * :math:`\rho_nosc(\lambda_ref)` with x a given percentage (default: 5%) and :math:`\lambda_ref` a reference wavelength (default: 670 nm) the *simil_fail* flag is raised.
    Next the *similarity corrected* reflectance product is computed as follows:
    
-   .. :math:: \rho_w(\lambda) =\rho_w_nosc(\lambda)-\epsilon
+   .. :math:: \rho_w(\lambda) =\rho_w^nosc(\lambda)-\epsilon
 
 Land Network
 --------------
