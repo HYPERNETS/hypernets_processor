@@ -162,33 +162,38 @@ class CalibrationConverter:
         directory = self.path_ascii
         caldatepaths = [os.path.basename(path) for path in glob.glob(
             os.path.join(directory,"hypstar_"+str(hypstar)+"/radiometric/*"))]
-        nonlindates=[]
-        caldates=[]
+        caldates = []
 
         for caldatepath in caldatepaths:
-            caldate=caldatepath
-            nonlinpath=glob.glob(os.path.join(directory,
-                                   "hypstar_"+str(hypstar)+"\\radiometric\\"+str(
-                                       caldatepath)+"\\hypstar_"+str(
-                                       hypstar)+"_nonlin_corr_coefs_*.dat"))[0]
-            if os.path.exists(nonlinpath):
-                nonlindates=np.append(nonlindates,caldate)
-                non_linear_cals = np.genfromtxt(nonlinpath)[:,0]
-
+            caldate = caldatepath
             if measurandstring == "radiance":
-                calpath=glob.glob(os.path.join(directory,"hypstar_"+str(
+                calpath = glob.glob(os.path.join(directory,"hypstar_"+str(
                     hypstar)+"\\radiometric\\"+str(caldatepath)+"\\hypstar_"+str(
                     hypstar)+"_radcal_L_*_%s.dat"%(sensortag)))[0]
 
             else:
-                calpath=glob.glob(os.path.join(directory,"hypstar_"+str(
+                calpath = glob.glob(os.path.join(directory,"hypstar_"+str(
                     hypstar)+"\\radiometric\\"+str(caldatepath)+"\\hypstar_"+str(
                     hypstar)+"_radcal_E_*_%s.dat"%(sensortag)))[0]
 
             if os.path.exists(calpath):
-                caldates=np.append(caldates,caldate)
+                caldates = np.append(caldates,caldate)
                 gains = np.genfromtxt(calpath)
                 wavs = gains[:,1]
+
+        lincaldatepaths = [os.path.basename(path) for path in glob.glob(
+            os.path.join(directory,"hypstar_"+str(hypstar)+"/linearity/*"))]
+        nonlindates = []
+
+        for lincaldatepath in lincaldatepaths:
+            nonlinpath = glob.glob(os.path.join(directory,
+                                                "hypstar_"+str(hypstar)+"\\linearity\\"+str(
+                                                    lincaldatepath)+"\\hypstar_"+str(
+                                                    hypstar)+"_nonlin_corr_coefs_*.dat"))[0]
+
+            if os.path.exists(nonlinpath):
+                nonlindates = np.append(nonlindates,lincaldatepath)
+                non_linear_cals = np.genfromtxt(nonlinpath)[:,0]
 
         wavcaldatepaths = [os.path.basename(path) for path in glob.glob(
             os.path.join(directory,"hypstar_"+str(hypstar)+"/wavelength/*"))]
@@ -207,9 +212,9 @@ class CalibrationConverter:
         calibration_data = self.templ.calibration_dataset(wavs,non_linear_cals,wav_cals,
                                                     caldates,nonlindates,wavcaldates)
         i_nonlin=0
-        for caldatepath in caldatepaths:
+        for lincaldatepath in lincaldatepaths:
             nonlinpath = glob.glob(os.path.join(directory,"hypstar_"+str(
-                hypstar)+"\\radiometric\\"+str(caldatepath)+"\\hypstar_"+str(
+                hypstar)+"\\linearity\\"+str(lincaldatepath)+"\\hypstar_"+str(
                 hypstar)+"_nonlin_corr_coefs_*.dat"))[0]
             if os.path.exists(nonlinpath):
                 non_linear_cals = np.genfromtxt(nonlinpath)[:,0]
@@ -267,12 +272,12 @@ class CalibrationConverter:
                                                      gains[:,2]*(gains[:,19])/100)
     
                 cov_other = punpy.convert_corr_to_cov(np.eye(len(gains[:,2])),
-                            gains[:,2]*(gains[:,8]**2+gains[:,9]**2+gains[:,11]**2+
+                            gains[:,2]*(gains[:,8]**2+gains[:,10]**2+gains[:,11]**2+
                                         gains[:,16]**2+gains[:,17]**2)**0.5/100)
     
                 cov_full = punpy.convert_corr_to_cov(
                             np.ones((len(gains[:,2]),len(gains[:,2]))),
-                            gains[:,2]*(gains[:,7]**2+gains[:,10]**2+gains[:,12]**2+
+                            gains[:,2]*(gains[:,7]**2+gains[:,9]**2+gains[:,12]**2+
                                         gains[:,13]**2+gains[:,14]**2+gains[:,15]**2)**0.5/100)
     
                 cov_filament = punpy.convert_corr_to_cov(
