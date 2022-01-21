@@ -8,14 +8,8 @@
 
 HYPERNETS Reader - Process to L0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Radiometer measurements are taken in a defined set of geometries called a sequence.
-Each geometry in a sequence is called a series (see Fig. XXX), as it is composed of a set of repeat
-measurements called scans that are averaged. A suite of different series thus creates a sequence.
-A sequence scheduler is used to order the different sequences that need to be executed during the day.
-Within the sequence scheduler each sequence is executed according to a start and end time
-(HH:MM UTC with a 24 hours format and an automatic update of the system to UTC time when
-connecting to the internet), the time-lapse between each sequence (in minutes),
-the filename in which the sequence is defined and the number of times the sequence needs to be repeated.
+Radiometer measurements are taken in a defined set of geometries called a sequence. Each geometry in a sequence is called a series, as it is composed of a set of repeat measurements called scans (see  :ref:`data_structure`). A suite of different series thus creates a sequence. A sequence scheduler is used to order the different sequences that need to be executed during the day. Within the sequence scheduler each sequence is executed according to a start and end time
+(HH:MM UTC with a 24 hours format and an automatic update of the system to UTC time when connecting to the internet), the time-lapse between each sequence (in minutes), the filename in which the sequence is defined and the number of times the sequence needs to be repeated.
 
 Once a sequence has been completed succesfully, the data is sent to the server with the following data format, name convention and data structure:
    * Sequence directory:
@@ -35,8 +29,16 @@ the L0 data product (readable netcdf file). The main function in this module is 
 It calls (1) read_metadata to read the metadata file of the sequence (ASCII file),
 (2) read_series to read the different scans concatenated per series in a single spe-binary data file.
 According to the metadata file and the filename of the spe-binary file the processing reorders the
-scans to L0 radiance, irradiance and black data products.
+scans to L0 radiance, irradiance and black data and outputs for each of those a netcdf with the different scans. The *data_io.hypernets_reader* module also copies and renames the RGB images taken from the target and/or the sky during the sequence with the time of acquisition, the series number and the viewing and (relative) azimuth angle. All the L0 outputs also includes the processing time and the version number of the processor, for instance:
 
-.. image:: ../figures/sequence.jpg
-  :width: 400
-  :alt: sequence
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_RAD_20220101T1316_20220101T1615_v1.2.nc'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_BLA_20220101T1316_20220101T1615_v1.2.nc'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_L0_IRR_20220101T1316_20220101T1615_v1.2.nc'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_IMG_20220101T1316_20220101T1615_006_140_90_v1.2.jpg'*
+
+*'/BSBE/2022/01/01/HYPERNETS_W_BSBE_IMG_20220101T1316_20220101T1615_003_180_90_v1.2.jpg'*
+
+
