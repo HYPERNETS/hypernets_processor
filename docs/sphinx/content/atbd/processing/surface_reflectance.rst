@@ -11,43 +11,27 @@ Surface Reflectance - Process to L2A
 
 Water Network
 --------------
-From the above water upwelling radiance L_u and the above water downwelling radiance L_d, the water leaving radiance Lw can be approximated as:
+From the above water upwelling radiance :math:`L_u` and the above water downwelling radiance :math:`L_d`, the water leaving radiance :math:`L_w` can be approximated as:
 
 .. math:: L_w(\theta,\Delta\phi,\lambda,\theta_0)=L_u(\theta,\Delta\phi,\lambda,\theta_0)-\rho(\theta,\Delta\phi,\lambda,\theta_0,e)L_d(\theta,\Delta\phi,\lambda,\theta_0)
+with
+   * :math:`\theta` being the viewing zenith angle (0° is pointing vertically down, measuring upwelling light and 180° is pointing vertically upward, measuring downwelling light),
+   * :math:`\theta_0` is the sun zenith angle (equals 0°  when the sun is at zenith and 90° when the sun is at sunset), and,
+   * :math:`\Delta\phi` is the relative azimuth angle between sun and sensor measured with respect to sun and clockwise from sun to target (0° means that the radiance sensors are pointing into the sun glint direction, while 180° corresponds to a viewing azimuth with the sun behind).
 
-with :math:`\theta` being the viewing zenith angle (0° is pointing vertically down, measuring upwelling light and 180° is pointing vertically upward, measuring downwelling light),
-:math:`\theta_0` is the sun zenith angle (equals 0°  when the sun is at zenith and 90°
-when the sun is at sunset), and, :math:`\Delta\phi` is the relative azimuth angle between sun and sensor measured with respect to sun and clockwise from sun to target (0° means that the radiance sensors are pointing into the sun glint direction, while 180° corresponds to a viewing azimuth with the sun behind). The term :math:`\rho` is the air-water interface reflectance coefficient expressed as a function of viewing geometry and sun zenith angle and environmental factors (:math:`e`). When the water surface is perfectly flat, :math:`\rho` is the Fresnel reflectance and the environmental factor only depends on the relative refractive index of the air-water interface. When the water is not perfectly flat, :math:`\rho` needs to account, in addition to the fresnel reflectance, for the geometric effects of the wave facets created by the roughened water surface (often called the “effective Fresnel reflectance coefficient”, Ruddick et al., 2019). Therefore, :math:`\rho` is commonly approximated as a function of the viewing and illumination geometry and wind speed, ws, and can be written as :math:`\rho(\theta,\theta_0,\Delta\phi,ws)` (Mobley, 1999 and 2015).
+The term :math:`\rho` is the air-water interface reflectance coefficient expressed as a function of viewing geometry and sun zenith angle and environmental factors (:math:`e`). When the water surface is perfectly flat, :math:`\rho` is the Fresnel reflectance and the environmental factor only depends on the relative refractive index of the air-water interface. When the water is not perfectly flat, :math:`\rho` needs to account, in addition to the fresnel reflectance, for the geometric effects of the wave facets created by the roughened water surface (often called the “effective Fresnel reflectance coefficient”, Ruddick et al., 2019). Therefore, :math:`\rho` is commonly approximated as a function of the viewing and illumination geometry and wind speed, ws, and can be written as :math:`\rho(\theta,\theta_0,\Delta\phi,ws)` (Mobley, 1999 and 2015). The appropriate :math:`\rho` is calculated in the L1C processing, see :ref:`interpolate`.
 
 The water leaving radiance is then converted into water reflectance as follows:
 
-.. math:: \rho_wnosc =\pi\frac{L_w}{E_d}
+.. :math:: \rho_w_nosc =\pi\frac{L_w}{E_d}
 
-with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. Indeed, although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied. :math:`\epsilon` is estimated using two wavelengths in the NIR (Ruddick et al., 2006), where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm.
+with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. Indeed, although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied. :math:`\epsilon` is estimated using two wavelengths in the NIR (Ruddick et al., 2006), where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm. The :math:`\epsilon` correction factor is calculated in the L1C processing, see :ref:`interpolate`.
 
-.. math:: \epsilon =\frac{\alpha\rho_wnosc(\lambda_2)-\rho_wnosc(\lambda_1)}{(\lambda_2-\lambda_1)}
+The final L2a product is the averaged water reflectance corrected for the NIR similarity spectrum:
 
-Thus the final L2a product is the water reflectance corrected for the NIR similarity spectrum:
+.. :math:: \rho_w(\lambda)=\rho_wnosc(\lambda)-\epsilon
 
-.. math:: \rho_w(\lambda)=\rho_wnosc(\lambda)-\epsilon
-
-To process the water network data, the hypernets processor includes RHYMER ("Reliable processing of HYperspectral MEasurement of Radiance", version 20190718 on 16/10/2020, written by Quinten Vanhellemont). RHYMER provides all the required functions to process the above water measurements (currently including Mobley 1999 and 2015 and Ruddick et al., 2006 for the Fresnel correction). It includes 4 submodules:
-
-1. Rhymer – process L1b:
-
-   The first function in the rhymer_hypstar.process_l1b  module performs a quality check per series, i.e., it assigns flags to each spectrum showing a temporal jump of more than a given threshold (25% is the default) at 550 nm. The second function parses the cycle, i.e., it separates downwelling and upwelling radiance, investigate if all required angles are present and if there are coincident upwelling and downwelling radiance measurements for the retrieval of the water leaving radiance as given in Eq. 1. Next, since the irradiance and radiance measurements have a slight shift in wavelength, first a spectral interpolation is performed to fit the irradiance measurements to the radiance wavelengths. After, downwelling irradiance and radiance are interpolated to the timestamp of the upwelling radiance (see function interpolate). Therefore, downwelling radiance and irradiance (as well as uncertainties) are first averaged per series (see function average). Next, averages per series are interpolated in time. Hence, for each upwelling radiance measurement (target radiance or total radiance), a time coincident downwelling radiance and irradiance measurement is retrieved. Uncertainties are computed for the interpolation of the downwelling radiance and irradiance measurements, respectively. The default measurement function returns interpolated downwelling irradiance or radiance values at the upwelling radiance time stamps using linear interpolation (see  https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html)
-
-2. Rhymer – process L1c:
-
-   Level L1c data is an intermediate step consisting to retrieve all the required parameters for the computation of the water leaving radiance and reflectance, i.e., wind speed, ws, and the effective fresnel reflectance coefficient (:math:`\rho(\theta,\theta_0,\Delta\phi,ws)`. Wind speed may be taken from, e.g., a default value, in situ measurements, ancilliary datasets such as NCEP Met data. Similarly, the Fresnel reflectance coefficient can be extracted from different look-up tables (Mobley 1999; 2015)), set to a default value, estimated as a function of wind speed (e.g., Ruddick et al. 2006). The  configuration files (job and processing) determine which option is used for the processing (see Section 6.9, e.g., fresnel_option: Ruddick2006). The level L1d also includes the retrieval of the water leaving radiance and reflectance for each single upwelling radiance scan. It does not include any additional correction and the uncertainty budget is not updated. Most additional corrections are applied on a first estimate of water reflectance. The level L1c data thus serve as input for the level L1d where the water leaving radiance and water reflectance are recomputed with and without additional correction factors but with the use of Punpy for the estimations of uncertainties. The level L1c is not distributed by default to the end users.
-
-3. Surface reflectance – process L1d:
-
-   The surface_reflectance.processe_l1d module computes the correction factors (e.g., :math:`\epsilon`, the spectrally flat measurement error, for the NIR similarity correction, Ruddick et al., 2006), using the L1c :math:`\rho_wnosc` estimates (see Eq XXX). A quality control is also performed on the value retrieved for :math:`\epsilon`, i.e., :math:`\epsilon` should not exceed 5% of the reference water reflectance value, e.g.,  :math:`\rho_wnosc` at 620 nm).
-
-4. Surface reflectance – process L2a:
-
-   The module surface_reflectance.process performs final quality checks (still to be defined, potentially using auxillary data from, e.g., light sensors, rain sensor, camera, …). These final quality checks are foreseen in an updated version. Next, all variables are averaged per series (i.e., all scans previously interpolated to the upwelling radiance time step are averaged, see average function). Level 2a data have thus the dimensions “wavelength” and “series” and have the same dimensions with the land network L2a data.
+Note, the final L2A average product is only computed for sequences that does not show any of the following flags : "outliers", "angles_missing","lu_eq_missing","fresnel_angle_missing", "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"
 
 Land Network
 --------------
