@@ -108,7 +108,7 @@ class SurfaceReflectance:
                     print("not plotting ", measurandstring)
 
         elif self.context.get_config_value("network").lower() == "l":
-            dataset_l2a = self.templ.l2_from_l1c_dataset(dataset)
+            dataset_l2a = self.templ.l2_from_l1c_dataset(dataset,["outliers","dark_outliers"])
             dataset_l2a = self.prop.process_measurement_function_l2(["reflectance"], dataset_l2a,
                                                                     l1tol2_function.function,
                                                                     input_qty, u_random_input_qty,

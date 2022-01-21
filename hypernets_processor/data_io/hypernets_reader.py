@@ -492,13 +492,13 @@ class HypernetsReader:
                                         scan_number]+vaa_rel)/360-int(
                                 ds["solar_azimuth_angle"][scan_number]+vaa_rel))/360
 
-                            ds_swir.attrs["site_latitude"] = lat
-                            ds_swir.attrs["site_longitude"] = lon
-                            ds_swir["solar_zenith_angle"][
-                                scan_number_swir] = 90-get_altitude(float(lat),
+                            ds.attrs["site_latitude"] = lat
+                            ds.attrs["site_longitude"] = lon
+                            ds["solar_zenith_angle"][
+                                scan_number] = 90-get_altitude(float(lat),
                                 float(lon),acquisitionTime)
-                            ds_swir["solar_azimuth_angle"][
-                                scan_number_swir] = get_azimuth(float(lat),float(lon),
+                            ds["solar_azimuth_angle"][
+                                scan_number] = get_azimuth(float(lat),float(lon),
                                 acquisitionTime)
                         else:
                             self.context.logger.error(
