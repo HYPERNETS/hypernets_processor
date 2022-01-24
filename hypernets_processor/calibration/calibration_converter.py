@@ -71,6 +71,8 @@ class CalibrationConverter:
         else:
             raise IOError(os.path.join(hypstar_path, name) + " calibration file does not exist")
 
+        #todo set this index to something appropriate after interpolating
+        index=0
         calibration_data_times=calibration_data_rad["calibrationdates"].values
         nonlin_times=calibration_data_rad["nonlineardates"].values
         wav_times=calibration_data_rad["wavdates"].values
