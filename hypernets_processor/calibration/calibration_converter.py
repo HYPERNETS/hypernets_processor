@@ -212,7 +212,8 @@ class CalibrationConverter:
         calibration_data = self.templ.calibration_dataset(wavs,non_linear_cals,wav_cals,
                                                     caldates,nonlindates,wavcaldates)
         i_nonlin=0
-        for lincaldatepath in lincaldatepaths:
+        #todo remove [-1] and use all calibrations and interpolate?
+        for lincaldatepath in [lincaldatepaths[-1]]:
             nonlinpath = glob.glob(os.path.join(directory,"hypstar_"+str(
                 hypstar)+"\\linearity\\"+str(lincaldatepath)+"\\hypstar_"+str(
                 hypstar)+"_nonlin_corr_coefs_*.dat"))[0]
@@ -222,7 +223,7 @@ class CalibrationConverter:
                 i_nonlin+=1
 
         i_wavcoef=0
-        for wavcaldatepath in wavcaldatepaths:
+        for wavcaldatepath in [wavcaldatepaths[-1]]:
             wavcaldate = wavcaldatepath
             wavcalpath = glob.glob(os.path.join(directory,"hypstar_"+str(
                 hypstar)+"\\wavelength\\"+str(wavcaldatepath)+"\\hypstar_"+str(
@@ -242,7 +243,7 @@ class CalibrationConverter:
                 i_wavcoef += 1
 
         i_cal=0
-        for caldatepath in caldatepaths:
+        for caldatepath in [caldatepaths[-1]]:
             if measurandstring == "radiance":
                 calpath = glob.glob(os.path.join(directory,"hypstar_"+str(
                     hypstar)+"\\radiometric\\"+str(caldatepath)+"\\hypstar_"+str(
