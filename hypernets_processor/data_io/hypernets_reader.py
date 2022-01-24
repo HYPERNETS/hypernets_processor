@@ -487,10 +487,10 @@ class HypernetsReader:
                                 float(lat),float(lon),acquisitionTime)
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
-                            vaa_rel,vza = map(float,specattr['pt_ask'].split(";"))
-                            vaa = ((ds["solar_azimuth_angle"][
-                                        scan_number]+vaa_rel)/360-int(
-                                ds["solar_azimuth_angle"][scan_number]+vaa_rel))/360
+                            vaa,vza = map(float,specattr['pt_ask'].split(";"))
+                            # vaa = ((ds["solar_azimuth_angle"][
+                            #             scan_number]+vaa_rel)/360-int(
+                            #     ds["solar_azimuth_angle"][scan_number]+vaa_rel))/360
 
                             ds.attrs["site_latitude"] = lat
                             ds.attrs["site_longitude"] = lon
@@ -571,10 +571,10 @@ class HypernetsReader:
                                 float(lat),float(lon),acquisitionTime)
                             ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
-                            vaa_rel,vza = map(float,specattr['pt_ask'].split(";"))
-                            vaa = ((ds_swir["solar_azimuth_angle"][
-                                        scan_number_swir]+vaa_rel)/360-int(
-                                ds_swir["solar_azimuth_angle"][scan_number_swir]+vaa_rel))/360
+                            vaa,vza = map(float,specattr['pt_ask'].split(";"))
+                            # vaa = ((ds_swir["solar_azimuth_angle"][
+                            #             scan_number_swir]+vaa_rel)/360-int(
+                            #     ds_swir["solar_azimuth_angle"][scan_number_swir]+vaa_rel))/360
                         else:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
