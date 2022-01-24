@@ -565,26 +565,30 @@ class HypernetsReader:
                         #             print(datetime.fromtimestamp(int(ts+timereboot)))
                         #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
                         if lat is not None:
-                            ds.attrs["site_latitude"] = lat
-                            ds.attrs["site_longitude"] = lon
-                            ds["solar_zenith_angle"][scan_number_swir] = 90-get_altitude(
+                            ds_swir.attrs["site_latitude"] = lat
+                            ds_swir.attrs["site_longitude"] = lon
+                            ds_swir["solar_zenith_angle"][scan_number_swir] = 90-get_altitude(
                                 float(lat),float(lon),acquisitionTime)
-                            ds["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
+                            ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
                             vaa_rel,vza = map(float,specattr['pt_ask'].split(";"))
-                            vaa = ((ds["solar_azimuth_angle"][
+                            vaa = ((ds_swir["solar_azimuth_angle"][
                                         scan_number_swir]+vaa_rel)/360-int(
-                                ds["solar_azimuth_angle"][scan_number_swir]+vaa_rel))/360
+                                ds_swir["solar_azimuth_angle"][scan_number_swir]+vaa_rel))/360
                         else:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
-                        ds['quality_flag'][scan_number_swir] = flag
-                        ds['integration_time'][
+                        ds_swir['quality_flag'][scan_number_swir] = flag
+                        if spectrum.header.exposure_time>0:
+                            ds_swir['integration_time'][
                             scan_number_swir] = spectrum.header.exposure_time
-                        ds['temperature'][scan_number_swir] = spectrum.header.temperature
+                        else:
+                            ds_swir['integration_time'][
+                                scan_number_swir] = ds['integration_time'][0]
+                        ds_swir['temperature'][scan_number_swir] = spectrum.header.temperature
 
-                        ds["viewing_azimuth_angle"][scan_number_swir] = vaa
-                        ds["viewing_zenith_angle"][scan_number_swir] = vza
+                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = vaa
+                        ds_swir["viewing_zenith_angle"][scan_number_swir] = vza
 
                         # accelaration:
                         # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
