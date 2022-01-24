@@ -208,11 +208,10 @@ class CalibrationConverter:
                 wavcaldates = np.append(wavcaldates,wavcaldate)
                 wav_cals = np.genfromtxt(wavcalpath)[:,0]
 
-
-        calibration_data = self.templ.calibration_dataset(wavs,non_linear_cals,wav_cals,
-                                                    caldates,nonlindates,wavcaldates)
-        i_nonlin=0
         #todo remove [-1] and use all calibrations and interpolate?
+        calibration_data = self.templ.calibration_dataset(wavs,non_linear_cals,wav_cals,
+                                                    [caldates[-1]],[nonlindates[-1]],[wavcaldates[-1]])
+        i_nonlin=0
         for lincaldatepath in [lincaldatepaths[-1]]:
             nonlinpath = glob.glob(os.path.join(directory,"hypstar_"+str(
                 hypstar)+"\\linearity\\"+str(lincaldatepath)+"\\hypstar_"+str(
