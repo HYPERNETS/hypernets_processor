@@ -64,8 +64,9 @@ class Plotting():
                    dataset.attrs['product_name']+"."+self.context.get_config_value("plotting_format"))
 
         angle_labels=["vza= {:.2f}, vaa= {:.2f}".format(dataset["viewing_zenith_angle"].values[i],dataset["viewing_azimuth_angle"].values[i]) for i in range(len(dataset["viewing_zenith_angle"].values))]
+        linestyles=[(0,3,dataset["viewing_zenith_angle"].values[i]/5.) for i in range(len(dataset["viewing_zenith_angle"].values))]
         self.plot_variable(measurandstring,plotpath,dataset["wavelength"].values,
-                           dataset[measurandstring].values,labels=angle_labels)
+                           dataset[measurandstring].values,labels=angle_labels,linestyles=linestyles)
 
     def plot_diff_scans(self,measurandstring,dataset,dataset_avg=None):
         series_id = np.unique(dataset['series_id'])
@@ -191,13 +192,16 @@ class Plotting():
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
-    def plot_reflectance(self,plotpath,xdata,ydata,labels=None):
+    def plot_reflectance(self,plotpath,xdata,ydata,labels=None,linestyles=None,linecolour=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
         if labels is None:
             ax1.plot(xdata,ydata,alpha=0.3)
         else:
             for i in range(len(labels)):
-                ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                if linestyles is None:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                else:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],ls=linestyles[i],alpha=0.3)
             ax1.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")

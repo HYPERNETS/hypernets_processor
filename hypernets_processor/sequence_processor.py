@@ -118,32 +118,37 @@ class SequenceProcessor:
             if self.context.get_config_value("max_level") in ["L1A","L1B","L1C","L2A"]:
                 self.context.logger.info("Processing to L1a...")
                 if l0_rad:
-                    L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
+                    L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,
+                                                calibration_data_rad)
                 if l0_irr:
-                    L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
+                    L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,
+                                                calibration_data_irr)
                 if l0_swir_rad:
                     L1a_swir_rad = cal.calibrate_l1a("radiance",l0_swir_rad,l0_swir_bla,
-                                                 calibration_data_swir_rad,swir=True)
+                                                     calibration_data_swir_rad,swir=True)
                 if l0_swir_irr:
-                    L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,l0_swir_bla,
-                                                 calibration_data_swir_irr,swir=True)
+                    L1a_swir_irr = cal.calibrate_l1a("irradiance",l0_swir_irr,
+                                                     l0_swir_bla,
+                                                     calibration_data_swir_irr,swir=True)
                 self.context.logger.info("Done")
 
-            if l0_rad and l0_irr:
-                if self.context.get_config_value("max_level") in ["L1B","L1C","L2A"]:
+            if self.context.get_config_value("max_level") in ["L1B","L1C","L2A"]:
+                if l0_rad and l0_swir_rad:
                     self.context.logger.info("Processing to L1b radiance...")
-                    L1b_rad = comb.combine("radiance", L1a_rad, L1a_swir_rad)
+                    L1b_rad = comb.combine("radiance",L1a_rad,L1a_swir_rad)
                     self.context.logger.info("Done")
 
+                if l0_irr and l0_swir_irr:
                     self.context.logger.info("Processing to L1b irradiance...")
-                    L1b_irr = comb.combine("irradiance", L1a_irr, L1a_swir_irr)
+                    L1b_irr = comb.combine("irradiance",L1a_irr,L1a_swir_irr)
                     self.context.logger.info("Done")
 
+            if l0_rad and l0_irr:
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:
                     self.context.logger.info("Processing to L1c...")
-                    L1c = intp.interpolate_l1c(L1b_rad, L1b_irr)
+                    L1c = intp.interpolate_l1c(L1b_rad,L1b_irr)
                     self.context.logger.info("Done")
-                if self.context.get_config_value("max_level") =="L2A":
+                if self.context.get_config_value("max_level") == "L2A":
                     self.context.logger.info("Processing to L2a...")
                     L2a = surf.process_l2(L1c)
                     self.context.logger.info("Done")
