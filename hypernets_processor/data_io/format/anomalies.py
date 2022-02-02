@@ -54,5 +54,11 @@ ANOMALIES_DICT = {
         "description": "Not enough Lsky scans",
         "error": IOError,
         "error_msg": None
-    }
+    },
+    "i": {
+        "description": "Irradiance not vza=180",
+        "error": None,
+        "error_msg": None
+    },
+
 }

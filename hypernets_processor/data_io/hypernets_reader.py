@@ -425,8 +425,8 @@ class HypernetsReader:
         ds.attrs["source_file"] = str(os.path.basename(seq_dir))
 
         scanDim = swir.shape[0]
-        wvl = self.read_wavelength(swir.shape[1], cal_data_swir)
-        ds_swir = self.templ.l0_template_dataset(wvl, scanDim, fileformat, swir=True)
+        wvl_swir = self.read_wavelength(swir.shape[1], cal_data_swir)
+        ds_swir = self.templ.l0_template_dataset(wvl_swir, scanDim, fileformat, swir=True)
 
         ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds_swir.attrs["instrument_id"] = str(instrument_id)
@@ -488,9 +488,15 @@ class HypernetsReader:
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
                             vaa,vza = map(float,specattr['pt_ask'].split(";"))
-                            # vaa = ((ds["solar_azimuth_angle"][
-                            #             scan_number]+vaa_rel)/360-int(
-                            #     ds["solar_azimuth_angle"][scan_number]+vaa_rel))/360
+                            if vza==-1 and vaa==-1:
+                                self.context.logger.warning(
+                                    "vza and vaa are both -1, using pt_abs instead")
+                                vaa,vza = map(float,specattr['pt_abs'].split(";"))
+                            if vza>180:
+                                self.context.logger.warning(
+                                    "vza is larger than 90degrees, changing to equivalent geometry with vza<90.")
+                                vza=360-vza
+                                vaa=vaa+180
 
                             ds.attrs["site_latitude"] = lat
                             ds.attrs["site_longitude"] = lon
