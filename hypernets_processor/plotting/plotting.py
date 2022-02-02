@@ -64,7 +64,10 @@ class Plotting():
                    dataset.attrs['product_name']+"."+self.context.get_config_value("plotting_format"))
 
         angle_labels=["vza= {:.2f}, vaa= {:.2f}".format(dataset["viewing_zenith_angle"].values[i],dataset["viewing_azimuth_angle"].values[i]) for i in range(len(dataset["viewing_zenith_angle"].values))]
-        linestyles=[(0,3,dataset["viewing_zenith_angle"].values[i]/5.) for i in range(len(dataset["viewing_zenith_angle"].values))]
+        linestyles=[(0,(3,dataset["viewing_zenith_angle"].values[i]/10.))
+                    if dataset["viewing_azimuth_angle"].values[i]<180
+                    else (0,(1,dataset["viewing_zenith_angle"].values[i]/10.))
+                    for i in range(len(dataset["viewing_zenith_angle"].values))]
         self.plot_variable(measurandstring,plotpath,dataset["wavelength"].values,
                            dataset[measurandstring].values,labels=angle_labels,linestyles=linestyles)
 
@@ -147,13 +150,16 @@ class Plotting():
                 fig1.savefig(plotpath,bbox_inches='tight')
                 plt.close(fig1)
 
-    def plot_radiance(self,plotpath,xdata,ydata,labels=None):
+    def plot_radiance(self,plotpath,xdata,ydata,labels=None,linestyles=None,linecolour=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
         if labels is None:
             ax1.plot(xdata,ydata,alpha=0.3)
         else:
             for i in range(len(labels)):
-                ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                if linestyles is None:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                else:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],ls=linestyles[i],alpha=0.3)
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)")
@@ -163,13 +169,16 @@ class Plotting():
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
-    def plot_irradiance(self,plotpath,xdata,ydata,labels=None):
+    def plot_irradiance(self,plotpath,xdata,ydata,labels=None,linestyles=None,linecolour=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
         if labels is None:
             ax1.plot(xdata,ydata,alpha=0.3)
         else:
             for i in range(len(labels)):
-                ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                if linestyles is None:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                else:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],ls=linestyles[i],alpha=0.3)
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Irradiance ($mW\ nm^{-1}\ m^{-2}$)")
@@ -179,13 +188,16 @@ class Plotting():
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
-    def plot_DN(self,plotpath,xdata,ydata,labels=None):
+    def plot_DN(self,plotpath,xdata,ydata,labels=None,linestyles=None,linecolour=None):
         fig1,ax1 = plt.subplots(figsize=(10,5))
         if labels is None:
             ax1.plot(xdata,ydata,alpha=0.3)
         else:
             for i in range(len(labels)):
-                ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                if linestyles is None:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                else:
+                    ax1.plot(xdata,ydata[:,i],label=labels[i],ls=linestyles[i],alpha=0.3)
             ax1.legend()
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"digital_number")
@@ -211,7 +223,7 @@ class Plotting():
         fig1.savefig(plotpath,bbox_inches='tight')
         plt.close(fig1)
 
-    def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None,mask=None):
+    def plot_other_var(self,measurandstring,plotpath,xdata,ydata,labels=None,ylim=None,mask=None,linestyles=None,linecolour=None):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             fig1,ax1 = plt.subplots(figsize=(10,5))
@@ -219,12 +231,17 @@ class Plotting():
                 ax1.plot(xdata,ydata,alpha=0.3)
             elif mask is None:
                 for i in range(len(labels)):
-                    ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.5)
+                    if linestyles is None:
+                        ax1.plot(xdata,ydata[:,i],label=labels[i],alpha=0.3)
+                    else:
+                        ax1.plot(xdata,ydata[:,i],label=labels[i],ls=linestyles[i],
+                                 alpha=0.3)
             elif len(np.where(mask)[0]) == 0:
                 ax1.plot(xdata,ydata,alpha=0.3)
             else:
                 ax1.plot(xdata,ydata[:,np.where(mask)].reshape((len(ydata),len(np.where(mask)[0]))),label="masked",alpha=0.3,color="red")
-                ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3,color="blue")
+                if not all(mask):
+                    ax1.plot(xdata,ydata[:,np.where(np.invert(mask))].reshape((len(ydata),len(np.where(np.invert(mask))[0]))),label="used",alpha=0.3,color="blue")
 
             if labels is not None or mask is not None:
                 handles,labels = plt.gca().get_legend_handles_labels()

@@ -85,7 +85,6 @@ class Calibrate:
                         min(abs(dataset['acquisition_time'] - acq_time))) &
                        (dataset['integration_time'] == int_time))[0]
         #todo check if integration time always has to be same
-
         dark_mask=self.qual.outlier_checks(dataset["digital_number"].values[:,ids])
         if np.sum(dark_mask)>0:
             dark_outlier=1
@@ -106,22 +105,23 @@ class Calibrate:
         """
         wavs=dataset_calib["wavelength"].values
         wavpix=dataset_calib["wavpix"].values
-
         datasetl0=datasetl0.isel(wavelength=slice(int(wavpix[0]),int(wavpix[-1])+1))
         datasetl0_bla=datasetl0_bla.isel(wavelength=slice(int(wavpix[0]),int(wavpix[-1])+1))
         datasetl0 = datasetl0.assign_coords(wavelength=wavs)
         datasetl0_bla = datasetl0_bla.assign_coords(wavelength=wavs)
 
         series_ids = np.unique(datasetl0['series_id'])
+
         dark_signals = np.zeros_like(datasetl0['digital_number'].values)
         dark_outliers= np.zeros_like(datasetl0['quality_flag'].values)
 
         for i in range(len(series_ids)):
             ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
+            dark_signal,dark_outlier = self.find_nearest_black(datasetl0_bla,
+                                    datasetl0['acquisition_time'].values[ids[0]],
+                                    datasetl0['integration_time'].values[ids[0]])
             for id in ids:
-                dark_signals[:,id],dark_outliers[id] = self.find_nearest_black(datasetl0_bla,
-                datasetl0['acquisition_time'].values[id],
-                datasetl0['integration_time'].values[id])
+                dark_signals[:,id],dark_outliers[id] = dark_signal,dark_outlier
 
         datasetl0,mask=self.qual.perform_quality_check_L0(datasetl0,series_ids,dark_signals,dark_outliers)
 

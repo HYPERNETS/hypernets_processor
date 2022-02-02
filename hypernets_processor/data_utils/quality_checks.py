@@ -61,7 +61,14 @@ class QualityChecks:
         return dataset_l1b,dataset_l1b_swir
 
     def perform_quality_check_interpolate(self,dataset_l1b_rad,dataset_l1b_irr):
-        #todo add these checks
+        #todo add further checks
+        for i,vza in enumerate(dataset_l1b_irr["viewing_zenith_angle"].values):
+            if vza!=180:
+                dataset_l1b_irr["irradiance"].values[i]=dataset_l1b_irr["irradiance"].values[i]*np.nan
+                self.context.logger.warning(
+                    "One of the irradiance measurements did not have vza=180, so has been masked")
+                self.context.anomaly_handler.add_anomaly("i")
+
         return dataset_l1b_rad,dataset_l1b_irr
 
     def perform_quality_check_L2a(self,dataset):
