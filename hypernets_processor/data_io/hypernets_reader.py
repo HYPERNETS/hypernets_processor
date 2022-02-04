@@ -17,6 +17,7 @@ from pysolar.solar import *
 from hypernets_processor.data_io.format.header import HEADER_DEF
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.spectrum import Spectrum
+from hypernets_processor.data_io.format.flags import FLAG_COMMON
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
@@ -493,7 +494,7 @@ class HypernetsReader:
                                     "vza and vaa are both -1, using pt_abs instead")
                                 vaa,vza = map(float,specattr['pt_abs'].split(";"))
                             if vza>180:
-                                self.context.logger.warning(
+                                self.context.logger.debug(
                                     "vza is larger than 90degrees, changing to equivalent geometry with vza<90.")
                                 vza=360-vza
                                 vaa=vaa+180
@@ -674,20 +675,37 @@ class HypernetsReader:
             # look for latitude and longitude or lat and lon , more elegant way??
             if 'latitude' in (globalattr.keys()):
                 lat = float(globalattr['latitude'])
+                if lat ==0.:
+                    print("Latitude is 0.0, use default or add it in metadata.txt")
+                    lat = self.context.get_config_value("lat")
+                    flag = flag+2**FLAG_COMMON.index("lat_default")
             elif 'lat' in (globalattr.keys()):
                 lat = float(globalattr['lat'])
+                if lat == 0.:
+                    print("Latitude is 0.0, use default or add it in metadata.txt")
+                    lat = self.context.get_config_value("lat")
+                    flag = flag+2**FLAG_COMMON.index("lat_default")
             else:
                 print("Latitude is not given, use default or add it in metadata.txt")
                 lat = self.context.get_config_value("lat")
-                flag = flag + 2 ** self.context.get_config_value("lat_default")  # du.set_flag(flag, "lat_default") #
+                flag = flag + 2 ** FLAG_COMMON.index("lat_default")
+
             if 'longitude' in (globalattr.keys()):
                 lon = float(globalattr['longitude'])
+                if lon == 0.:
+                    print("Latitude is 0.0, use default or add it in metadata.txt")
+                    lon = self.context.get_config_value("lon")
+                    flag = flag+2**FLAG_COMMON.index("lon_default")
             elif 'lon' in (globalattr.keys()):
                 lon = float(globalattr['lon'])
+                if lon == 0.:
+                    print("Longitude is 0.0, use default or add it in metadata.txt")
+                    lon = self.context.get_config_value("lon")
+                    flag = flag+2**FLAG_COMMON.index("lon_default")
             else:
                 print("Longitude is not given, use default or add it in metadata.txt")
                 lon = self.context.get_config_value("lon")
-                flag = flag + 2 ** self.context.get_config_value("lon_default")  # du.set_flag(flag, "lon_default")  #
+                flag = flag + 2 ** FLAG_COMMON.index("lon_default")
 
             if 'hypstar_sn' in (globalattr.keys()):
                 instrument_id = int(globalattr['hypstar_sn'])
