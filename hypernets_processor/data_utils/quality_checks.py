@@ -8,6 +8,8 @@ from hypernets_processor.data_io.data_templates import DataTemplates
 import punpy
 import numpy as np
 import warnings
+import matplotlib.pyplot as plt
+import xarray as xr
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -69,6 +71,17 @@ class QualityChecks:
                     "One of the irradiance measurements did not have vza=180, so has been masked")
                 self.context.anomaly_handler.add_anomaly("i")
 
+        ref_data=xr.open_dataset("irradiance_reference.nc")
+        for i,vza in enumerate(dataset_l1b_irr["viewing_zenith_angle"].values):
+
+            plt.plot(dataset_l1b_irr["irradiance"].values[i])
+            if False:
+                dataset_l1b_irr["irradiance"].values[i]=dataset_l1b_irr["irradiance"].values[i]*np.nan
+                self.context.logger.warning(
+                    "One of the irradiance measurements did not have vza=180, so has been masked")
+                self.context.anomaly_handler.add_anomaly("i")
+        plt.legend()
+        plt.show()
         return dataset_l1b_rad,dataset_l1b_irr
 
     def perform_quality_check_L2a(self,dataset):
