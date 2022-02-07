@@ -35,5 +35,10 @@ Note, the final L2A average product is only computed for sequences that does not
 
 Land Network
 --------------
+For the land network, the surface reflectances can now be trivially calculated from the L1C radiances (:math:`L_u`) and irradiances (:math:`E_d`) as:
 
-TBC - Pieter
+.. :math:: \rho =\pi\frac{L_u}{E_d}
+
+The L1C products alreay contained (ir)radiance averaged per series, so no further steps are necessary.
+
+
