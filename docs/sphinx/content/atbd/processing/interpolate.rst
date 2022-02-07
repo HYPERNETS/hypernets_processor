@@ -82,4 +82,20 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 Land Network
 --------------
 
-TBC - Pieter
+The L1C processing for the land network consists of two interpolation steps that are applied to the irradiance measurements in order to bring them to the same wavelength scale and timestamps as the radiance measurements. 
+
+1. **Spectral interpolation**: 
+The irradiances are spectrally interpolated to the wavelengths of the radiance measurements (which are not identical to the irradiance measurements).
+Currently, we use a simple linear interpion, but this will substitud by the following:
+To perform the interpolation, we want to account for the spectral variability that is expected for typical solar irradiance measurements. In order to do this, we take a reference simulated solar spectrum, convolved with the HYPERNETS spectral response function, but sampled at 0.1 nm intervals. This high resolution spectrum is used to inform us on the spectral variability between the given data points.
+We then use the interpolation tool within the NPL CoMet toolkit to interpolate between the irradiance wavelengths using this high-resolution reference. The resulting interpolation function goes through the irradiance data at the given irradiance wavelengths, but follows the high-resolution spectrum between these wavelengths.
+The irradiances at the new set of wavelengths are then calculated using this interpolation function.
+
+2. **Temporal interpolation**: 
+Next, we use a similar method to perform a temporal interpolation. In this case, we interpolate the irradiance measurements at the start and end of the sequence, to each of the timestamps of the radiance measurements. Here the high-resolution model is the known daily cycle of irradiance, approximately proportional to the cosine of the solar zenith angle.
+The NPL CoMet interpolation tool is again used for the interpolation. 
+
+The output of the L1C processing is a product with irradiances that now have the same wavelengths and timestamps as the radiance measurements.
+
+
+
