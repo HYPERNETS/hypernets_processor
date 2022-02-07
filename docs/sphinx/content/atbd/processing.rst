@@ -21,6 +21,7 @@ TBC - Pieter
    processing/average
    processing/interpolate
    processing/surface_reflectance
+   processing/quality_checks
    processing/uncertainty_propagation
    processing/processing_config
    
