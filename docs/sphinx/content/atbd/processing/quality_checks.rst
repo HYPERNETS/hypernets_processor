@@ -35,9 +35,16 @@ If all scans in a series are masked, an anomaly is raised (see :ref:`anomalies`)
 
 L1B
 :::::
+No further quality checks are performed, but only scans that passed the L1A quality checks are used when taking the average.
+In the future, we aim to add a quality check for the land network, checking the differences between the radiances for the VNIR and SWIR instruments forthe overlapping wavelengths.
 
 L1C
 :::::
+Before interpolating the irradiances, a number of quality checks are applied to the irradiances. 
+First, their viewing angles are checked (which must be 180°, with a tolerance of 2°, as irradiance measurements have to be pointing up).
+Next, the irradiance is compared to a simulated clear-sky model. 
 
-L1A
+L2A
 :::::
+Currently, no further quality checks are applied. It is expected further checks will be added, either as part of the hypernets_processor, or in quality assurance pipelines per site.
+
