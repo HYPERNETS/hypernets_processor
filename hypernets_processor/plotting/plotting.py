@@ -272,3 +272,16 @@ class Plotting():
                     ax1.set_ylim([0,ymax])
             fig1.savefig(plotpath,bbox_inches='tight')
             plt.close(fig1)
+
+    def plot_quality_irradiance(self,dataset,irrscaled,irrref,refsza):
+
+        plotpath = os.path.join(self.path,"plot_clearskycheck_irradiance_"+dataset.attrs[
+            'product_name']+"."+self.context.get_config_value("plotting_format"))
+
+        angle_labels = [
+            "time= {:.0f}, sza= {:.2f}, rescaled to sza= {:.0f}".format(dataset["acquisition_time"].values[i],
+                                              dataset["solar_zenith_angle"].values[i],refsza)
+            for i in range(len(dataset["viewing_zenith_angle"].values))]
+        angle_labels = np.append(angle_labels,["clear sky RT model sza=%s"%refsza])
+        ydata = np.hstack((irrscaled,np.atleast_2d(irrref).T))
+        self.plot_irradiance(plotpath,dataset["wavelength"].values,ydata,labels=angle_labels)
