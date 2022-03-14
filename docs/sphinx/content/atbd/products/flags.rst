@@ -16,3 +16,106 @@ Flags description
 +------+---------------+
 | 2    | Cinderella    |
 +------+---------------+
+
+
++-------+------------+-------------------------------------+-----------------------------+
+| Bit # | Symbol     | Description                         | Comment                     |
++=======+============+=====================================+=============================+
+| 1 | Saturation  | Pixel saturation                         |                      |
++-------+------------+-------------------------------------+-----------------------------+
+| 2 | non-linearity  | Non-linearity                       |                      |
++-------+------------+-------------------------------------+-----------------------------+
+
+
+2
+non-linearity
+Non-linearity
+NYI
+
+3
+bad_pointing
+Bad pointing 
+Pan/tilt angle versus requested angle -NYI
+
+4
+placeholder1
+
+Placeholder for other potential calibration related quality flags
+
+5
+lon_default
+Missing longitude
+When raised use default
+Quality control #1
+6
+lat_default
+Missing latitude
+When raised use default
+Quality control #1
+7
+outliers
+Outliers and NaN 
+Mask the scans that lie more than 3 standard-deviations away from the mean
+Quality control #2
+8
+angles_missing
+Missing angles
+
+Quality control #3
+9
+lu_eq_missing
+missing azimuthal equivalent for upwelling radiance 
+ 
+Quality control #3
+10
+fresnel_angle_missing
+no appropriate fresnel angle for downwelling radiance
+
+
+Quality control #3
+11
+fresnel_default
+Default/Fixed fresnel reflectance/fresnel angles out of range for Mobleys look up table
+fresnel_default
+in get_fresnelrefl
+Quality control #4
+12
+temp_variability_ed
+Temporal variability in ED
+diff_threshold from processing config
+Quality control #3
+13
+temp_variability_lu
+Temporal variability in Lsky
+diff_threshold from processing config
+Quality control #3
+14
+min_nbred
+Min number of Ed
+Nbred from processing config
+Quality control #3
+15
+min_nbrlu
+Min number of Lt
+Nrblu from processing config
+Quality control #3
+16
+min_nbrlsky
+Min number of Lsky
+Nbrlsky from processing config
+Quality control #3
+17
+def_wind_flag
+Default wind value for fresnel retrieval
+In get_wind
+Quality control #4
+18
+simil_fail
+Similarity test failure
+Reference wavelength  from processing config and LUT from Ruddick et al. (2006).
+Quality control #5
+
+
+
+
+
