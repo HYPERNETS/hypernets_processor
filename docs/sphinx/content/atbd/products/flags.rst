@@ -15,7 +15,7 @@ Flags description
 | 1    | Puss in Boots |
 +------+---------------+
 | 2    | Cinderella    |
-|      |               |
+|      |  test         |
 +------+---------------+
 
 
