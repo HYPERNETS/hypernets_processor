@@ -14,7 +14,7 @@ The quality flag field consists of 32 bits. Every bit is related to the absence 
 .. csv-table::
    :file: table_flags.csv
    :class: longtable
-   :widths: 1 2 3 4 3
+   :widths: p{1cm} p{2cm} p{3cm} p{3cm} p{3cm}
    :header-rows: 1
 
 \* Flag applied for Land (L) and/or Water (W) network
