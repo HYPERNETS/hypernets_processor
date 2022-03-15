@@ -1,4 +1,4 @@
-Level,Network, Abbrevi-ated Name,Description,File Scope
+Level,Network, Abbreviated Name,Description,File Scope
 Ancillary,L and W,CDB,Instrument calibration and characterisation data,
 ,L and W,MET,"Instrument, system, site and component metadata file",
 0,L and W,RAD,Raw instrument data from radiance sensor,File per sequence

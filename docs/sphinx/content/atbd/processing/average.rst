@@ -14,10 +14,10 @@ Water Network
 
 The L1B data processing takes calibrated radiance and irradiance scans as input and computes the mean per series. For a standard water protocol the series are the following:
 
-   1. L1A irradiance scans taken at the start of the sequence (standard protocol requires minimum 3 scans, typically 10 are used),
-   2. L1A downwelling radiance following (1) (standard protocol requires minimum 3 scans, typically 10 are used),
-   3. L1A upwelling radiance scans (standard protocol requires minimum 6 scans, typically 10 are used), and finally,
-   4. L1A irradiance scans taken at the end of the sequence (standard protocol requires minimum 3 scans, typically 10 are used).
+   1. L1A irradiance scans taken at the start of the sequence (standard protocol requires minimum 3 scans),
+   2. L1A downwelling radiance following (1) (standard protocol requires minimum 3 scans),
+   3. L1A upwelling radiance scans (standard protocol requires minimum 6 scans), and finally,
+   4. L1A irradiance scans taken at the end of the sequence (standard protocol requires minimum 3 scans).
 
 The L1B output is an average per series excluding scans which did not pass the :ref:`quality`.
 
