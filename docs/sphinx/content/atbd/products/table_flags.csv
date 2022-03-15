@@ -6,8 +6,8 @@ Bit #,Symbol,Description,Comment, Application*
 5,lon_default,Missing longitude,When raised use default, L & W
 6,lat_default,Missing latitude,When raised use default, L & W
 7, outliers, Outliers and NaN, Scan masked if the spectrally integrated signal is more than 3 sigma/25% (whichever is largest) - process is repeated until convergance, L & W
-8, l0_thresholds,, L & W
-9, l0_discontinuity,, L & W
+8, l0_thresholds,, ,L & W
+9, l0_discontinuity,, ,L & W
 10, dark_outliers, Outliers and NaN , Same as for outliers (see 7), L & W
 11,angles_missing,Missing angles,, W
 12,lu_eq_missing,missing azimuthal equivalent for upwelling radiance ,, W
