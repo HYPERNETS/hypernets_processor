@@ -82,14 +82,14 @@ Table 2 defines the abbreviated name convention applicable to the individual Hyp
 
 Data level
 ----------
-The end-to-end prototype processor takes the data from acquisition (raw data) to application of calibration and quality controls, computation of correction factors (e.g., Fresnel correction for water processing), temporal interpolation to coincident timestamps, processing to surface reflectance and averaging per series. To account for all these steps different data levels have been defined (see Table 3). 
+The end-to-end prototype processor takes the data from acquisition (raw data) to application of calibration and quality controls, computation of correction factors (e.g., Fresnel correction for water processing), temporal interpolation to coincident timestamps, processing to surface reflectance and averaging per series. To account for all these steps different data levels have been defined (see Table 3). See :ref:`data_structure <../processing/data_structure>` for a detailed explanantion of the terminology used.
 
 **Table 3: List Hypernets Processor processing levels**
 
 .. csv-table::
    :file: table_datalevel.csv
    :class: longtable
-   :widths: 1 4 4 4
+   :widths: 1 1 4 4
    :header-rows: 1
 
 
@@ -100,9 +100,9 @@ Files are in netcdf CF-convention version 1.8 format. Detailed file format per d
 **Table 4: Hypernets products definition including level and abvreviated names used for the file conventions, main variables and file scope.**
 
 .. csv-table::
-   :file: table_datalevel.csv
+   :file: table_dataformat.csv
    :class: longtable
-   :widths: 1 4 4 4
+   :widths: 1 1 4 4 4
    :header-rows: 1
 
 
