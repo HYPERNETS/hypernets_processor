@@ -35,7 +35,6 @@ Links to each of the subsections can be found here:
 .. toctree::
    :maxdepth: 1
 
-   processing/data_structure
    processing/hypernets_reader
    processing/calibrate
    processing/average
