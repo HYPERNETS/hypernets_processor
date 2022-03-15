@@ -16,6 +16,7 @@ TBC - Sam/Clemence
    :maxdepth: 1
 
    products/product_files
+   products/data_structure
    products/SQL_databases 
    products/metadata 
    products/flags 
