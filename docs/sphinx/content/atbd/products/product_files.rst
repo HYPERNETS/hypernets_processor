@@ -82,7 +82,7 @@ Table 2 defines the abbreviated name convention applicable to the individual Hyp
 
 Data level
 ----------
-The end-to-end prototype processor takes the data from acquisition (raw data) to application of calibration and quality controls, computation of correction factors (e.g., Fresnel correction for water processing), temporal interpolation to coincident timestamps, processing to surface reflectance and averaging per series. To account for all these steps different data levels have been defined (see Table 3). See :ref:`data_structure <../processing/data_structure>` for a detailed explanantion of the terminology used.
+The end-to-end prototype processor takes the data from acquisition (raw data) to application of calibration and quality controls, computation of correction factors (e.g., Fresnel correction for water processing), temporal interpolation to coincident timestamps, processing to surface reflectance and averaging per series. To account for all these steps different data levels have been defined (see Table 3). See :ref:`data_structure` for a detailed explanantion of the terminology used.
 
 **Table 3: List Hypernets Processor processing levels**
 
