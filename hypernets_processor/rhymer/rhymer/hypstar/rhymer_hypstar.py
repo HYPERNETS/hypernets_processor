@@ -186,7 +186,7 @@ class RhymerHypstar:
             print(senz_lu)
             print(senz_lsky)
             for i in senz_lu:
-                    if np.round(i) < np.min(np.round(senz_lsky)) or np.round(i) > np.max(np.round(senz_lsky)):
+                if np.round(i) < np.min(np.round(senz_lsky)) or np.round(i) > np.max(np.round(senz_lsky)):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "fresnel_angle_missing")
                     ts = [datetime.utcfromtimestamp(x) for x in
