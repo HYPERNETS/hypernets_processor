@@ -121,6 +121,7 @@ class QualityChecks:
             noisestd,noiseavg = self.sigma_clip(intsig)
             mask[np.where(np.abs(intsig-noiseavg) >= k_unc*noisestd)] = 1
             mask[np.where(np.abs(intsig-noiseavg) >= 0.25*intsig)] = 1
+        print(mask)
         return mask
 
     def threshold_checks(self,data_subset):

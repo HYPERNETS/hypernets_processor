@@ -16,7 +16,7 @@ from hypernets_processor.data_io.dataset_util import DatasetUtil as du
 
 import numpy as np
 import math
-
+import sys
 
 class RhymerHypstar:
 
@@ -160,10 +160,12 @@ class RhymerHypstar:
             sena_lu=np.array([sena_lu[i] + 360 if sena_lu[i] < 0 else sena_lu[i] for i in range(0, len(sena_lu))])
             sena_lsky=np.array([sena_lsky[i] + 360 if sena_lsky[i] < 0 else sena_lsky[i] for i in range(0, len(sena_lsky))])
 
-            print(np.round(sena_lsky))
 
             for i in sena_lu:
-                if np.round(i) < np.min(sena_lsky) or np.round(i) > np.max(sena_lsky):
+                print(i)
+                print(np.min(sena_lsky))
+                print(np.max(sena_lsky))
+                if np.round(i) < np.min(np.round(sena_lsky)) or np.round(i) > np.max(np.round(sena_lsky)):
                 #if np.min(np.round(sena_lsky)) > np.round(i) or np.max(np.round(sena_lsky)) < np.round(i):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "lu_eq_missing")
@@ -181,8 +183,10 @@ class RhymerHypstar:
             # check if we have the required fresnel angle for lsky
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
+            print(senz_lu)
+            print(senz_lsky)
             for i in senz_lu:
-                if i not in senz_lsky:
+                    if np.round(i) < np.min(np.round(senz_lsky)) or np.round(i) > np.max(np.round(senz_lsky)):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "fresnel_angle_missing")
                     ts = [datetime.utcfromtimestamp(x) for x in
@@ -358,6 +362,10 @@ class RhymerHypstar:
         # irradiance wavelength to the radiance wavelength
         L1c_int = self.intp.interpolate_l1b_w(dataset_l1b,L1a_uprad, L1b_downrad, L1b_irr)
 
-        print(du.unpack_flags(L1c_int['quality_flag']))
+        import pandas as pd
+        pd.set_option('display.max_columns', None)  # or 1000
+        pd.set_option('display.max_rows', None)  # or 1000
+        pd.set_option('display.max_colwidth', -1)  # or 199
+        print(pd.DataFrame(du.unpack_flags(L1c_int['quality_flag']).to_dataframe()))
 
         return L1c_int
