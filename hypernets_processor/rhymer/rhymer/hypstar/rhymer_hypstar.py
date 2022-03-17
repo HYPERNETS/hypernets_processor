@@ -88,13 +88,13 @@ class RhymerHypstar:
                     # get flag value for the temporal variability
                     if measurandstring == 'irradiance':
                         flags[id] = 1
-                        dataset_l1b['quality_flag'][range(len(dataset_l1b['scan']))] = du.set_flag(
-                            dataset_l1b["quality_flag"][range(len(dataset_l1b['scan']))],
+                        dataset_l1b['quality_flag'][i] = du.set_flag(
+                            dataset_l1b["quality_flag"][i],
                             "temp_variability_ed")
                     else:
                         flags[id] = 1
-                        dataset_l1b['quality_flag'][range(len(dataset_l1b['scan']))] = du.set_flag(
-                            dataset_l1b["quality_flag"][range(len(dataset_l1b['scan']))],
+                        dataset_l1b['quality_flag'][i] = du.set_flag(
+                            dataset_l1b["quality_flag"][i],
                             "temp_variability_lu")
 
                     seq = dataset.attrs["sequence_id"]
@@ -104,6 +104,7 @@ class RhymerHypstar:
                         'Temporal jump: in {}:  Aquisition time {}, {}'.format(seq, ts, ', '.join(
                             ['{}:{}'.format(k, dataset[k][scans[i]].values) for k in ['scan', 'quality_flag']])))
                 id += 1
+
 
             return dataset_l1b, flags
 
@@ -158,12 +159,11 @@ class RhymerHypstar:
             sena_lsky = np.unique(lsky["viewing_azimuth_angle"].values)
             sena_lu=np.array([sena_lu[i] + 360 if sena_lu[i] < 0 else sena_lu[i] for i in range(0, len(sena_lu))])
             sena_lsky=np.array([sena_lsky[i] + 360 if sena_lsky[i] < 0 else sena_lsky[i] for i in range(0, len(sena_lsky))])
-            print(sena_lsky)
-            print(sena_lu)
-            print(du.unpack_flags(lu['quality_flag']))
+
+            print(np.round(sena_lsky))
 
             for i in sena_lu:
-                if np.round(i) not in np.round(sena_lsky):
+                if np.round(i) < np.min(sena_lsky) or np.round(i) > np.max(sena_lsky):
                 #if np.min(np.round(sena_lsky)) > np.round(i) or np.max(np.round(sena_lsky)) < np.round(i):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "lu_eq_missing")
@@ -357,4 +357,7 @@ class RhymerHypstar:
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the
         # irradiance wavelength to the radiance wavelength
         L1c_int = self.intp.interpolate_l1b_w(dataset_l1b,L1a_uprad, L1b_downrad, L1b_irr)
+
+        print(du.unpack_flags(L1c_int['quality_flag']))
+
         return L1c_int
