@@ -18,8 +18,7 @@ uncertainties for all automated sequences measured by the network, and make thes
 The **hypernets_processor** produces various products ranging from L0 (raw data in NetCDF format) to L2A (reflectance products), 
 with various intermediate products (L1A, L1b, L1c). For a full description of the data products see :ref:`products`.
 
-In the following subsections, we will first discuss the data structure and some of the key terminology for the HYPERNETS data. 
-Next, we will discuss the processing that is performed at each processing stage. 
+In the following subsections, we will first discuss the processing that is performed at each processing stage. 
 In the L0 processing, the HYPERNETS data is read in from the spe files together with metadata. 
 The L1A stage consists of calibrating each of the scans and performing quality checks. 
 The next stage (L1B) consists of averaging the scans per series (and combining VNIR and SWIR ranges for the land network). 
