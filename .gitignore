@@ -20,5 +20,5 @@ docs/sphinx/content/API
 /hypernets_processor/data_utils/average.py
 /hypernets_processor/etc/job_CG.config
 /hypernets_processor/etc/jobs.txt
-/hypernets_processor/etc/processor.config
+/hypernets_processor/etc/processor_real.config
 /hypernets_processor/etc/scheduler.config

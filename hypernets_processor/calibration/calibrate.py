@@ -46,7 +46,7 @@ class Calibrate:
         input_vars = calibrate_function.get_argument_names()
 
         dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
-        print("preprocessing done")
+        self.context.logger.info("preprocessing done")
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0, swir)
 
         input_qty = self.prop.find_input_l1a(input_vars, dataset_l0, calibration_data)

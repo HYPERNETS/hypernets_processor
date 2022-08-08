@@ -1,5 +1,0 @@
-/home/cgoyens/.hypernets/BSBEtest.config
-/home/cgoyens/.hypernets/BSBEtest.config
-/home/cgoyens/.hypernets/BSBE20210928.config
-/home/cgoyens/.hypernets/BSBE20210928.config
-/home/cgoyens/.hypernets/BSBE20210928.config
