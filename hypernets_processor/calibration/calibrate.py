@@ -102,7 +102,8 @@ class Calibrate:
         dataset_l0_masked, dataset_l0_bla_masked = self.preprocess_l0(
             dataset_l0, dataset_l0_bla, calibration_data
         )
-        print("preprocessing done")
+
+        self.context.logger.info("preprocessing done")
 
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(
             measurandstring, dataset_l0_masked, swir

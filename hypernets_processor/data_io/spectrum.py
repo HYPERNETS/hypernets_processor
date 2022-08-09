@@ -115,8 +115,8 @@ class Spectrum:
 			for i in range(self.header.pixel_count-1):
 				f.write('{}\t{}\n'.format(i, self.body[i]))
 
-	def print_header(self):
-		(print('Dataset length: {} bytes\n'
+	def return_header(self):
+		return ('Dataset length: {} bytes\n'
 		 'Timestamp: {} ms\n'
 		 'CRC32: {} \n'
 		 'Entrance: {}\n'
@@ -135,7 +135,7 @@ class Spectrum:
 									self.header.accel_stats.mean_y,
 									self.header.accel_stats.std_y,
 									self.header.accel_stats.mean_z,
-									self.header.accel_stats.std_z)))
+									self.header.accel_stats.std_z))
 
 	@classmethod
 	def parse_raw(cls, data, save_raw=False, slot=0):

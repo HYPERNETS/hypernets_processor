@@ -25,33 +25,72 @@ class Average:
         self.writer=HypernetsWriter(context)
 
 
-    def average_l1b(self, measurandstring, dataset_l1a):
+    def average_l1b(self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data):
+        """
 
+        :param measurandstring:
+        :type measurandstring:
+        :param dataset_l0:
+        :type dataset_l0:
+        :param dataset_l0_bla:
+        :type dataset_l0_bla:
+        :param calibration_data:
+        :type calibration_data:
+        :return:
+        :rtype:
+        """
         if self.context.get_config_value("network") == "w":
-            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
         else:
-            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l0)
 
         if self.context.get_config_value("network") == "l":
-            flags=["outliers"]
+            flags = ["outliers"]
         else:
             flags = ["outliers"]
 
-        dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring,flags)
+        calibrate_function = self._measurement_function_factory.get_measurement_function(
+            self.context.get_config_value("measurement_function_calibrate"))
+        input_vars = calibrate_function.get_argument_names()
 
-        dataset_l1b["u_rel_random_" + measurandstring].values = self.calc_mean_masked(\
-            dataset_l1a,"u_rel_random_" + measurandstring,flags,rand_unc=True)
-        dataset_l1b["u_rel_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
-        (dataset_l1a,"u_rel_systematic_indep_"+measurandstring,flags)
-        dataset_l1b["u_rel_systematic_corr_rad_irr_"+measurandstring].values = self.calc_mean_masked\
-        (dataset_l1a,"u_rel_systematic_corr_rad_irr_"+measurandstring,flags)
+        input_qty = []
+        u_random_input_qty = []
+        for var in input_vars:
+            if var=="dark_signal":
+                meanvar=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
+                input_qty.append(meanvar)
+                u_random_input_qty.append(self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)*meanvar)
+            elif var=="integration_time":
+                input_qty.append(self.calc_mean_masked(dataset_l0,var,flags))
+                u_random_input_qty.append(None)
+            else:
+                try:
+                    meanvar=self.calc_mean_masked(dataset_l0, var,flags)
+                    input_qty.append(meanvar)
+                except:
+                    meanvar=calibration_data[var].values.astype("float32")
+                    input_qty.append(meanvar)
+                try:
+                    u_random_input_qty.append(self.calc_mean_masked(dataset_l0, "u_rel_random_" + var,flags,rand_unc=True)*meanvar)
+                except:
+                    try:
+                        u_random_input_qty.append((calibration_data["u_rel_random_"+var].values*
+                                                   calibration_data[var].values).astype("float32"))
+                    except:
+                        u_random_input_qty.append(None)
 
-        dataset_l1b["corr_random_" + measurandstring].values = np.eye(
-                len(dataset_l1b["u_rel_random_" + measurandstring].values))
-        dataset_l1b["corr_systematic_indep_"+measurandstring].values = \
-                dataset_l1a["corr_systematic_indep_"+measurandstring].values
-        dataset_l1b["corr_systematic_corr_rad_irr_"+measurandstring].values = \
-                dataset_l1a["corr_systematic_corr_rad_irr_"+measurandstring].values
+        u_systematic_input_qty_indep,u_systematic_input_qty_corr,\
+        corr_systematic_input_qty_indep,corr_systematic_input_qty_corr = self.prop.find_u_systematic_input_l1a(input_vars, dataset_l0, calibration_data)
+
+        dataset_l1b = self.prop.process_measurement_function_l1a(measurandstring,
+                                                                 dataset_l1b,
+                                                                 calibrate_function.function,
+                                                                 input_qty,
+                                                                 u_random_input_qty,
+                                                                 u_systematic_input_qty_indep,
+                                                                 u_systematic_input_qty_corr,
+                                                                 corr_systematic_input_qty_indep,
+                                                                 corr_systematic_input_qty_corr)
 
         return dataset_l1b
 

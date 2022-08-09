@@ -407,18 +407,17 @@ class HypernetsReader:
                     chunk_size = 1
                     chunk_counter = 1
                     while file_size - byte_pointer:
-                        # self.context.logger.debug(
-                        #     "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
-                        #         chunk_counter, chunk_size, file_size - byte_pointer
-                        #     )
-                        # )
+                        self.context.logger.debug(
+                            "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
+                                chunk_counter, chunk_size, file_size - byte_pointer
+                            )
+                        )
                         chunk_size = unpack("<H", f.read(2))[0]
                         if chunk_size == 4119:
                             chunk_size = 4131
                         f.seek(byte_pointer)
                         chunk_body = f.read(chunk_size)
                         spectrum = Spectrum.parse_raw(chunk_body)
-                        # spectrum.print_header()
                         if len(spectrum.body) > 500:
                             spectrum_vnir = spectrum
                             if len(vnir) == 0:
@@ -440,8 +439,10 @@ class HypernetsReader:
                 swir = np.vstack([swir, np.nan*np.array(spectrum_swir.body)])
                 continue
 
-        spectrum_vnir.print_header()
-        spectrum.print_header()
+        self.context.logger.info(
+            spectrum_vnir.return_header(),
+            spectrum.return_header()
+        )
 
         if len(vnir.shape) == 1:
             vnir = vnir[None, :]
