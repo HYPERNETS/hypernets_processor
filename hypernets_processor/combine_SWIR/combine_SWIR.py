@@ -88,7 +88,10 @@ class CombineSWIR:
             self.writer.write(dataset_l1b_comb, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
 
         if self.context.get_config_value("plot_l1b"):
-            self.plot.plot_series_in_sequence(measurandstring,dataset_l1b_comb)
+            self.plot.plot_series_in_sequence(measurandstring, dataset_l1b_comb)
+            if measurandstring=="radiance":
+                self.plot.plot_series_in_sequence_vaa(measurandstring, dataset_l1b_comb, 98)
+                self.plot.plot_series_in_sequence_vza(measurandstring, dataset_l1b_comb, 30)
 
         if self.context.get_config_value("plot_uncertainty"):
             self.plot.plot_relative_uncertainty(measurandstring,dataset_l1b_comb)
