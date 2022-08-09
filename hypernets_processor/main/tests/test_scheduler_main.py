@@ -31,6 +31,7 @@ SCHEDULE_CONFIG_DICT = {"minutes": 3,
 
 SCHEDULE_LOG_DICT = {"path": None,
                      "verbose": False,
+                     "trace": False,
                      "quiet": False}
 
 JOBS_LIST = ["job1.config", "job2.config"]

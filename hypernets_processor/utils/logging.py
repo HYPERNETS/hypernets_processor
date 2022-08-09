@@ -23,7 +23,7 @@ __status__ = "Development"
 loggers = {}
 
 
-def configure_logging(fname=None, verbose=None, quiet=None, config=None, name=None):
+def configure_logging(fname=None, verbose=None, trace=None, quiet=None, config=None, name=None):
     """
     Configure logger
 
@@ -55,6 +55,7 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None, name=No
     if config is not None:
         fname = get_config_value(config, "Log", "log_path", dtype=str)
         verbose = get_config_value(config, "Log", "verbose", dtype=bool)
+        trace = get_config_value(config, "Log", "trace", dtype=bool)
         quiet = get_config_value(config, "Log", "quiet", dtype=bool)
 
     # Configure logger
@@ -66,6 +67,8 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None, name=No
     # Define verboseness levels
     if verbose:
         logger.setLevel(logging.DEBUG)
+    elif trace:
+        logger.setLevel(logging.TRACE)
     elif quiet:
         logger.setLevel(logging.WARNING)
     else:

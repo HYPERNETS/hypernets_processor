@@ -123,7 +123,10 @@ def cli():
     if parsed_args.verbose is not None:
         job_config["Log"]["verbose"] = str(parsed_args.verbose)
 
-    if parsed_args.verbose is not None:
+    if parsed_args.trace is not None:
+        job_config["Log"]["trace"] = str(parsed_args.trace)
+
+    if parsed_args.quiet is not None:
         job_config["Log"]["quiet"] = str(parsed_args.quiet)
 
     # run main
