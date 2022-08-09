@@ -635,8 +635,7 @@ class HypernetsReader:
 
         return ds, ds_swir
 
-        def set_series_params(self,ds,model,scan_number,vaa,vza,acquisitionTime,lat,lon,specattr,flag):
-
+    def set_series_params(self,ds,model,scan_number,vaa,vza,acquisitionTime,lat,lon,specattr,flag):
         series_id = model["series_id"]
         ds["series_id"][scan_number] = series_id
         ds["viewing_azimuth_angle"][scan_number] = vaa
@@ -679,6 +678,7 @@ class HypernetsReader:
             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
                 float(lat), float(lon), acquisitionTime
             )
+
         else:
             self.context.logger.error(
                 "Lattitude is not found, using default values instead for lat, lon, sza and saa."
@@ -690,7 +690,6 @@ class HypernetsReader:
         ds["viewing_zenith_angle"][scan_number] = vza
 
     def read_metadata(self, seq_dir):
-
         model_name = self.model
         flag = 0
         #     Spectra name : AA_BBB_CCCC_D_EEEE_FFF_GG_HHHH_II_JJJJ.spe
