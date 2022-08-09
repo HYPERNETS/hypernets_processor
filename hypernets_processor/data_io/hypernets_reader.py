@@ -351,8 +351,20 @@ class HypernetsReader:
 
         return ds
 
-    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir,
-                      instrument_id, site_id):
+    def read_series_L(
+            self,
+            seq_dir,
+            series,
+            lat,
+            lon,
+            metadata,
+            flag,
+            fileformat,
+            cal_data,
+            cal_data_swir,
+            instrument_id,
+            site_id,
+    ):
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         model_name = self.model
 
@@ -361,60 +373,85 @@ class HypernetsReader:
         swir = []
         for spectra in series:
             self.context.logger.debug("processing " + spectra)
-            model = dict(zip(model_name, spectra.split('_')[:-1]))
-            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + \
-                        model['azimuth_ref'] + '_' + model['vza']
+            model = dict(zip(model_name, spectra.split("_")[:-1]))
+            specBlock = (
+                    model["series_rep"]
+                    + "_"
+                    + model["series_id"]
+                    + "_"
+                    + model["vaa"]
+                    + "_"
+                    + model["azimuth_ref"]
+                    + "_"
+                    + model["vza"]
+            )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
-            vaa, vza = map(float, specattr['pt_abs'].split(";"))
+            vaa, vza = map(float, specattr["pt_abs"].split(";"))
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
-            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC",
-                                                         '%Y%m%dT%H%M%S%Z')
+            acquisitionTime = datetime.datetime.strptime(
+                acquisitionTime + "UTC", "%Y%m%dT%H%M%S%Z"
+            )
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             # -----------------------
             # read the file
             # -----------------------
-            with open(FOLDER_NAME + spectra, "rb") as f:
-                f.seek(0, 2)
-                file_size = f.tell()
-                f.seek(0)
-                byte_pointer = 0
-                chunk_size = 1
-                chunk_counter = 1
-                while file_size - byte_pointer:
-                    self.context.logger.debug('Parsing chunk No {}, size {} bytes, bytes left: {}'.format(
-                        chunk_counter, chunk_size, file_size - byte_pointer))
-                    chunk_size = unpack('<H', f.read(2))[0]
-                    if chunk_size == 4119:
-                        chunk_size = 4131
-                    f.seek(byte_pointer)
-                    chunk_body = f.read(chunk_size)
-                    spectrum = Spectrum.parse_raw(chunk_body)
-                    # spectrum.print_header()
-                    if len(spectrum.body) > 500:
-                        if len(vnir) == 0:
-                            vnir = np.array(spectrum.body)
+            try:
+                with open(FOLDER_NAME + spectra, "rb") as f:
+                    f.seek(0, 2)
+                    file_size = f.tell()
+                    f.seek(0)
+                    byte_pointer = 0
+                    chunk_size = 1
+                    chunk_counter = 1
+                    while file_size - byte_pointer:
+                        self.context.logger.debug(
+                            "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
+                                chunk_counter, chunk_size, file_size - byte_pointer
+                            )
+                        )
+                        chunk_size = unpack("<H", f.read(2))[0]
+                        if chunk_size == 4119:
+                            chunk_size = 4131
+                        f.seek(byte_pointer)
+                        chunk_body = f.read(chunk_size)
+                        spectrum = Spectrum.parse_raw(chunk_body)
+                        # spectrum.print_header()
+                        if len(spectrum.body) > 500:
+                            spectrum_vnir = spectrum
+                            if len(vnir) == 0:
+                                vnir = np.array(spectrum_vnir.body)
+                            else:
+                                vnir = np.vstack([vnir, spectrum_vnir.body])
                         else:
-                            vnir = np.vstack([vnir, spectrum.body])
-                    else:
-                        if len(swir) == 0:
-                            swir = np.array(spectrum.body)
-                        else:
-                            swir = np.vstack([swir, spectrum.body])
+                            spectrum_swir = spectrum
+                            if len(swir) == 0:
+                                swir = np.array(spectrum_swir.body)
+                            else:
+                                swir = np.vstack([swir, spectrum_swir.body])
 
-                    byte_pointer = f.tell()
-                    chunk_counter += 1
+                        byte_pointer = f.tell()
+                        chunk_counter += 1
+            except:
+                print(spectra,"not found")
+                vnir = np.vstack([vnir, np.nan*np.array(spectrum_vnir.body)])
+                swir = np.vstack([swir, np.nan*np.array(spectrum_swir.body)])
+                continue
+
+        spectrum_vnir.print_header()
+        spectrum.print_header()
 
         if len(vnir.shape) == 1:
             vnir = vnir[None, :]
         if len(swir.shape) == 1:
             swir = swir[None, :]
 
-        self.context.logger.debug("vnir data shape in combined raw files: %s \n "
-                                  "swir data shape in combined raw files: %s"
-                                  % (vnir.shape, swir.shape))
+        self.context.logger.debug(
+            "vnir data shape in combined raw files: %s \n "
+            "swir data shape in combined raw files: %s" % (vnir.shape, swir.shape)
+        )
 
         scanDim = vnir.shape[0]
         wvl = self.read_wavelength(vnir.shape[1], cal_data)
@@ -427,7 +464,9 @@ class HypernetsReader:
 
         scanDim = swir.shape[0]
         wvl_swir = self.read_wavelength(swir.shape[1], cal_data_swir)
-        ds_swir = self.templ.l0_template_dataset(wvl_swir, scanDim, fileformat, swir=True)
+        ds_swir = self.templ.l0_template_dataset(
+            wvl_swir, scanDim, fileformat, swir=True
+        )
 
         ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds_swir.attrs["instrument_id"] = str(instrument_id)
@@ -437,190 +476,218 @@ class HypernetsReader:
         scan_number = 0
         scan_number_swir = 0
         for spectra in series:
-            model = dict(zip(model_name, spectra.split('_')[:-1]))
-            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model[
-                'vaa'] + '_' + model['azimuth_ref'] + '_' + model['vza']
+            model = dict(zip(model_name, spectra.split("_")[:-1]))
+            specBlock = (
+                    model["series_rep"]
+                    + "_"
+                    + model["series_id"]
+                    + "_"
+                    + model["vaa"]
+                    + "_"
+                    + model["azimuth_ref"]
+                    + "_"
+                    + model["vza"]
+            )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
             acquisitionTime = datetime.datetime.strptime(
-                acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+                acquisitionTime + "UTC", "%Y%m%dT%H%M%S%Z"
+            )
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             # -----------------------
             # read the file
             # -----------------------
-            with open(FOLDER_NAME + spectra, "rb") as f:
-                f.seek(0, 2)
-                file_size = f.tell()
-                f.seek(0)
-                byte_pointer = 0
-                chunk_size = 1
-                chunk_counter = 1
-                while file_size - byte_pointer:
-                    chunk_size = unpack('<H', f.read(2))[0]
-                    if chunk_size == 4119:
-                        chunk_size = 4131
-                    f.seek(byte_pointer)
-                    chunk_body = f.read(chunk_size)
-                    spectrum = Spectrum.parse_raw(chunk_body)
-                    # spectrum.print_header()
-                    if len(spectrum.body) > 500:
-                        scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                        # HypernetsReader(self.context).plot_spectra(spectra, scan)
+            try:
+                with open(FOLDER_NAME + spectra, "rb") as f:
+                    f.seek(0, 2)
+                    file_size = f.tell()
+                    f.seek(0)
+                    byte_pointer = 0
+                    chunk_size = 1
+                    chunk_counter = 1
+                    while file_size - byte_pointer:
+                        chunk_size = unpack("<H", f.read(2))[0]
+                        if chunk_size == 4119:
+                            chunk_size = 4131
+                        f.seek(byte_pointer)
+                        chunk_body = f.read(chunk_size)
+                        spectrum = Spectrum.parse_raw(chunk_body)
+                        if len(spectrum.body) > 500:
+                            scan = (
+                                spectrum.body
+                            )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                        # fill in dataset  # maybe xarray has a better way to do - check merge, concat, ...
+                            # HypernetsReader(self.context).plot_spectra(spectra, scan)
 
-                        series_id = model['series_id']
-                        ds["series_id"][scan_number] = series_id
-                        ds["viewing_azimuth_angle"][scan_number] = vaa
-                        ds["viewing_zenith_angle"][scan_number] = vza
+                            # fill in dataset  # maybe xarray has a better way to do - check merge, concat, ...
 
-                        # estimate time based on timestamp
-                        ds["acquisition_time"][
-                            scan_number] = datetime.datetime.timestamp(acquisitionTime)
-                        if lat is not None:
-                            ds.attrs["site_latitude"] = lat
-                            ds.attrs["site_longitude"] = lon
-                            ds["solar_zenith_angle"][scan_number] = 90-get_altitude(
-                                float(lat),float(lon),acquisitionTime)
-                            ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                                float(lat),float(lon),acquisitionTime)
-                            vaa,vza = map(float,specattr['pt_ask'].split(";"))
-                            if vza==-1 and vaa==-1:
-                                self.context.logger.warning(
-                                    "vza and vaa are both -1, using pt_abs instead")
-                                vaa,vza = map(float,specattr['pt_abs'].split(";"))
-                            if vza>180:
-                                self.context.logger.debug(
-                                    "vza is larger than 90degrees, changing to equivalent geometry with vza<90.")
-                                vza=360-vza
-                                vaa=vaa+180
 
-                            ds.attrs["site_latitude"] = lat
-                            ds.attrs["site_longitude"] = lon
-                            ds["solar_zenith_angle"][
-                                scan_number] = 90-get_altitude(float(lat),
-                                float(lon),acquisitionTime)
-                            ds["solar_azimuth_angle"][
-                                scan_number] = get_azimuth(float(lat),float(lon),
-                                acquisitionTime)
+                            ds["integration_time"][
+                                scan_number
+                            ] = spectrum.header.exposure_time
+                            ds["temperature"][scan_number] = spectrum.header.temperature
+
+                            # accelaration:
+                            # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
+                            # acceleration measurements respectively. These are factory-calibrated steady-state
+                            # reference acceleration measurements of the gravity vector when instrument is in
+                            # horizontal position. Due to device manufacturing tolerances, these are
+                            # device-specific and should be applied, when estimating tilt from the measured
+                            # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
+                            # Acceleration for each axis can be calculated per Eq. (4).
+
+                            a = 19.6
+                            b = 2 ** 15
+                            ds["acceleration_x_mean"][scan_number] = (
+                                    spectrum.header.accel_stats.mean_x * a / b
+                            )
+                            ds["acceleration_x_std"][scan_number] = (
+                                    spectrum.header.accel_stats.std_x * a / b
+                            )
+                            ds["acceleration_y_mean"][scan_number] = (
+                                    spectrum.header.accel_stats.mean_y * a / b
+                            )
+                            ds["acceleration_y_std"][scan_number] = (
+                                    spectrum.header.accel_stats.std_y * a / b
+                            )
+                            ds["acceleration_z_mean"][scan_number] = (
+                                    spectrum.header.accel_stats.mean_z * a / b
+                            )
+                            ds["acceleration_z_std"][scan_number] = (
+                                    spectrum.header.accel_stats.std_z * a / b
+                            )
+                            ds["digital_number"][:, scan_number] = scan
+
+                            self.set_series_params(ds,model,scan_number,vaa,vza,acquisitionTime,lat,lon,specattr,flag)
+
+                            scan_number += 1
                         else:
-                            self.context.logger.error(
-                                "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
-                        ds['quality_flag'][scan_number] = flag
-                        ds['integration_time'][
-                            scan_number] = spectrum.header.exposure_time
-                        ds['temperature'][scan_number] = spectrum.header.temperature
+                            scan = (
+                                spectrum.body
+                            )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                        ds["viewing_azimuth_angle"][scan_number] = vaa
-                        ds["viewing_zenith_angle"][scan_number] = vza
+                            # HypernetsReader(self.context).plot_spectra(spectra, scan)
 
-                        # accelaration:
-                        # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
-                        # acceleration measurements respectively. These are factory-calibrated steady-state
-                        # reference acceleration measurements of the gravity vector when instrument is in
-                        # horizontal position. Due to device manufacturing tolerances, these are
-                        # device-specific and should be applied, when estimating tilt from the measured
-                        # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
-                        # Acceleration for each axis can be calculated per Eq. (4).
+                            # fill in dataset  # maybe xarray has a better way to do - check merge, concat, ...
 
-                        a = 19.6
-                        b = 2 ** 15
-                        ds['acceleration_x_mean'][scan_number] = spectrum.header.accel_stats.mean_x * a / b
-                        ds['acceleration_x_std'][scan_number] = spectrum.header.accel_stats.std_x * a / b
-                        ds['acceleration_y_mean'][scan_number] = spectrum.header.accel_stats.mean_y * a / b
-                        ds['acceleration_y_std'][scan_number] = spectrum.header.accel_stats.std_y * a / b
-                        ds['acceleration_z_mean'][scan_number] = spectrum.header.accel_stats.mean_z * a / b
-                        ds['acceleration_z_std'][scan_number] = spectrum.header.accel_stats.std_z * a / b
-                        ds['digital_number'][:, scan_number] = scan
-                        scan_number += 1
-                    else:
-                        scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                        # HypernetsReader(self.context).plot_spectra(spectra, scan)
+                            if spectrum.header.exposure_time > 0:
+                                ds_swir["integration_time"][
+                                    scan_number_swir
+                                ] = spectrum.header.exposure_time
+                            else:
+                                ds_swir["integration_time"][scan_number_swir] = ds[
+                                    "integration_time"
+                                ][0]
+                            ds_swir["temperature"][
+                                scan_number_swir
+                            ] = spectrum.header.temperature
 
-                        # fill in dataset  # maybe xarray has a better way to do - check merge, concat, ...
 
-                        series_id = model['series_id']
-                        ds_swir["series_id"][scan_number_swir] = series_id
-                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = vaa
-                        ds_swir["viewing_zenith_angle"][scan_number_swir] = vza
+                            # accelaration:
+                            # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
+                            # acceleration measurements respectively. These are factory-calibrated steady-state
+                            # reference acceleration measurements of the gravity vector when instrument is in
+                            # horizontal position. Due to device manufacturing tolerances, these are
+                            # device-specific and should be applied, when estimating tilt from the measured
+                            # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
+                            # Acceleration for each axis can be calculated per Eq. (4).
 
-                        # estimate time based on timestamp
-                        ds_swir["acquisition_time"][
-                            scan_number_swir] = datetime.datetime.timestamp(acquisitionTime)
-                        #            #print(datetime.fromtimestamp(acquisitionTime))
+                            a = 19.6
+                            b = 2 ** 15
+                            ds_swir["acceleration_x_mean"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.mean_x * a / b
+                            )
+                            ds_swir["acceleration_x_std"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.std_x * a / b
+                            )
+                            ds_swir["acceleration_y_mean"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.mean_y * a / b
+                            )
+                            ds_swir["acceleration_y_std"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.std_y * a / b
+                            )
+                            ds_swir["acceleration_z_mean"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.mean_z * a / b
+                            )
+                            ds_swir["acceleration_z_std"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.std_z * a / b
+                            )
+                            ds_swir["digital_number"][:, scan_number_swir] = scan
 
-                        #             # didn't use acquisition time from instrument
-                        #             # possibility that acquisition time is time since reboot, but how to now reboot time?
-                        #             # if we use the metadata time header
-                        #             timestamp=header['acquisition_time']
-                        #             ts = int(timestamp)/1000
+                            self.set_series_params(ds_swir,model,scan_number_swir,vaa,vza,acquisitionTime,lat,lon,specattr,flag)
 
-                        #             date_time_str = timereboot+'UTC'
-                        #             print(date_time_str)
-                        #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
-                        #             print(date_time_obj)
+                            scan_number_swir += 1
 
-                        #             timereboot = datetime.timestamp(date_time_obj)
-                        #             print("timereboot =", timereboot)
-                        #             print(datetime.fromtimestamp(timereboot))
+                        byte_pointer = f.tell()
+                        chunk_counter += 1
+            except:
+                self.set_series_params(ds_swir,model,scan_number_swir,vaa,vza,acquisitionTime,lat,lon,specattr,flag)
+                self.set_series_params(ds,model,scan_number,vaa,vza,acquisitionTime,lat,lon,specattr,flag)
 
-                        #             print(datetime.fromtimestamp(int(ts+timereboot)))
-                        #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
-                        if lat is not None:
-                            ds_swir.attrs["site_latitude"] = lat
-                            ds_swir.attrs["site_longitude"] = lon
-                            ds_swir["solar_zenith_angle"][scan_number_swir] = 90-get_altitude(
-                                float(lat),float(lon),acquisitionTime)
-                            ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
-                                float(lat),float(lon),acquisitionTime)
-                            vaa,vza = map(float,specattr['pt_ask'].split(";"))
-                            # vaa = ((ds_swir["solar_azimuth_angle"][
-                            #             scan_number_swir]+vaa_rel)/360-int(
-                            #     ds_swir["solar_azimuth_angle"][scan_number_swir]+vaa_rel))/360
-                        else:
-                            self.context.logger.error(
-                                "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
-                        ds_swir['quality_flag'][scan_number_swir] = flag
-                        if spectrum.header.exposure_time>0:
-                            ds_swir['integration_time'][
-                            scan_number_swir] = spectrum.header.exposure_time
-                        else:
-                            ds_swir['integration_time'][
-                                scan_number_swir] = ds['integration_time'][0]
-                        ds_swir['temperature'][scan_number_swir] = spectrum.header.temperature
-
-                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = vaa
-                        ds_swir["viewing_zenith_angle"][scan_number_swir] = vza
-
-                        # accelaration:
-                        # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
-                        # acceleration measurements respectively. These are factory-calibrated steady-state
-                        # reference acceleration measurements of the gravity vector when instrument is in
-                        # horizontal position. Due to device manufacturing tolerances, these are
-                        # device-specific and should be applied, when estimating tilt from the measured
-                        # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
-                        # Acceleration for each axis can be calculated per Eq. (4).
-
-                        a = 19.6
-                        b = 2 ** 15
-                        ds_swir['acceleration_x_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_x * a / b
-                        ds_swir['acceleration_x_std'][scan_number_swir] = spectrum.header.accel_stats.std_x * a / b
-                        ds_swir['acceleration_y_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_y * a / b
-                        ds_swir['acceleration_y_std'][scan_number_swir] = spectrum.header.accel_stats.std_y * a / b
-                        ds_swir['acceleration_z_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_z * a / b
-                        ds_swir['acceleration_z_std'][scan_number_swir] = spectrum.header.accel_stats.std_z * a / b
-                        ds_swir['digital_number'][:, scan_number_swir] = scan
-                        scan_number_swir += 1
-
-                    byte_pointer = f.tell()
-                    chunk_counter += 1
+                scan_number += 1
+                scan_number_swir += 1
+                continue
 
         return ds, ds_swir
+
+        def set_series_params(self,ds,model,scan_number,vaa,vza,acquisitionTime,lat,lon,specattr,flag):
+
+        series_id = model["series_id"]
+        ds["series_id"][scan_number] = series_id
+        ds["viewing_azimuth_angle"][scan_number] = vaa
+        ds["viewing_zenith_angle"][scan_number] = vza
+
+        # estimate time based on timestamp
+        ds["acquisition_time"][
+            scan_number
+        ] = datetime.datetime.timestamp(acquisitionTime)
+        if lat is not None:
+            ds.attrs["site_latitude"] = lat
+            ds.attrs["site_longitude"] = lon
+            ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
+                float(lat), float(lon), acquisitionTime
+            )
+            ds["solar_azimuth_angle"][scan_number] = get_azimuth(
+                float(lat), float(lon), acquisitionTime
+            )
+            vaa, vza = map(float, specattr["pt_ask"].split(";"))
+            if vza == -1 and vaa == -1:
+                self.context.logger.warning(
+                    "vza and vaa are both -1, using pt_abs instead"
+                )
+                vaa, vza = map(float, specattr["pt_abs"].split(";"))
+            if vza > 180:
+                self.context.logger.debug(
+                    "vza is larger than 90degrees, changing to equivalent geometry with vza<90."
+                )
+                vza = 360 - vza
+                vaa = vaa + 180
+
+            if vaa>360:
+                vaa = vaa - 360
+
+            ds.attrs["site_latitude"] = lat
+            ds.attrs["site_longitude"] = lon
+            ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
+                float(lat), float(lon), acquisitionTime
+            )
+            ds["solar_azimuth_angle"][scan_number] = get_azimuth(
+                float(lat), float(lon), acquisitionTime
+            )
+        else:
+            self.context.logger.error(
+                "Lattitude is not found, using default values instead for lat, lon, sza and saa."
+            )
+        ds["quality_flag"][scan_number] = flag
+
+
+        ds["viewing_azimuth_angle"][scan_number] = vaa
+        ds["viewing_zenith_angle"][scan_number] = vza
 
     def read_metadata(self, seq_dir):
 
