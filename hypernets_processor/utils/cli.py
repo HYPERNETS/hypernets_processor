@@ -35,9 +35,6 @@ def configure_std_parser(description=None):
     logging_options.add_argument("--verbose", action="store_true",
                                  help="Option for verbose output")
 
-    logging_options.add_argument("--trace", action="store_true",
-                                 help="Option for output with full trace for debugging")
-
     logging_options.add_argument("--quiet", action="store_true",
                                  help="Option for quiet output")
 

@@ -440,7 +440,7 @@ class HypernetsReader:
                 continue
 
         self.context.logger.info(
-            spectrum_vnir.return_header(),
+            spectrum_vnir.return_header()
             spectrum.return_header()
         )
 
