@@ -6,6 +6,9 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
+from hypernets_processor.calibration.measurement_functions.measurement_function_factory import\
+    MeasurementFunctionFactory
+from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 
 import numpy as np
 
@@ -23,6 +26,8 @@ class Average:
         self.templ = DataTemplates(context=context)
         self.context = context
         self.writer=HypernetsWriter(context)
+        self._measurement_function_factory = MeasurementFunctionFactory()
+        self.prop = PropagateUnc(context, parallel_cores=0)
 
 
     def average_l1b(self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data):
@@ -123,7 +128,23 @@ class Average:
         return dataset_l2a
 
     def calc_mean_masked(self, dataset, var, flags, rand_unc=False, corr=False):
+        """
+
+        :param dataset:
+        :type dataset:
+        :param var:
+        :type var:
+        :param flags:
+        :type flags:
+        :param rand_unc:
+        :type rand_unc:
+        :param corr:
+        :type corr:
+        :return:
+        :rtype:
+        """
         series_id = np.unique(dataset['series_id'])
+        vals=dataset[var].values
         if corr:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
@@ -133,10 +154,24 @@ class Average:
                      flags],axis=0)
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
-                out[i] = np.mean(dataset[var].values[:,:,ids],axis=3)[:,:,0]
+                out[i] = np.mean(vals[:,:,ids],axis=3)[:,:,0]
 
             out = np.mean(out, axis=0)
 
+        elif vals.ndim==1:
+            out = np.empty((len(series_id),))
+
+            for i in range(len(series_id)):
+                flagged = np.any(
+                    [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
+                     flags],axis=0)
+                ids = np.where(
+                    (dataset['series_id'] == series_id[i]) & (flagged == False))
+                out[i] = np.mean(dataset[var].values[ids])
+
+                if rand_unc:
+                    out[i] = np.mean(dataset[var].values[ids])/len(
+                        ids[0])
         else:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
 

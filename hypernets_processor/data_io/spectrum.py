@@ -116,26 +116,30 @@ class Spectrum:
 				f.write('{}\t{}\n'.format(i, self.body[i]))
 
 	def return_header(self):
-		return ('Dataset length: {} bytes\n'
-		 'Timestamp: {} ms\n'
-		 'CRC32: {} \n'
-		 'Entrance: {}\n'
+		return (
+		 #'Dataset length: {} bytes\n'
+		 #'Timestamp: {} ms\n'
+		 #'CRC32: {} \n'
+		 'Entrance: {}\t'
 		 'Radiometer: {}\n'
-		 'Exposure time: {} ms\n'
-		 'Sensor temperature: {} \'C\n'
-		 'Pixel count: {}\n'
-		 'Tilt:\n'
-		 '\tx:{}\u00B1{}\n'
-		 '\t y:{}\u00B1{}\n'
-		 '\t z:{}\u00B1{}\n'.format(self.header.total_length, self.header.timestamp, hex(self.crc32[0]), self.header.spectrum_type.optics.name,
-									self.header.spectrum_type.radiometer.name,
-									self.header.exposure_time, self.header.temperature, self.header.pixel_count,
-									self.header.accel_stats.mean_x,
-									self.header.accel_stats.std_x,
-									self.header.accel_stats.mean_y,
-									self.header.accel_stats.std_y,
-									self.header.accel_stats.mean_z,
-									self.header.accel_stats.std_z))
+		 'Exposure time: {} ms\t'
+		 'Sensor temperature: {} \'C \t'
+		 'Pixel count: {}'.format(self.header.spectrum_type.optics.name,
+		 						self.header.spectrum_type.radiometer.name,
+		 						self.header.exposure_time, self.header.temperature, self.header.pixel_count))
+		 # 'Pixel count: {}\n'
+		 # 'Tilt:\n'
+		 # '\tx:{}\u00B1{}\n'
+		 # '\t y:{}\u00B1{}\n'
+		 # '\t z:{}\u00B1{}\n'.format(self.header.total_length, self.header.timestamp, hex(self.crc32[0]), self.header.spectrum_type.optics.name,
+			# 						self.header.spectrum_type.radiometer.name,
+			# 						self.header.exposure_time, self.header.temperature, self.header.pixel_count,
+			# 						self.header.accel_stats.mean_x,
+			# 						self.header.accel_stats.std_x,
+			# 						self.header.accel_stats.mean_y,
+			# 						self.header.accel_stats.std_y,
+			# 						self.header.accel_stats.mean_z,
+			# 						self.header.accel_stats.std_z))
 
 	@classmethod
 	def parse_raw(cls, data, save_raw=False, slot=0):

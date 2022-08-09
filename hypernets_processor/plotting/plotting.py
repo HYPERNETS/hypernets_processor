@@ -134,7 +134,6 @@ class Plotting:
             ])
 
         id_vza=np.where(dataset["viewing_zenith_angle"].values==vza)[0]
-        print(id_vza)
         self.plot_variable(
             measurandstring,
             plotpath,

@@ -418,6 +418,7 @@ class HypernetsReader:
                         f.seek(byte_pointer)
                         chunk_body = f.read(chunk_size)
                         spectrum = Spectrum.parse_raw(chunk_body)
+
                         if len(spectrum.body) > 500:
                             spectrum_vnir = spectrum
                             if len(vnir) == 0:
@@ -440,8 +441,10 @@ class HypernetsReader:
                 continue
 
         self.context.logger.info(
-            spectrum_vnir.return_header()
-            spectrum.return_header()
+            spectrum_vnir.return_header(),
+        )
+        self.context.logger.info(
+            spectrum_swir.return_header()
         )
 
         if len(vnir.shape) == 1:
@@ -874,6 +877,7 @@ class HypernetsReader:
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_irr, overwrite=True)
             else:
+                self.context.logger.info("reading irradiance, info for last scan:")
                 l0_irr, l0_swir_irr = self.read_series_L(seq_dir, seriesIrr, lat, lon,
                                                          metadata, flag, "L0_IRR",
                                                          calibration_data_irr,
@@ -892,6 +896,7 @@ class HypernetsReader:
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_rad, overwrite=True)
             else:
+                self.context.logger.info("reading radiance, info for last scan:")
                 l0_rad, l0_swir_rad = self.read_series_L(seq_dir, seriesRad, lat, lon,
                                                          metadata, flag, "L0_RAD",
                                                          calibration_data_rad,
@@ -911,6 +916,7 @@ class HypernetsReader:
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_bla, overwrite=True)
             else:
+                self.context.logger.info("reading blacks, info for last scan:")
                 l0_bla, l0_swir_bla = self.read_series_L(seq_dir, seriesBlack, lat, lon,
                                                          metadata, flag, "L0_BLA",
                                                          calibration_data_rad,

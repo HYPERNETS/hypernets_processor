@@ -110,14 +110,6 @@ class CombineSWIR:
             measurandstring, dataset_l1b, dataset_l1b_swir
         )
 
-        print(
-            u_random_input_qty,
-            u_systematic_input_qty_indep,
-            u_systematic_input_qty_corr,
-            corr_systematic_input_qty_indep,
-            corr_systematic_input_qty_corr,
-        )
-
         self.prop.process_measurement_function_l1(
             measurandstring,
             dataset_l1b_comb,

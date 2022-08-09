@@ -98,8 +98,8 @@ class SurfaceReflectance:
                 try:
                     if self.context.get_config_value("plot_l2a"):
                         self.plot.plot_series_in_sequence(measurandstring, dataset_l2a)
-                        self.plot.plot_series_in_sequence_vaa("reflectance", dataset_l2a, 98)
-                        self.plot.plot_series_in_sequence_vza("reflectance", dataset_l2a, 30)
+                        self.plot.plot_series_in_sequence_vaa(measurandstring, dataset_l2a, 98)
+                        self.plot.plot_series_in_sequence_vza(measurandstring, dataset_l2a, 30)
                     if self.context.get_config_value("plot_uncertainty"):
                         self.plot.plot_relative_uncertainty(measurandstring, dataset_l2a, L2=True)
 
@@ -117,7 +117,8 @@ class SurfaceReflectance:
                                                                     cov_systematic_input_qty)
             if self.context.get_config_value("plot_l2a"):
                 self.plot.plot_series_in_sequence("reflectance", dataset_l2a)
-
+                self.plot.plot_series_in_sequence_vaa("reflectance", dataset_l2a, 98)
+                self.plot.plot_series_in_sequence_vza("reflectance", dataset_l2a, 30)
             if self.context.get_config_value("plot_uncertainty"):
                 self.plot.plot_relative_uncertainty("reflectance", dataset_l2a, L2=True)
 

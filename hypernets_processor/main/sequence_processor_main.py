@@ -140,7 +140,7 @@ def main(processor_config, job_config, to_archive):
                     context.logger.info("Processing Anomalies: " + str(context.anomaly_handler.anomalies_added))
 
                 logger.error("Failed: " + repr(e))
-                logger.debug(traceback.format_exc())
+                logger.info(traceback.format_exc())
 
         msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + \
               " sequences successfully processed"
