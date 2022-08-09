@@ -407,11 +407,11 @@ class HypernetsReader:
                     chunk_size = 1
                     chunk_counter = 1
                     while file_size - byte_pointer:
-                        self.context.logger.debug(
-                            "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
-                                chunk_counter, chunk_size, file_size - byte_pointer
-                            )
-                        )
+                        # self.context.logger.debug(
+                        #     "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
+                        #         chunk_counter, chunk_size, file_size - byte_pointer
+                        #     )
+                        # )
                         chunk_size = unpack("<H", f.read(2))[0]
                         if chunk_size == 4119:
                             chunk_size = 4131

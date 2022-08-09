@@ -33,82 +33,152 @@ class QualityChecks:
         self.plot=Plotting(context)
 
 
-    def perform_quality_check_L0(self,datasetl0,series_ids,dark_signals,dark_outliers):
-        mask=[]
+    def perform_quality_check_L0(self, datasetl0, series_ids):
+        mask = []
         mask_threshold = []
         mask_outliers = []
         mask_discontinuity = []
         for i in range(len(series_ids)):
-            ids = np.where(datasetl0['series_id'] == series_ids[i])[0]
+            ids = np.where(datasetl0["series_id"] == series_ids[i])[0]
 
-            data_subset=(datasetl0["digital_number"].values[:, ids]-
-                                 dark_signals[:,ids])
-            intsig = np.nanmean(data_subset,axis=0)
+            data_subset = datasetl0["digital_number"].values[:, ids]
+            intsig = np.nanmean(data_subset, axis=0)
             mask_all_i = np.zeros_like(intsig)  # mask the columns that have NaN
             mask_threshold_i = self.threshold_checks(data_subset)
             mask_outliers_i = self.outlier_checks(data_subset)
             mask_discontinuity_i = self.discontinuity_checks(data_subset)
-            #mask_all_i[np.where(mask_threshold_i==1)] = 1
-            mask_all_i[np.where(mask_outliers_i==1)] = 1
-            #mask_all_i[np.where(mask_discontinuity_i==1)] = 1
+            # mask_all_i[np.where(mask_threshold_i==1)] = 1
+            mask_all_i[np.where(mask_outliers_i == 1)] = 1
+            # mask_all_i[np.where(mask_discontinuity_i==1)] = 1
 
-            if all(mask_all_i==1):
+            if all(mask_all_i == 1):
                 self.context.logger.error(
-                    "None of the scans for series passed the quality control criteria")
+                    "None of the scans for series passed the quality control criteria"
+                )
                 self.context.anomaly_handler.add_anomaly("q")
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
             mask_outliers = np.append(mask_outliers, mask_outliers_i)
             mask_discontinuity = np.append(mask_discontinuity, mask_discontinuity_i)
-        datasetl0["quality_flag"][np.where(mask_outliers==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask_outliers==1)],"outliers") #for i in range(len(mask))]
-        datasetl0["quality_flag"][np.where(mask_threshold==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask_threshold==1)],"L0_thresholds") #for i in range(len(mask))]
-        datasetl0["quality_flag"][np.where(mask_discontinuity==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(mask_discontinuity==1)],"L0_discontinuity") #for i in range(len(mask))]
-        datasetl0["quality_flag"][np.where(dark_outliers==1)] = DatasetUtil.set_flag(datasetl0["quality_flag"][np.where(dark_outliers==1)],"dark_outliers") #for i in range(len(mask))]
-        return datasetl0,mask
+        datasetl0["quality_flag"][np.where(mask_outliers == 1)] = DatasetUtil.set_flag(
+            datasetl0["quality_flag"][np.where(mask_outliers == 1)], "outliers"
+        )  # for i in range(len(mask))]
+        datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
+            datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_thresholds"
+        )  # for i in range(len(mask))]
+        datasetl0["quality_flag"][
+            np.where(mask_discontinuity == 1)
+        ] = DatasetUtil.set_flag(
+            datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
+            "L0_discontinuity",
+        )  # for i in range(len(mask))]
+        return datasetl0, mask
 
-    def perform_quality_check_comb(self,dataset_l1b,dataset_l1b_swir):
-        #todo add these checks
-        return dataset_l1b,dataset_l1b_swir
+    def perform_quality_check_black(self, datasetl0, series_ids):
+        mask = []
+        mask_outliers = []
+        mask_discontinuity = []
+        for i in range(len(series_ids)):
+            ids = np.where(datasetl0["series_id"] == series_ids[i])[0]
 
-    def perform_quality_check_interpolate(self,dataset_l1b_rad,dataset_l1b_irr):
-        #todo add further checks
-        vzas=dataset_l1b_irr["viewing_zenith_angle"].values
-        szas=dataset_l1b_irr["solar_zenith_angle"].values
+            data_subset = datasetl0["digital_number"].values[:, ids]
+            intsig = np.nanmean(data_subset, axis=0)
+            mask_all_i = np.zeros_like(intsig)  # mask the columns that have NaN
+            mask_threshold_i = self.threshold_checks(data_subset)
+            mask_outliers_i = self.outlier_checks(data_subset)
+            mask_discontinuity_i = self.discontinuity_checks(data_subset)
+            # mask_all_i[np.where(mask_threshold_i==1)] = 1
+            mask_all_i[np.where(mask_outliers_i == 1)] = 1
+            # mask_all_i[np.where(mask_discontinuity_i==1)] = 1
 
+            if all(mask_all_i == 1):
+                self.context.logger.error(
+                    "None of the scans for series passed the quality control criteria"
+                )
+                self.context.anomaly_handler.add_anomaly("q")
 
-        for i,vza in enumerate(vzas):
-            if np.abs(vza-180)>2:
-                dataset_l1b_irr["irradiance"].values[:,i]=np.mean(dataset_l1b_irr["irradiance"].values[:,np.where(np.abs(vzas-180)<2.)[0]],axis=1)
+            mask = np.append(mask, mask_all_i)
+            mask_threshold = np.append(mask_threshold, mask_threshold_i)
+            mask_outliers = np.append(mask_outliers, mask_outliers_i)
+            mask_discontinuity = np.append(mask_discontinuity, mask_discontinuity_i)
+        datasetl0["quality_flag"][np.where(mask_outliers == 1)] = DatasetUtil.set_flag(
+            datasetl0["quality_flag"][np.where(mask_outliers == 1)], "outliers"
+        )  # for i in range(len(mask))]
+        datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
+            datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_thresholds"
+        )  # for i in range(len(mask))]
+        datasetl0["quality_flag"][
+            np.where(mask_discontinuity == 1)
+        ] = DatasetUtil.set_flag(
+            datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
+            "L0_discontinuity",
+        )  # for i in range(len(mask))]
+        return datasetl0, mask
+
+    def perform_quality_check_comb(self, dataset_l1b, dataset_l1b_swir):
+        # todo add these checks
+        return dataset_l1b, dataset_l1b_swir
+
+    def perform_quality_check_interpolate(self, dataset_l1b_rad, dataset_l1b_irr):
+        # todo add further checks
+        vzas = dataset_l1b_irr["viewing_zenith_angle"].values
+        szas = dataset_l1b_irr["solar_zenith_angle"].values
+
+        for i, vza in enumerate(vzas):
+            if np.abs(vza - 180) > 2:
+                dataset_l1b_irr["irradiance"].values[:, i] = np.mean(
+                    dataset_l1b_irr["irradiance"].values[
+                    :, np.where(np.abs(vzas - 180) < 2.0)[0]
+                    ],
+                    axis=1,
+                )
                 self.context.logger.warning(
-                    "One of the irradiance measurements did not have vza=180, so has been masked")
+                    "One of the irradiance measurements did not have vza=180, so has been masked"
+                )
                 dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l1b_irr["quality_flag"][i],"vza_irradiance")  #for i in range(len(mask))]
+                    dataset_l1b_irr["quality_flag"][i], "vza_irradiance"
+                )  # for i in range(len(mask))]
 
         if self.context.get_config_value("clear_sky_check"):
             # could also be done by: https://pvlib-python.readthedocs.io/en/stable/auto_examples/plot_spectrl2_fig51A.html
-            ref_szas = [0,20,40,60,70,80]
-            ref_sza = ref_szas[np.argmin(np.abs(ref_szas-np.mean(szas)))]
+            ref_szas = [0, 20, 40, 60, 70, 80]
+            ref_sza = ref_szas[np.argmin(np.abs(ref_szas - np.mean(szas)))]
             system_id = dataset_l1b_irr.attrs["system_id"]
-            ref_data = xr.open_dataset(os.path.join(refdat_path,
-                                                    "solar_irradiance_hypernets_sza%s_%s.nc"%(
-                                                    ref_sza,system_id)))
+            ref_data = xr.open_dataset(
+                os.path.join(
+                    refdat_path,
+                    "solar_irradiance_hypernets_sza%s_%s.nc" % (ref_sza, system_id),
+                    )
+            )
             # ref_irrtot = pysolar.radiation.get_radiation_direct(
             #     np.mean(dataset_l1b_irr["acquisition_time"]),90-ref_sza)
             irr_scaled = np.zeros_like(dataset_l1b_irr["irradiance"].values)
-            for i,vza in enumerate(vzas):
+            for i, vza in enumerate(vzas):
 
-                #irrtot=pysolar.radiation.get_radiation_direct(datetime.datetime.fromtimestamp(dataset_l1b_irr["acquisition_time"][i]),90-dataset_l1b_irr["solar_zenith_angle"].values[i])
-                irr_scaled[:,i] = dataset_l1b_irr["irradiance"].values[:,i]/np.cos(
-                    np.pi/180.*dataset_l1b_irr["solar_zenith_angle"].values[i])*np.cos(
-                    np.pi/180.*ref_sza)
-                if np.count_nonzero(irr_scaled[:,i]>0.5*ref_data["solar_irradiance_BOA"])>20:
+                # irrtot=pysolar.radiation.get_radiation_direct(datetime.datetime.fromtimestamp(dataset_l1b_irr["acquisition_time"][i]),90-dataset_l1b_irr["solar_zenith_angle"].values[i])
+                irr_scaled[:, i] = (
+                        dataset_l1b_irr["irradiance"].values[:, i]
+                        / np.cos(
+                    np.pi / 180.0 * dataset_l1b_irr["solar_zenith_angle"].values[i]
+                )
+                        * np.cos(np.pi / 180.0 * ref_sza)
+                )
+                if (
+                        np.count_nonzero(
+                            irr_scaled[:, i] > 0.5 * ref_data["solar_irradiance_BOA"]
+                        )
+                        > 20
+                ):
                     dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l1b_irr["quality_flag"][i],"clear_sky_irradiance")
+                        dataset_l1b_irr["quality_flag"][i], "clear_sky_irradiance"
+                    )
 
-            self.plot.plot_quality_irradiance(dataset_l1b_irr,irr_scaled, ref_data["solar_irradiance_BOA"],ref_sza)
+            self.plot.plot_quality_irradiance(
+                dataset_l1b_irr, irr_scaled, ref_data["solar_irradiance_BOA"], ref_sza
+            )
 
-        return dataset_l1b_rad,dataset_l1b_irr
+        return dataset_l1b_rad, dataset_l1b_irr
 
     def perform_quality_check_L2a(self,dataset):
         #todo add these checks
