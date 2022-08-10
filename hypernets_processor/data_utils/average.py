@@ -3,7 +3,6 @@ Averaging class
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.calibration.measurement_functions.measurement_function_factory import\
@@ -11,7 +10,7 @@ from hypernets_processor.calibration.measurement_functions.measurement_function_
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 
 import numpy as np
-
+from obsarray.templater.dataset_util import DatasetUtil
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"

@@ -3,7 +3,6 @@ Averaging class
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.data_templates import DataTemplates
 import punpy
 import numpy as np

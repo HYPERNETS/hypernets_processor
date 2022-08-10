@@ -17,11 +17,11 @@ from hypernets_processor.calibration.calibration_converter import CalibrationCon
 import os
 
 '''___Authorship___'''
-__author__ = "Sam Hunt"
+__author__ = "Pieter De Vis"
 __created__ = "21/10/2020"
 __version__ = __version__
-__maintainer__ = "Sam Hunt"
-__email__ = "sam.hunt@npl.co.uk"
+__maintainer__ = "Pieter De Vis"
+__email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 

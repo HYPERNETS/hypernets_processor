@@ -9,11 +9,11 @@ from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 from hypernets_processor.data_utils.quality_checks import QualityChecks
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
-from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.plotting.plotting import Plotting
 
 import numpy as np
 import matplotlib.pyplot as plt
+from obsarray.templater.dataset_util import DatasetUtil
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"

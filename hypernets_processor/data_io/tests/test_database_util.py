@@ -1,5 +1,5 @@
 """
-Tests for DatasetUtil class
+Tests for DataBaseUtil class
 """
 
 import unittest

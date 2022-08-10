@@ -3,11 +3,13 @@ HypernetsDSBuilder class
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.template_util import create_template_dataset
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
+
 from datetime import datetime
+import obsarray
+import copy
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -70,7 +72,7 @@ class HypernetsDSBuilder:
 
         # Find variables
         if ds_format in self.return_ds_formats():
-            variables_dict = self.variables_dict_defs[ds_format]
+            variables_dict = copy.deepcopy(self.variables_dict_defs[ds_format])
         else:
             raise NameError(
                 "Invalid format name: "
@@ -151,13 +153,12 @@ class HypernetsDSBuilder:
                 metadata["similarity_wavelen1"] = self.context.get_config_value("similarity_w1")
                 metadata["similarity_wavelen2"] = self.context.get_config_value("similarity_w2")
                 metadata["similarity_alpha"] = self.context.get_config_value("similarity_alpha")
-        return create_template_dataset(
-            variables_dict,
-            dim_sizes_dict,
-            metadata=metadata,
-            propagate_ds=propagate_ds,
-            metadata_db=metadata_db,
-            metadata_db_query=metadata_db_query,
+
+        if (metadata_db is not None) and (metadata_db_query is not None):
+            metadata = self.find_metadata(metadata, metadata_db, metadata_db_query)
+
+        return obsarray.create_ds(variables_dict, dim_sizes_dict, metadata=metadata,
+            propagate_ds=propagate_ds
         )
 
     def return_ds_formats(self):
@@ -236,6 +237,41 @@ class HypernetsDSBuilder:
 
         return dim_sizes_dict
 
+    @staticmethod
+    def find_metadata(metadata, db, query):
+        """
+        Populate metadata dictionary with values from database query
+
+        :type metadata: dict
+        :param metadata: dictionary of dataset metadata
+
+        :type db: dataset.Database
+        :param db: metadata database
+
+        :type query: dict/list
+        :param query: database query, defined as {"table_name": query_dict} where query_dict defines. Can be a list of
+        such database queries
+        """
+
+        if isinstance(query, dict):
+            query = [query]
+
+        for q in query:
+            table_name = list(q.keys())[0]
+
+            row = deepcopy(db[table_name].find_one(**q[table_name]))
+
+            if row is None:
+                raise LookupError("query does not find unique metadata value")
+
+            not_required_keys = [key for key in row.keys() if key not in metadata.keys()]
+
+            for key in not_required_keys:
+                row.pop(key)
+
+            metadata.update(row)
+
+        return metadata
 
 if __name__ == "__main__":
     pass

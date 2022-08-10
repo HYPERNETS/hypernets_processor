@@ -4,15 +4,15 @@ Tests for HypernetsWriter class
 
 import unittest
 from unittest.mock import patch, MagicMock
-from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.context import Context
 from hypernets_processor.version import __version__
+
 from xarray import Dataset
 import numpy as np
 import os
 from datetime import datetime as dt
-
+import obsarray
 
 '''___Authorship___'''
 __author__ = "Sam Hunt"
@@ -129,8 +129,8 @@ class TestHypernetsWriter(unittest.TestCase):
 
     def test_fill_ds(self):
         ds = Dataset()
-        ds["array_variable1"] = DatasetUtil.create_variable([7, 8], np.float32)
-        ds["array_variable2"] = DatasetUtil.create_variable([7, 8], np.float32)
+        ds["array_variable1"] = obsarray.create_var([7, 8], np.float32)
+        ds["array_variable2"] = obsarray.create_var([7, 8], np.float32)
 
         ds["array_variable1"][2, 3] = np.nan
         ds["array_variable2"][2, 3] = np.nan

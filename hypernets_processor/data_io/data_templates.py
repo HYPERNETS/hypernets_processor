@@ -4,9 +4,9 @@ Data template class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
-from hypernets_processor.data_io.dataset_util import DatasetUtil
 
 import numpy as np
+from obsarray.templater.dataset_util import DatasetUtil
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"

@@ -11,13 +11,13 @@ from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypst
 from hypernets_processor.rhymer.rhymer.processing.rhymer_processing import RhymerProcessing
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.plotting.plotting import Plotting
-from hypernets_processor.data_io.dataset_util import DatasetUtil
 from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 from hypernets_processor.data_utils.quality_checks import QualityChecks
 
 import punpy
 import numpy as np
+from obsarray.templater.dataset_util import DatasetUtil
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
