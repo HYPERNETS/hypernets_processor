@@ -119,8 +119,6 @@ class Average:
                 dataset,"u_rel_random_"+measurandstring,flags,rand_unc=True)
             dataset_l2a["u_rel_systematic_"+measurandstring].values = self.calc_mean_masked(
                 dataset,"u_rel_systematic_"+measurandstring,flags)
-            dataset_l2a["corr_random_"+measurandstring].values = np.eye(
-                len(dataset_l2a["u_rel_systematic_"+measurandstring].values))
             dataset_l2a["corr_systematic_"+measurandstring].values = \
                 dataset["corr_systematic_"+measurandstring].values
 

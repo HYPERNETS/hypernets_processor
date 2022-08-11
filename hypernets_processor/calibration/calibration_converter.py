@@ -401,7 +401,6 @@ class CalibrationConverter:
                     calibration_data["wavpix"].values[i_cal] = gains[:, 0]
                     calibration_data["gains"].values[i_cal] = gains[:, 2]
                     # calibration_data["u_rel_random_gains"].values = None
-                    # calibration_data["corr_random_gains"].values = None
 
                     calibration_data["u_rel_systematic_indep_gains"].values[i_cal] = (
                                                                                              gains[:, 6] ** 2

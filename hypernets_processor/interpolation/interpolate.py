@@ -43,7 +43,6 @@ class Interpolate:
         dataset_l1b["u_rel_random_upwelling_radiance"] = dataset_l1a_uprad["u_rel_random_radiance"].sel(scan=upscan)
         dataset_l1b["u_rel_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["u_rel_systematic_indep_radiance"].sel(scan=upscan)
         dataset_l1b["u_rel_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["u_rel_systematic_corr_rad_irr_radiance"].sel(scan=upscan)
-        dataset_l1b["corr_random_upwelling_radiance"] = dataset_l1a_uprad["corr_random_radiance"]
         dataset_l1b["corr_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["corr_systematic_indep_radiance"]
         dataset_l1b["corr_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["corr_systematic_corr_rad_irr_radiance"]
 
@@ -97,9 +96,9 @@ class Interpolate:
         dataset_l1c_temp = self.prop.process_measurement_function_l1("irradiance",
             dataset_l1c_temp,interpolation_function_wav.function,
             [wavs_rad,wavs_irr,dataset_l1b_irr['irradiance'].values],
-            [None,None,dataset_l1b_irr['u_rel_random_irradiance'].values*dataset_l1b_irr['irradiance'].values],
-            [None,None,dataset_l1b_irr['u_rel_systematic_indep_irradiance'].values*dataset_l1b_irr['irradiance'].values],
-            [None,None,dataset_l1b_irr['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1b_irr['irradiance'].values],
+            [None,None,dataset_l1b_irr['u_rel_random_irradiance'].values*dataset_l1b_irr['irradiance'].values]/100,
+            [None,None,dataset_l1b_irr['u_rel_systematic_indep_irradiance'].values*dataset_l1b_irr['irradiance'].values]/100,
+            [None,None,dataset_l1b_irr['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1b_irr['irradiance'].values]/100,
             [None,None,dataset_l1b_irr["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1b_irr["corr_systematic_corr_rad_irr_irradiance"].values],
             param_fixed=[True,True,False])
@@ -111,9 +110,9 @@ class Interpolate:
         dataset_l1c = self.prop.process_measurement_function_l1("irradiance",
             dataset_l1c,interpolation_function_time.function,
             [acqui_rad,acqui_irr,dataset_l1c_temp['irradiance'].values],
-            [None,None,dataset_l1c_temp['u_rel_random_irradiance'].values*dataset_l1c_temp['irradiance'].values],
-            [None,None,dataset_l1c_temp['u_rel_systematic_indep_irradiance'].values*dataset_l1c_temp['irradiance'].values],
-            [None,None,dataset_l1c_temp['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1c_temp['irradiance'].values],
+            [None,None,dataset_l1c_temp['u_rel_random_irradiance'].values*dataset_l1c_temp['irradiance'].values]/100,
+            [None,None,dataset_l1c_temp['u_rel_systematic_indep_irradiance'].values*dataset_l1c_temp['irradiance'].values]/100,
+            [None,None,dataset_l1c_temp['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1c_temp['irradiance'].values]/100,
             [None,None,dataset_l1c_temp["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1c_temp["corr_systematic_corr_rad_irr_irradiance"].values],
             param_fixed=[False,True,True])
@@ -135,13 +134,13 @@ class Interpolate:
                                                              'radiance'].values],
                                                         [None,None,dataset_l1a_skyrad[
                                                             'u_rel_random_radiance'].values*dataset_l1a_skyrad[
-                                                             'radiance'].values],
+                                                             'radiance'].values/100],
                                                         [None,None,dataset_l1a_skyrad[
                                                             'u_rel_systematic_indep_radiance'].values*dataset_l1a_skyrad[
-                                                             'radiance'].values],
+                                                             'radiance'].values/100],
                                                         [None,None,dataset_l1a_skyrad[
                                                             'u_rel_systematic_corr_rad_irr_radiance'].values*dataset_l1a_skyrad[
-                                                             'radiance'].values],
+                                                             'radiance'].values/100],
                                                         [None,None,dataset_l1a_skyrad["corr_systematic_indep_radiance"].values],
                                                         [None,None,dataset_l1a_skyrad["corr_systematic_corr_rad_irr_radiance"].values],
                                                         param_fixed=[False,True,True])

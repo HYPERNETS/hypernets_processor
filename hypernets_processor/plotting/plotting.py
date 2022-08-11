@@ -262,12 +262,12 @@ class Plotting:
                 )
             )
         self.plot_variable(
-            "relative uncertainty " + measurandstring,
+            "relative uncertainty " + measurandstring + " (%)",
             plotpath,
             dataset["wavelength"].values,
             yerr,
             labels=ylabel,
-            ylim=[0, 0.2],
+            ylim=[0, 20],
             )
 
     def plot_correlation(self, measurandstring, dataset, L2=False):

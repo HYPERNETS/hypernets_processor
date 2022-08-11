@@ -152,7 +152,6 @@ class Calibrate:
                     "u_rel_random_" + measurandstring,
                     "u_rel_systematic_indep_" + measurandstring,
                     "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "corr_random_" + measurandstring,
                     "corr_systematic_indep_" + measurandstring,
                     "corr_systematic_corr_rad_irr_" + measurandstring,
                     ]
@@ -260,9 +259,19 @@ class Calibrate:
             dim_names=["wavelength", "scan"],
             dtype=np.float32,
             fill_value=0,
+            attributes={
+                     "standard_name": "random relative uncertainty on digital number",
+                     "long_name": "random relative uncertainty on digital number",
+                     "units": "%",
+                     "err_corr": [
+                         {"dim": "scan", "form": "random", "params": [], "units": []},
+                         {"dim": "wavelength", "form": "random", "params": [], "units": []},
+                     ],
+                 },
         )
 
         datasetl0masked["u_rel_random_digital_number"] = DN_rand
+        datasetl0masked["digital_number"].attrs["unc_comps"] = ["u_rel_random_digital_number",]
 
         # calculate and store random uncertainties on radiance/irradiance
         rand = np.zeros_like(DN_rand.values)
@@ -287,7 +296,7 @@ class Calibrate:
                     axis=1,
                 )
                 for ii, id in enumerate(ids):
-                    rand[:, id] = std / avg
+                    rand[:, id] = std / avg *100
             else:
                 for ii, id in enumerate(ids):
                     rand[:, id] = np.nan
@@ -297,8 +306,14 @@ class Calibrate:
             DN_dark = DatasetUtil.create_variable(
                 [len(datasetl0masked["wavelength"]), len(datasetl0masked["scan"])],
                 dim_names=["wavelength", "scan"],
-                dtype=np.uint32,
+                dtype=np.uint16,
                 fill_value=0,
+                attributes= {"standard_name": "digital number for dark signal",
+                               "long_name": "Digital number, raw data, dark signal",
+                               "units": "-",
+                               "unc_comps": [
+                                   "u_rel_random_dark_signal",
+                               ],}
             )
 
             datasetl0masked["dark_signal"] = DN_dark
@@ -313,6 +328,15 @@ class Calibrate:
             dim_names=["wavelength", "scan"],
             dtype=np.float32,
             fill_value=0,
+            attributes={
+                "standard_name": "random relative uncertainty on black digital number",
+                "long_name": "random relative uncertainty on black digital number",
+                "units": "%",
+                "err_corr": [
+                    {"dim": "scan", "form": "random", "params": [], "units": []},
+                    {"dim": "wavelength", "form": "random", "params": [], "units": []},
+                ],
+            },
         )
 
         datasetl0masked_bla["u_rel_random_digital_number"] = DN_rand_bla
@@ -334,7 +358,7 @@ class Calibrate:
                     axis=1,
                 )
                 for ii, id in enumerate(ids):
-                    rand[:, id] = std / avg
+                    rand[:, id] = std / avg*100
             else:
                 for ii, id in enumerate(ids):
                     rand[:, id] = np.nan
