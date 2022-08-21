@@ -40,7 +40,6 @@ def open_database(url, db_format=None, context=None):
     :return: opened database
     :rtype: dataset.Database
     """
-    stop
     if database_exists(url):
 
         if db_format == "archive":
