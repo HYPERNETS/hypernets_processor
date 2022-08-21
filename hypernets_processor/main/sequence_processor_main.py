@@ -42,12 +42,10 @@ def get_target_sequences(context, to_archive):
         raw_paths.append(context.get_config_value("raw_data_directory"))
     else:
         for path in os.listdir(context.get_config_value("raw_data_directory")):
-            print(path)
             if parse_sequence_path(path) is not None:
                 raw_paths.append(
                     os.path.join(context.get_config_value("raw_data_directory"), path)
                 )
-    print("here11")
 
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
@@ -70,7 +68,6 @@ def get_target_sequences(context, to_archive):
         complete_products = processed_products + failed_products
 
         directory = os.path.dirname(raw_paths[0])
-        print("here7")
 
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
         raw_products = list(set(raw_products) - set(complete_products))
@@ -96,8 +93,6 @@ def main(processor_config, job_config, to_archive):
     """
 
     # Configure logging
-    print("here6")
-
     name = __name__
     if "job_name" in job_config["Job"].keys():
         name = job_config["Job"]["job_name"]
@@ -109,19 +104,13 @@ def main(processor_config, job_config, to_archive):
         processor_config=processor_config, job_config=job_config, logger=logger
     )
     context.set_config_value("to_archive", to_archive)
-    print("here7")
-
-
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
-
-    print("here8")
 
     # Run processor
     sp = SequenceProcessor(context=context)
     target_sequences_passed = 0
     target_sequences_total = len(target_sequences)
-    print("here9")
 
     if target_sequences_total == 0:
         msg = "No sequences to process"
@@ -134,10 +123,7 @@ def main(processor_config, job_config, to_archive):
             try:
                 # profiler = cProfile.Profile()
                 # profiler.enable()
-                print("here8")
-
                 sp.process_sequence(target_sequence)
-                print("here9")
                 # profiler.disable()
                 # stats = pstats.Stats(profiler).sort_stats('tottime')
                 # stats.print_stats(100)
