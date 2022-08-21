@@ -17,10 +17,10 @@ __status__ = "Development"
 
 
 class MeasurementFunctionFactory:
-    def __init__(self):
-        self.measurement_functions = dict([(StandardMeasurementFunction.get_name(),StandardMeasurementFunction()),
+    def __init__(self,*args,**kwargs):
+        self.measurement_functions = dict([(StandardMeasurementFunction.get_name(),StandardMeasurementFunction(*args,**kwargs)),
                                            #(StandardMeasurementFunctionCython.get_name(),StandardMeasurementFunctionCython()),
-                                (TemplateMeasurementFunction.get_name(),TemplateMeasurementFunction())])
+                                (TemplateMeasurementFunction.get_name(),TemplateMeasurementFunction(*args,**kwargs))])
 
     def get_names(self):
         return self.measurement_functions.keys()

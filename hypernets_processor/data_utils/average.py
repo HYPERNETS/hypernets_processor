@@ -9,6 +9,7 @@ from hypernets_processor.calibration.measurement_functions.measurement_function_
     MeasurementFunctionFactory
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 
+import time
 import numpy as np
 from obsarray.templater.dataset_util import DatasetUtil
 
@@ -25,8 +26,10 @@ class Average:
         self.templ = DataTemplates(context=context)
         self.context = context
         self.writer=HypernetsWriter(context)
-        self._measurement_function_factory = MeasurementFunctionFactory()
         self.prop = PropagateUnc(context, parallel_cores=0)
+
+        #self.prop = punpy.MCPropagation(context.get_config_value("mcsteps"),dtype="float32")
+        self._measurement_function_factory = MeasurementFunctionFactory
 
 
     def average_l1b(self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data):
@@ -45,17 +48,30 @@ class Average:
         """
         if self.context.get_config_value("network") == "w":
             dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
-        else:
-            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l0)
-
-        if self.context.get_config_value("network") == "l":
-            flags = ["outliers"]
-        else:
             flags = ["outliers"]
 
-        calibrate_function = self._measurement_function_factory.get_measurement_function(
+        else:
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
+            dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring, dataset_l0)
+            flags = ["outliers"]
+            for var in dataset_l0b.variables:
+                if var=="dark_signal":
+                    dataset_l0b["dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
+                elif var=="u_rel_random_dark_signal":
+                    dataset_l0b["u_rel_random_dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)
+                elif "series" in dataset_l0b[var].dims:
+                    if "u_rel_random" in var:
+                        dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags,rand_unc=True)
+                    elif "corr_" in var:
+                        dataset_l0b[var].values=dataset_l0[var].values
+                    else:
+                        dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags)
+
+        calibrate_function = self._measurement_function_factory(repeat_dims="series").get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
+
         input_vars = calibrate_function.get_argument_names()
+        # calibrate_function.propagate_ds(dataset_l0b,calibration_data)
 
         input_qty = []
         u_random_input_qty = []
@@ -88,7 +104,7 @@ class Average:
 
         dataset_l1b = self.prop.process_measurement_function_l1a(measurandstring,
                                                                  dataset_l1b,
-                                                                 calibrate_function.function,
+                                                                 calibrate_function.meas_function,
                                                                  input_qty,
                                                                  u_random_input_qty,
                                                                  u_systematic_input_qty_indep,
@@ -146,9 +162,7 @@ class Average:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
             for i in range(len(series_id)):
-                flagged = np.any(
-                    [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
-                     flags],axis=0)
+                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'])
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(vals[:,:,ids],axis=3)[:,:,0]
@@ -159,23 +173,18 @@ class Average:
             out = np.empty((len(series_id),))
 
             for i in range(len(series_id)):
-                flagged = np.any(
-                    [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
-                     flags],axis=0)
+                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'])
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(dataset[var].values[ids])
 
                 if rand_unc:
-                    out[i] = np.mean(dataset[var].values[ids])/len(
-                        ids[0])
+                    out[i] = (np.sum(dataset[var].values[ids]**2))**0.5 / len(ids[0])
         else:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
 
             for i in range(len(series_id)):
-                flagged = np.any(
-                    [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
-                     flags],axis=0)
+                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'])
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]

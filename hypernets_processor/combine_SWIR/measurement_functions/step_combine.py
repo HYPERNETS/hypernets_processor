@@ -1,10 +1,10 @@
-
+from punpy import MeasurementFunction
 import numpy as np
 
 
-class StepCombine:
+class StepCombine(MeasurementFunction):
 
-    def function(self,wavs_vis,rad_VIS,wavs_swir,rad_SWIR,wav_step):
+    def meas_function(self,wavs_vis,rad_VIS,wavs_swir,rad_SWIR,wav_step):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).

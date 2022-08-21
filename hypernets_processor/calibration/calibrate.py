@@ -55,7 +55,7 @@ class Calibrate:
         corr_systematic_input_qty_indep,corr_systematic_input_qty_corr = self.prop.find_u_systematic_input_l1a(input_vars, dataset_l0, calibration_data)
         dataset_l1a = self.prop.process_measurement_function_l1a(measurandstring,
                                                         dataset_l1a,
-                                                        calibrate_function.function,
+                                                        calibrate_function.meas_function,
                                                         input_qty,
                                                         u_random_input_qty,
                                                         u_systematic_input_qty_indep,
@@ -128,7 +128,7 @@ class Calibrate:
             dataset_l1a = self.prop.process_measurement_function_l1a(
                 measurandstring,
                 dataset_l1a,
-                calibrate_function.function,
+                calibrate_function.meas_function,
                 input_qty,
                 u_random_input_qty,
                 u_systematic_input_qty_indep,
@@ -145,7 +145,7 @@ class Calibrate:
                         input_qty[i] = np.tile(input_qty[i], (datashape[0], 1))
                     elif input_qty[i].shape[0] == datashape[0]:
                         input_qty[i] = np.tile(input_qty[i], (datashape[1], 1)).T
-            measurand = calibrate_function.function(*input_qty)
+            measurand = calibrate_function.meas_function(*input_qty)
             dataset_l1a[measurandstring].values = measurand
             dataset_l1a.drop(
                 [

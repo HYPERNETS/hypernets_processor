@@ -16,9 +16,9 @@ __status__ = "Development"
 
 
 class ProtocolFactory:
-    def __init__(self, context):
-        self.measurement_functions = dict([(LandNetworkProtocol.get_name(),LandNetworkProtocol()),
-                                        (WaterNetworkProtocol.get_name(),WaterNetworkProtocol(context))])
+    def __init__(self, *args,**kwargs):
+        self.measurement_functions = dict([(LandNetworkProtocol.get_name(),LandNetworkProtocol(*args,**kwargs)),
+                                        (WaterNetworkProtocol.get_name(),WaterNetworkProtocol(*args,**kwargs))])
 
     def get_names(self):
         return self.measurement_functions.keys()

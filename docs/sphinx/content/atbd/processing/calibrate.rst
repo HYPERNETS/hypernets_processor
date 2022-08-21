@@ -15,7 +15,7 @@ The exact measurement function to be used can be specified manually by providing
 If no custom measurement function is provided, a default measurement function is used (labelled StandardMeasurementFunction). 
 This measurement function is defined by::
 
-	def function(digital_number,gains,dark_signal,non_linear,int_time):
+	def meas_function(digital_number,gains,dark_signal,non_linear,int_time):
         
         	DN=digital_number-dark_signal
         	DN[DN==0]=1

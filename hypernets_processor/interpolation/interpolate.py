@@ -54,7 +54,6 @@ class Interpolate:
 
     def interpolate_l1c(self,dataset_l1b_rad,dataset_l1b_irr):
 
-
         dataset_l1c=self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
         dataset_l1c["acquisition_time"].values = dataset_l1b_rad["acquisition_time"].values
 
@@ -94,11 +93,11 @@ class Interpolate:
         dataset_l1c_temp = self.templ.l1ctemp_dataset(dataset_l1c,dataset_l1b_irr)
 
         dataset_l1c_temp = self.prop.process_measurement_function_l1("irradiance",
-            dataset_l1c_temp,interpolation_function_wav.function,
+            dataset_l1c_temp,interpolation_function_wav.meas_function,
             [wavs_rad,wavs_irr,dataset_l1b_irr['irradiance'].values],
-            [None,None,dataset_l1b_irr['u_rel_random_irradiance'].values*dataset_l1b_irr['irradiance'].values]/100,
-            [None,None,dataset_l1b_irr['u_rel_systematic_indep_irradiance'].values*dataset_l1b_irr['irradiance'].values]/100,
-            [None,None,dataset_l1b_irr['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1b_irr['irradiance'].values]/100,
+            [None,None,dataset_l1b_irr['u_rel_random_irradiance'].values*dataset_l1b_irr['irradiance'].values/100],
+            [None,None,dataset_l1b_irr['u_rel_systematic_indep_irradiance'].values*dataset_l1b_irr['irradiance'].values/100],
+            [None,None,dataset_l1b_irr['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1b_irr['irradiance'].values/100],
             [None,None,dataset_l1b_irr["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1b_irr["corr_systematic_corr_rad_irr_irradiance"].values],
             param_fixed=[True,True,False])
@@ -108,11 +107,11 @@ class Interpolate:
         acqui_rad = dataset_l1c['acquisition_time'].values
 
         dataset_l1c = self.prop.process_measurement_function_l1("irradiance",
-            dataset_l1c,interpolation_function_time.function,
+            dataset_l1c,interpolation_function_time.meas_function,
             [acqui_rad,acqui_irr,dataset_l1c_temp['irradiance'].values],
-            [None,None,dataset_l1c_temp['u_rel_random_irradiance'].values*dataset_l1c_temp['irradiance'].values]/100,
-            [None,None,dataset_l1c_temp['u_rel_systematic_indep_irradiance'].values*dataset_l1c_temp['irradiance'].values]/100,
-            [None,None,dataset_l1c_temp['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1c_temp['irradiance'].values]/100,
+            [None,None,dataset_l1c_temp['u_rel_random_irradiance'].values*dataset_l1c_temp['irradiance'].values/100],
+            [None,None,dataset_l1c_temp['u_rel_systematic_indep_irradiance'].values*dataset_l1c_temp['irradiance'].values/100],
+            [None,None,dataset_l1c_temp['u_rel_systematic_corr_rad_irr_irradiance'].values*dataset_l1c_temp['irradiance'].values/100],
             [None,None,dataset_l1c_temp["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1c_temp["corr_systematic_corr_rad_irr_irradiance"].values],
             param_fixed=[False,True,True])
@@ -128,7 +127,7 @@ class Interpolate:
         acqui_rad = dataset_l1c['acquisition_time'].values
 
         dataset_l1c = self.prop.process_measurement_function_l1("downwelling_radiance",dataset_l1c,
-                                                        interpolation_function_time.function,
+                                                        interpolation_function_time.meas_function,
                                                         [acqui_rad,acqui_irr,
                                                          dataset_l1a_skyrad[
                                                              'radiance'].values],

@@ -180,6 +180,36 @@ class DataTemplates:
 
         return dataset_l1b
 
+    def l0b_template_from_l0_dataset_land(self, measurandstring, dataset_l0):
+        """
+        Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
+
+        :param datasetl0:
+        :type datasetl0:
+        :return:
+        :rtype:
+        """
+        l0b_dim_sizes_dict = {"wavelength": len(dataset_l0["wavelength"]),
+                              "series": len(np.unique(dataset_l0['series_id']))}
+
+        dataset_l0b = self.hdsb.create_ds_template(l0b_dim_sizes_dict, "L_L0B", propagate_ds=dataset_l0,ds=dataset_l0)
+
+        dataset_l0b = dataset_l0b.assign_coords(wavelength=dataset_l0.wavelength)
+
+        series_id = np.unique(dataset_l0['series_id'])
+        dataset_l0b["series_id"].values = series_id
+
+        # for variablestring in ["acquisition_time", "viewing_azimuth_angle", "viewing_zenith_angle",
+        #                        "solar_azimuth_angle", "solar_zenith_angle"]:
+        #     temp_arr = np.empty(len(series_id))
+        #     for i in range(len(series_id)):
+        #         ids = np.where((dataset_l0['series_id'] == series_id[i]) & np.invert(
+        #             DatasetUtil.unpack_flags(dataset_l0["quality_flag"])["outliers"]))
+        #         temp_arr[i] = np.mean(dataset_l0[variablestring].values[ids])
+        #     dataset_l0b[variablestring].values = temp_arr
+
+        return dataset_l0b
+
     def l1b_template_from_combine(self, measurementstring, dataset, dataset_SWIR):
         wavs_vis = dataset["wavelength"].values
         wavs_swir = dataset_SWIR["wavelength"].values

@@ -1,11 +1,9 @@
+from punpy import MeasurementFunction
+
+class TemplateMeasurementFunction(MeasurementFunction):
 
 
-
-
-class TemplateMeasurementFunction:
-
-
-    def function(self,digital_number,gains,dark_signal,temp):
+    def meas_function(self,digital_number,gains,dark_signal,temp):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).

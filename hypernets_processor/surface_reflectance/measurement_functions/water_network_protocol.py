@@ -2,16 +2,16 @@ import numpy as np
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.rhymer.rhymer.processing.rhymer_processing import RhymerProcessing
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
+from punpy import MeasurementFunction
 
-class WaterNetworkProtocol:
-
-    def __init__(self, context, MCsteps=1000, parallel_cores=1):
+class WaterNetworkProtocol(MeasurementFunction):
+    def setup(self, context, MCsteps=1000, parallel_cores=1):
         self.context = context
         self.rh = RhymerHypstar(context)
         self.rhp = RhymerProcessing(context)
         self.rhs = RhymerShared(context)
 
-    def function(self,upwelling_radiance,downwelling_radiance,irradiance,rhof, wavelength):
+    def meas_function(self,upwelling_radiance,downwelling_radiance,irradiance,rhof, wavelength):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).

@@ -113,7 +113,7 @@ class CombineSWIR:
         self.prop.process_measurement_function_l1(
             measurandstring,
             dataset_l1b_comb,
-            combine_function.function,
+            combine_function.meas_function,
             input_qty,
             u_random_input_qty,
             u_systematic_input_qty_indep,

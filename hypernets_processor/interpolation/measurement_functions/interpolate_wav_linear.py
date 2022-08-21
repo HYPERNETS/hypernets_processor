@@ -1,10 +1,11 @@
 
+from punpy import MeasurementFunction
 
 import scipy.interpolate
 import numpy as np
 
-class InterpolationWavLinear:
-    def function(self,rad_wavs,irr_wavs,irr):
+class InterpolationWavLinear(MeasurementFunction):
+    def meas_function(self,rad_wavs,irr_wavs,irr):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).

@@ -1,10 +1,11 @@
 
+from punpy import MeasurementFunction
 
 import scipy.interpolate
 import numpy as np
 
-class InterpolationTimeLinear:
-    def function(self,output_time,times,variables):
+class InterpolationTimeLinear(MeasurementFunction):
+    def meas_function(self,output_time,times,variables):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
@@ -58,7 +59,7 @@ class InterpolationTimeLinear:
         return ["output_time","times","irradiance", "downwelling_radiance"]
 
 # class WaterNetworkInterpolationSkyRadianceLinear:
-#     def function(self,output_time,times,variables):
+#     def meas_function(self,output_time,times,variables):
 #         '''
 #         This function implements the measurement function.
 #         Each of the arguments can be either a scalar or a vector (1D-array).

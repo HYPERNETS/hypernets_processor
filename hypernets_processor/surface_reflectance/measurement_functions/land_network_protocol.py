@@ -1,10 +1,7 @@
+from punpy import MeasurementFunction
 
-
-
-
-class LandNetworkProtocol:
-
-    def function(self,radiance,irradiance):
+class LandNetworkProtocol(MeasurementFunction):
+    def meas_function(self,radiance,irradiance):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).

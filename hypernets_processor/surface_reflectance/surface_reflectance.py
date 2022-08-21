@@ -30,7 +30,7 @@ __status__ = "Development"
 
 class SurfaceReflectance:
     def __init__(self, context, parallel_cores=1):
-        self._measurement_function_factory = ProtocolFactory(context=context)
+        self._measurement_function_factory = ProtocolFactory()
         self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
         self.qual = QualityChecks(context)
         self.templ = DataTemplates(context=context)
@@ -59,7 +59,7 @@ class SurfaceReflectance:
 
         L1c = self.prop.process_measurement_function_l2(
             ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
-            dataset_l1c, l1ctol1b_function.function, input_qty,
+            dataset_l1c, l1ctol1b_function.meas_function, input_qty,
             u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
 
         failSimil=self.rh.qc_similarity(L1c)
@@ -111,7 +111,7 @@ class SurfaceReflectance:
         elif self.context.get_config_value("network").lower() == "l":
             dataset_l2a = self.templ.l2_from_l1c_dataset(dataset,["outliers","dark_outliers"])
             dataset_l2a = self.prop.process_measurement_function_l2(["reflectance"], dataset_l2a,
-                                                                    l1tol2_function.function,
+                                                                    l1tol2_function.meas_function,
                                                                     input_qty, u_random_input_qty,
                                                                     u_systematic_input_qty,
                                                                     cov_systematic_input_qty)

@@ -1,6 +1,7 @@
-class StandardMeasurementFunction:
+from punpy import MeasurementFunction
 
-    def function(self,digital_number,gains,dark_signal,non_linear,int_time):
+class StandardMeasurementFunction(MeasurementFunction):
+    def meas_function(self,digital_number,gains,dark_signal,non_linear,int_time):
         '''
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
@@ -15,8 +16,10 @@ class StandardMeasurementFunction:
                                        non_linear[6]*DN**6+
                                        non_linear[7]*DN**7)
 
-        # print(DN[500,5],corrected_DN[500,5],(gains*corrected_DN/int_time*1000)[500,5])
-        return gains*corrected_DN/int_time*1000
+        if gains.ndim == 1:
+            return gains[:, None] * corrected_DN / int_time * 1000
+        else:
+            return gains*corrected_DN/int_time*1000
 
     @staticmethod
     def get_name():
