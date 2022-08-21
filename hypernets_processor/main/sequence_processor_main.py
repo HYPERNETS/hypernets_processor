@@ -107,6 +107,7 @@ def main(processor_config, job_config, to_archive):
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
 
+    print(target_sequences)
     # Run processor
     sp = SequenceProcessor(context=context)
     target_sequences_passed = 0
