@@ -51,8 +51,6 @@ def open_database(url, db_format=None, context=None):
         return dataset.connect(url)
 
     elif db_format is not None:
-        print(url)
-        stop
         url_ = make_url(url)
         if url_.drivername == "sqlite":
             makedirs(dirname(url_.database), exist_ok=True)
