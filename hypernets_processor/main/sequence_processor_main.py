@@ -93,6 +93,8 @@ def main(processor_config, job_config, to_archive):
     """
 
     # Configure logging
+    print("here6")
+
     name = __name__
     if "job_name" in job_config["Job"].keys():
         name = job_config["Job"]["job_name"]
@@ -111,6 +113,7 @@ def main(processor_config, job_config, to_archive):
     sp = SequenceProcessor(context=context)
     target_sequences_passed = 0
     target_sequences_total = len(target_sequences)
+    print("here7")
 
     if target_sequences_total == 0:
         msg = "No sequences to process"
@@ -123,7 +126,10 @@ def main(processor_config, job_config, to_archive):
             try:
                 # profiler = cProfile.Profile()
                 # profiler.enable()
+                print("here8")
+
                 sp.process_sequence(target_sequence)
+                print("here9")
                 # profiler.disable()
                 # stats = pstats.Stats(profiler).sort_stats('tottime')
                 # stats.print_stats(100)

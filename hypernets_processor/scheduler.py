@@ -89,8 +89,6 @@ class Scheduler:
         :type job: func
         :param job: function
         """
-        print("here6")
-
         if logger is not None:
             def with_logging(func, logger, name):
                 @functools.wraps(func)
@@ -98,7 +96,6 @@ class Scheduler:
                     logger.info("Started: " + name)
 
                     try:
-                        print("here7")
                         msg = func(*args, **kwargs)
 
                         log_msg = "Completed: " + name
