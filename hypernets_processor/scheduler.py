@@ -97,6 +97,7 @@ class Scheduler:
                     logger.info("Started: " + name)
 
                     try:
+                        print("here7")
                         msg = func(*args, **kwargs)
 
                         log_msg = "Completed: " + name
