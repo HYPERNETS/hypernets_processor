@@ -42,10 +42,12 @@ def get_target_sequences(context, to_archive):
         raw_paths.append(context.get_config_value("raw_data_directory"))
     else:
         for path in os.listdir(context.get_config_value("raw_data_directory")):
+            print(path)
             if parse_sequence_path(path) is not None:
                 raw_paths.append(
                     os.path.join(context.get_config_value("raw_data_directory"), path)
                 )
+    print("here11")
 
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
@@ -68,6 +70,7 @@ def get_target_sequences(context, to_archive):
         complete_products = processed_products + failed_products
 
         directory = os.path.dirname(raw_paths[0])
+        print("here7")
 
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
         raw_products = list(set(raw_products) - set(complete_products))
