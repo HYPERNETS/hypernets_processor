@@ -48,6 +48,7 @@ class SequenceProcessor:
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
         self.context.set_config_value("sequence_path", sequence_path)
         self.context.set_config_value("sequence_name", os.path.basename(sequence_path))
+        print("here5",job_config_path)
 
         reader = HypernetsReader(self.context)
         calcon = CalibrationConverter(self.context)

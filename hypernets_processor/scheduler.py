@@ -136,6 +136,8 @@ class Scheduler:
         # todo - implement start_time feature
 
         while True:
+            print("here5")
+
             self.scheduler.run_pending()
             time.sleep(1)
 
