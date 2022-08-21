@@ -92,7 +92,7 @@ def main(scheduler_config, processor_config):
     processor_sch = Scheduler(logger=logger)
 
     for job_config_path in jobs_list:
-
+        print("here",job_config_path)
         # define scheduler job config
         scheduler_job_config = dict()
 
@@ -109,13 +109,19 @@ def main(scheduler_config, processor_config):
         scheduler_job_config["parallel"] = scheduler_config["Processor Schedule"]["parallel"]
 
         # schedule job
+        print("here2")
+
         processor_sch.schedule(processor_main,
                                scheduler_job_config=scheduler_job_config,
                                job_config=job_config,
                                processor_config=processor_config,
                                to_archive=True)
+        print("here3")
 
-    # run scheduled jobs
+
+# run scheduled jobs
+        print("here4",job_config_path)
+
     processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
 
     return None
