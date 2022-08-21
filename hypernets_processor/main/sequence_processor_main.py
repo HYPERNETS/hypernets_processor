@@ -100,10 +100,13 @@ def main(processor_config, job_config, to_archive):
 
     logger = configure_logging(config=job_config, name=name)
 
+    print("here3")
+
     # Define context
     context = Context(
         processor_config=processor_config, job_config=job_config, logger=logger
     )
+
     context.set_config_value("to_archive", to_archive)
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
