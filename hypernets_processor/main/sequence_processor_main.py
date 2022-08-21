@@ -106,14 +106,19 @@ def main(processor_config, job_config, to_archive):
         processor_config=processor_config, job_config=job_config, logger=logger
     )
     context.set_config_value("to_archive", to_archive)
+    print("here7")
+
+
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
+
+    print("here8")
 
     # Run processor
     sp = SequenceProcessor(context=context)
     target_sequences_passed = 0
     target_sequences_total = len(target_sequences)
-    print("here7")
+    print("here9")
 
     if target_sequences_total == 0:
         msg = "No sequences to process"
