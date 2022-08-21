@@ -42,6 +42,7 @@ def get_target_sequences(context, to_archive):
         raw_paths.append(context.get_config_value("raw_data_directory"))
     else:
         for path in os.listdir(context.get_config_value("raw_data_directory")):
+            print(path)
             if parse_sequence_path(path) is not None:
                 raw_paths.append(
                     os.path.join(context.get_config_value("raw_data_directory"), path)
