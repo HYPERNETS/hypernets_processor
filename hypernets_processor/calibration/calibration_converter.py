@@ -58,6 +58,7 @@ class CalibrationConverter:
                 self.context.logger.error(
                     "No SN set for hypstar instrument! using hypstar_cal_number from config file instead."
                 )
+            print(instrument_id)
         else:
             self.context.logger.error("Metadata missing")
             self.context.anomaly_handler.add_anomaly("m")
