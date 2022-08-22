@@ -49,8 +49,6 @@ def get_target_sequences(context, to_archive):
 
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
-    print("here")
-
     if to_archive is True:
         processed_products = [
             product["sequence_name"]
@@ -65,7 +63,6 @@ def get_target_sequences(context, to_archive):
                 site_id=context.get_config_value("site_id")
             )
         ]
-        print("here2")
         complete_products = processed_products + failed_products
 
         directory = os.path.dirname(raw_paths[0])
@@ -100,8 +97,6 @@ def main(processor_config, job_config, to_archive):
 
     logger = configure_logging(config=job_config, name=name)
 
-    print("here3")
-
     # Define context
     context = Context(
         processor_config=processor_config, job_config=job_config, logger=logger
@@ -111,20 +106,16 @@ def main(processor_config, job_config, to_archive):
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
 
-    print("here3")
     # Run processor
     sp = SequenceProcessor(context=context)
     target_sequences_passed = 0
     target_sequences_total = len(target_sequences)
-    print("here4")
 
     if target_sequences_total == 0:
         msg = "No sequences to process"
 
     else:
         for target_sequence in target_sequences:
-            print("here5")
-
             context.logger.info("Processing sequence: " + target_sequence)
 
             try:
