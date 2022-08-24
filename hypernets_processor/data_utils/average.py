@@ -79,7 +79,7 @@ class Average:
             if var=="dark_signal":
                 meanvar=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
                 input_qty.append(meanvar)
-                u_random_input_qty.append(self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)*meanvar)
+                u_random_input_qty.append(self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)*meanvar/100)
             elif var=="integration_time":
                 input_qty.append(self.calc_mean_masked(dataset_l0,var,flags))
                 u_random_input_qty.append(None)
@@ -91,11 +91,11 @@ class Average:
                     meanvar=calibration_data[var].values.astype("float32")
                     input_qty.append(meanvar)
                 try:
-                    u_random_input_qty.append(self.calc_mean_masked(dataset_l0, "u_rel_random_" + var,flags,rand_unc=True)*meanvar)
+                    u_random_input_qty.append(self.calc_mean_masked(dataset_l0, "u_rel_random_" + var,flags,rand_unc=True)*meanvar/100.)
                 except:
                     try:
                         u_random_input_qty.append((calibration_data["u_rel_random_"+var].values*
-                                                   calibration_data[var].values).astype("float32"))
+                                                   calibration_data[var].values/100.).astype("float32"))
                     except:
                         u_random_input_qty.append(None)
 

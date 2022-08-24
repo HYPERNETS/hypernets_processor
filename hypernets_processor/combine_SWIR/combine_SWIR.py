@@ -44,6 +44,7 @@ class CombineSWIR:
         dataset_l1b = self.avg.average_l1b(
             measurandstring, dataset_l0masked, dataset_bla, calibration_data
         )
+
         dataset_l1b_swir = self.avg.average_l1b(
             measurandstring,
             dataset_l0masked_swir,
