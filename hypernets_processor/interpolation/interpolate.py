@@ -9,7 +9,8 @@ from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.interpolation.measurement_functions.interpolation_factory import InterpolationFactory
 from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 from hypernets_processor.data_utils.quality_checks import QualityChecks
-
+from obsarray.templater.dataset_util import DatasetUtil
+import numpy as np
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -57,7 +58,7 @@ class Interpolate:
         dataset_l1c=self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
         dataset_l1c["acquisition_time"].values = dataset_l1b_rad["acquisition_time"].values
 
-        dataset_l1b_rad,dataset_l1b_irr=self.qual.perform_quality_check_interpolate(dataset_l1b_rad,dataset_l1b_irr)
+        #dataset_l1b_rad,dataset_l1b_irr=self.qual.perform_quality_check_interpolate(dataset_l1b_rad,dataset_l1b_irr)
 
         dataset_l1c=self.interpolate_irradiance(dataset_l1c,dataset_l1b_irr)
 
@@ -103,8 +104,13 @@ class Interpolate:
             param_fixed=[True,True,False])
 
         # Interpolate in time to radiance times
-        acqui_irr = dataset_l1b_irr['acquisition_time'].values
+        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr['quality_flag'])
+        dataset_l1c_temp=dataset_l1c_temp.isel(series=np.where(flagged == False)[0])
+        acqui_irr = dataset_l1b_irr['acquisition_time'].values[flagged == False]
         acqui_rad = dataset_l1c['acquisition_time'].values
+
+        if len(acqui_irr)==0:
+            self.context.anomaly_handler.add_anomaly("i")
 
         dataset_l1c = self.prop.process_measurement_function_l1("irradiance",
             dataset_l1c,interpolation_function_time.meas_function,
@@ -115,6 +121,12 @@ class Interpolate:
             [None,None,dataset_l1c_temp["corr_systematic_indep_irradiance"].values],
             [None,None,dataset_l1c_temp["corr_systematic_corr_rad_irr_irradiance"].values],
             param_fixed=[False,True,True])
+
+        if len(acqui_irr)==1:
+            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+                dataset_l1c["quality_flag"], "single_irradiance_used"
+            )
+
         return dataset_l1c
 
     def interpolate_skyradiance(self,dataset_l1c,dataset_l1a_skyrad):

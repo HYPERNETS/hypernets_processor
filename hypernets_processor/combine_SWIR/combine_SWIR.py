@@ -124,6 +124,9 @@ class CombineSWIR:
             param_fixed=[True, False, True, False, True],
         )
 
+        if measurandstring=="irradiance":
+            dataset_l1b_comb=self.qual.perform_quality_irradiance(dataset_l1b_comb)
+
         if self.context.get_config_value("write_l1b"):
             self.writer.write(
                 dataset_l1b_comb,

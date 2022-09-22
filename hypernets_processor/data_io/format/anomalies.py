@@ -17,8 +17,8 @@ ANOMALIES_DICT = {
     },
     "s": {
             "description": "sequence data incomplete",
-            "error": IOError,
-            "error_msg": "sequence data incomplete (review log for more details)"
+            "error": None,
+            "error_msg": None
         },
     "x": {
             "description": "unexpected error during processing",
@@ -56,8 +56,8 @@ ANOMALIES_DICT = {
         "error_msg": None
     },
     "i": {
-        "description": "Irradiance not vza=180",
-        "error": None,
+        "description": "No valid irradiance measurements",
+        "error": IOError,
         "error_msg": None
     },
 

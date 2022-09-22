@@ -16,10 +16,10 @@ class InterpolationTimeLinear(MeasurementFunction):
             simpleint=False
             out = np.empty((len(variables),len(output_time)))
             for i in range(len(output_time)):
-                if output_time[i] > np.max(times[:,i]):
+                if output_time[i] >= np.max(times[:,i]):
                     out[:,i] = variables[:,times[:,i] == np.max(times[:,i]),
                                i][:,0]
-                elif output_time[i] < np.min(times[:,i]):
+                elif output_time[i] <= np.min(times[:,i]):
                     out[:,i] = variables[:,times[:,i] == np.min(times[:,i]),
                                i][:,0]
                 else:
@@ -32,9 +32,9 @@ class InterpolationTimeLinear(MeasurementFunction):
                 simpleint=False
                 out = np.empty((len(variables),len(output_time)))
                 for i in range(len(output_time)):
-                    if output_time[i] > np.max(times):
+                    if output_time[i] >= np.max(times):
                         out[:,i] = variables[:,times == np.max(times)][:,0]
-                    elif output_time[i] < np.min(times):
+                    elif output_time[i] <= np.min(times):
                         out[:,i] = variables[:,times == np.min(times)][:,0]
                     else:
                         irradiance_intfunc = scipy.interpolate.interp1d(times,
@@ -42,9 +42,9 @@ class InterpolationTimeLinear(MeasurementFunction):
                         out[:,i] = irradiance_intfunc(output_time[i])
 
         if simpleint:
-            if output_time > max(times):
+            if output_time >= max(times):
                 out= variables[:,times == max(times)]
-            elif output_time < min(times):
+            elif output_time <= min(times):
                 out=  variables[:,times == min(times)]
             else:
                 irradiance_intfunc = scipy.interpolate.interp1d(times,variables)

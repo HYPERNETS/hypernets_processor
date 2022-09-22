@@ -435,7 +435,8 @@ class HypernetsReader:
                         byte_pointer = f.tell()
                         chunk_counter += 1
             except:
-                print(spectra,"not found")
+                self.context.logger.info("%s file missing"%(spectra))
+                self.context.anomaly_handler.add_anomaly("s")
                 vnir = np.vstack([vnir, np.nan*np.array(spectrum_vnir.body)])
                 swir = np.vstack([swir, np.nan*np.array(spectrum_swir.body)])
                 continue

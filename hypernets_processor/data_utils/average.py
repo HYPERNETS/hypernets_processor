@@ -53,9 +53,10 @@ class Average:
         else:
             dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
             dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring, dataset_l0)
-            flags = ["outliers"]
+            flags = ["outliers","L0_thresholds", "L0_discontinuity"]
             for var in dataset_l0b.variables:
                 if var=="dark_signal":
+                    meanvar=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
                     dataset_l0b["dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
                 elif var=="u_rel_random_dark_signal":
                     dataset_l0b["u_rel_random_dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)
@@ -67,11 +68,42 @@ class Average:
                     else:
                         dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags)
 
+        series_id = np.unique(dataset_l0['series_id'])
+        series_id_bla = np.unique(dataset_l0_bla['series_id'])
+        flag_halfmasked = [False]*len(series_id)
+        flag_allmasked = [False]*len(series_id)
+        flag_darkmasked = [False]*len(series_id)
+        for i in range(len(series_id)):
+            flagged_bla = DatasetUtil.get_flags_mask_or(dataset_l0_bla['quality_flag'],["dark_masked"])
+            flagged_bla = flagged_bla[np.where(dataset_l0_bla['series_id'] == series_id_bla[i])]
+            flagged = DatasetUtil.get_flags_mask_or(dataset_l0['quality_flag'],flags)
+            flagged = flagged[np.where(dataset_l0['series_id'] == series_id[i])]
+            if np.count_nonzero(flagged) > 0.5*len(flagged):
+                flag_halfmasked[i]=True
+                self.context.logger.info("less than half of the scans for series %s passed quality checks"%(series_id[i]))
+            if np.count_nonzero(flagged) == len(flagged):
+                flag_allmasked[i]=True
+                self.context.logger.info("None of the scans for series %s passed quality checks"%(series_id[i]))
+            if np.count_nonzero(flagged_bla==False)<3:
+                flag_darkmasked[i]=True
+                self.context.logger.info("less than 3 dark scans for series %s passed quality checks"%(series_id[i]))
+
+
+        dataset_l1b["quality_flag"][np.where(flag_halfmasked)] = DatasetUtil.set_flag(
+            dataset_l1b["quality_flag"][np.where(flag_halfmasked)], "half_of_scans_masked"
+        )
+        dataset_l1b["quality_flag"][np.where(flag_allmasked)] = DatasetUtil.set_flag(
+            dataset_l1b["quality_flag"][np.where(flag_allmasked)], "angles_missing"
+        )
+        dataset_l1b["quality_flag"][np.where(flag_darkmasked)] = DatasetUtil.set_flag(
+            dataset_l1b["quality_flag"][np.where(flag_darkmasked)], "less_than_three_darks"
+        )
+
         calibrate_function = self._measurement_function_factory(repeat_dims="series").get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
 
         input_vars = calibrate_function.get_argument_names()
-        # calibrate_function.propagate_ds(dataset_l0b,calibration_data)
+        #dataset_l1b=calibrate_function.propagate_ds(dataset_l0b,calibration_data)
 
         input_qty = []
         u_random_input_qty = []
@@ -162,7 +194,7 @@ class Average:
             out = np.empty\
                 ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
             for i in range(len(series_id)):
-                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'])
+                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'],flags)
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(vals[:,:,ids],axis=3)[:,:,0]
@@ -173,7 +205,7 @@ class Average:
             out = np.empty((len(series_id),))
 
             for i in range(len(series_id)):
-                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'])
+                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'],flags)
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(dataset[var].values[ids])
@@ -184,11 +216,10 @@ class Average:
             out = np.empty((len(series_id), len(dataset['wavelength'])))
 
             for i in range(len(series_id)):
-                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'])
+                flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'],flags)
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
-
                 if rand_unc:
                     out[i] = (np.sum(dataset[var].values[:, ids]**2, axis=2)[:, 0])**0.5 / len(ids[0])
 

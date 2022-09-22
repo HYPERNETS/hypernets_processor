@@ -68,9 +68,14 @@ class Plotting:
 
             ids = np.where((dataset["series_id"] == series_id[i]))[0]
             ydata_subset = dataset[measurandstring].values[:, ids]
-            self.plot_variable(
-                measurandstring, plotpath, dataset["wavelength"].values, ydata_subset
-            )
+            if measurandstring=="digital_number":
+                self.plot_variable(
+                    measurandstring, plotpath, range(len(ydata_subset)), ydata_subset
+                )
+            else:
+                self.plot_variable(
+                    measurandstring, plotpath, dataset["wavelength"].values, ydata_subset
+                )
 
     def plot_series_in_sequence(self, measurandstring, dataset):
         plotpath = os.path.join(
@@ -333,7 +338,7 @@ class Plotting:
             if len(labels)>10:
                 ax1.legend(bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=8, ncol=2)
             else:
-                ax1.legend(bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=8)
+                ax1.legend(fontsize=8, loc="upper right")
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)")
         ymax = np.percentile(ydata, 95) * 1.2
@@ -397,7 +402,7 @@ class Plotting:
             if len(labels)>10:
                 ax1.legend(bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=8, ncol=2)
             else:
-                ax1.legend(bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=8)
+                ax1.legend(loc="lower right", fontsize=8)
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")
         ymax = np.percentile(ydata, 95) * 1.2

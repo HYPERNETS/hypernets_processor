@@ -486,7 +486,7 @@ L1A_RAD_VARIABLES = {"u_rel_random_radiance": {"dim": [WL_DIM, SCAN_DIM],
                                   "attributes": {"standard_name": "radiance",
                                                  "long_name": "upwelling radiance",
                                                  "units": "mW m^-2 nm^-1 sr^-1",
-                                                  "unc_comps": [
+                                                 "unc_comps": [
                                                                    "u_rel_random_radiance",
                                                                    "u_rel_systematic_indep_radiance",
                                                                    "u_rel_systematic_corr_rad_irr_radiance",

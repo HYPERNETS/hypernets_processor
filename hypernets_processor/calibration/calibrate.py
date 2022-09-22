@@ -251,7 +251,7 @@ class Calibrate:
             np.where(dark_outlier_rad == 1)
         ] = DatasetUtil.set_flag(
             datasetl0masked["quality_flag"][np.where(dark_outlier_rad == 1)],
-            "dark_outliers",
+            "dark_masked",
         )  # for i in range(len(mask))]
 
         DN_rand = DatasetUtil.create_variable(
@@ -319,7 +319,7 @@ class Calibrate:
             datasetl0masked["dark_signal"] = DN_dark
             datasetl0masked["dark_signal"].values = dark_signals_radscans
 
-        datasetl0masked_bla, mask = self.qual.perform_quality_check_L0(
+        datasetl0masked_bla, mask = self.qual.perform_quality_check_black(
             datasetl0masked_bla, series_ids_bla
         )
 
