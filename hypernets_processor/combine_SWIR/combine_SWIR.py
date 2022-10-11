@@ -8,8 +8,8 @@ from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.combine_SWIR.measurement_functions.combine_factory import CombineFactory
-from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 from hypernets_processor.data_utils.quality_checks import QualityChecks
+import punpy
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -22,8 +22,7 @@ __status__ = "Development"
 
 class CombineSWIR:
     def __init__(self,context,parallel_cores=1):
-        self._measurement_function_factory = CombineFactory()
-        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
+        self._measurement_function_factory = CombineFactory
         self.qual = QualityChecks(context)
         self.avg = Average(context=context)
         self.templ = DataTemplates(context)
@@ -54,75 +53,36 @@ class CombineSWIR:
         dataset_l1b, dataset_l1b_swir = self.qual.perform_quality_check_comb(
             dataset_l1b, dataset_l1b_swir
         )
-        combine_function = self._measurement_function_factory.get_measurement_function(
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        combine_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_combine")
         )
-        input_vars = combine_function.get_argument_names()
-        input_qty = [
-            dataset_l1b["wavelength"].values,
-            dataset_l1b[measurandstring].values,
-            dataset_l1b_swir["wavelength"].values,
-            dataset_l1b_swir[measurandstring].values,
-            self.context.get_config_value("combine_lim_wav"),
-        ]
-        u_random_input_qty = [
-            None,
-            dataset_l1b["u_rel_random_" + measurandstring].values
-            * dataset_l1b[measurandstring].values/100,
-            None,
-            dataset_l1b_swir["u_rel_random_" + measurandstring].values
-            * dataset_l1b_swir[measurandstring].values/100,
-            None,
-            ]
-        u_systematic_input_qty_indep = [
-            None,
-            dataset_l1b["u_rel_systematic_indep_" + measurandstring].values
-            * dataset_l1b[measurandstring].values/100,
-            None,
-            dataset_l1b_swir["u_rel_systematic_indep_" + measurandstring].values
-            * dataset_l1b_swir[measurandstring].values/100,
-            None,
-            ]
-        u_systematic_input_qty_corr = [
-            None,
-            dataset_l1b["u_rel_systematic_corr_rad_irr_" + measurandstring].values
-            * dataset_l1b[measurandstring].values/100,
-            None,
-            dataset_l1b_swir["u_rel_systematic_corr_rad_irr_" + measurandstring].values
-            * dataset_l1b_swir[measurandstring].values/100,
-            None,
-            ]
-        corr_systematic_input_qty_indep = [
-            None,
-            dataset_l1b["corr_systematic_indep_" + measurandstring].values,
-            None,
-            dataset_l1b_swir["corr_systematic_indep_" + measurandstring].values,
-            None,
-        ]
-        corr_systematic_input_qty_corr = [
-            None,
-            dataset_l1b["corr_systematic_corr_rad_irr_" + measurandstring].values,
-            None,
-            dataset_l1b_swir["corr_systematic_corr_rad_irr_" + measurandstring].values,
-            None,
-        ]
-        # todo do this more consistently with other modules, and do a direct copy for ranges that don't overlap
+
         dataset_l1b_comb = self.templ.l1b_template_from_combine(
             measurandstring, dataset_l1b, dataset_l1b_swir
         )
 
-        self.prop.process_measurement_function_l1(
-            measurandstring,
-            dataset_l1b_comb,
-            combine_function.meas_function,
-            input_qty,
-            u_random_input_qty,
-            u_systematic_input_qty_indep,
-            u_systematic_input_qty_corr,
-            corr_systematic_input_qty_indep,
-            corr_systematic_input_qty_corr,
-            param_fixed=[True, False, True, False, True],
-        )
+        # replace_dict_VIS={"wavelength":"wavelength_VIS"}
+        # for var in dataset_l1b.variables:
+        #     if measurandstring in var:
+        #         replace_dict_VIS[var]=var.replace(measurandstring,"measurand_VIS")
+        # dataset_l1b_temp=dataset_l1b.rename(replace_dict_VIS)
+        # dataset_l1b_temp["measurand_VIS"].attrs["unc_comps"]=[comp.replace(measurandstring,"measurand_VIS") for comp in dataset_l1b_temp["measurand_VIS"].attrs["unc_comps"]]
+        #
+        # replace_dict_SWIR={"wavelength":"wavelength_SWIR"}
+        # for var in dataset_l1b.variables:
+        #     if measurandstring in var:
+        #         replace_dict_SWIR[var]=var.replace(measurandstring,"measurand_SWIR")
+        # dataset_l1b_swir_temp=dataset_l1b_swir.rename(replace_dict_SWIR)
+        # dataset_l1b_swir_temp["measurand_SWIR"].attrs["unc_comps"]=[comp.replace(measurandstring,"measurand_SWIR") for comp in dataset_l1b_swir_temp["measurand_SWIR"].attrs["unc_comps"]]
+
+        dataset_l1b_comb=combine_function.propagate_ds_specific(
+            ["random","systematic_indep","systematic_corr_rad_irr"],
+            dataset_l1b.rename({"wavelength":"wavelength_VIS", measurandstring:"measurand_VIS"}),
+            dataset_l1b_swir.rename({"wavelength":"wavelength_SWIR", measurandstring:"measurand_SWIR"}),
+            {"wavelength_step": self.context.get_config_value("combine_lim_wav")},
+            ds_out_pre=dataset_l1b_comb,
+            store_unc_percent=True)
 
         if measurandstring=="irradiance":
             dataset_l1b_comb=self.qual.perform_quality_irradiance(dataset_l1b_comb)

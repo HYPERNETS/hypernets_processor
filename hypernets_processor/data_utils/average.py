@@ -7,11 +7,11 @@ from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.calibration.measurement_functions.measurement_function_factory import\
     MeasurementFunctionFactory
-from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 
 import time
 import numpy as np
 from obsarray.templater.dataset_util import DatasetUtil
+import punpy
 
 '''___Authorship___'''
 __author__ = "Pieter De Vis"
@@ -26,9 +26,6 @@ class Average:
         self.templ = DataTemplates(context=context)
         self.context = context
         self.writer=HypernetsWriter(context)
-        self.prop = PropagateUnc(context, parallel_cores=0)
-
-        #self.prop = punpy.MCPropagation(context.get_config_value("mcsteps"),dtype="float32")
         self._measurement_function_factory = MeasurementFunctionFactory
 
 
@@ -63,7 +60,7 @@ class Average:
                 elif "series" in dataset_l0b[var].dims:
                     if "u_rel_random" in var:
                         dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags,rand_unc=True)
-                    elif "corr_" in var:
+                    elif "err_corr_" in var:
                         dataset_l0b[var].values=dataset_l0[var].values
                     else:
                         dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags)
@@ -99,50 +96,11 @@ class Average:
             dataset_l1b["quality_flag"][np.where(flag_darkmasked)], "less_than_three_darks"
         )
 
-        calibrate_function = self._measurement_function_factory(repeat_dims="series").get_measurement_function(
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
 
-        input_vars = calibrate_function.get_argument_names()
-        #dataset_l1b=calibrate_function.propagate_ds(dataset_l0b,calibration_data)
-
-        input_qty = []
-        u_random_input_qty = []
-        for var in input_vars:
-            if var=="dark_signal":
-                meanvar=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
-                input_qty.append(meanvar)
-                u_random_input_qty.append(self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)*meanvar/100)
-            elif var=="integration_time":
-                input_qty.append(self.calc_mean_masked(dataset_l0,var,flags))
-                u_random_input_qty.append(None)
-            else:
-                try:
-                    meanvar=self.calc_mean_masked(dataset_l0, var,flags)
-                    input_qty.append(meanvar)
-                except:
-                    meanvar=calibration_data[var].values.astype("float32")
-                    input_qty.append(meanvar)
-                try:
-                    u_random_input_qty.append(self.calc_mean_masked(dataset_l0, "u_rel_random_" + var,flags,rand_unc=True)*meanvar/100.)
-                except:
-                    try:
-                        u_random_input_qty.append((calibration_data["u_rel_random_"+var].values*
-                                                   calibration_data[var].values/100.).astype("float32"))
-                    except:
-                        u_random_input_qty.append(None)
-
-        u_systematic_input_qty_indep,u_systematic_input_qty_corr,\
-        corr_systematic_input_qty_indep,corr_systematic_input_qty_corr = self.prop.find_u_systematic_input_l1a(input_vars, dataset_l0, calibration_data)
-
-        dataset_l1b = self.prop.process_measurement_function_l1a(measurandstring,
-                                                                 dataset_l1b,
-                                                                 calibrate_function.meas_function,
-                                                                 input_qty,
-                                                                 u_random_input_qty,
-                                                                 u_systematic_input_qty_indep,
-                                                                 u_systematic_input_qty_corr,
-                                                                 corr_systematic_input_qty_indep,
-                                                                 corr_systematic_input_qty_corr)
+        dataset_l1b=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
 
         return dataset_l1b
 
@@ -167,8 +125,8 @@ class Average:
                 dataset,"u_rel_random_"+measurandstring,flags,rand_unc=True)
             dataset_l2a["u_rel_systematic_"+measurandstring].values = self.calc_mean_masked(
                 dataset,"u_rel_systematic_"+measurandstring,flags)
-            dataset_l2a["corr_systematic_"+measurandstring].values = \
-                dataset["corr_systematic_"+measurandstring].values
+            dataset_l2a["err_corr_systematic_"+measurandstring].values = \
+                dataset["err_corr_systematic_"+measurandstring].values
 
         return dataset_l2a
 

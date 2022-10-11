@@ -20,5 +20,5 @@ class StepCombine(MeasurementFunction):
         return "StepCombine"
 
     def get_argument_names(self):
-        return ["wavelength_VIS","radiance_VIS","wavelength_SWIR","radiance_SWIR","wavelength_step"]
+        return ["wavelength_VIS","measurand_VIS","wavelength_SWIR","measurand_SWIR","wavelength_step"]
 

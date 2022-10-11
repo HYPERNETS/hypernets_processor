@@ -457,7 +457,7 @@ class CalibrationConverter:
                         gains[:, 2] * (gains[:, 6] ** 2) ** 0.5,
                         )
 
-                    calibration_data["corr_systematic_indep_gains"].values[
+                    calibration_data["err_corr_systematic_indep_gains"].values[
                         i_cal
                     ] = cm.correlation_from_covariance(
                         cov_diag + cov_other + cov_full + cov_filament
@@ -481,7 +481,7 @@ class CalibrationConverter:
                         gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
                         )
 
-                    calibration_data["corr_systematic_corr_rad_irr_gains"].values[
+                    calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
                         i_cal
                     ] = cm.correlation_from_covariance(cov_other + cov_filament)
                 except:

@@ -115,7 +115,7 @@ setup(
         "dataset",
         "sqlalchemy==1.3.20",
         "sqlalchemy-utils",
-        "punpy>=0.32",
+        "punpy>=0.35",
         "freezegun"
         # "psycopg2",
     ],

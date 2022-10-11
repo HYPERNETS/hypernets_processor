@@ -12,7 +12,6 @@ from hypernets_processor.rhymer.rhymer.processing.rhymer_processing import Rhyme
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_utils.average import Average
-from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 from hypernets_processor.data_utils.quality_checks import QualityChecks
 
 import punpy
@@ -30,8 +29,7 @@ __status__ = "Development"
 
 class SurfaceReflectance:
     def __init__(self, context, parallel_cores=1):
-        self._measurement_function_factory = ProtocolFactory()
-        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
+        self._measurement_function_factory = ProtocolFactory
         self.qual = QualityChecks(context)
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
@@ -82,13 +80,9 @@ class SurfaceReflectance:
 
     def process_l2(self, dataset):
         dataset = self.qual.perform_quality_check_L2a(dataset)
-        l1tol2_function = self._measurement_function_factory.get_measurement_function(
+        l1tol2_function = self._measurement_function_factory(repeat_dims="series",yvariable="reflectance")\
+            .get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
-        input_vars = l1tol2_function.get_argument_names()
-        input_qty = self.prop.find_input(input_vars, dataset)
-        u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset)
-        u_systematic_input_qty, cov_systematic_input_qty = \
-            self.prop.find_u_systematic_input(input_vars, dataset)
 
         if self.context.get_config_value("network").lower() == "w":
 
@@ -110,11 +104,15 @@ class SurfaceReflectance:
 
         elif self.context.get_config_value("network").lower() == "l":
             dataset_l2a = self.templ.l2_from_l1c_dataset(dataset,["outliers","dark_outliers"])
-            dataset_l2a = self.prop.process_measurement_function_l2(["reflectance"], dataset_l2a,
-                                                                    l1tol2_function.meas_function,
-                                                                    input_qty, u_random_input_qty,
-                                                                    u_systematic_input_qty,
-                                                                    cov_systematic_input_qty)
+
+            dataset_l2a=l1tol2_function.propagate_ds_specific(
+                ["random","systematic_indep"],
+                dataset,
+                comp_list_out=["random","systematic"],
+                ds_out_pre=dataset_l2a,
+                store_unc_percent=True,
+                simple_systematic=False)
+
             if self.context.get_config_value("plot_l2a"):
                 self.plot.plot_series_in_sequence("reflectance", dataset_l2a)
                 self.plot.plot_series_in_sequence_vaa("reflectance", dataset_l2a, 98)

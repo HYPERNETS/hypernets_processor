@@ -26,5 +26,5 @@ class InterpolationWavLinear(MeasurementFunction):
         return "InterpolationWavLinear"
 
     def get_argument_names(self):
-        return ["radiance_wavelengths","irradiance_wavelengths","irradiances"]
+        return ["radiance_wavelength","irradiance_wavelength","irradiance"]
 

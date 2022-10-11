@@ -5,11 +5,11 @@ Calibration class
 from hypernets_processor.version import __version__
 from hypernets_processor.calibration.measurement_functions.measurement_function_factory import \
     MeasurementFunctionFactory
-from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 from hypernets_processor.data_utils.quality_checks import QualityChecks
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.plotting.plotting import Plotting
+import punpy
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,8 +25,7 @@ __status__ = "Development"
 
 class Calibrate:
     def __init__(self, context, parallel_cores=0):
-        self._measurement_function_factory = MeasurementFunctionFactory()
-        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
+        self._measurement_function_factory = MeasurementFunctionFactory
         self.qual = QualityChecks(context)
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context)
@@ -41,28 +40,31 @@ class Calibrate:
         if self.context.get_config_value("plot_l0"):
             self.plot.plot_scans_in_series("digital_number",dataset_l0)
 
-        calibrate_function = self._measurement_function_factory.get_measurement_function(
-            self.context.get_config_value("measurement_function_calibrate"))
-        input_vars = calibrate_function.get_argument_names()
-
         dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
         self.context.logger.info("preprocessing done")
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0, swir)
 
-        input_qty = self.prop.find_input_l1a(input_vars, dataset_l0, calibration_data)
-        u_random_input_qty = self.prop.find_u_random_input_l1a(input_vars, dataset_l0, calibration_data)
-        u_systematic_input_qty_indep,u_systematic_input_qty_corr,\
-        corr_systematic_input_qty_indep,corr_systematic_input_qty_corr = self.prop.find_u_systematic_input_l1a(input_vars, dataset_l0, calibration_data)
-        dataset_l1a = self.prop.process_measurement_function_l1a(measurandstring,
-                                                        dataset_l1a,
-                                                        calibrate_function.meas_function,
-                                                        input_qty,
-                                                        u_random_input_qty,
-                                                        u_systematic_input_qty_indep,
-                                                        u_systematic_input_qty_corr,
-                                                        corr_systematic_input_qty_indep,
-                                                        corr_systematic_input_qty_corr)
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
+            self.context.get_config_value("measurement_function_calibrate"))
 
+        if self.context.get_config_value("uncertainty_l1a"):
+
+
+            dataset_l1a=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0,calibration_data,ds_out_pre=dataset_l1a,store_unc_percent=True)
+
+        else:
+            measurand = calibrate_function.run(dataset_l0,calibration_data)
+            dataset_l1a[measurandstring].values = measurand
+            dataset_l1a.drop(
+                [
+                    "u_rel_random_" + measurandstring,
+                    "u_rel_systematic_indep_" + measurandstring,
+                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
+                    "err_corr_systematic_indep_" + measurandstring,
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
+                    ]
+            )
         if self.context.get_config_value("write_l1a"):
             self.writer.write(dataset_l1a, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
 
@@ -92,13 +94,6 @@ class Calibrate:
         if self.context.get_config_value("plot_l0"):
             self.plot.plot_scans_in_series("digital_number", dataset_l0)
 
-        calibrate_function = (
-            self._measurement_function_factory.get_measurement_function(
-                self.context.get_config_value("measurement_function_calibrate")
-            )
-        )
-        input_vars = calibrate_function.get_argument_names()
-
         dataset_l0_masked, dataset_l0_bla_masked = self.preprocess_l0(
             dataset_l0, dataset_l0_bla, calibration_data
         )
@@ -109,51 +104,24 @@ class Calibrate:
             measurandstring, dataset_l0_masked, swir
         )
 
-        input_qty = self.prop.find_input_l1a(
-            input_vars, dataset_l0_masked, calibration_data
-        )
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+
+        calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="scan",yvariable=measurandstring).get_measurement_function(
+            self.context.get_config_value("measurement_function_calibrate"))
 
         if self.context.get_config_value("uncertainty_l1a"):
-            u_random_input_qty = self.prop.find_u_random_input_l1a(
-                input_vars, dataset_l0_masked, calibration_data
-            )
-            (
-                u_systematic_input_qty_indep,
-                u_systematic_input_qty_corr,
-                corr_systematic_input_qty_indep,
-                corr_systematic_input_qty_corr,
-            ) = self.prop.find_u_systematic_input_l1a(
-                input_vars, dataset_l0_masked, calibration_data
-            )
-            dataset_l1a = self.prop.process_measurement_function_l1a(
-                measurandstring,
-                dataset_l1a,
-                calibrate_function.meas_function,
-                input_qty,
-                u_random_input_qty,
-                u_systematic_input_qty_indep,
-                u_systematic_input_qty_corr,
-                corr_systematic_input_qty_indep,
-                corr_systematic_input_qty_corr,
-            )
+            dataset_l1a=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0_masked, dataset_l0_bla_masked,calibration_data,ds_out_pre=dataset_l1a,store_unc_percent=True)
 
         else:
-            datashape = input_qty[0].shape
-            for i in range(len(input_qty)):
-                if len(input_qty[i].shape) < len(datashape):
-                    if input_qty[i].shape[0] == datashape[1]:
-                        input_qty[i] = np.tile(input_qty[i], (datashape[0], 1))
-                    elif input_qty[i].shape[0] == datashape[0]:
-                        input_qty[i] = np.tile(input_qty[i], (datashape[1], 1)).T
-            measurand = calibrate_function.meas_function(*input_qty)
+            measurand = calibrate_function.run(dataset_l0_masked,calibration_data)
             dataset_l1a[measurandstring].values = measurand
             dataset_l1a.drop(
                 [
                     "u_rel_random_" + measurandstring,
                     "u_rel_systematic_indep_" + measurandstring,
                     "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "corr_systematic_indep_" + measurandstring,
-                    "corr_systematic_corr_rad_irr_" + measurandstring,
+                    "err_corr_systematic_indep_" + measurandstring,
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
                     ]
             )
 

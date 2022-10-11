@@ -289,7 +289,7 @@ class Plotting:
                 )
 
             if L2:
-                ycorr = dataset["corr_systematic_" + measurandstring].values
+                ycorr = dataset["err_corr_systematic_" + measurandstring].values
                 wavs = dataset["wavelength"].values
                 fig1, ax1 = plt.subplots(figsize=(5, 5))
                 im = ax1.pcolormesh(wavs, wavs, ycorr, vmin=0, vmax=1, cmap="gnuplot")
@@ -301,9 +301,9 @@ class Plotting:
                 plt.close(fig1)
 
             else:
-                ycorr_indep = dataset["corr_systematic_indep_" + measurandstring].values
+                ycorr_indep = dataset["err_corr_systematic_indep_" + measurandstring].values
                 ycorr_corr = dataset[
-                    "corr_systematic_corr_rad_irr_" + measurandstring
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring
                     ].values
                 wavs = dataset["wavelength"].values
                 fig1, (ax1, ax2) = plt.subplots(ncol=2, nrows=1, figsize=(10, 5))

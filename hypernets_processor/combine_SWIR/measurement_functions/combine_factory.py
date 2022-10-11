@@ -16,9 +16,9 @@ __status__ = "Development"
 
 
 class CombineFactory:
-    def __init__(self):
-        self.measurement_functions = dict([(SlidingAverageCombine.get_name(),SlidingAverageCombine()),
-                                        (StepCombine.get_name(),StepCombine())])
+    def __init__(self,*args,**kwargs):
+        self.measurement_functions = dict([(SlidingAverageCombine.get_name(),SlidingAverageCombine(*args,**kwargs)),
+                                        (StepCombine.get_name(),StepCombine(*args,**kwargs))])
 
     def get_names(self):
         return self.measurement_functions.keys()

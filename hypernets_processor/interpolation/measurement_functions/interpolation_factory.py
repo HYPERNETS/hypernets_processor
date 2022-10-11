@@ -16,12 +16,12 @@ __status__ = "Development"
 
 
 class InterpolationFactory:
-    def __init__(self):
+    def __init__(self,*args,**kwargs):
         self.measurement_functions = dict([
             (InterpolationTimeLinear.get_name(),
-             InterpolationTimeLinear()),
+             InterpolationTimeLinear(*args,**kwargs)),
             (InterpolationWavLinear.get_name(),
-             InterpolationWavLinear())])
+             InterpolationWavLinear(*args,**kwargs))])
 
     def get_names(self):
         return self.measurement_functions.keys()
