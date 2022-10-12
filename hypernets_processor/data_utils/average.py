@@ -100,6 +100,11 @@ class Average:
         calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
 
+        for var in dataset_l0b.variables:
+            print(dataset_l0b[var])
+        for var in calibration_data.variables:
+            print(calibration_data[var])
+
         dataset_l1b=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
 
         return dataset_l1b
