@@ -99,11 +99,12 @@ class Plotting:
                 for i in range(len(dataset["viewing_zenith_angle"].values))
             ]
         linestyles = [
-            (0, (3, dataset["viewing_zenith_angle"].values[i] / 10.0))
-            if dataset["viewing_azimuth_angle"].values[i] < 180
-            else (0, (1, dataset["viewing_zenith_angle"].values[i] / 10.0))
+            (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
+            if np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180
+            else (0, (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
             for i in range(len(dataset["viewing_zenith_angle"].values))
         ]
+
         self.plot_variable(
             measurandstring,
             plotpath,

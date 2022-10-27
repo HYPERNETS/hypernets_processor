@@ -310,16 +310,24 @@ class HypernetsReader:
 
                 #             print(datetime.fromtimestamp(int(ts+timereboot)))
                 #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
-                if lat is not None:
-                    ds.attrs["site_latitude"] = lat
-                    ds.attrs["site_longitude"] = lon
-                    ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
-                    ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
-                    vaa_rel, vza = map(float, specattr['pt_ask'].split(";"))
-                    vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360-int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360))*360
-                else:
+                if lat is None:
+                    lat=np.nan
+                    lon=np.nan
+                    sza=np.nan
+                    saa=np.nan
                     self.context.logger.error(
-                        "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
+                        "Lattitude is not found, using nan values instead for lat, lon, sza and saa.")
+                else:
+                    sza = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
+                    saa = get_azimuth(float(lat), float(lon), acquisitionTime)
+
+                ds.attrs["site_latitude"] = lat
+                ds.attrs["site_longitude"] = lon
+                ds["solar_zenith_angle"][scan_number] = sza
+                ds["solar_azimuth_angle"][scan_number] = saa
+                vaa_rel, vza = map(float, specattr['pt_ask'].split(";"))
+                vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360-int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360))*360
+
                 ds['quality_flag'][scan_number] = flag
                 ds['integration_time'][scan_number] = header['integration_time']
                 ds['temperature'][scan_number] = header['temperature']
@@ -387,7 +395,7 @@ class HypernetsReader:
             )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
-            vaa, vza = map(float, specattr["pt_abs"].split(";"))
+            vaa, vza = map(float, specattr["pt_ask"].split(";"))
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
@@ -650,44 +658,40 @@ class HypernetsReader:
         ds["acquisition_time"][
             scan_number
         ] = datetime.datetime.timestamp(acquisitionTime)
-        if lat is not None:
-            ds.attrs["site_latitude"] = lat
-            ds.attrs["site_longitude"] = lon
-            ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
-                float(lat), float(lon), acquisitionTime
-            )
-            ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                float(lat), float(lon), acquisitionTime
-            )
-            vaa, vza = map(float, specattr["pt_ask"].split(";"))
-            if vza == -1 and vaa == -1:
-                self.context.logger.warning(
-                    "vza and vaa are both -1, using pt_abs instead"
-                )
-                vaa, vza = map(float, specattr["pt_abs"].split(";"))
-            if vza > 180:
-                self.context.logger.debug(
-                    "vza is larger than 90degrees, changing to equivalent geometry with vza<90."
-                )
-                vza = 360 - vza
-                vaa = vaa + 180
 
-            if vaa>360:
-                vaa = vaa - 360
 
-            ds.attrs["site_latitude"] = lat
-            ds.attrs["site_longitude"] = lon
-            ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
-                float(lat), float(lon), acquisitionTime
-            )
-            ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                float(lat), float(lon), acquisitionTime
-            )
-
-        else:
+        if lat is None:
+            lat=np.nan
+            lon=np.nan
+            sza=np.nan
+            saa=np.nan
             self.context.logger.error(
-                "Lattitude is not found, using default values instead for lat, lon, sza and saa."
+                "Lattitude is not found, using nan values instead for lat, lon, sza and saa.")
+        else:
+            sza = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
+            saa = get_azimuth(float(lat), float(lon), acquisitionTime)
+
+        vaa, vza = map(float, specattr["pt_ask"].split(";"))
+        if vza == -1 and vaa == -1:
+            self.context.logger.warning(
+                "vza and vaa are both -1, using pt_abs instead"
             )
+            vaa, vza = map(float, specattr["pt_abs"].split(";"))
+        if vza > 180:
+            self.context.logger.debug(
+                "vza is larger than 90degrees, changing to equivalent geometry with vza<90."
+            )
+            vza = 360 - vza
+            vaa = vaa + 180
+
+        if vaa>360:
+            vaa = vaa - 360
+
+        ds.attrs["site_latitude"] = lat
+        ds.attrs["site_longitude"] = lon
+        ds["solar_zenith_angle"][scan_number] = sza
+        ds["solar_azimuth_angle"][scan_number] = saa
+
         ds["quality_flag"][scan_number] = flag
 
 
