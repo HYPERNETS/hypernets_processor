@@ -43,27 +43,27 @@ class Average:
         :return:
         :rtype:
         """
-        if self.context.get_config_value("network") == "w":
-            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
-            flags = ["outliers"]
-
-        else:
-            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
-            dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring, dataset_l0)
-            flags = ["outliers","L0_thresholds", "L0_discontinuity"]
-            for var in dataset_l0b.variables:
-                if var=="dark_signal":
-                    meanvar=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
-                    dataset_l0b["dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
-                elif var=="u_rel_random_dark_signal":
-                    dataset_l0b["u_rel_random_dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)
-                elif "series" in dataset_l0b[var].dims:
-                    if "u_rel_random" in var:
-                        dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags,rand_unc=True)
-                    elif "err_corr_" in var:
-                        dataset_l0b[var].values=dataset_l0[var].values
-                    else:
-                        dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags)
+        # if self.context.get_config_value("network") == "w":
+        #     dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
+        #     flags = ["outliers"]
+        #
+        # else:
+        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
+        dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring, dataset_l0)
+        flags = ["outliers","L0_thresholds", "L0_discontinuity"]
+        for var in dataset_l0b.variables:
+            if var=="dark_signal":
+                meanvar=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
+                dataset_l0b["dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
+            elif var=="u_rel_random_dark_signal":
+                dataset_l0b["u_rel_random_dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)
+            elif "series" in dataset_l0b[var].dims:
+                if "u_rel_random" in var:
+                    dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags,rand_unc=True)
+                elif "err_corr_" in var:
+                    dataset_l0b[var].values=dataset_l0[var].values
+                else:
+                    dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags)
 
         series_id = np.unique(dataset_l0['series_id'])
         series_id_bla = np.unique(dataset_l0_bla['series_id'])

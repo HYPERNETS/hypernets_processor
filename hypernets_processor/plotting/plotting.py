@@ -306,7 +306,7 @@ class Plotting:
                     "err_corr_systematic_corr_rad_irr_" + measurandstring
                     ].values
                 wavs = dataset["wavelength"].values
-                fig1, (ax1, ax2) = plt.subplots(ncol=2, nrows=1, figsize=(10, 5))
+                fig1, (ax1, ax2) = plt.subplots(ncols=2, nrows=1, figsize=(10, 5))
                 ax1.pcolormesh(wavs, wavs, ycorr_indep, vmin=0, vmax=1, cmap="gnuplot")
                 ax1.set_ylabel("wavelength (nm)")
                 ax1.set_xlabel("wavelength (nm)")

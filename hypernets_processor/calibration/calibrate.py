@@ -42,7 +42,7 @@ class Calibrate:
 
         dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
         self.context.logger.info("preprocessing done")
-        dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0, swir)
+        dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0[0], swir)
 
         prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
         calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
@@ -52,7 +52,7 @@ class Calibrate:
             dataset_l1a=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0,calibration_data,ds_out_pre=dataset_l1a,store_unc_percent=True)
 
         else:
-            measurand = calibrate_function.run(dataset_l0,calibration_data)
+            measurand = calibrate_function.run(dataset_l0[0],calibration_data)
             dataset_l1a[measurandstring].values = measurand
             dataset_l1a.drop(
                 [
