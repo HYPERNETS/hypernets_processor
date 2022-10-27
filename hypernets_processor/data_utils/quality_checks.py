@@ -122,12 +122,12 @@ class QualityChecks:
 
         for i, vza in enumerate(vzas):
             if np.abs(vza - 180) > 2:
-                dataset_l1b_irr["irradiance"].values[:, i] = np.mean(
-                    dataset_l1b_irr["irradiance"].values[
-                    :, np.where(np.abs(vzas - 180) < 2.0)[0]
-                    ],
-                    axis=1,
-                )
+                # dataset_l1b_irr["irradiance"].values[:, i] = np.mean(
+                #     dataset_l1b_irr["irradiance"].values[
+                #     :, np.where(np.abs(vzas - 180) < 2.0)[0]
+                #     ],
+                #     axis=1,
+                # )
                 self.context.logger.warning(
                     "One of the irradiance measurements did not have vza=180, so has been masked"
                 )
@@ -135,6 +135,7 @@ class QualityChecks:
                     dataset_l1b_irr["quality_flag"][i], "vza_irradiance"
                 )  # for i in range(len(mask))]
 
+        print(self.context.get_config_value("clear_sky_check"))
         if self.context.get_config_value("clear_sky_check"):
             # could also be done by: https://pvlib-python.readthedocs.io/en/stable/auto_examples/plot_spectrl2_fig51A.html
             ref_szas = [0, 20, 40, 60, 70, 80]

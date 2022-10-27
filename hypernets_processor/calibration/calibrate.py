@@ -49,8 +49,6 @@ class Calibrate:
             self.context.get_config_value("measurement_function_calibrate"))
 
         if self.context.get_config_value("uncertainty_l1a"):
-
-
             dataset_l1a=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0,calibration_data,ds_out_pre=dataset_l1a,store_unc_percent=True)
 
         else:

@@ -57,7 +57,7 @@ ANOMALIES_DICT = {
     },
     "i": {
         "description": "No valid irradiance measurements",
-        "error": IOError,
+        "error": None,
         "error_msg": None
     },
 

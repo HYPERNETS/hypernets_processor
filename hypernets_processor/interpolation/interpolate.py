@@ -97,13 +97,16 @@ class Interpolate:
             store_unc_percent=True)
 
         # Interpolate in time to radiance times
-        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr['quality_flag'])
-        dataset_l1c_temp=dataset_l1c_temp.isel(series=np.where(flagged == False)[0])
-        acqui_irr = dataset_l1b_irr['acquisition_time'].values[flagged == False]
         acqui_rad = dataset_l1c['acquisition_time'].values
 
-        if len(acqui_irr)==0:
+        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr['quality_flag'])
+        mask_notflagged=np.where(flagged == False)[0]
+        if len(mask_notflagged)==0:
             self.context.anomaly_handler.add_anomaly("i")
+            acqui_irr = dataset_l1b_irr['acquisition_time'].values
+        else:
+            dataset_l1c_temp=dataset_l1c_temp.isel(series=mask_notflagged)
+            acqui_irr = dataset_l1b_irr['acquisition_time'].values[mask_notflagged]
 
         dataset_l1c=interpolation_function_time.propagate_ds_specific(
             ["random","systematic_indep","systematic_corr_rad_irr"],
