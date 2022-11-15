@@ -32,9 +32,9 @@ class InterpolationTimeLinear(MeasurementFunction):
                 out = np.empty((len(irradiance),len(output_time)))
                 for i in range(len(output_time)):
                     if output_time[i] >= np.max(times):
-                        out[:,i] = irradiance[:,times == np.max(times)][:,0]
+                        out[:,i] = irradiance[:,times == np.max(times)].squeeze()
                     elif output_time[i] <= np.min(times):
-                        out[:,i] = irradiance[:,times == np.min(times)][:,0]
+                        out[:,i] = irradiance[:,times == np.min(times)].squeeze()
                     else:
                         irradiance_intfunc = scipy.interpolate.interp1d(times,
                                                                         irradiance)
