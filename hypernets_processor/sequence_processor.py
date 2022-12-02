@@ -65,7 +65,6 @@ class SequenceProcessor:
             self.context.logger.info("Reading raw data...")
             l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)
             self.context.logger.info("Done")
-
             # Calibrate to L1a
             if self.context.get_config_value("max_level") in ["L1A","L1B","L1C","L2A"]:
                 self.context.logger.info("Processing to L1a...")
