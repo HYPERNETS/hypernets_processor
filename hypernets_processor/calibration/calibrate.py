@@ -40,8 +40,8 @@ class Calibrate:
         if self.context.get_config_value("plot_l0"):
             self.plot.plot_scans_in_series("digital_number",dataset_l0)
 
-        dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
-        self.context.logger.info("preprocessing done")
+        # dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
+        # self.context.logger.info("preprocessing done")
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0[0], swir)
 
         prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
@@ -81,7 +81,7 @@ class Calibrate:
         return dataset_l1a
 
     def calibrate_l1a(
-            self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data, swir=False
+            self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data, swir=False, preprocessing=True
     ):
         if measurandstring != "radiance" and measurandstring != "irradiance":
             self.context.logger.error(
@@ -92,11 +92,15 @@ class Calibrate:
         if self.context.get_config_value("plot_l0"):
             self.plot.plot_scans_in_series("digital_number", dataset_l0)
 
-        dataset_l0_masked, dataset_l0_bla_masked = self.preprocess_l0(
-            dataset_l0, dataset_l0_bla, calibration_data
-        )
+        if preprocessing :
+            dataset_l0_masked, dataset_l0_bla_masked = self.preprocess_l0(
+                dataset_l0, dataset_l0_bla, calibration_data
+            )
 
-        self.context.logger.debug("preprocessing done")
+            self.context.logger.debug("preprocessing done")
+        else:
+            dataset_l0_masked=dataset_l0
+            dataset_l0_bla_masked=dataset_l0_bla
 
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(
             measurandstring, dataset_l0_masked, swir

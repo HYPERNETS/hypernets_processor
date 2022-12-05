@@ -95,7 +95,8 @@ class SequenceProcessor:
             if L1b_rad and L1b_irr:
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:
                     self.context.logger.info("Processing to L1c...")
-                    L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)
+                    L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr, l0_rad_masked, l0_rad_bla_masked, calibration_data_rad,
+                                                     l0_irr_masked, l0_irr_bla_masked, calibration_data_irr)
                     L1c = surf.process_l1c(L1c_int)
                     self.context.logger.info("Done")
 

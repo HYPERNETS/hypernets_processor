@@ -33,9 +33,6 @@ class Interpolate:
 
         # chek for upwelling radiance
         upscan = [i for i, e in enumerate(dataset_l1a_uprad['viewing_zenith_angle'].values) if e < 90]
-
-        dataset_l1b=self.templ.l1c_int_template_from_l1a_dataset_water(dataset_l1a_uprad)
-
         dataset_l1b["wavelength"] = dataset_l1a_uprad["wavelength"]
         dataset_l1b["upwelling_radiance"] = dataset_l1a_uprad["radiance"].sel(scan=upscan)
         dataset_l1b["acquisition_time"] = dataset_l1a_uprad["acquisition_time"].sel(scan=upscan)
@@ -125,8 +122,8 @@ class Interpolate:
     def interpolate_skyradiance(self,dataset_l1c,dataset_l1a_skyrad):
         measurement_function_interpolate_time = self.context.get_config_value(
             'measurement_function_interpolate_time')
-        interpolation_function_time = self._measurement_function_factory\
-            .get_measurement_function(measurement_function_interpolate_time)
+        print(measurement_function_interpolate_time)
+        interpolation_function_time = self._measurement_function_factory.get_measurement_function(measurement_function_interpolate_time)
 
         acqui_irr = dataset_l1a_skyrad['acquisition_time'].values
         acqui_rad = dataset_l1c['acquisition_time'].values

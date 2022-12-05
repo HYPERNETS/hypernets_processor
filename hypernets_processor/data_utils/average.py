@@ -43,11 +43,6 @@ class Average:
         :return:
         :rtype:
         """
-        # if self.context.get_config_value("network") == "w":
-        #     dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
-        #     flags = ["outliers"]
-        #
-        # else:
         dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
         dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring, dataset_l0)
         flags = ["outliers","L0_thresholds", "L0_discontinuity"]

@@ -224,7 +224,7 @@ class HypernetsReader:
 
         ds["wavelength"] = wvl
         # ds["bandwidth"]=wvl
-        ds["scan"] = np.linspace(1, scanDim, scanDim)
+        #ds["scan"] = np.linspace(0, scanDim, scanDim)
 
         # add auxiliary data to the L0 data
         temp, RH , pressure, lux=self.read_aux(seq_dir)

@@ -13,6 +13,7 @@ from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_utils.average import Average
 from obsarray.templater.dataset_util import DatasetUtil as du
+from hypernets_processor.calibration.calibrate import Calibrate
 
 import numpy as np
 import math
@@ -25,6 +26,7 @@ class RhymerHypstar:
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
         self.avg = Average(context)
+        self.cal = Calibrate(context)
         self.intp = Interpolate(context)
         self.plot = Plotting(context)
         self.rhymeranc = RhymerAncillary(context)
@@ -107,7 +109,7 @@ class RhymerHypstar:
 
             return dataset_l1b, flags
 
-    def cycleparse(self, rad, irr, dataset_l1b):
+    def cycleparse(self, rad, rad_bla, irr,irr_bla, dataset_l1b):
 
         protocol = self.context.get_config_value("measurement_function_surface_reflectance")
         self.context.logger.debug(protocol)
@@ -122,6 +124,8 @@ class RhymerHypstar:
         else:
             uprad = []
             downrad = []
+            uprad_bla = []
+            downrad_bla = []
             for i in rad['scan']:
                 scani = rad.sel(scan=i)
                 senz = scani["viewing_zenith_angle"].values
@@ -135,6 +139,20 @@ class RhymerHypstar:
 
             lu = rad.sel(scan=uprad)
             lsky = rad.sel(scan=downrad)
+
+            for i in rad_bla['scan']:
+                scani = rad_bla.sel(scan=i)
+                senz = scani["viewing_zenith_angle"].values
+                if senz < 90:
+                    measurement = 'upwelling_radiance'
+                    uprad_bla.append(int(i))
+                if senz >= 90:
+                    measurement = 'downwelling_radiance'
+                    downrad_bla.append(int(i))
+                if measurement is None: continue
+
+            lu_bla = rad_bla.sel(scan=uprad_bla)
+            lsky_bla = rad_bla.sel(scan=downrad_bla)
 
             for i in lu['scan']:
                 scani = lu.sel(scan=i)
@@ -158,9 +176,6 @@ class RhymerHypstar:
             sena_lsky = np.unique(lsky["viewing_azimuth_angle"].values)
             sena_lu=np.array([sena_lu[i] + 360 if sena_lu[i] < 0 else sena_lu[i] for i in range(0, len(sena_lu))])
             sena_lsky=np.array([sena_lsky[i] + 360 if sena_lsky[i] < 0 else sena_lsky[i] for i in range(0, len(sena_lsky))])
-            print(sena_lsky)
-            print(sena_lu)
-            print(du.unpack_flags(lu['quality_flag']))
 
             for i in sena_lu:
                 if np.round(i) not in np.round(sena_lsky):
@@ -202,7 +217,6 @@ class RhymerHypstar:
                 [du.unpack_flags(lu['quality_flag'])[x] for x in
                  flags], axis=0)
             ids = np.where(flagged == False)[0]
-            print(nbrlu)
             if len(ids) < nbrlu:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
@@ -215,7 +229,6 @@ class RhymerHypstar:
                 [du.unpack_flags(lsky['quality_flag'])[x] for x in
                  flags], axis=0)
             ids = np.where(flagged == False)[0]
-            print(nbrlsky)
             if len(ids) < nbrlsky:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
@@ -236,7 +249,7 @@ class RhymerHypstar:
                 self.context.logger.info(
                     "Not enough downwelling irradiance data for sequence {}".format(irr.attrs['sequence_id']))
 
-            return lu, lsky, irr, dataset_l1b
+            return lu, lu_bla, lsky, lsky_bla, irr, irr_bla, dataset_l1b
 
     def get_wind(self, l1b):
 
@@ -336,8 +349,10 @@ class RhymerHypstar:
                 failSimil.append(0)
         return failSimil
 
-    def process_l1c_int(self, l1a_rad, l1a_irr):
+    def process_l1c_int(self,l1a_rad,l1a_irr, l0_rad_masked, l0_rad_bla_masked,
+                        calibration_data_rad, l0_irr_masked, l0_irr_bla_masked, calibration_data_irr):
 
+        #l0_rad_masked, l0_rad_bla_masked, calibration_data_rad, l0_irr_masked, l0_irr_bla_masked, calibration_data_irr
         # because we average to Lu scan we propagate values from radiance!
         dataset_l1b = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
         # QUALITY CHECK: TEMPORAL VARIABILITY IN ED AND LSKY -> ASSIGN FLAG
@@ -345,16 +360,19 @@ class RhymerHypstar:
         dataset_l1b, flags_irr = self.qc_scan(l1a_irr, "irradiance", dataset_l1b)
         # QUALITY CHECK: MIN NBR OF SCANS -> ASSIGN FLAG
         # remove temporal variability scans before average
-        l1a_rad = l1a_rad.sel(scan=np.where(np.array(flags_rad) != 1)[0])
-        l1a_irr = l1a_irr.sel(scan=np.where(np.array(flags_irr) != 1)[0])
+
+        l0_rad_masked = l0_rad_masked.sel(scan=np.where(np.array(flags_rad) != 1)[0])
+        l0_irr_masked = l0_irr_masked.sel(scan=np.where(np.array(flags_irr) != 1)[0])
 
         # check number of scans per cycle for up, down radiance and irradiance
-        L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = self.cycleparse(l1a_rad, l1a_irr, dataset_l1b)
+        l0_uprad, l0_uprad_bla, l0_downrad, l0_downrad_bla, l0_irr, l0_irr_bla, dataset_l1b = self.cycleparse(l0_rad_masked,l0_rad_bla_masked, l0_irr_masked,l0_irr_bla_masked, dataset_l1b)
 
-        L1b_downrad = self.avg.average_l1b("radiance", L1a_downrad)
-        L1b_irr = self.avg.average_l1b("irradiance", L1a_irr)
+        l1a_uprad,l0_uprad, l0_uprad_bla = self.cal.calibrate_l1a("radiance", l0_uprad, l0_uprad_bla,calibration_data_rad, preprocessing=False)
+        l1b_irr = self.avg.average_l1b("radiance", l0_downrad, l0_downrad_bla, calibration_data_rad)
+        l1b_downrad = self.avg.average_l1b("irradiance", l0_irr,l0_irr_bla, calibration_data_irr)
+
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the
         # irradiance wavelength to the radiance wavelength
-        L1c_int = self.intp.interpolate_l1b_w(dataset_l1b,L1a_uprad, L1b_downrad, L1b_irr)
-        return L1c_int
+        l1c_int = self.intp.interpolate_l1b_w(dataset_l1b,l1a_uprad, l1b_downrad, l1b_irr)
+        return l1c_int
