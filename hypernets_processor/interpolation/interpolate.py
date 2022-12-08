@@ -122,28 +122,42 @@ class Interpolate:
     def interpolate_skyradiance(self,dataset_l1c,dataset_l1a_skyrad):
         measurement_function_interpolate_time = self.context.get_config_value(
             'measurement_function_interpolate_time')
-        print(measurement_function_interpolate_time)
-        interpolation_function_time = self._measurement_function_factory.get_measurement_function(measurement_function_interpolate_time)
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
+        interpolation_function_time = self._measurement_function_factory(prop=prop,corr_dims="wavelength",yvariable="downwelling_radiance",param_fixed=[False,True,True]).get_measurement_function("WaterNetworkInterpolationSkyRadianceLinear")
 
         acqui_irr = dataset_l1a_skyrad['acquisition_time'].values
         acqui_rad = dataset_l1c['acquisition_time'].values
 
-        dataset_l1c = self.prop.process_measurement_function_l1("downwelling_radiance",dataset_l1c,
-                                                        interpolation_function_time.meas_function,
-                                                        [acqui_rad,acqui_irr,
-                                                         dataset_l1a_skyrad[
-                                                             'radiance'].values],
-                                                        [None,None,dataset_l1a_skyrad[
-                                                            'u_rel_random_radiance'].values*dataset_l1a_skyrad[
-                                                             'radiance'].values/100],
-                                                        [None,None,dataset_l1a_skyrad[
-                                                            'u_rel_systematic_indep_radiance'].values*dataset_l1a_skyrad[
-                                                             'radiance'].values/100],
-                                                        [None,None,dataset_l1a_skyrad[
-                                                            'u_rel_systematic_corr_rad_irr_radiance'].values*dataset_l1a_skyrad[
-                                                             'radiance'].values/100],
-                                                        [None,None,dataset_l1a_skyrad["err_corr_systematic_indep_radiance"].values],
-                                                        [None,None,dataset_l1a_skyrad["err_corr_systematic_corr_rad_irr_radiance"].values],
-                                                        param_fixed=[False,True,True])
+        print(acqui_rad.shape,dataset_l1c.wavelength,dataset_l1a_skyrad.wavelength)
+
+        dataset_l1c=interpolation_function_time.propagate_ds_specific(
+            ["random","systematic_indep","systematic_corr_rad_irr"],
+            dataset_l1a_skyrad,
+            {"input_time": acqui_irr, "output_time": acqui_rad},
+            ds_out_pre=dataset_l1c,
+            store_unc_percent=True)
+
+        if len(acqui_irr)==1:
+            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+                dataset_l1c["quality_flag"], "single_irradiance_used"
+            )
+
+        # dataset_l1c = self.prop.process_measurement_function_l1("downwelling_radiance",dataset_l1c,
+        #                                                 interpolation_function_time.meas_function,
+        #                                                 [acqui_rad,acqui_irr,
+        #                                                  dataset_l1a_skyrad[
+        #                                                      'radiance'].values],
+        #                                                 [None,None,dataset_l1a_skyrad[
+        #                                                     'u_rel_random_radiance'].values*dataset_l1a_skyrad[
+        #                                                      'radiance'].values/100],
+        #                                                 [None,None,dataset_l1a_skyrad[
+        #                                                     'u_rel_systematic_indep_radiance'].values*dataset_l1a_skyrad[
+        #                                                      'radiance'].values/100],
+        #                                                 [None,None,dataset_l1a_skyrad[
+        #                                                     'u_rel_systematic_corr_rad_irr_radiance'].values*dataset_l1a_skyrad[
+        #                                                      'radiance'].values/100],
+        #                                                 [None,None,dataset_l1a_skyrad["err_corr_systematic_indep_radiance"].values],
+        #                                                 [None,None,dataset_l1a_skyrad["err_corr_systematic_corr_rad_irr_radiance"].values],
+        #                                                 param_fixed=[False,True,True])
         return dataset_l1c
 

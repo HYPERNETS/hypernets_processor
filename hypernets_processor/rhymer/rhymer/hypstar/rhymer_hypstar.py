@@ -368,8 +368,8 @@ class RhymerHypstar:
         l0_uprad, l0_uprad_bla, l0_downrad, l0_downrad_bla, l0_irr, l0_irr_bla, dataset_l1b = self.cycleparse(l0_rad_masked,l0_rad_bla_masked, l0_irr_masked,l0_irr_bla_masked, dataset_l1b)
 
         l1a_uprad,l0_uprad, l0_uprad_bla = self.cal.calibrate_l1a("radiance", l0_uprad, l0_uprad_bla,calibration_data_rad, preprocessing=False)
-        l1b_irr = self.avg.average_l1b("radiance", l0_downrad, l0_downrad_bla, calibration_data_rad)
-        l1b_downrad = self.avg.average_l1b("irradiance", l0_irr,l0_irr_bla, calibration_data_irr)
+        l1b_downrad = self.avg.average_l1b("radiance", l0_downrad, l0_downrad_bla, calibration_data_rad)
+        l1b_irr = self.avg.average_l1b("irradiance", l0_irr,l0_irr_bla, calibration_data_irr)
 
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the

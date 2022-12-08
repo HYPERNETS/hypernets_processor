@@ -57,20 +57,20 @@ class InterpolationTimeLinear(MeasurementFunction):
     def get_argument_names(self):
         return ["output_time","input_time","irradiance"]
 
-# class WaterNetworkInterpolationSkyRadianceLinear:
-#     def meas_function(self,output_time,times,irradiance):
-#         '''
-#         This function implements the measurement function.
-#         Each of the arguments can be either a scalar or a vector (1D-array).
-#         '''
-#         skyradiance_intfunc=scipy.interpolate.interp1d(times,irradiance)
-#
-#         return skyradiance_intfunc(output_time)
-#
-#     @staticmethod
-#     def get_name():
-#         return "WaterNetworkInterpolationSkyRadianceLinear"
-#
-#     def get_argument_names(self):
-#         return ["output_time","times","downwelling_radiance"]
+class WaterNetworkInterpolationSkyRadianceLinear(MeasurementFunction):
+    def meas_function(self,output_time,times,radiance):
+        '''
+        This function implements the measurement function.
+        Each of the arguments can be either a scalar or a vector (1D-array).
+        '''
+        skyradiance_intfunc=scipy.interpolate.interp1d(times,radiance)
+
+        return skyradiance_intfunc(output_time)
+
+    @staticmethod
+    def get_name():
+        return "WaterNetworkInterpolationSkyRadianceLinear"
+
+    def get_argument_names(self):
+        return ["output_time","input_time","radiance"]
 

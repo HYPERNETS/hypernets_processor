@@ -4,6 +4,7 @@ Measurement function object creator
 
 from hypernets_processor.version import __version__
 from hypernets_processor.interpolation.measurement_functions.interpolate_time_linear import InterpolationTimeLinear
+from hypernets_processor.interpolation.measurement_functions.interpolate_time_linear import WaterNetworkInterpolationSkyRadianceLinear
 from hypernets_processor.interpolation.measurement_functions.interpolate_wav_linear import InterpolationWavLinear
 
 '''___Authorship___'''
@@ -21,7 +22,9 @@ class InterpolationFactory:
             (InterpolationTimeLinear.get_name(),
              InterpolationTimeLinear(*args,**kwargs)),
             (InterpolationWavLinear.get_name(),
-             InterpolationWavLinear(*args,**kwargs))])
+             InterpolationWavLinear(*args,**kwargs)),
+            (WaterNetworkInterpolationSkyRadianceLinear.get_name(),
+             WaterNetworkInterpolationSkyRadianceLinear(*args,**kwargs))])
 
     def get_names(self):
         return self.measurement_functions.keys()
