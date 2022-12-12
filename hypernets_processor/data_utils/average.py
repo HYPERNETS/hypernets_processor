@@ -91,7 +91,7 @@ class Average:
             dataset_l1b["quality_flag"][np.where(flag_darkmasked)], "less_than_three_darks"
         )
 
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
         calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
 

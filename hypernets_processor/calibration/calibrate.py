@@ -44,7 +44,7 @@ class Calibrate:
         # self.context.logger.info("preprocessing done")
         dataset_l1a = self.templ.l1a_template_from_l0_dataset(measurandstring, dataset_l0[0], swir)
 
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
         calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
 
@@ -106,7 +106,7 @@ class Calibrate:
             measurandstring, dataset_l0_masked, swir
         )
 
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
 
         calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="scan",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))

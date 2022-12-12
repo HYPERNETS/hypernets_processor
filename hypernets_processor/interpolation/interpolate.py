@@ -76,7 +76,7 @@ class Interpolate:
 
         measurement_function_interpolate_wav = self.context.get_config_value(
             'measurement_function_interpolate_wav')
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
         if self.context.get_config_value("network") == "w":
             interpolation_function_wav = self._measurement_function_factory(prop=prop,repeat_dims="scan",yvariable="irradiance").get_measurement_function(measurement_function_interpolate_wav)
         else:
