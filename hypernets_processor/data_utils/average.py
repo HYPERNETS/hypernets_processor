@@ -95,7 +95,7 @@ class Average:
         calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
         print(np.all(np.isfinite(dataset_l0b["digital_number"].values)),dataset_l0b["dark_signal"].values,dataset_l0b["integration_time"].values,calibration_data["non_linearity_coefficients"].values,calibration_data["gains"].values)
-        print(dataset_l0b["u_random_digital_number"].values,dataset_l0b["u_rel_random_dark_signal"].values,calibration_data["u_systematic_indep_gains"].values)
+        print(dataset_l0b["u_rel_random_digital_number"].values,dataset_l0b["u_rel_random_dark_signal"].values,calibration_data["u_rel_systematic_indep_gains"].values)
 
         dataset_l1b=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
 
