@@ -97,7 +97,7 @@ class Average:
         print(np.all(np.isfinite(dataset_l0b["digital_number"].values)),np.all(np.isfinite(dataset_l0b["dark_signal"].values)),np.all(np.isfinite(dataset_l0b["integration_time"].values)),np.all(np.isfinite(calibration_data["non_linearity_coefficients"].values)),np.all(np.isfinite(calibration_data["gains"].values)))
         print(np.all(np.isfinite(dataset_l0b["u_rel_random_digital_number"].values)),np.all(np.isfinite(dataset_l0b["u_rel_random_dark_signal"].values)),np.all(np.isfinite(calibration_data["u_rel_systematic_indep_gains"].values)))
 
-        dataset_l1b=calibrate_function.propagate_ds_specific(["random"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
+        dataset_l1b=calibrate_function.propagate_ds_specific(["systematic_indep"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
 
         return dataset_l1b
 
