@@ -398,7 +398,7 @@ class CalibrationConverter:
                 gains = np.genfromtxt(calpath)
 
                 try:
-                    calibration_data["wavelengths"].values[i_cal] = gains[:, 1]
+                    # calibration_data["wavelength"].values = gains[:, 1]
                     calibration_data["wavpix"].values[i_cal] = gains[:, 0]
                     calibration_data["gains"].values[i_cal] = gains[:, 2]
                     # calibration_data["u_rel_random_gains"].values = None

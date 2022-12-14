@@ -314,7 +314,7 @@ L0_BLA_VARIABLES = L0_RAD_VARIABLES
 
 L0B_IRR_VARIABLES = L0B_RAD_VARIABLES
 
-CAL_VARIABLES = {"wavelengths": {"dim": [CD_DIM,WL_DIM],
+CAL_VARIABLES = {"wavelength": {"dim": [WL_DIM],
                                           "dtype": np.float32,
                                           "attributes": {"standard_name": "wavelength",
                                                          "long_name": "Wavelength",
