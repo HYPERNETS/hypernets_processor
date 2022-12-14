@@ -94,9 +94,6 @@ class Average:
         prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
         calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
             self.context.get_config_value("measurement_function_calibrate"))
-        print(np.all(np.isfinite(calibration_data["non_linearity_coefficients"].values)),np.all(np.isfinite(calibration_data["gains"].values)))
-        print(calibration_data["u_rel_systematic_corr_rad_irr_gains"].values)
-        print(np.all(np.isfinite(calibration_data["u_rel_systematic_corr_rad_irr_gains"].values)))
 
         dataset_l1b=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
 
