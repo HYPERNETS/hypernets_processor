@@ -85,7 +85,7 @@ class Interpolate:
 
         measurement_function_interpolate_time = self.context.get_config_value(
             'measurement_function_interpolate_time')
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32",verbose=True)
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
         interpolation_function_time = self._measurement_function_factory(prop=prop,corr_dims="wavelength",yvariable="irradiance",use_err_corr_dict=True).get_measurement_function(measurement_function_interpolate_time)
 
         dataset_l1c_temp = self.templ.l1ctemp_dataset(dataset_l1c,dataset_l1b_irr)
@@ -130,7 +130,7 @@ class Interpolate:
     def interpolate_skyradiance(self,dataset_l1c,dataset_l1a_skyrad):
         measurement_function_interpolate_time = self.context.get_config_value(
             'measurement_function_interpolate_time')
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32",verbose=True)
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
         interpolation_function_time = self._measurement_function_factory(prop=prop,corr_dims="wavelength",yvariable="downwelling_radiance",use_err_corr_dict=True).get_measurement_function("WaterNetworkInterpolationSkyRadianceLinear")
 
         acqui_irr = dataset_l1a_skyrad['acquisition_time'].values
