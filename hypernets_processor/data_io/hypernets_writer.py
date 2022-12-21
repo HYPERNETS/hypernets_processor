@@ -198,7 +198,7 @@ class HypernetsWriter:
             if "dtype" in var_encoding.keys():
                 ds[var_name].attrs["_FillValue"]=DatasetUtil.get_default_fill_value(var_encoding["dtype"])
 
-        encoding.update({var_name: var_encoding})
+            encoding.update({var_name: var_encoding})
         ds.to_netcdf(path, format="netCDF4", engine="netcdf4", encoding=encoding)
 
     @staticmethod

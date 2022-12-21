@@ -45,20 +45,33 @@ class SurfaceReflectance:
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset)
         dataset_l1c = self.rh.get_wind(dataset_l1c)
         dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
-
-        l1ctol1b_function = self._measurement_function_factory.get_measurement_function(
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",parallel_cores=1)
+        l1ctol1b_function = self._measurement_function_factory(prop=prop,yvariable=["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],use_err_corr_dict=True)\
+            .get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
 
-        input_vars = l1ctol1b_function.get_argument_names()
-        input_qty = self.prop.find_input(input_vars, dataset_l1c)
-        u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset_l1c)
-        u_systematic_input_qty, corr_systematic_input_qty = \
-            self.prop.find_u_systematic_input(input_vars, dataset_l1c)
+        l1ctol1b_function.setup(self.context)
+        for var in dataset.variables:
+            print(dataset[var])
+        stop
+        L1c=l1ctol1b_function.propagate_ds_specific(
+            ["random","systematic_indep"],
+            dataset,
+            comp_list_out=["random","systematic"],
+            ds_out_pre=dataset_l1c,use_ds_out_pre_unmodified=True,
+            store_unc_percent=True,
+            simple_systematic=False)
 
-        L1c = self.prop.process_measurement_function_l2(
-            ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
-            dataset_l1c, l1ctol1b_function.meas_function, input_qty,
-            u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
+        # input_vars = l1ctol1b_function.get_argument_names()
+        # input_qty = self.prop.find_input(input_vars, dataset_l1c)
+        # u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset_l1c)
+        # u_systematic_input_qty, corr_systematic_input_qty = \
+        #     self.prop.find_u_systematic_input(input_vars, dataset_l1c)
+        #
+        # L1c = self.prop.process_measurement_function_l2(
+        #     ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
+        #     dataset_l1c, l1ctol1b_function.meas_function, input_qty,
+        #     u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
 
         failSimil=self.rh.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
@@ -80,7 +93,8 @@ class SurfaceReflectance:
 
     def process_l2(self, dataset):
         dataset = self.qual.perform_quality_check_L2a(dataset)
-        l1tol2_function = self._measurement_function_factory(repeat_dims="series",yvariable="reflectance")\
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32")
+        l1tol2_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable="reflectance")\
             .get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
 

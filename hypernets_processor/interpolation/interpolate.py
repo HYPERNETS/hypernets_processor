@@ -33,15 +33,16 @@ class Interpolate:
 
         # chek for upwelling radiance
         upscan = [i for i, e in enumerate(dataset_l1a_uprad['viewing_zenith_angle'].values) if e < 90]
-        dataset_l1b["wavelength"] = dataset_l1a_uprad["wavelength"]
-        dataset_l1b["upwelling_radiance"] = dataset_l1a_uprad["radiance"].sel(scan=upscan)
-        dataset_l1b["acquisition_time"] = dataset_l1a_uprad["acquisition_time"].sel(scan=upscan)
+
+        dataset_l1b.assign_coords(wavelength=dataset_l1a_uprad["wavelength"].values)
+        dataset_l1b["upwelling_radiance"].values = dataset_l1a_uprad["radiance"].sel(scan=upscan).values
+        dataset_l1b["acquisition_time"].values = dataset_l1a_uprad["acquisition_time"].sel(scan=upscan).values
         # is this correct????
-        dataset_l1b["u_rel_random_upwelling_radiance"] = dataset_l1a_uprad["u_rel_random_radiance"].sel(scan=upscan)
-        dataset_l1b["u_rel_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["u_rel_systematic_indep_radiance"].sel(scan=upscan)
-        dataset_l1b["u_rel_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["u_rel_systematic_corr_rad_irr_radiance"].sel(scan=upscan)
-        dataset_l1b["err_corr_systematic_indep_upwelling_radiance"] = dataset_l1a_uprad["err_corr_systematic_indep_radiance"]
-        dataset_l1b["err_corr_systematic_corr_rad_irr_upwelling_radiance"] = dataset_l1a_uprad["err_corr_systematic_corr_rad_irr_radiance"]
+        dataset_l1b["u_rel_random_upwelling_radiance"].values = dataset_l1a_uprad["u_rel_random_radiance"].sel(scan=upscan).values
+        dataset_l1b["u_rel_systematic_indep_upwelling_radiance"].values = dataset_l1a_uprad["u_rel_systematic_indep_radiance"].sel(scan=upscan).values
+        dataset_l1b["u_rel_systematic_corr_rad_irr_upwelling_radiance"].values = dataset_l1a_uprad["u_rel_systematic_corr_rad_irr_radiance"].sel(scan=upscan).values
+        dataset_l1b["err_corr_systematic_indep_upwelling_radiance"].values = dataset_l1a_uprad["err_corr_systematic_indep_radiance"].values
+        dataset_l1b["err_corr_systematic_corr_rad_irr_upwelling_radiance"].values = dataset_l1a_uprad["err_corr_systematic_corr_rad_irr_radiance"].values
 
         self.context.logger.info("interpolate sky radiance")
         dataset_l1b=self.interpolate_skyradiance(dataset_l1b, dataset_l1b_downrad)
@@ -78,14 +79,14 @@ class Interpolate:
             'measurement_function_interpolate_wav')
         prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
         if self.context.get_config_value("network") == "w":
-            interpolation_function_wav = self._measurement_function_factory(prop=prop,repeat_dims="scan",yvariable="irradiance").get_measurement_function(measurement_function_interpolate_wav)
+            interpolation_function_wav = self._measurement_function_factory(prop=prop,yvariable="irradiance",ydims=["wavelength","series"],corr_dims=["wavelength"],use_err_corr_dict=False).get_measurement_function(measurement_function_interpolate_wav)
         else:
             interpolation_function_wav = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable="irradiance").get_measurement_function(measurement_function_interpolate_wav)
 
         measurement_function_interpolate_time = self.context.get_config_value(
             'measurement_function_interpolate_time')
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32")
-        interpolation_function_time = self._measurement_function_factory(prop=prop,corr_dims="wavelength",yvariable="irradiance",param_fixed=[False,True,True]).get_measurement_function(measurement_function_interpolate_time)
+        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),parallel_cores=1,dtype="float32",verbose=True)
+        interpolation_function_time = self._measurement_function_factory(prop=prop,corr_dims="wavelength",yvariable="irradiance",use_err_corr_dict=True).get_measurement_function(measurement_function_interpolate_time)
 
         dataset_l1c_temp = self.templ.l1ctemp_dataset(dataset_l1c,dataset_l1b_irr)
 
@@ -93,7 +94,7 @@ class Interpolate:
             ["random","systematic_indep","systematic_corr_rad_irr"],
             dataset_l1c.rename({"wavelength":"radiance_wavelength"}),
             dataset_l1b_irr.rename({"wavelength":"irradiance_wavelength"}),
-            ds_out_pre=dataset_l1c_temp,
+            ds_out_pre=dataset_l1c_temp,use_ds_out_pre_unmodified=True,
             store_unc_percent=True)
 
         # Interpolate in time to radiance times
@@ -105,8 +106,12 @@ class Interpolate:
             self.context.anomaly_handler.add_anomaly("i")
             acqui_irr = dataset_l1b_irr['acquisition_time'].values
         else:
-            dataset_l1c_temp=dataset_l1c_temp.isel(series=mask_notflagged)
-            acqui_irr = dataset_l1b_irr['acquisition_time'].values[mask_notflagged]
+            if self.context.get_config_value("network") == "w":
+                dataset_l1c_temp=dataset_l1c_temp.isel(scan=mask_notflagged)
+                acqui_irr = dataset_l1b_irr['acquisition_time'].values[mask_notflagged]
+            else:
+                dataset_l1c_temp=dataset_l1c_temp.isel(series=mask_notflagged)
+                acqui_irr = dataset_l1b_irr['acquisition_time'].values[mask_notflagged]
 
         dataset_l1c=interpolation_function_time.propagate_ds_specific(
             ["random","systematic_indep","systematic_corr_rad_irr"],

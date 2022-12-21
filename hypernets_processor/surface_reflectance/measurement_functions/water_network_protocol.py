@@ -5,7 +5,7 @@ from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from punpy import MeasurementFunction
 
 class WaterNetworkProtocol(MeasurementFunction):
-    def setup(self, context, MCsteps=1000, parallel_cores=1):
+    def setup(self, context):
         self.context = context
         self.rh = RhymerHypstar(context)
         self.rhp = RhymerProcessing(context)
@@ -18,10 +18,10 @@ class WaterNetworkProtocol(MeasurementFunction):
         '''
 
         # default water network processing
-        water_leaving_radiance = [(upwelling_radiance[w] - (rhof * downwelling_radiance[w])) for w in
-                                  range(len(downwelling_radiance))]
-        reflectance_nosc = [np.pi * (upwelling_radiance[w] - (rhof * downwelling_radiance[w])) / irradiance[w] for w in
-                            range(len(downwelling_radiance))]
+        water_leaving_radiance = np.array([(upwelling_radiance[w] - (rhof * downwelling_radiance[w])) for w in
+                                  range(len(downwelling_radiance))])
+        reflectance_nosc = np.array([np.pi * (upwelling_radiance[w] - (rhof * downwelling_radiance[w])) / irradiance[w] for w in
+                            range(len(downwelling_radiance))])
 
         # NIR SIMIL CORRECTION
         # retrieve variables for NIR SIMIL correction
@@ -40,8 +40,7 @@ class WaterNetworkProtocol(MeasurementFunction):
             alpha = ssd['ave'][id1] / ssd['ave'][id2]
 
         epsilon = (alpha * reflectance_nosc[iref2] - reflectance_nosc[iref1]) / (alpha - 1.0)
-        reflectance = [r - epsilon for r in reflectance_nosc]
-
+        reflectance = np.array([r - epsilon for r in reflectance_nosc])
         return water_leaving_radiance, reflectance_nosc, reflectance, epsilon
 
     @staticmethod

@@ -709,7 +709,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                                  {
                                                                      "dim": WL_DIM,
                                                                      "form": "err_corr_matrix",
-                                                                     "params": ["err_corr_systematic_indep_radiance"],
+                                                                     "params": ["err_corr_systematic_indep_downwelling_radiance"],
                                                                      "units": [],
                                                                  },
                                                                  {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -725,7 +725,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                                  {
                                                                      "dim": WL_DIM,
                                                                      "form": "err_corr_matrix",
-                                                                     "params": ["err_corr_systematic_indep_radiance"],
+                                                                     "params": ["err_corr_systematic_corr_rad_irr_downwelling_radiance"],
                                                                      "units": [],
                                                                  },
                                                                  {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -775,7 +775,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                                {
                                                                    "dim": WL_DIM,
                                                                    "form": "err_corr_matrix",
-                                                                   "params": ["err_corr_systematic_indep_radiance"],
+                                                                   "params": ["err_corr_systematic_indep_upwelling_radiance"],
                                                                    "units": [],
                                                                },
                                                                {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -791,7 +791,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                                {
                                                                    "dim": WL_DIM,
                                                                    "form": "err_corr_matrix",
-                                                                   "params": ["err_corr_systematic_indep_radiance"],
+                                                                   "params": ["err_corr_systematic_corr_rad_irr_upwelling_radiance"],
                                                                    "units": [],
                                                                },
                                                                {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -813,7 +813,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                           "encoding": {'dtype': np.int8, "scale_factor": 0.01, "offset": 0.0}},
                    "upwelling_radiance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                           "dtype": np.float32,
-                                          "attributes": {"standard_name": "radiance",
+                                          "attributes": {"standard_name": "upwelling_radiance",
                                                          "long_name": "upwelling radiance",
                                                          "units": "mW m^-2 nm^-1 sr^-1",
                                                          "unc_comps": [
@@ -840,7 +840,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                                   {
                                                                       "dim": WL_DIM,
                                                                       "form": "err_corr_matrix",
-                                                                      "params": ["err_corr_systematic_indep_radiance"],
+                                                                      "params": ["err_corr_systematic_indep_irradiance"],
                                                                       "units": [],
                                                                   },
                                                                   {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -855,7 +855,7 @@ W_L1C_VARIABLES = {"u_rel_random_downwelling_radiance": {"dim": [WL_DIM, Lu_SCAN
                                                                   {
                                                                       "dim": WL_DIM,
                                                                       "form": "err_corr_matrix",
-                                                                      "params": ["err_corr_systematic_indep_radiance"],
+                                                                      "params": ["err_corr_systematic_corr_rad_irr_irradiance"],
                                                                       "units": [],
                                                                   },
                                                                   {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -954,7 +954,7 @@ L_L2A_REFLECTANCE_VARIABLES = {"u_rel_random_reflectance": {"dim": [WL_DIM, SERI
                                                                                {
                                                                                    "dim": WL_DIM,
                                                                                    "form": "err_corr_matrix",
-                                                                                   "params": ["err_corr_systematic_indep_radiance"],
+                                                                                   "params": ["err_corr_systematic_reflectance"],
                                                                                    "units": [],
                                                                                },
                                                                                {"dim": SERIES_DIM, "form": "systematic", "params": [], "units": []},
@@ -1069,7 +1069,7 @@ W_L1C_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                                {
                                                                                    "dim": WL_DIM,
                                                                                    "form": "err_corr_matrix",
-                                                                                   "params": ["err_corr_systematic_indep_radiance"],
+                                                                                   "params": ["err_corr_systematic_water_leaving_radiance"],
                                                                                    "units": [],
                                                                                },
                                                                                {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -1110,7 +1110,7 @@ W_L1C_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                     {
                                                                         "dim": WL_DIM,
                                                                         "form": "err_corr_matrix",
-                                                                        "params": ["err_corr_systematic_indep_radiance"],
+                                                                        "params": ["err_corr_systematic_reflectance"],
                                                                         "units": [],
                                                                     },
                                                                     {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -1151,7 +1151,7 @@ W_L1C_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                          {
                                                                              "dim": WL_DIM,
                                                                              "form": "err_corr_matrix",
-                                                                             "params": ["err_corr_systematic_indep_radiance"],
+                                                                             "params": ["err_corr_systematic_reflectance_nosc"],
                                                                              "units": [],
                                                                          },
                                                                          {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -1239,7 +1239,7 @@ L_L2B_REFLECTANCE_VARIABLES = {"u_rel_random_reflectance": {"dim": [WL_DIM, SERI
                                                                                {
                                                                                    "dim": WL_DIM,
                                                                                    "form": "err_corr_matrix",
-                                                                                   "params": ["err_corr_systematic_indep_radiance"],
+                                                                                   "params": ["err_corr_systematic_reflectance"],
                                                                                    "units": [],
                                                                                },
                                                                                {"dim": SERIES_DIM, "form": "systematic", "params": [], "units": []},
