@@ -30,7 +30,9 @@ class AnomalyHandler:
     :param anomalies_dict: anomaly definitions (default defined in hypernets_processor.data_io.format.anomalies)
     """
 
-    def __init__(self, context, anomaly_db=None, url=None, anomalies_dict=ANOMALIES_DICT):
+    def __init__(
+        self, context, anomaly_db=None, url=None, anomalies_dict=ANOMALIES_DICT
+    ):
         self.context = context
         self.anomaly_db = None
 
@@ -52,7 +54,9 @@ class AnomalyHandler:
 
         # Check anomaly defined
         if anomaly_id not in self.get_anomaly_ids():
-            self.context.logger.debug("Unknown anomaly_id (" + anomaly_id + ") - not add to anomaly database")
+            self.context.logger.debug(
+                "Unknown anomaly_id (" + anomaly_id + ") - not add to anomaly database"
+            )
             return
 
         # Add anomaly to list of anomalies added during current processing

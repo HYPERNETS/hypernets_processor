@@ -10,7 +10,7 @@ from hypernets_processor.context import Context
 from hypernets_processor.sequence_processor import SequenceProcessor
 import os
 import traceback
-import cProfile,pstats
+import cProfile, pstats
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -128,20 +128,30 @@ def main(processor_config, job_config, to_archive):
                 target_sequences_passed += 1
 
                 if context.anomaly_handler.anomalies_added is not []:
-                    context.logger.info("Processing Anomalies: " + str(context.anomaly_handler.anomalies_added))
+                    context.logger.info(
+                        "Processing Anomalies: "
+                        + str(context.anomaly_handler.anomalies_added)
+                    )
 
                 context.logger.info("Complete")
             except Exception as e:
 
                 context.anomaly_handler.add_x_anomaly()
                 if context.anomaly_handler.anomalies_added is not []:
-                    context.logger.info("Processing Anomalies: " + str(context.anomaly_handler.anomalies_added))
+                    context.logger.info(
+                        "Processing Anomalies: "
+                        + str(context.anomaly_handler.anomalies_added)
+                    )
 
                 logger.error("Failed: " + repr(e))
                 logger.info(traceback.format_exc())
 
-        msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + \
-              " sequences successfully processed"
+        msg = (
+            str(target_sequences_passed)
+            + "/"
+            + str(target_sequences_total)
+            + " sequences successfully processed"
+        )
 
     return msg
 

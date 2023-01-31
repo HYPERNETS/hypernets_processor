@@ -8,14 +8,14 @@ from hypernets_processor.utils.config import (
     PROCESSOR_CONFIG_PATH,
     PROCESSOR_LAND_DEFAULTS_CONFIG_PATH,
     PROCESSOR_WATER_DEFAULTS_CONFIG_PATH,
-    SCHEDULER_CONFIG_PATH
+    SCHEDULER_CONFIG_PATH,
 )
 from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
 from hypernets_processor.data_io.hypernets_db_builder import open_database
 import os
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "24/9/2020"
 __version__ = __version__
@@ -40,7 +40,7 @@ def main(settings):
         elif settings["network"] == "w":
             def_config_path = PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
         else:
-            raise KeyError("Invalid network name ("+settings["network"]+")")
+            raise KeyError("Invalid network name (" + settings["network"] + ")")
 
         config_path = [PROCESSOR_CONFIG_PATH, def_config_path]
 
@@ -48,7 +48,9 @@ def main(settings):
 
     # Create directories (resets with existing if unchanged)
     os.makedirs(settings["working_directory"], exist_ok=True)
-    processor_config["Processor"]["processor_working_directory"] = settings["working_directory"]
+    processor_config["Processor"]["processor_working_directory"] = settings[
+        "working_directory"
+    ]
     os.makedirs(settings["archive_directory"], exist_ok=True)
     processor_config["Output"]["archive_directory"] = settings["archive_directory"]
 
@@ -62,16 +64,16 @@ def main(settings):
             processor_config["Databases"][db_fmt + "_db_url"] = url
 
     # Write updated config file
-    with open(PROCESSOR_CONFIG_PATH, 'w') as f:
+    with open(PROCESSOR_CONFIG_PATH, "w") as f:
         processor_config.write(f)
 
     # Set scheduler log file
     scheduler_config = read_config_file(SCHEDULER_CONFIG_PATH)
     if not os.path.exists(settings["log_path"]):
-        open(settings["log_path"], 'a').close()
+        open(settings["log_path"], "a").close()
     scheduler_config["Log"]["log_path"] = settings["log_path"]
 
-    with open(SCHEDULER_CONFIG_PATH, 'w') as f:
+    with open(SCHEDULER_CONFIG_PATH, "w") as f:
         scheduler_config.write(f)
 
     return None

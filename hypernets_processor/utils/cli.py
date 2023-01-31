@@ -6,7 +6,7 @@ from hypernets_processor.version import __version__
 import argparse
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "26/3/2020"
 __version__ = __version__
@@ -27,22 +27,29 @@ def configure_std_parser(description=None):
 
     # Initialise argument parser
     parser = argparse.ArgumentParser(
-        description=description,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
     # Add logging related arguments
     logging_options = parser.add_mutually_exclusive_group()
-    logging_options.add_argument("--verbose", action="store_true",
-                                 help="Option for verbose output")
+    logging_options.add_argument(
+        "--verbose", action="store_true", help="Option for verbose output"
+    )
 
-    logging_options.add_argument("--quiet", action="store_true",
-                                 help="Option for quiet output")
+    logging_options.add_argument(
+        "--quiet", action="store_true", help="Option for quiet output"
+    )
 
-    parser.add_argument("--log", action="store", type=str, default=None,
-                        help="Log file to write to. Leave out for stdout.")
+    parser.add_argument(
+        "--log",
+        action="store",
+        type=str,
+        default=None,
+        help="Log file to write to. Leave out for stdout.",
+    )
 
     # Add software version argument
-    parser.add_argument("--version", action="version", version='v%s' % __version__)
+    parser.add_argument("--version", action="version", version="v%s" % __version__)
 
     return parser
 
@@ -94,13 +101,14 @@ def determine_if_set(value_name, context):
     set_value = True
     if value is not None:
         set_value = cli_input_yn(
-            "update " + value_name + ", currently '" + value + "'",
-            default=False
+            "update " + value_name + ", currently '" + value + "'", default=False
         )
     return set_value
 
 
-def determine_set_value(value_name, context, default=None, options=None, return_existing=False):
+def determine_set_value(
+    value_name, context, default=None, options=None, return_existing=False
+):
     value = context.get_config_value(value_name)
 
     set_value = determine_if_set(value_name, context)
@@ -109,16 +117,10 @@ def determine_set_value(value_name, context, default=None, options=None, return_
 
     if set_value:
         if options is not None:
-            value_return = cli_input_str_opts(
-                "set "+value_name,
-                options=options
-            )
+            value_return = cli_input_str_opts("set " + value_name, options=options)
 
         else:
-            value_return = cli_input_str_default(
-                "set " + value_name,
-                default=default
-            )
+            value_return = cli_input_str_default("set " + value_name, default=default)
 
     if (value_return is None) and return_existing:
         return value

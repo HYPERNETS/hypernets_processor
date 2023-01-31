@@ -12,7 +12,7 @@ import argparse
 import configparser
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "26/3/2020"
 __version__ = __version__
@@ -73,14 +73,14 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None, name=No
 
     # Define logging to file if fname provided
     if fname is not None:
-        file_formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+        file_formatter = logging.Formatter("%(asctime)s : %(levelname)s : %(message)s")
         file_handler = logging.FileHandler(fname)
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
 
     # Define logging to stdout if no fname provided
     else:
-        stream_formatter = logging.Formatter('%(message)s')
+        stream_formatter = logging.Formatter("%(message)s")
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)

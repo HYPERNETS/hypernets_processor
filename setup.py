@@ -116,7 +116,8 @@ setup(
         "sqlalchemy==1.3.20",
         "sqlalchemy-utils",
         "punpy>=0.35",
-        "freezegun"
+        "freezegun",
+        "importlib-metadata==4.0.1",
         # "psycopg2",
     ],
     entry_points={

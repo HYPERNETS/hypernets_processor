@@ -59,12 +59,12 @@ class Context:
                 if self.get_config_value(db_fmt + "_db_url") is not None:
                     setattr(
                         self,
-                        db_fmt+"_db",
+                        db_fmt + "_db",
                         open_database(
                             self.get_config_value(db_fmt + "_db_url"),
                             db_format=db_fmt,
-                            context=self
-                        )
+                            context=self,
+                        ),
                     )
 
         # If anomaly_db not None, add it to anomaly_handler

@@ -27,7 +27,13 @@ class HypernetsWriter:
         self.context = context
 
     def write(
-        self, ds, directory=None, overwrite=False, fmt=None, compression_level=None, remove_vars_strings=None
+        self,
+        ds,
+        directory=None,
+        overwrite=False,
+        fmt=None,
+        compression_level=None,
+        remove_vars_strings=None,
     ):
         """
         Write xarray dataset to file
@@ -65,12 +71,12 @@ class HypernetsWriter:
                 raise IOError("The file already exists: " + path)
 
         if remove_vars_strings is not None:
-            for remove_var_string in remove_vars_strings.split(','):
+            for remove_var_string in remove_vars_strings.split(","):
                 for var_name in ds.data_vars:
                     if remove_var_string.strip() in var_name:
                         ds = ds.drop_vars(var_name)
 
-        #ds = HypernetsWriter.fill_ds(ds)
+        # ds = HypernetsWriter.fill_ds(ds)
         if fmt == "nc":
             HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
 
@@ -138,7 +144,12 @@ class HypernetsWriter:
                     seq = self.context.get_config_value("sequence_name")
 
                     directory = os.path.join(
-                        archive_directory, site, str(year), str('{:02d}'.format(month)), str('{:02d}'.format(day)), seq
+                        archive_directory,
+                        site,
+                        str(year),
+                        str("{:02d}".format(month)),
+                        str("{:02d}".format(day)),
+                        seq,
                     )
 
         return directory
@@ -196,9 +207,11 @@ class HypernetsWriter:
             var_encoding = dict(comp)
             var_encoding.update(ds[var_name].encoding)
             if "dtype" in var_encoding.keys():
-                ds[var_name].attrs["_FillValue"]=DatasetUtil.get_default_fill_value(var_encoding["dtype"])
-
+                ds[var_name].attrs["_FillValue"] = DatasetUtil.get_default_fill_value(
+                    var_encoding["dtype"]
+                )
             encoding.update({var_name: var_encoding})
+
         ds.to_netcdf(path, format="netCDF4", engine="netcdf4", encoding=encoding)
 
     @staticmethod
@@ -254,8 +267,11 @@ class HypernetsWriter:
         """
 
         if self.context is not None:
-            if (self.context.get_config_value("to_archive") is True) and (self.context.archive_db is not None):
+            if (self.context.get_config_value("to_archive") is True) and (
+                self.context.archive_db is not None
+            ):
                 self.context.archive_db.archive_product(ds, path)
+
 
 if __name__ == "__main__":
     pass

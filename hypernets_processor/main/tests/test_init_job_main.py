@@ -13,7 +13,7 @@ import os
 import shutil
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "21/10/2020"
 __version__ = __version__
@@ -23,7 +23,6 @@ __status__ = "Development"
 
 
 class TestInitJobMain(unittest.TestCase):
-
     def test_main(self):
         tmpdir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
         settings = dict()
@@ -36,15 +35,13 @@ class TestInitJobMain(unittest.TestCase):
 
         expect_config_path = os.path.abspath(
             os.path.join(
-                settings["job_working_directory"],
-                settings["job_name"] + ".config"
+                settings["job_working_directory"], settings["job_name"] + ".config"
             )
         )
 
         expect_log_path = os.path.abspath(
             os.path.join(
-                settings["job_working_directory"],
-                settings["job_name"] + ".log"
+                settings["job_working_directory"], settings["job_name"] + ".log"
             )
         )
 
@@ -55,13 +52,19 @@ class TestInitJobMain(unittest.TestCase):
 
         config = read_config_file(expect_config_path)
         self.assertEqual(config["Job"]["job_name"], "test")
-        self.assertEqual(config["Job"]["job_working_directory"], os.path.abspath(settings["job_working_directory"]))
-        self.assertEqual(config["Input"]["raw_data_directory"], os.path.abspath(settings["raw_data_directory"]))
+        self.assertEqual(
+            config["Job"]["job_working_directory"],
+            os.path.abspath(settings["job_working_directory"]),
+        )
+        self.assertEqual(
+            config["Input"]["raw_data_directory"],
+            os.path.abspath(settings["raw_data_directory"]),
+        )
         self.assertEqual(config["Log"]["log_path"], expect_log_path)
 
         shutil.rmtree(tmpdir)
 
-    @patch('hypernets_processor.main.init_job_main.JOBS_FILE_PATH', "test1.txt")
+    @patch("hypernets_processor.main.init_job_main.JOBS_FILE_PATH", "test1.txt")
     def test_main_add_to_scheduler_empty(self):
         tmpdir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
         settings = dict()
@@ -70,14 +73,13 @@ class TestInitJobMain(unittest.TestCase):
         settings["raw_data_directory"] = os.path.join(tmpdir, "test_raw")
         settings["add_to_scheduler"] = True
 
-        open("test1.txt", 'a').close()
+        open("test1.txt", "a").close()
 
         main(settings)
 
         expect_config_path = os.path.abspath(
             os.path.join(
-                settings["job_working_directory"],
-                settings["job_name"] + ".config"
+                settings["job_working_directory"], settings["job_name"] + ".config"
             )
         )
 
@@ -91,7 +93,7 @@ class TestInitJobMain(unittest.TestCase):
         shutil.rmtree(tmpdir)
         os.remove("test1.txt")
 
-    @patch('hypernets_processor.main.init_job_main.JOBS_FILE_PATH', "test2.txt")
+    @patch("hypernets_processor.main.init_job_main.JOBS_FILE_PATH", "test2.txt")
     def test_main_add_to_scheduler_append(self):
         tmpdir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
         settings = dict()
@@ -100,21 +102,20 @@ class TestInitJobMain(unittest.TestCase):
         settings["raw_data_directory"] = os.path.join(tmpdir, "test_raw")
         settings["add_to_scheduler"] = True
 
-        with open("test2.txt", 'w') as f:
+        with open("test2.txt", "w") as f:
             f.write("test")
 
         main(settings)
 
         expect_config_path = os.path.abspath(
             os.path.join(
-                settings["job_working_directory"],
-                settings["job_name"] + ".config"
+                settings["job_working_directory"], settings["job_name"] + ".config"
             )
         )
 
         with open("test2.txt", "r") as f:
             t = f.read()
-            self.assertEqual(t, "test"+"\n"+expect_config_path)
+            self.assertEqual(t, "test" + "\n" + expect_config_path)
 
         shutil.rmtree(settings["job_working_directory"])
         shutil.rmtree(settings["raw_data_directory"])

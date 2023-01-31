@@ -29,7 +29,7 @@ class Average:
         self._measurement_function_factory = MeasurementFunctionFactory
 
 
-    def average_l1b(self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data):
+    def average_l0(self, measurandstring, dataset_l0, dataset_l0_bla):
         """
 
         :param measurandstring:
@@ -43,7 +43,6 @@ class Average:
         :return:
         :rtype:
         """
-        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
         dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring, dataset_l0)
         flags = ["outliers","L0_thresholds", "L0_discontinuity"]
         for var in dataset_l0b.variables:
@@ -60,42 +59,21 @@ class Average:
                 else:
                     dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags)
 
-        series_id = np.unique(dataset_l0['series_id'])
-        series_id_bla = np.unique(dataset_l0_bla['series_id'])
-        flag_halfmasked = [False]*len(series_id)
-        flag_allmasked = [False]*len(series_id)
-        flag_darkmasked = [False]*len(series_id)
-        for i in range(len(series_id)):
-            flagged_bla = DatasetUtil.get_flags_mask_or(dataset_l0_bla['quality_flag'],["dark_masked"])
-            flagged_bla = flagged_bla[np.where(dataset_l0_bla['series_id'] == series_id_bla[i])]
-            flagged = DatasetUtil.get_flags_mask_or(dataset_l0['quality_flag'],flags)
-            flagged = flagged[np.where(dataset_l0['series_id'] == series_id[i])]
-            if np.count_nonzero(flagged) > 0.5*len(flagged):
-                flag_halfmasked[i]=True
-                self.context.logger.info("less than half of the scans for series %s passed quality checks"%(series_id[i]))
-            if np.count_nonzero(flagged) == len(flagged):
-                flag_allmasked[i]=True
-                self.context.logger.info("None of the scans for series %s passed quality checks"%(series_id[i]))
-            if np.count_nonzero(flagged_bla==False)<3:
-                flag_darkmasked[i]=True
-                self.context.logger.info("less than 3 dark scans for series %s passed quality checks"%(series_id[i]))
+        return dataset_l0b
 
+    def average_l1a(self, measurandstring, dataset_l1a):
 
-        dataset_l1b["quality_flag"][np.where(flag_halfmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_halfmasked)], "half_of_scans_masked"
-        )
-        dataset_l1b["quality_flag"][np.where(flag_allmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_allmasked)], "angles_missing"
-        )
-        dataset_l1b["quality_flag"][np.where(flag_darkmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_darkmasked)], "less_than_three_darks"
-        )
+        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
+        flags = ["outliers","L0_thresholds", "L0_discontinuity"]
 
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
-        calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
-            self.context.get_config_value("measurement_function_calibrate"))
-
-        dataset_l1b=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
+        for var in dataset_l1b.variables:
+            if measurandstring in var:
+                if "u_rel_random" in var:
+                    dataset_l1b[var].values=self.calc_mean_masked(dataset_l1a,var,flags,rand_unc=True)
+                elif "err_corr_" in var:
+                    dataset_l1b[var].values=dataset_l1a[var].values
+                else:
+                    dataset_l1b[var].values=self.calc_mean_masked(dataset_l1a,var,flags)
 
         return dataset_l1b
 

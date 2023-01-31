@@ -9,8 +9,15 @@
 ##                2018-03-05 (QV) fixed end of year rollover
 ##                2018-03-12 (QV) added file closing to enable file deletion for Windows
 
-def ancillary_interp_met(files, lon, lat, time, datasets=['z_wind', 'm_wind', 'press', 'rel_hum', 'p_water'],
-                         kind='linear'):
+
+def ancillary_interp_met(
+    files,
+    lon,
+    lat,
+    time,
+    datasets=["z_wind", "m_wind", "press", "rel_hum", "p_water"],
+    kind="linear",
+):
     import os, bz2
     from pyhdf.SD import SD, SDC
     from numpy import linspace
@@ -22,17 +29,21 @@ def ancillary_interp_met(files, lon, lat, time, datasets=['z_wind', 'm_wind', 'p
     for file in files:
         zipped = False
         # uncompress bz2 files
-        if file[-4:len(file)] == '.bz2':
+        if file[-4 : len(file)] == ".bz2":
             try:
                 zipped = True
-                file = file.strip('.bz2')
-                file_zipped = file + '.bz2'
-                with bz2.open(file_zipped, 'rb') as f:
+                file = file.strip(".bz2")
+                file_zipped = file + ".bz2"
+                with bz2.open(file_zipped, "rb") as f:
                     data = f.read()
-                with open(file, 'wb') as f:
+                with open(file, "wb") as f:
                     f.write(data)
             except:
-                print("Error extracting file {}, probably incomplete download".format(file_zipped))
+                print(
+                    "Error extracting file {}, probably incomplete download".format(
+                        file_zipped
+                    )
+                )
 
         f = SD(file, SDC.READ)
         datasets_dic = f.datasets()
@@ -40,23 +51,30 @@ def ancillary_interp_met(files, lon, lat, time, datasets=['z_wind', 'm_wind', 'p
 
         if False:
             print(meta)
-            for idx, sds in enumerate(datasets_dic.keys()): print(idx, sds)
+            for idx, sds in enumerate(datasets_dic.keys()):
+                print(idx, sds)
 
-        ftime = meta['Start Millisec'] / 3600000.
+        ftime = meta["Start Millisec"] / 3600000.0
         ftimes.append(ftime)
-        jdates.append(meta['Start Day'])
+        jdates.append(meta["Start Day"])
 
-        ## make lons and lats for this file       
-        lons = linspace(meta["Westernmost Longitude"], meta["Easternmost Longitude"],
-                        num=meta['Number of Columns'])
-        lats = linspace(meta["Northernmost Latitude"], meta["Southernmost Latitude"],
-                        num=meta['Number of Rows'])
+        ## make lons and lats for this file
+        lons = linspace(
+            meta["Westernmost Longitude"],
+            meta["Easternmost Longitude"],
+            num=meta["Number of Columns"],
+        )
+        lats = linspace(
+            meta["Northernmost Latitude"],
+            meta["Southernmost Latitude"],
+            num=meta["Number of Rows"],
+        )
 
         for dataset in datasets:
             sds_obj = f.select(dataset)
             data = sds_obj.get()
             ## do interpolation in space
-            if kind == 'nearest':
+            if kind == "nearest":
                 xi, xret = min(enumerate(lons), key=lambda x: abs(x[1] - float(lon)))
                 yi, yret = min(enumerate(lats), key=lambda x: abs(x[1] - float(lat)))
                 interp_data[dataset].append(data[yi, xi])
@@ -71,12 +89,15 @@ def ancillary_interp_met(files, lon, lat, time, datasets=['z_wind', 'm_wind', 'p
 
         ### delete unzipped file
         # if (zipped) & (sys.platform[0:3].lower() != 'win'): os.remove(file)
-        if (zipped): os.remove(file)
+        if zipped:
+            os.remove(file)
     # f = None
 
     ## add check for year for files[-1]?
-    if (ftimes[-1] == 0.) & \
-            ((jdates[-1] == jdates[0] + 1) | (jdates[0] >= 365 & jdates[-1] == 1)): ftimes[-1] = 24.0
+    if (ftimes[-1] == 0.0) & (
+        (jdates[-1] == jdates[0] + 1) | (jdates[0] >= 365 & jdates[-1] == 1)
+    ):
+        ftimes[-1] = 24.0
 
     ## do interpolation in time
     anc_data = {}
@@ -85,4 +106,4 @@ def ancillary_interp_met(files, lon, lat, time, datasets=['z_wind', 'm_wind', 'p
         ti = tinp(time)
         anc_data[dataset] = {"interp": ti, "series": interp_data[dataset]}
 
-    return (anc_data)
+    return anc_data

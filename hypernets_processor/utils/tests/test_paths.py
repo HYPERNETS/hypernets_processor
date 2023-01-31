@@ -29,9 +29,7 @@ class TestPaths(unittest.TestCase):
 
         full_path = relative_path(fname, data_directory)
 
-        self.assertEqual(
-            full_path, os.path.abspath("../../etc/processor.config")
-        )
+        self.assertEqual(full_path, os.path.abspath("../../etc/processor.config"))
         self.assertEqual(cwd, os.getcwd())
 
     def test_relative_path_in_subdirectory(self):
@@ -59,14 +57,14 @@ class TestPaths(unittest.TestCase):
 
         full_path = relative_path(fname, data_directory)
 
-        self.assertEqual(
-            full_path, os.path.abspath("../../etc/processor.config")
-        )
+        self.assertEqual(full_path, os.path.abspath("../../etc/processor.config"))
         self.assertEqual(cwd, os.getcwd())
 
     def test_parse_sequence_directory(self):
-        self.assertDictEqual(parse_sequence_path("/Test/Path/SEQ20200312T135926"),
-                             {"datetime": dt(2020, 3, 12, 13, 59, 26)})
+        self.assertDictEqual(
+            parse_sequence_path("/Test/Path/SEQ20200312T135926"),
+            {"datetime": dt(2020, 3, 12, 13, 59, 26)},
+        )
 
     def test_parse_sequence_directory_none(self):
         self.assertIsNone(parse_sequence_path("test"))

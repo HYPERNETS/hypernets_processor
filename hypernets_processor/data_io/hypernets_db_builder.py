@@ -198,7 +198,6 @@ class AnomalyDB(dataset.Database):
                 site_id=self.context.get_config_value("site_id"),
                 system_id=self.context.get_config_value("system_id"),
                 datetime=self.context.get_config_value("time"),
-
             )
         )
 

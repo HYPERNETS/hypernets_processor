@@ -1,30 +1,39 @@
 from punpy import MeasurementFunction
 
+
 class StandardMeasurementFunction(MeasurementFunction):
-    def meas_function(self,digital_number,gains,dark_signal,non_linear,int_time):
-        '''
+    def meas_function(self, digital_number, gains, dark_signal, non_linear, int_time):
+        """
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
-        '''
-        DN=digital_number-dark_signal
-        DN[DN==0]=1
-        corrected_DN = DN /(non_linear[0]+non_linear[1]*DN+
-                                       non_linear[2]*DN**2+
-                                       non_linear[3]*DN**3+
-                                       non_linear[4]*DN**4+
-                                       non_linear[5]*DN**5+
-                                       non_linear[6]*DN**6+
-                                       non_linear[7]*DN**7)
+        """
+        DN = digital_number - dark_signal
+        DN[DN == 0] = 1
+        corrected_DN = DN / (
+            non_linear[0]
+            + non_linear[1] * DN
+            + non_linear[2] * DN ** 2
+            + non_linear[3] * DN ** 3
+            + non_linear[4] * DN ** 4
+            + non_linear[5] * DN ** 5
+            + non_linear[6] * DN ** 6
+            + non_linear[7] * DN ** 7
+        )
 
         if gains.ndim == 1:
             return gains[:, None] * corrected_DN / int_time * 1000
         else:
-            return gains*corrected_DN/int_time*1000
+            return gains * corrected_DN / int_time * 1000
 
     @staticmethod
     def get_name():
         return "StandardMeasurementFunction"
 
     def get_argument_names(self):
-        return ["digital_number","gains","dark_signal","non_linearity_coefficients","integration_time"]
-
+        return [
+            "digital_number",
+            "gains",
+            "dark_signal",
+            "non_linearity_coefficients",
+            "integration_time",
+        ]

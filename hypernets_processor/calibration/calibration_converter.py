@@ -21,6 +21,7 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
+
 class CalibrationConverter:
     def __init__(self, context):
         dir_path = os.path.dirname(
@@ -37,8 +38,10 @@ class CalibrationConverter:
         self.writer = HypernetsWriter(context)
         self.context = context
         self.version = self.context.get_config_value("version")
-        if self.version==0.0:
-            self.version = input("Enter hypernets_processor version for which you are generating calib files:")
+        if self.version == 0.0:
+            self.version = input(
+                "Enter hypernets_processor version for which you are generating calib files:"
+            )
 
     def read_calib_files(self, sequence_path):
 
@@ -105,11 +108,11 @@ class CalibrationConverter:
         calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times[-1])
         if self.context.get_config_value("network") == "l":
             name = (
-                    "HYPERNETS_CAL_"
-                    + hypstar.upper()
-                    + "_RAD_SWIR_v"
-                    + str(self.version)
-                    + ".nc"
+                "HYPERNETS_CAL_"
+                + hypstar.upper()
+                + "_RAD_SWIR_v"
+                + str(self.version)
+                + ".nc"
             )
             if os.path.exists(os.path.join(hypstar_path, name)):
                 calibration_data_rad_swir = xarray.open_dataset(
@@ -122,11 +125,11 @@ class CalibrationConverter:
                 )
 
             name = (
-                    "HYPERNETS_CAL_"
-                    + hypstar.upper()
-                    + "_IRR_SWIR_v"
-                    + str(self.version)
-                    + ".nc"
+                "HYPERNETS_CAL_"
+                + hypstar.upper()
+                + "_IRR_SWIR_v"
+                + str(self.version)
+                + ".nc"
             )
             if os.path.exists(os.path.join(hypstar_path, name)):
                 calibration_data_irr_swir = xarray.open_dataset(
@@ -193,7 +196,7 @@ class CalibrationConverter:
                     measurandstring, hypstar=hypstar[8::]
                 )
                 calib_data.attrs["product_name"] = (
-                        "HYPERNETS_CAL_" + hypstar.upper() + tag + "v" + str(self.version)
+                    "HYPERNETS_CAL_" + hypstar.upper() + tag + "v" + str(self.version)
                 )
                 self.writer.write(calib_data, directory=hypstar_path, overwrite=True)
                 if hypstar[8] == "2":
@@ -202,7 +205,11 @@ class CalibrationConverter:
                         measurandstring, hypstar=hypstar[8::], swir=True
                     )
                     calib_data.attrs["product_name"] = (
-                            "HYPERNETS_CAL_" + hypstar.upper() + tag + "v" + str(self.version)
+                        "HYPERNETS_CAL_"
+                        + hypstar.upper()
+                        + tag
+                        + "v"
+                        + str(self.version)
                     )
                     self.writer.write(
                         calib_data, directory=hypstar_path, overwrite=True
@@ -236,7 +243,7 @@ class CalibrationConverter:
                         + "\\hypstar_"
                         + str(hypstar)
                         + "_radcal_L_*_%s.dat" % (sensortag),
-                        )
+                    )
                 )[0]
 
             else:
@@ -250,7 +257,7 @@ class CalibrationConverter:
                         + "\\hypstar_"
                         + str(hypstar)
                         + "_radcal_E_*_%s.dat" % (sensortag),
-                        )
+                    )
                 )[0]
 
             if os.path.exists(calpath):
@@ -277,7 +284,7 @@ class CalibrationConverter:
                     + "\\hypstar_"
                     + str(hypstar)
                     + "_nonlin_corr_coefs_*.dat",
-                    )
+                )
             )[0]
 
             if os.path.exists(nonlinpath):
@@ -304,7 +311,7 @@ class CalibrationConverter:
                     + "\\hypstar_"
                     + str(hypstar)
                     + "_wl_coefs_*.dat",
-                    )
+                )
             )[0]
             if os.path.exists(wavcalpath):
                 wavcaldates = np.append(wavcaldates, wavcaldate)
@@ -326,7 +333,7 @@ class CalibrationConverter:
                     + "\\hypstar_"
                     + str(hypstar)
                     + "_nonlin_corr_coefs_*.dat",
-                    )
+                )
             )[0]
             if os.path.exists(nonlinpath):
                 non_linear_cals = np.genfromtxt(nonlinpath)[:, 0]
@@ -348,7 +355,7 @@ class CalibrationConverter:
                     + "\\hypstar_"
                     + str(hypstar)
                     + "_wl_coefs_*.dat",
-                    )
+                )
             )[0]
             if os.path.exists(wavcalpath):
                 wav_cals = np.genfromtxt(wavcalpath)
@@ -377,7 +384,7 @@ class CalibrationConverter:
                         + "\\hypstar_"
                         + str(hypstar)
                         + "_radcal_L_*_%s.dat" % (sensortag),
-                        )
+                    )
                 )[0]
             else:
                 calpath = glob.glob(
@@ -390,7 +397,7 @@ class CalibrationConverter:
                         + "\\hypstar_"
                         + str(hypstar)
                         + "_radcal_E_*_%s.dat" % (sensortag),
-                        )
+                    )
                 )[0]
 
             if os.path.exists(calpath):
@@ -404,20 +411,20 @@ class CalibrationConverter:
                     # calibration_data["u_rel_random_gains"].values = None
 
                     calibration_data["u_rel_systematic_indep_gains"].values[i_cal] = (
-                                                                                             gains[:, 6] ** 2
-                                                                                             + gains[:, 7] ** 2
-                                                                                             + gains[:, 8] ** 2
-                                                                                             + gains[:, 9] ** 2
-                                                                                             + gains[:, 10] ** 2
-                                                                                             + gains[:, 11] ** 2
-                                                                                             + gains[:, 12] ** 2
-                                                                                             + gains[:, 13] ** 2
-                                                                                             + gains[:, 14] ** 2
-                                                                                             + gains[:, 15] ** 2
-                                                                                             + gains[:, 16] ** 2
-                                                                                             + gains[:, 17] ** 2
-                                                                                             + gains[:, 19] ** 2
-                                                                                     ) ** 0.5
+                        gains[:, 6] ** 2
+                        + gains[:, 7] ** 2
+                        + gains[:, 8] ** 2
+                        + gains[:, 9] ** 2
+                        + gains[:, 10] ** 2
+                        + gains[:, 11] ** 2
+                        + gains[:, 12] ** 2
+                        + gains[:, 13] ** 2
+                        + gains[:, 14] ** 2
+                        + gains[:, 15] ** 2
+                        + gains[:, 16] ** 2
+                        + gains[:, 17] ** 2
+                        + gains[:, 19] ** 2
+                    ) ** 0.5
 
                     cov_diag = cm.convert_corr_to_cov(
                         np.eye(len(gains[:, 2])), gains[:, 2] * (gains[:, 19])
@@ -427,35 +434,33 @@ class CalibrationConverter:
                         np.eye(len(gains[:, 2])),
                         gains[:, 2]
                         * (
-                                gains[:, 8] ** 2
-                                + gains[:, 10] ** 2
-                                + gains[:, 11] ** 2
-                                + gains[:, 16] ** 2
-                                + gains[:, 17] ** 2
+                            gains[:, 8] ** 2
+                            + gains[:, 10] ** 2
+                            + gains[:, 11] ** 2
+                            + gains[:, 16] ** 2
+                            + gains[:, 17] ** 2
                         )
-                        ** 0.5
-                        ,
-                        )
+                        ** 0.5,
+                    )
 
                     cov_full = cm.convert_corr_to_cov(
                         np.ones((len(gains[:, 2]), len(gains[:, 2]))),
                         gains[:, 2]
                         * (
-                                gains[:, 7] ** 2
-                                + gains[:, 9] ** 2
-                                + gains[:, 12] ** 2
-                                + gains[:, 13] ** 2
-                                + gains[:, 14] ** 2
-                                + gains[:, 15] ** 2
+                            gains[:, 7] ** 2
+                            + gains[:, 9] ** 2
+                            + gains[:, 12] ** 2
+                            + gains[:, 13] ** 2
+                            + gains[:, 14] ** 2
+                            + gains[:, 15] ** 2
                         )
-                        ** 0.5
-                        ,
-                        )
+                        ** 0.5,
+                    )
 
                     cov_filament = cm.convert_corr_to_cov(
                         np.ones((len(gains[:, 2]), len(gains[:, 2]))),
                         gains[:, 2] * (gains[:, 6] ** 2) ** 0.5,
-                        )
+                    )
 
                     calibration_data["err_corr_systematic_indep_gains"].values[
                         i_cal
@@ -465,21 +470,17 @@ class CalibrationConverter:
 
                     calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[
                         i_cal
-                    ] = (
-                                gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2
-                        ) ** 0.5
+                    ] = (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5
 
                     cov_other = cm.convert_corr_to_cov(
                         np.eye(len(gains[:, 2])),
-                        gains[:, 2]
-                        * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5
-                        ,
-                        )
+                        gains[:, 2] * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5,
+                    )
 
                     cov_filament = cm.convert_corr_to_cov(
                         np.ones((len(gains[:, 2]), len(gains[:, 2]))),
                         gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
-                        )
+                    )
 
                     calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
                         i_cal

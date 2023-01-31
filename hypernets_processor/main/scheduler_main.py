@@ -10,7 +10,7 @@ from hypernets_processor import Scheduler
 from hypernets_processor.main.sequence_processor_main import main as processor_main
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "26/3/2020"
 __version__ = __version__
@@ -48,14 +48,26 @@ def unpack_scheduler_config(scheduler_config):
         scheduler_config_dict[sch] = {}
 
         # Schedule Configuration
-        scheduler_config_dict[sch]["seconds"] = get_config_value(scheduler_config, sch, "seconds", dtype=int)
-        scheduler_config_dict[sch]["minutes"] = get_config_value(scheduler_config, sch, "minutes", dtype=int)
-        scheduler_config_dict[sch]["hours"] = get_config_value(scheduler_config, sch, "hours", dtype=int)
-        scheduler_config_dict[sch]["start_time"] = get_config_value(scheduler_config, sch, "start_time", dtype=str)
-        scheduler_config_dict[sch]["parallel"] = get_config_value(scheduler_config, sch, "parallel", dtype=bool)
+        scheduler_config_dict[sch]["seconds"] = get_config_value(
+            scheduler_config, sch, "seconds", dtype=int
+        )
+        scheduler_config_dict[sch]["minutes"] = get_config_value(
+            scheduler_config, sch, "minutes", dtype=int
+        )
+        scheduler_config_dict[sch]["hours"] = get_config_value(
+            scheduler_config, sch, "hours", dtype=int
+        )
+        scheduler_config_dict[sch]["start_time"] = get_config_value(
+            scheduler_config, sch, "start_time", dtype=str
+        )
+        scheduler_config_dict[sch]["parallel"] = get_config_value(
+            scheduler_config, sch, "parallel", dtype=bool
+        )
 
         # Use custom jobs list provided, else use default
-        scheduler_config_dict[sch]["jobs_list"] = get_config_value(scheduler_config, sch, "jobs_list", dtype=str)
+        scheduler_config_dict[sch]["jobs_list"] = get_config_value(
+            scheduler_config, sch, "jobs_list", dtype=str
+        )
         if scheduler_config_dict[sch]["jobs_list"] is None:
             scheduler_config_dict[sch]["jobs_list"] = JOBS_FILE_PATH
 
@@ -63,10 +75,16 @@ def unpack_scheduler_config(scheduler_config):
 
         # Checks
         # Check only have hours, minutes or seconds
-        intervals = [scheduler_config_dict[sch]["seconds"], scheduler_config_dict[sch]["minutes"],
-                     scheduler_config_dict[sch]["hours"]]
+        intervals = [
+            scheduler_config_dict[sch]["seconds"],
+            scheduler_config_dict[sch]["minutes"],
+            scheduler_config_dict[sch]["hours"],
+        ]
         if intervals.count(None) != 2:
-            raise ValueError("job repeat interval must be defined as 1 of seconds, minutes or hours for " + sch)
+            raise ValueError(
+                "job repeat interval must be defined as 1 of seconds, minutes or hours for "
+                + sch
+            )
 
     return scheduler_config_dict
 
@@ -103,17 +121,25 @@ def main(scheduler_config, processor_config):
         else:
             scheduler_job_config["name"] = job_config_path
 
-        scheduler_job_config["seconds"] = scheduler_config["Processor Schedule"]["seconds"]
-        scheduler_job_config["minutes"] = scheduler_config["Processor Schedule"]["minutes"]
+        scheduler_job_config["seconds"] = scheduler_config["Processor Schedule"][
+            "seconds"
+        ]
+        scheduler_job_config["minutes"] = scheduler_config["Processor Schedule"][
+            "minutes"
+        ]
         scheduler_job_config["hours"] = scheduler_config["Processor Schedule"]["hours"]
-        scheduler_job_config["parallel"] = scheduler_config["Processor Schedule"]["parallel"]
+        scheduler_job_config["parallel"] = scheduler_config["Processor Schedule"][
+            "parallel"
+        ]
 
         # schedule job
-        processor_sch.schedule(processor_main,
-                               scheduler_job_config=scheduler_job_config,
-                               job_config=job_config,
-                               processor_config=processor_config,
-                               to_archive=True)
+        processor_sch.schedule(
+            processor_main,
+            scheduler_job_config=scheduler_job_config,
+            job_config=job_config,
+            processor_config=processor_config,
+            to_archive=True,
+        )
 
     # run scheduled jobs
     processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
