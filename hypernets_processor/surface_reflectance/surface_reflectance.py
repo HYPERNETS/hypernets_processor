@@ -49,6 +49,7 @@ class SurfaceReflectance:
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset)
         dataset_l1c = self.rh.get_wind(dataset_l1c)
         dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
+
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
         )
@@ -70,7 +71,7 @@ class SurfaceReflectance:
 
         L1c = l1ctol1b_function.propagate_ds_specific(
             ["random", "systematic_indep"],
-            dataset,
+            dataset_l1c,
             comp_list_out=["random", "systematic"],
             ds_out_pre=dataset_l1c,
             use_ds_out_pre_unmodified=True,
@@ -131,10 +132,10 @@ class SurfaceReflectance:
         )
 
         if self.context.get_config_value("network").lower() == "w":
-
             dataset_l2a = self.avg.average_L2(
                 dataset
             )  # template and propagation is in average_L2
+
             for measurandstring in [
                 "water_leaving_radiance",
                 "reflectance_nosc",

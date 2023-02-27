@@ -89,7 +89,6 @@ class Average:
 
         dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags)
 
-
         for measurandstring in ["water_leaving_radiance","reflectance_nosc",
                                 "reflectance"]:
             dataset_l2a[measurandstring].values = self.calc_mean_masked(
@@ -150,6 +149,7 @@ class Average:
                 flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'],flags)
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
+                print(flagged,dataset['series_id'],series_id[i])
                 out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
                 if rand_unc:
                     out[i] = (np.sum(dataset[var].values[:, ids]**2, axis=2)[:, 0])**0.5 / len(ids[0])

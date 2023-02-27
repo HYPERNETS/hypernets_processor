@@ -58,7 +58,6 @@ class SequenceProcessor:
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
         rhymer = RhymerHypstar(self.context)
-        writer = HypernetsWriter(self.context)
 
         if self.context.get_config_value("network") == "w":
 

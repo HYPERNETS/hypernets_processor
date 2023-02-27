@@ -121,12 +121,15 @@ class DataTemplates:
         ]
         l1b_dim_sizes_dict = {
             "wavelength": len(dataset_l1a["wavelength"]),
-            "scan": len(upscan),
+            "scan": len(dataset_l1a["scan"]),
         }
 
         dataset_l1b = self.hdsb.create_ds_template(
             l1b_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1a, ds=dataset_l1a
         )
+
+        dataset_l1b=dataset_l1b.isel(scan=upscan)
+
         dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
         # todo check whether here some additional keywords need to propagated (see land version).
         return dataset_l1b

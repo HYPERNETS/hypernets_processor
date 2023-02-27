@@ -183,6 +183,7 @@ class RhymerHypstar:
             for i in rad['scan']:
                 scani = rad.sel(scan=i)
                 senz = scani["viewing_zenith_angle"].values
+                print(senz)
                 if senz < 90:
                     measurement = 'upwelling_radiance'
                     uprad.append(int(i))
@@ -193,8 +194,6 @@ class RhymerHypstar:
 
             lu = rad.sel(scan=uprad)
             lsky = rad.sel(scan=downrad)
-
-            print("k",lu['acquisition_time'])
 
             for i in lu['scan']:
                 scani = lu.sel(scan=i)
@@ -642,16 +641,16 @@ class RhymerHypstar:
 
         # l0_rad_masked, l0_rad_bla_masked, calibration_data_rad, l0_irr_masked, l0_irr_bla_masked, calibration_data_irr
         # because we average to Lu scan we propagate values from radiance!
-        dataset_l1b = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
+        dataset_l1c_int = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
+
         # QUALITY CHECK: TEMPORAL VARIABILITY IN ED AND LSKY -> ASSIGN FLAG
-        dataset_l1b, flags_rad = self.qc_scan(l1a_rad, "radiance", dataset_l1b)
-        dataset_l1b, flags_irr = self.qc_scan(l1a_irr, "irradiance", dataset_l1b)
+        dataset_l1c_int, flags_rad = self.qc_scan(l1a_rad, "radiance", dataset_l1c_int)
+        dataset_l1c_int, flags_irr = self.qc_scan(l1a_irr, "irradiance", dataset_l1c_int)
         # QUALITY CHECK: MIN NBR OF SCANS -> ASSIGN FLAG
         # remove temporal variability scans before average
 
         # check number of scans per cycle for up, down radiance and irradiance
-        L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = self.cycleparse(l1a_rad, l1a_irr, dataset_l1b)
-        print("s",l1a_rad["acquisition_time"].values,L1a_uprad["acquisition_time"].values)
+        L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = self.cycleparse(l1a_rad, l1a_irr, dataset_l1c_int)
 
         L1b_downrad = self.avg.average_l1a("radiance", L1a_downrad)
         # L1b_irr = self.avg.average_l1a("irradiance", L1a_irr)
@@ -660,12 +659,10 @@ class RhymerHypstar:
         #         "irradiance", l0_irr_masked, l0_irr_bla_masked, calibration_data_irr
         #     )
 
-
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the
         # irradiance wavelength to the radiance wavelength
-        L1c_int = self.intp.interpolate_l1b_w(dataset_l1b,L1a_uprad, L1b_downrad, l1b_irr)
-
+        L1c_int = self.intp.interpolate_l1b_w(dataset_l1c_int,L1a_uprad, L1b_downrad, l1b_irr)
 
         # check number of scans per cycle for up, down radiance and irradiance
         # (

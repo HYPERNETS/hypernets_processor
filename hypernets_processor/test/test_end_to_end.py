@@ -4,12 +4,15 @@ Tests for Calibrate class
 
 import unittest
 from unittest.mock import MagicMock, patch, call
+
+import xarray
 from hypernets_processor.version import __version__
 from hypernets_processor.data_utils.average import Average
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.surface_reflectance.surface_reflectance import (
     SurfaceReflectance,
 )
+from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.context import Context
 from hypernets_processor import HypernetsDSBuilder
@@ -124,6 +127,43 @@ def setup_test_files(context):
 
 
 class TestEndToEnd(unittest.TestCase):
+    def test_from_l1b(self):
+        this_directory_path = os.path.abspath(os.path.dirname(__file__))
+        this_directory_path = os.path.join(this_directory_path)
+
+        tmpdir = "tmp_" + "".join(random.choices(string.ascii_lowercase, k=6))
+
+        context = setup_test_context(
+            raw_data_directory=os.path.join(tmpdir, "data"),
+            archive_directory=os.path.join(tmpdir, "out"),
+            metadata_db_url="sqlite:///" + tmpdir + "/metadata.db",
+            anomaly_db_url="sqlite:///" + tmpdir + "/anomoly.db",
+            archive_db_url="sqlite:///" + tmpdir + "/archive.db",
+            create_directories=True,
+            create_dbs=False,
+        )
+        context.set_config_value(
+            "measurement_function_surface_reflectance", "WaterNetworkProtocol"
+        )
+        context.set_config_value("processor_directory", this_directory_path)
+
+        cal = Calibrate(context)
+        surf = SurfaceReflectance(context)
+        rhymer = RhymerHypstar(context)
+
+        L1a_rad=xarray.open_dataset(this_directory_path+"\HYPERNETS_W_TEST_L1A_RAD_20211106T0700_20230131T1418_v0.3.nc")
+        L1a_irr=xarray.open_dataset(this_directory_path+"\HYPERNETS_W_TEST_L1A_IRR_20211106T0700_20230131T1418_v0.3.nc")
+        L1b_irr=xarray.open_dataset(this_directory_path+"\HYPERNETS_W_TEST_L1B_IRR_20211106T0700_20230131T1419_v0.3.nc")
+
+        L1c_int = rhymer.process_l1c_int(
+            L1a_rad,
+            L1a_irr,
+            L1b_irr,
+        )
+
+        L1c = surf.process_l1c(L1c_int)
+
+
     def test_end_to_end(self):
         this_directory_path = os.path.abspath(os.path.dirname(__file__))
         this_directory_path = os.path.join(this_directory_path, "..\\")

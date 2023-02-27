@@ -76,7 +76,7 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0[0], calibration_data)
             dataset_l1a[measurandstring].values = measurand
-            dataset_l1a.drop(
+            dataset_l1a=dataset_l1a.drop(
                 [
                     "u_rel_random_" + measurandstring,
                     "u_rel_systematic_indep_" + measurandstring,
@@ -162,14 +162,14 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
             dataset_l1a[measurandstring].values = measurand
-            dataset_l1a.drop(
+            dataset_l1a=dataset_l1a.drop(
                 [
                     "u_rel_random_" + measurandstring,
                     "u_rel_systematic_indep_" + measurandstring,
                     "u_rel_systematic_corr_rad_irr_" + measurandstring,
                     "err_corr_systematic_indep_" + measurandstring,
                     "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
+                    ]
             )
 
         if self.context.get_config_value("write_l1a"):
@@ -242,7 +242,7 @@ class Calibrate:
 
         if self.context.get_config_value("plot_l1b"):
             self.plot.plot_series_in_sequence(measurandstring, dataset_l1b)
-            if measurandstring == "radiance":
+            if measurandstring == "radiance" and self.context.get_config_value("network") == "l":
                 self.plot.plot_series_in_sequence_vaa(
                     measurandstring, dataset_l1b, 98
                 )

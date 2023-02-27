@@ -103,7 +103,8 @@ class Plotting:
             ]
         linestyles = [
             (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
-            if np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180
+            if ((np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180) and
+                (len(angle_labels)>10))
             else (0, (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
             for i in range(len(dataset["viewing_zenith_angle"].values))
         ]
