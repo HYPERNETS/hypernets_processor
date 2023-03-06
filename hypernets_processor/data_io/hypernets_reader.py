@@ -509,7 +509,8 @@ class HypernetsReader:
         self.context.logger.info(
             spectrum_vnir.return_header(),
         )
-        self.context.logger.info(spectrum_swir.return_header())
+        # self.context.logger.info(spectrum_swir.return_header())
+        print(spectrum_swir.return_header())
 
         if len(vnir.shape) == 1:
             vnir = vnir[None, :]

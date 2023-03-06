@@ -116,6 +116,16 @@ L1A_IRR_METADATA = {
     "instrument_calibration_file_irr": "NaN",
 }
 
+L1B_RAD_METADATA = {
+    "title": "HYPSTAR dataset of radiance averaged over scans",  # example of irradiance file
+    "instrument_calibration_file_rad": "NaN",
+}
+
+L1B_IRR_METADATA = {
+    "title": "HYPSTAR dataset of irradiance averaged over scans",  # example of irradiance file
+    "instrument_calibration_file_irr": "NaN",
+}
+
 W_L1C_WLR_METADATA = {
     "title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
     " radiance and water leaving radiance",  # example of irradiance file
@@ -381,13 +391,13 @@ METADATA_DEFS = {
         **STANDARD_METADATA,
         **COMPONENTS_METADATA,
         **LAND_NETWORK_METADATA,
-        **L1A_RAD_METADATA,
+        **L1B_RAD_METADATA,
     },
     "W_L1B_RAD": {
         **STANDARD_METADATA,
         **COMPONENTS_METADATA,
         **WATER_NETWORK_METADATA,
-        **L1A_RAD_METADATA,
+        **L1B_RAD_METADATA,
     },
     "L_L1B_IRR": {
         **STANDARD_METADATA,

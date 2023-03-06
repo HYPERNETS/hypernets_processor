@@ -71,6 +71,7 @@ class AnomalyHandler:
         error_msg = self.get_anomaly_error_msg(anomaly_id)
         if error is not None:
             self.context.logger.error(error_msg)
+            print(error_msg)
             raise error(error_msg)
 
     def add_x_anomaly(self):

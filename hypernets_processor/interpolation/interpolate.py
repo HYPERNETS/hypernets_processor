@@ -70,7 +70,9 @@ class Interpolate:
         ].values = dataset_l1a_uprad["err_corr_systematic_corr_rad_irr_radiance"].values
 
         self.context.logger.info("interpolate sky radiance")
-        dataset_l1c_int = self.interpolate_skyradiance(dataset_l1c_int, dataset_l1b_downrad)
+        dataset_l1c_int = self.interpolate_skyradiance(
+            dataset_l1c_int, dataset_l1b_downrad
+        )
 
         self.context.logger.info("interpolate irradiances")
         dataset_l1c_int = self.interpolate_irradiance(dataset_l1c_int, dataset_l1b_irr)
@@ -113,7 +115,7 @@ class Interpolate:
             "measurement_function_interpolate_wav"
         )
         prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32", MCdimlast=True
+            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
         )
         if self.context.get_config_value("network") == "w":
             interpolation_function_wav = self._measurement_function_factory(
@@ -127,6 +129,12 @@ class Interpolate:
             interpolation_function_wav = self._measurement_function_factory(
                 prop=prop, repeat_dims="series", yvariable="irradiance"
             ).get_measurement_function(measurement_function_interpolate_wav)
+
+        interpolation_function_wav.setup(
+            np.nanmean(dataset_l1b_irr["solar_zenith_angle"].values),
+            self.context.get_config_value("network"),
+            dataset_l1b_irr["wavelength"].values,
+        )
 
         dataset_l1c_temp = self.templ.l1ctemp_dataset(dataset_l1c, dataset_l1b_irr)
 
@@ -143,7 +151,7 @@ class Interpolate:
             "measurement_function_interpolate_time"
         )
         prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), parallel_cores=1, dtype="float32"
+            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
         )
         interpolation_function_time = self._measurement_function_factory(
             prop=prop,

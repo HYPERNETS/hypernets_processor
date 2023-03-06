@@ -7,8 +7,10 @@ from hypernets_processor.utils.config import (
     read_config_file,
     JOB_CONFIG_TEMPLATE_PATH,
     JOBS_FILE_PATH,
+    WORKING_DIRECTORY_FILE_PATH,
 )
 import os
+import shutil
 
 
 """___Authorship___"""

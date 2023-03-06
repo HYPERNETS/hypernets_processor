@@ -62,7 +62,7 @@ class SurfaceReflectance:
                 "epsilon",
             ],
             repeat_dims=["scan"],
-            param_fixed=[False,False,False,False,True]
+            param_fixed=[False, False, False, False, True],
         ).get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance")
         )
@@ -108,7 +108,6 @@ class SurfaceReflectance:
             "water_leaving_radiance",
             "reflectance_nosc",
             "reflectance",
-            "epsilon",
         ]:
             try:
                 if self.context.get_config_value("plot_l1c"):
@@ -140,17 +139,11 @@ class SurfaceReflectance:
                 "water_leaving_radiance",
                 "reflectance_nosc",
                 "reflectance",
-                "epsilon",
             ]:
                 try:
                     if self.context.get_config_value("plot_l2a"):
-                        self.plot.plot_series_in_sequence(measurandstring, dataset_l2a)
-                        self.plot.plot_series_in_sequence_vaa(
-                            measurandstring, dataset_l2a, 98
-                        )
-                        self.plot.plot_series_in_sequence_vza(
-                            measurandstring, dataset_l2a, 30
-                        )
+                        self.plot.plot_series_in_sequence(measurandstring, dataset_l2a, ylim=[0,0.05])
+
                     if self.context.get_config_value("plot_uncertainty"):
                         self.plot.plot_relative_uncertainty(
                             measurandstring, dataset_l2a, L2=True
@@ -175,6 +168,11 @@ class SurfaceReflectance:
                 ds_out_pre=dataset_l2a,
                 store_unc_percent=True,
                 simple_systematic=False,
+            )
+            dataset_l2a["std_reflectance"].values = (
+                dataset["std_radiance"].values
+                / dataset["radiance"].values
+                * dataset_l2a["reflectance"].values
             )
 
             if self.context.get_config_value("plot_l2a"):

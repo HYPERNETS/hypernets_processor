@@ -7,7 +7,7 @@ from hypernets_processor.test.test_functions import (
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 
 import numpy as np
-import os
+import os.path
 import glob
 import comet_maths as cm
 import xarray
@@ -61,7 +61,6 @@ class CalibrationConverter:
                 self.context.logger.error(
                     "No SN set for hypstar instrument! using hypstar_cal_number from config file instead."
                 )
-            print(instrument_id)
         else:
             self.context.logger.error("Metadata missing")
             self.context.anomaly_handler.add_anomaly("m")

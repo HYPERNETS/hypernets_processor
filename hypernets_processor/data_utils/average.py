@@ -29,7 +29,7 @@ class Average:
         self._measurement_function_factory = MeasurementFunctionFactory
 
 
-    def average_l0(self, measurandstring, dataset_l0, dataset_l0_bla):
+    def average_l0(self, dataset_l0, dataset_l0_bla):
         """
 
         :param measurandstring:
@@ -43,12 +43,18 @@ class Average:
         :return:
         :rtype:
         """
-        dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring, dataset_l0)
+        dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(dataset_l0)
         flags = ["outliers","L0_thresholds", "L0_discontinuity"]
         for var in dataset_l0b.variables:
-            if var=="dark_signal":
-                meanvar=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
-                dataset_l0b["dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "digital_number",flags)
+            if var=="digital_number":
+                measurand, measurand_std,n_valid=self.calc_mean_masked(
+                    dataset_l0, "digital_number",flags,return_std=True)
+                dataset_l0b["digital_number"].values=measurand
+                dataset_l0b["std_digital_number"].values=measurand_std.astype(dataset_l0b["std_digital_number"].values.dtype)
+                dataset_l0b["n_valid_scans"].values=n_valid.astype(dataset_l0b["n_valid_scans"].values.dtype)
+            elif var=="dark_signal":
+                dataset_l0b["dark_signal"].values=self.calc_mean_masked(
+                    dataset_l0_bla, "digital_number",flags)
             elif var=="u_rel_random_dark_signal":
                 dataset_l0b["u_rel_random_dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)
             elif "series" in dataset_l0b[var].dims:
@@ -56,7 +62,7 @@ class Average:
                     dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags,rand_unc=True)
                 elif "err_corr_" in var:
                     dataset_l0b[var].values=dataset_l0[var].values
-                else:
+                elif (not "std" in var) and (not "n_valid" in var):
                     dataset_l0b[var].values=self.calc_mean_masked(dataset_l0,var,flags)
 
         return dataset_l0b
@@ -67,12 +73,19 @@ class Average:
         flags = ["outliers","L0_thresholds", "L0_discontinuity"]
 
         for var in dataset_l1b.variables:
-            if measurandstring in var:
+            if var==measurandstring:
+                measurand, measurand_std, n_valid=self.calc_mean_masked(
+                    dataset_l1a,measurandstring,flags,return_std=True)
+                dataset_l1b[measurandstring].values = measurand
+                dataset_l1b["std_"+measurandstring].values = measurand_std.astype(dataset_l1b["std_"+measurandstring].values.dtype)
+                dataset_l1b["n_valid_scans"].values = n_valid.astype(dataset_l1b["n_valid_scans"].values.dtype)
+
+            elif measurandstring in var:
                 if "u_rel_random" in var:
                     dataset_l1b[var].values=self.calc_mean_masked(dataset_l1a,var,flags,rand_unc=True)
                 elif "err_corr_" in var:
                     dataset_l1b[var].values=dataset_l1a[var].values
-                else:
+                elif (not "std" in var) and (not "n_valid" in var):
                     dataset_l1b[var].values=self.calc_mean_masked(dataset_l1a,var,flags)
 
         return dataset_l1b
@@ -88,21 +101,24 @@ class Average:
                          "fresnel_default","temp_variability_ed","temp_variability_lu", "simil_fail"]
 
         dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags)
-
         for measurandstring in ["water_leaving_radiance","reflectance_nosc",
-                                "reflectance"]:
-            dataset_l2a[measurandstring].values = self.calc_mean_masked(
-                dataset,measurandstring,flags)
+                                "reflectance","epsilon"]:
+            measurand, measurand_std, n_valid=self.calc_mean_masked(
+                dataset,measurandstring,flags,return_std=True)
+            dataset_l2a[measurandstring].values = measurand
+            dataset_l2a["std_"+measurandstring].values = measurand_std.astype(dataset_l2a["std_"+measurandstring].values.dtype)
+            dataset_l2a["n_valid_scans"].values = n_valid.astype(dataset_l2a["n_valid_scans"].values.dtype)
             dataset_l2a["u_rel_random_"+measurandstring].values = self.calc_mean_masked(
                 dataset,"u_rel_random_"+measurandstring,flags,rand_unc=True)
             dataset_l2a["u_rel_systematic_"+measurandstring].values = self.calc_mean_masked(
                 dataset,"u_rel_systematic_"+measurandstring,flags)
-            dataset_l2a["err_corr_systematic_"+measurandstring].values = \
-                dataset["err_corr_systematic_"+measurandstring].values
+            if not measurandstring=="epsilon":
+                dataset_l2a["err_corr_systematic_"+measurandstring].values = \
+                    dataset["err_corr_systematic_"+measurandstring].values
 
         return dataset_l2a
 
-    def calc_mean_masked(self, dataset, var, flags, rand_unc=False, corr=False):
+    def calc_mean_masked(self, dataset, var, flags, rand_unc=False, corr=False, return_std=False):
         """
 
         :param dataset:
@@ -122,7 +138,7 @@ class Average:
         vals=dataset[var].values
         if corr:
             out = np.empty\
-                ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])))
+                ((len(series_id), len(dataset['wavelength']), len(dataset['wavelength'])),dtype=dataset[var].values.dtype)
             for i in range(len(series_id)):
                 flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'],flags)
                 ids = np.where(
@@ -132,26 +148,39 @@ class Average:
             out = np.mean(out, axis=0)
 
         elif vals.ndim==1:
-            out = np.empty((len(series_id),))
+            out = np.empty((len(series_id),),dtype=dataset[var].values.dtype)
+            if return_std:
+                out_std = np.empty((len(series_id),),dtype=np.float32)
+                n_valid = np.empty((len(series_id),),dtype=np.uint16)
 
             for i in range(len(series_id)):
                 flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'],flags)
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
                 out[i] = np.mean(dataset[var].values[ids])
-
+                if return_std:
+                    out_std[i]=np.std(dataset[var].values[ids])
+                    n_valid[i]=len(ids[0])
                 if rand_unc:
                     out[i] = (np.sum(dataset[var].values[ids]**2))**0.5 / len(ids[0])
         else:
-            out = np.empty((len(series_id), len(dataset['wavelength'])))
+            out = np.empty((len(series_id), len(dataset['wavelength'])),dtype=dataset[var].values.dtype)
+            if return_std:
+                out_std = np.empty((len(series_id), len(dataset['wavelength'])),dtype=np.float32)
+                n_valid = np.empty((len(series_id),),dtype=np.uint16)
 
             for i in range(len(series_id)):
                 flagged = DatasetUtil.get_flags_mask_or(dataset['quality_flag'],flags)
                 ids = np.where(
                     (dataset['series_id'] == series_id[i]) & (flagged == False))
-                print(flagged,dataset['series_id'],series_id[i])
                 out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
+                if return_std:
+                    out_std[i]=np.std(dataset[var].values[:, ids], axis=2)[:, 0]
+                    n_valid[i]=len(ids[0])
                 if rand_unc:
                     out[i] = (np.sum(dataset[var].values[:, ids]**2, axis=2)[:, 0])**0.5 / len(ids[0])
 
-        return out.T
+        if return_std:
+            return out.T, out_std.T, n_valid
+        else:
+            return out.T

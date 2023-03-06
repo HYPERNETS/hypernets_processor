@@ -10,6 +10,7 @@ class InterpolationTimeLinear(MeasurementFunction):
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         """
+
         simpleint = True
         if len(times.shape) > 1:
             simpleint = False
@@ -35,9 +36,13 @@ class InterpolationTimeLinear(MeasurementFunction):
                 out = np.empty((len(irradiance), len(output_time)))
                 for i in range(len(output_time)):
                     if output_time[i] >= np.max(times):
-                        out[:, i] = np.mean(irradiance[:, times == np.max(times)],axis=1).squeeze()
+                        out[:, i] = np.mean(
+                            irradiance[:, times == np.max(times)], axis=1
+                        ).squeeze()
                     elif output_time[i] <= np.min(times):
-                        out[:, i] = np.mean(irradiance[:, times == np.min(times)],axis=1).squeeze()
+                        out[:, i] = np.mean(
+                            irradiance[:, times == np.min(times)], axis=1
+                        ).squeeze()
                     else:
                         irradiance_intfunc = scipy.interpolate.interp1d(
                             times, irradiance

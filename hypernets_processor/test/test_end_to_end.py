@@ -151,9 +151,18 @@ class TestEndToEnd(unittest.TestCase):
         surf = SurfaceReflectance(context)
         rhymer = RhymerHypstar(context)
 
-        L1a_rad=xarray.open_dataset(this_directory_path+"\HYPERNETS_W_TEST_L1A_RAD_20211106T0700_20230131T1418_v0.3.nc")
-        L1a_irr=xarray.open_dataset(this_directory_path+"\HYPERNETS_W_TEST_L1A_IRR_20211106T0700_20230131T1418_v0.3.nc")
-        L1b_irr=xarray.open_dataset(this_directory_path+"\HYPERNETS_W_TEST_L1B_IRR_20211106T0700_20230131T1419_v0.3.nc")
+        L1a_rad = xarray.open_dataset(
+            this_directory_path
+            + "\HYPERNETS_W_TEST_L1A_RAD_20211106T0700_20230131T1418_v0.3.nc"
+        )
+        L1a_irr = xarray.open_dataset(
+            this_directory_path
+            + "\HYPERNETS_W_TEST_L1A_IRR_20211106T0700_20230131T1418_v0.3.nc"
+        )
+        L1b_irr = xarray.open_dataset(
+            this_directory_path
+            + "\HYPERNETS_W_TEST_L1B_IRR_20211106T0700_20230131T1419_v0.3.nc"
+        )
 
         L1c_int = rhymer.process_l1c_int(
             L1a_rad,
@@ -162,7 +171,6 @@ class TestEndToEnd(unittest.TestCase):
         )
 
         L1c = surf.process_l1c(L1c_int)
-
 
     def test_end_to_end(self):
         this_directory_path = os.path.abspath(os.path.dirname(__file__))

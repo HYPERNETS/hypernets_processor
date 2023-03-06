@@ -8,6 +8,7 @@ from hypernets_processor.utils.config import (
     JOB_CONFIG_TEMPLATE_PATH,
     PROCESSOR_WATER_DEFAULTS_CONFIG_PATH,
     PROCESSOR_LAND_DEFAULTS_CONFIG_PATH,
+    PROCESSOR_DEFAULT_CONFIG_PATH,
 )
 from hypernets_processor.utils.cli import configure_std_parser
 from hypernets_processor.utils.config import read_config_file, get_config_value
@@ -156,7 +157,7 @@ def cli():
         job_config["Log"]["quiet"] = str(parsed_args.quiet)
 
     # run main
-    processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
+    processor_config = read_config_file(PROCESSOR_DEFAULT_CONFIG_PATH)
     main(processor_config=processor_config, job_config=job_config, to_archive=False)
 
     return None

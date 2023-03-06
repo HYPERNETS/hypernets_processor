@@ -177,15 +177,6 @@ for variable in COMMON_VARIABLES_Lu_SCAN.keys():
         for d in COMMON_VARIABLES_SERIES[variable]["dim"]
     ]
 
-# > L0_VARIABLES - Variables required for the L0 dataset
-# SHOULD I ADD MAX NUMBER OF CHARACTERS FOR SERIES ID.... or is acquisition time sufficient - extra check required ????
-# "series_id": {"dim": [SCAN_DIM],
-#                                   "dtype": np.unicode_,
-#                                   "attributes": {"standard_name": "series_id",
-#                                                  "long_name": "series identification for the scan",
-#                                                  "units": "-"},
-#                                   "encoding": {'dtype': np.unicode_}},
-
 
 L0_RAD_VARIABLES = {
     "integration_time": {
@@ -196,7 +187,6 @@ L0_RAD_VARIABLES = {
             "long_name": "Integration time during measurement",
             "units": "s",
         },
-        "encoding": {"dtype": np.uint32},
     },
     "temperature": {
         "dim": [SCAN_DIM],
@@ -206,7 +196,6 @@ L0_RAD_VARIABLES = {
             "long_name": "temperature of instrument",
             "units": "degrees",
         },
-        "encoding": {"dtype": np.float32},
     },
     "acceleration_x_mean": {
         "dim": [SCAN_DIM],
@@ -288,7 +277,6 @@ L0B_RAD_VARIABLES = {
             "long_name": "Integration time during measurement",
             "units": "s",
         },
-        "encoding": {"dtype": np.uint32},
     },
     "temperature": {
         "dim": [SERIES_DIM],
@@ -298,7 +286,6 @@ L0B_RAD_VARIABLES = {
             "long_name": "temperature of instrument",
             "units": "degrees",
         },
-        "encoding": {"dtype": np.float32},
     },
     "acceleration_x_mean": {
         "dim": [SERIES_DIM],
@@ -411,6 +398,33 @@ L0B_RAD_VARIABLES = {
             ],
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "std_digital_number": {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation digital_number",
+            "long_name": "standard deviation on digital number",
+            "units": "-",
+        },
+    },
+    "std_dark_signal": {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation dark_signal",
+            "long_name": "standard deviation on digital number of dark signal",
+            "units": "-",
+        },
+    },
+    "n_valid_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of valid scans used in average of digital number",
+            "long_name": "",
+            "units": "-",
+        },
     },
 }
 
@@ -815,6 +829,24 @@ L1B_RAD_VARIABLES = {
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
     },
+    "n_valid_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of valid scans used in average of VNIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
+    "n_valid_scans_SWIR": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of valid scans used in average of SWIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
     "radiance": {
         "dim": [WL_DIM, SERIES_DIM],
         "dtype": np.float32,
@@ -827,6 +859,15 @@ L1B_RAD_VARIABLES = {
                 "u_rel_systematic_indep_radiance",
                 "u_rel_systematic_corr_rad_irr_radiance",
             ],
+        },
+    },
+    "std_radiance": {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation radiance",
+            "long_name": "standard deviation on upwelling radiance",
+            "units": "mW m^-2 nm^-1 sr^-1",
         },
     },
 }
@@ -905,6 +946,24 @@ L1B_IRR_VARIABLES = {
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
     },
+    "n_valid_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of valid scans used in average of VNIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
+    "n_valid_scans_SWIR": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of valid scans used in average of SWIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
     "irradiance": {
         "dim": [WL_DIM, SERIES_DIM],
         "dtype": np.float32,
@@ -917,6 +976,15 @@ L1B_IRR_VARIABLES = {
                 "u_rel_systematic_indep_irradiance",
                 "u_rel_systematic_corr_rad_irr_irradiance",
             ],
+        },
+    },
+    "std_irradiance": {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation irradiance",
+            "long_name": "standard deviation on downwelling irradiance",
+            "units": "mW m^-2 nm^-1 sr^-1",
         },
     },
 }
@@ -1294,6 +1362,24 @@ L_L2A_REFLECTANCE_VARIABLES = {
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
     },
+    "n_valid_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of valid scans used in average of VNIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
+    "n_valid_scans_SWIR": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of valid scans used in average of SWIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
     "reflectance": {
         "dim": [WL_DIM, SERIES_DIM],
         "dtype": np.float32,
@@ -1314,6 +1400,15 @@ L_L2A_REFLECTANCE_VARIABLES = {
                 "u_rel_random_reflectance",
                 "u_rel_systematic_reflectance",
             ],
+        },
+    },
+    "std_reflectance": {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation reflectance",
+            "long_name": "standard deviation on surface reflectance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+            "units": "-",
         },
     },
 }
@@ -1581,8 +1676,60 @@ for variable in W_L2A_REFLECTANCE_VARIABLES.keys():
         d if d != Lu_SCAN_DIM else SERIES_DIM
         for d in W_L2A_REFLECTANCE_VARIABLES[variable]["dim"]
     ]
+W_L2A_REFLECTANCE_VARIABLES["n_valid_scans"] = {
+    "dim": [SERIES_DIM],
+    "dtype": np.uint8,
+    "attributes": {
+        "standard_name": "number of valid scans used in average of VNIR",
+        "long_name": "",
+        "units": "-",
+    },
+}
+W_L2A_REFLECTANCE_VARIABLES["std_reflectance"] = {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation reflectance",
+            "long_name": "standard deviation on reflectance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+            "units": "-",
+        },
+}
 
-# L_L2B_REFLECTANCE_VARIABLES - Reflectance variables required for L2A land data product
+
+W_L2A_REFLECTANCE_VARIABLES["std_water_leaving_radiance"] = {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation water_leaving_radiance",
+            "long_name": "standard deviation on water leaving radiance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+            "units": "mW m^-2 nm^-1 sr^-1",
+        },
+}
+
+W_L2A_REFLECTANCE_VARIABLES["std_reflectance_nosc"] = {
+        "dim": [WL_DIM, SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation reflectance_nosc",
+            "long_name": "standard deviation on Reflectance of the water column at the "
+            "surface without correction for the NIR that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance) ",
+            "units": "-",
+        },
+}
+
+W_L2A_REFLECTANCE_VARIABLES["std_epsilon"] = {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "standard deviation epsilon",
+            "long_name": "standard deviation on Similarity spectrum ratio at two wavelengths see Ruddick et al. (2016)  that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+            "units": "-",
+        },
+}
+
+
+
+# L_L2B_REFLECTANCE_VARIABLES - Reflectance variables required for L2B land data product
 L_L2B_REFLECTANCE_VARIABLES = {
     "u_rel_random_reflectance": {
         "dim": [WL_DIM, SERIES_DIM],
@@ -1671,7 +1818,6 @@ C_QUALITY_SCAN = {
             "ancillary_variables attribute.",
             "flag_meanings": FLAG_COMMON,
         },
-        "encoding": {},
     }
 }
 
@@ -1690,7 +1836,6 @@ L_QUALITY = {
             "ancillary_variables attribute.",
             "flag_meanings": FLAG_COMMON + FLAG_LAND,
         },
-        "encoding": {},
     }
 }
 
@@ -1709,7 +1854,6 @@ W_QUALITY_SERIES = {
             "ancillary_variables attribute.",
             "flag_meanings": FLAG_COMMON + FLAG_WATER,
         },
-        "encoding": {},
     }
 }
 

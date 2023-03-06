@@ -13,6 +13,10 @@ from hypernets_processor.interpolation.measurement_functions.interpolate_wav_lin
     InterpolationWavLinear,
 )
 
+from hypernets_processor.interpolation.measurement_functions.interpolate_wav_clearsky import (
+    InterpolationWavClearSky,
+)
+
 """___Authorship___"""
 __author__ = "Pieter De Vis"
 __created__ = "30/03/2020"
@@ -21,23 +25,23 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "Pieter.De.Vis@npl.co.uk"
 __status__ = "Development"
 
+interpolators = [
+    InterpolationTimeLinear,
+    WaterNetworkInterpolationSkyRadianceLinear,
+    InterpolationWavLinear,
+    InterpolationWavClearSky,
+]
+
 
 class InterpolationFactory:
     def __init__(self, *args, **kwargs):
         self.measurement_functions = dict(
             [
                 (
-                    InterpolationTimeLinear.get_name(),
-                    InterpolationTimeLinear(*args, **kwargs),
-                ),
-                (
-                    InterpolationWavLinear.get_name(),
-                    InterpolationWavLinear(*args, **kwargs),
-                ),
-                (
-                    WaterNetworkInterpolationSkyRadianceLinear.get_name(),
-                    WaterNetworkInterpolationSkyRadianceLinear(*args, **kwargs),
-                ),
+                    interpolator.get_name(),
+                    interpolator(*args, **kwargs),
+                )
+                for interpolator in interpolators
             ]
         )
 

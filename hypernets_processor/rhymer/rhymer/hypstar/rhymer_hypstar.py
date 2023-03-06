@@ -167,73 +167,119 @@ class RhymerHypstar:
 
     def cycleparse(self, rad, irr, dataset_l1b):
 
-        protocol = self.context.get_config_value("measurement_function_surface_reflectance")
+        protocol = self.context.get_config_value(
+            "measurement_function_surface_reflectance"
+        )
         self.context.logger.debug(protocol)
         nbrlu = self.context.get_config_value("n_upwelling_rad")
         nbred = self.context.get_config_value("n_upwelling_irr")
         nbrlsky = self.context.get_config_value("n_downwelling_rad")
 
-        if protocol != 'WaterNetworkProtocol':
+        if protocol != "WaterNetworkProtocol":
             # here we should simply provide surface reflectance?
             # what about a non-standard protocol but that includes the required standard series?
-            self.context.logger.error('Unknown measurement protocol: {}'.format(protocol))
+            self.context.logger.error(
+                "Unknown measurement protocol: {}".format(protocol)
+            )
         else:
             uprad = []
             downrad = []
-            for i in rad['scan']:
+            for i in rad["scan"]:
                 scani = rad.sel(scan=i)
                 senz = scani["viewing_zenith_angle"].values
-                print(senz)
                 if senz < 90:
-                    measurement = 'upwelling_radiance'
+                    measurement = "upwelling_radiance"
                     uprad.append(int(i))
                 if senz >= 90:
-                    measurement = 'downwelling_radiance'
+                    measurement = "downwelling_radiance"
                     downrad.append(int(i))
-                if measurement is None: continue
+                if measurement is None:
+                    continue
 
             lu = rad.sel(scan=uprad)
             lsky = rad.sel(scan=downrad)
 
-            for i in lu['scan']:
+            for i in lu["scan"]:
                 scani = lu.sel(scan=i)
                 sena = scani["viewing_azimuth_angle"].values
                 senz = scani["viewing_zenith_angle"].values
-                self.context.logger.debug(scani['acquisition_time'].values)
-                ts = datetime.utcfromtimestamp(int(scani['acquisition_time'].values))
+                self.context.logger.debug(scani["acquisition_time"].values)
+                ts = datetime.utcfromtimestamp(int(scani["acquisition_time"].values))
                 # not fromtimestamp?
 
-                if (senz != 'NULL') & (sena != 'NULL'):
+                if (senz != "NULL") & (sena != "NULL"):
                     senz = float(senz)
                     sena = abs(float(sena))
                 else:
-                    dataset_l1b['quality_flag'] = du.set_flag(dataset_l1b.sel(scan=i)['quality_flag'], "angles_missing")
-                    self.context.logger.info('NULL angles: Aquisition time {}, {}'.format(ts, ', '.join(
-                        ['{}:{}'.format(k, scani[k].values) for k in ['scan', 'quality_flag']])))
+                    dataset_l1b["quality_flag"] = du.set_flag(
+                        dataset_l1b.sel(scan=i)["quality_flag"], "angles_missing"
+                    )
+                    self.context.logger.info(
+                        "NULL angles: Aquisition time {}, {}".format(
+                            ts,
+                            ", ".join(
+                                [
+                                    "{}:{}".format(k, scani[k].values)
+                                    for k in ["scan", "quality_flag"]
+                                ]
+                            ),
+                        )
+                    )
                     continue
 
             # check if we have the same azimuth for lu and lsky
             sena_lu = np.unique(lu["viewing_azimuth_angle"].values)
             sena_lsky = np.unique(lsky["viewing_azimuth_angle"].values)
-            sena_lu=np.array([sena_lu[i] + 360 if sena_lu[i] < 0 else sena_lu[i] for i in range(0, len(sena_lu))])
-            sena_lsky=np.array([sena_lsky[i] + 360 if sena_lsky[i] < 0 else sena_lsky[i] for i in range(0, len(sena_lsky))])
+            sena_lu = np.array(
+                [
+                    sena_lu[i] + 360 if sena_lu[i] < 0 else sena_lu[i]
+                    for i in range(0, len(sena_lu))
+                ]
+            )
+            sena_lsky = np.array(
+                [
+                    sena_lsky[i] + 360 if sena_lsky[i] < 0 else sena_lsky[i]
+                    for i in range(0, len(sena_lsky))
+                ]
+            )
             # print(sena_lsky)
             # print(sena_lu)
             # print(du.unpack_flags(lu['quality_flag']))
 
             for i in sena_lu:
                 if np.round(i) not in np.round(sena_lsky):
-                    #if np.min(np.round(sena_lsky)) > np.round(i) or np.max(np.round(sena_lsky)) < np.round(i):
-                    dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
-                        dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "lu_eq_missing")
+                    # if np.min(np.round(sena_lsky)) > np.round(i) or np.max(np.round(sena_lsky)) < np.round(i):
+                    dataset_l1b["quality_flag"][
+                        dataset_l1b["viewing_azimuth_angle"] == i
+                    ] = du.set_flag(
+                        dataset_l1b["quality_flag"][
+                            dataset_l1b["viewing_azimuth_angle"] == i
+                        ],
+                        "lu_eq_missing",
+                    )
                     if self.context.get_config_value("verbosity") > 2:
-                        ts = [datetime.utcfromtimestamp(x) for x in
-                              lu['acquisition_time'][lu["viewing_azimuth_angle"] == i].values]
+                        ts = [
+                            datetime.utcfromtimestamp(x)
+                            for x in lu["acquisition_time"][
+                                lu["viewing_azimuth_angle"] == i
+                            ].values
+                        ]
                         self.context.logger.info(
-                            'No azimuthal equivalent downwelling radiance measurement: Aquisition time {}, {}'.format(
-                                ts, ', '.join(
-                                    ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k in
-                                     ['scan', 'quality_flag']])))
+                            "No azimuthal equivalent downwelling radiance measurement: Aquisition time {}, {}".format(
+                                ts,
+                                ", ".join(
+                                    [
+                                        "{}:{}".format(
+                                            k,
+                                            lu[k][
+                                                lu["viewing_azimuth_angle"] == i
+                                            ].values,
+                                        )
+                                        for k in ["scan", "quality_flag"]
+                                    ]
+                                ),
+                            )
+                        )
                         self.context.logger.error("Ld missing for fresnel correction")
                         self.context.anomaly_handler.add_anomaly("l")
 
@@ -242,15 +288,34 @@ class RhymerHypstar:
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
             for i in senz_lu:
                 if i not in senz_lsky:
-                    dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
-                        dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "fresnel_angle_missing")
-                    ts = [datetime.utcfromtimestamp(x) for x in
-                          lu['acquisition_time'][lu["viewing_zenith_angle"] == i].values]
+                    dataset_l1b["quality_flag"][
+                        dataset_l1b["viewing_azimuth_angle"] == i
+                    ] = du.set_flag(
+                        dataset_l1b["quality_flag"][
+                            dataset_l1b["viewing_azimuth_angle"] == i
+                        ],
+                        "fresnel_angle_missing",
+                    )
+                    ts = [
+                        datetime.utcfromtimestamp(x)
+                        for x in lu["acquisition_time"][
+                            lu["viewing_zenith_angle"] == i
+                        ].values
+                    ]
                     self.context.logger.info(
-                        'No downwelling radiance measurement at appropriate fresnel angle: Aquisition time {}, {}'.format(
-                            ts, ', '.join(
-                                ['{}:{}'.format(k, lu[k][lu["viewing_azimuth_angle"] == i].values) for k
-                                 in ['scan', 'quality_flag']])))
+                        "No downwelling radiance measurement at appropriate fresnel angle: Aquisition time {}, {}".format(
+                            ts,
+                            ", ".join(
+                                [
+                                    "{}:{}".format(
+                                        k,
+                                        lu[k][lu["viewing_azimuth_angle"] == i].values,
+                                    )
+                                    for k in ["scan", "quality_flag"]
+                                ]
+                            ),
+                        )
+                    )
                     self.context.logger.error("Ld missing for fresnel correction")
                     self.context.anomaly_handler.add_anomaly("l")
 
@@ -258,42 +323,57 @@ class RhymerHypstar:
             flags = ["saturation", "nonlinearity", "bad_pointing", "outliers"]
 
             flagged = np.any(
-                [du.unpack_flags(lu['quality_flag'])[x] for x in
-                 flags], axis=0)
+                [du.unpack_flags(lu["quality_flag"])[x] for x in flags], axis=0
+            )
             ids = np.where(flagged == False)[0]
             # print(nbrlu)
             if len(ids) < nbrlu:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
-                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlu")
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i],
+                        "min_nbrlu",
+                    )
                 self.context.logger.info(
-                    "Not enough upwelling radiance data for sequence {}".format(lu.attrs['sequence_id']))
+                    "Not enough upwelling radiance data for sequence {}".format(
+                        lu.attrs["sequence_id"]
+                    )
+                )
                 self.context.anomaly_handler.add_anomaly("nlu")
 
             flagged = np.any(
-                [du.unpack_flags(lsky['quality_flag'])[x] for x in
-                 flags], axis=0)
+                [du.unpack_flags(lsky["quality_flag"])[x] for x in flags], axis=0
+            )
             ids = np.where(flagged == False)[0]
             # print(nbrlsky)
             if len(ids) < nbrlsky:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
-                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbrlsky")
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i],
+                        "min_nbrlsky",
+                    )
                 self.context.logger.info(
-                    "Not enough downwelling radiance data for sequence {}".format(lsky.attrs['sequence_id']))
+                    "Not enough downwelling radiance data for sequence {}".format(
+                        lsky.attrs["sequence_id"]
+                    )
+                )
                 self.context.anomaly_handler.add_anomaly("nls")
 
             flagged = np.any(
-                [du.unpack_flags(irr['quality_flag'])[x] for x in
-                 flags], axis=0)
+                [du.unpack_flags(irr["quality_flag"])[x] for x in flags], axis=0
+            )
             ids = np.where(flagged == False)[0]
 
             if len(ids) < nbred:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
-                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i], "min_nbred")
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i],
+                        "min_nbred",
+                    )
                 self.context.logger.info(
-                    "Not enough downwelling irradiance data for sequence {}".format(irr.attrs['sequence_id']))
+                    "Not enough downwelling irradiance data for sequence {}".format(
+                        irr.attrs["sequence_id"]
+                    )
+                )
 
             return lu, lsky, irr, dataset_l1b
 
@@ -645,12 +725,16 @@ class RhymerHypstar:
 
         # QUALITY CHECK: TEMPORAL VARIABILITY IN ED AND LSKY -> ASSIGN FLAG
         dataset_l1c_int, flags_rad = self.qc_scan(l1a_rad, "radiance", dataset_l1c_int)
-        dataset_l1c_int, flags_irr = self.qc_scan(l1a_irr, "irradiance", dataset_l1c_int)
+        dataset_l1c_int, flags_irr = self.qc_scan(
+            l1a_irr, "irradiance", dataset_l1c_int
+        )
         # QUALITY CHECK: MIN NBR OF SCANS -> ASSIGN FLAG
         # remove temporal variability scans before average
 
         # check number of scans per cycle for up, down radiance and irradiance
-        L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = self.cycleparse(l1a_rad, l1a_irr, dataset_l1c_int)
+        L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = self.cycleparse(
+            l1a_rad, l1a_irr, dataset_l1c_int
+        )
 
         L1b_downrad = self.avg.average_l1a("radiance", L1a_downrad)
         # L1b_irr = self.avg.average_l1a("irradiance", L1a_irr)
@@ -662,7 +746,9 @@ class RhymerHypstar:
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the
         # irradiance wavelength to the radiance wavelength
-        L1c_int = self.intp.interpolate_l1b_w(dataset_l1c_int,L1a_uprad, L1b_downrad, l1b_irr)
+        L1c_int = self.intp.interpolate_l1b_w(
+            dataset_l1c_int, L1a_uprad, L1b_downrad, l1b_irr
+        )
 
         # check number of scans per cycle for up, down radiance and irradiance
         # (

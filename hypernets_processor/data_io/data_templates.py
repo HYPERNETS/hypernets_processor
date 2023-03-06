@@ -128,7 +128,7 @@ class DataTemplates:
             l1b_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1a, ds=dataset_l1a
         )
 
-        dataset_l1b=dataset_l1b.isel(scan=upscan)
+        dataset_l1b = dataset_l1b.isel(scan=upscan)
 
         dataset_l1b = dataset_l1b.assign_coords(wavelength=dataset_l1a.wavelength)
         # todo check whether here some additional keywords need to propagated (see land version).
@@ -246,7 +246,7 @@ class DataTemplates:
 
         return dataset_l1b
 
-    def l0b_template_from_l0_dataset_land(self, measurandstring, dataset_l0):
+    def l0b_template_from_l0_dataset_land(self, dataset_l0):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 

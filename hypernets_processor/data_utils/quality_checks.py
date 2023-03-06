@@ -6,7 +6,6 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.plotting.plotting import Plotting
 
-import punpy
 import numpy as np
 import warnings
 import os
@@ -14,7 +13,10 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import pysolar
 import datetime
+
+import punpy
 from obsarray.templater.dataset_util import DatasetUtil
+import matheo.band_integration as bi
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -135,20 +137,39 @@ class QualityChecks:
                     dataset_l1b_irr["quality_flag"][i], "vza_irradiance"
                 )  # for i in range(len(mask))]
 
-        print(self.context.get_config_value("clear_sky_check"))
         if self.context.get_config_value("clear_sky_check"):
             # could also be done by: https://pvlib-python.readthedocs.io/en/stable/auto_examples/plot_spectrl2_fig51A.html
-            ref_szas = [0, 20, 40, 60, 70, 80]
+            ref_szas = [0, 10, 20, 40, 60, 70, 80]
             ref_sza = ref_szas[np.argmin(np.abs(ref_szas - np.mean(szas)))]
-            system_id = dataset_l1b_irr.attrs["system_id"]
+
+            t1 = datetime.datetime.now()
             ref_data = xr.open_dataset(
                 os.path.join(
                     refdat_path,
-                    "solar_irradiance_hypernets_sza%s_%s.nc" % (ref_sza, system_id),
+                    "solar_irradiance_hypernets_sza%s_highres_%s.nc"
+                    % (ref_sza, self.context.get_config_value("network")),
                 )
             )
-            # ref_irrtot = pysolar.radiation.get_radiation_direct(
-            #     np.mean(dataset_l1b_irr["acquisition_time"]),90-ref_sza)
+
+            band_centres = dataset_l1b_irr["wavelength"].values
+            bandwidth = np.append(
+                3.0 * np.ones_like(band_centres[band_centres < 1000]),
+                10.0 * np.ones_like(band_centres[band_centres > 1000]),
+            )
+
+            ref_data_irr = bi.pixel_int(
+                d=ref_data["solar_irradiance_BOA"].values,
+                x=ref_data["wavelength"].values,
+                x_pixel=band_centres,
+                width_pixel=bandwidth,
+                d_axis_x=0,
+                band_shape="gaussian",
+            )
+
+            self.context.logger.debug(
+                "band integration took:", datetime.datetime.now() - t1
+            )
+
             irr_scaled = np.zeros_like(dataset_l1b_irr["irradiance"].values)
             for i, vza in enumerate(vzas):
 
@@ -160,12 +181,7 @@ class QualityChecks:
                     )
                     * np.cos(np.pi / 180.0 * ref_sza)
                 )
-                if (
-                    np.count_nonzero(
-                        irr_scaled[:, i] < 0.5 * ref_data["solar_irradiance_BOA"]
-                    )
-                    > 20
-                ):
+                if np.count_nonzero(irr_scaled[:, i] < 0.5 * ref_data_irr) > 20:
                     dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
                         dataset_l1b_irr["quality_flag"][i], "clear_sky_irradiance"
                     )
@@ -174,7 +190,7 @@ class QualityChecks:
                 self.plot.plot_quality_irradiance(
                     dataset_l1b_irr,
                     irr_scaled,
-                    ref_data["solar_irradiance_BOA"],
+                    ref_data_irr,
                     ref_sza,
                 )
 

@@ -137,22 +137,34 @@ class HypernetsWriter:
                         "archive_directory"
                     )
 
-                    site = self.context.get_config_value("site_id")
-                    year = self.context.get_config_value("time").year
-                    month = self.context.get_config_value("time").month
-                    day = self.context.get_config_value("time").day
-                    seq = self.context.get_config_value("sequence_name")
+                    rel_directory = self.return_rel_directory()
 
-                    directory = os.path.join(
-                        archive_directory,
-                        site,
-                        str(year),
-                        str("{:02d}".format(month)),
-                        str("{:02d}".format(day)),
-                        seq,
-                    )
+                    directory = os.path.join(archive_directory, rel_directory)
 
         return directory
+
+    def return_rel_directory(self):
+        """
+        Return relative product directory, with respect to archive folder
+
+        :return: directory
+        :rtype: str
+        """
+
+        site = self.context.get_config_value("site_id")
+        year = self.context.get_config_value("time").year
+        month = self.context.get_config_value("time").month
+        day = self.context.get_config_value("time").day
+        seq = self.context.get_config_value("sequence_name")
+
+        rel_directory = os.path.join(
+            site,
+            str(year),
+            str("{:02d}".format(month)),
+            str("{:02d}".format(day)),
+            seq,
+        )
+        return rel_directory
 
     def return_plot_directory(self, directory=None):
         """
@@ -183,7 +195,7 @@ class HypernetsWriter:
         return os.path.join(self.return_directory(directory), "image")
 
     @staticmethod
-    def _write_netcdf(ds, path, compression_level=None):
+    def _write_netcdf(ds, path, compression_level=None, encodefloat32=True):
         """
         Write xarray dataset to file to netcdf
 
@@ -206,12 +218,18 @@ class HypernetsWriter:
         for var_name in ds.data_vars:
             var_encoding = dict(comp)
             var_encoding.update(ds[var_name].encoding)
+            if ds[var_name].values.dtype==np.float64 and encodefloat32:
+                var_encoding["dtype"]=np.float32
             if "dtype" in var_encoding.keys():
-                ds[var_name].attrs["_FillValue"] = DatasetUtil.get_default_fill_value(
-                    var_encoding["dtype"]
+                var_encoding.update(
+                    {
+                        "_FillValue": DatasetUtil.get_default_fill_value(
+                            var_encoding["dtype"]
+                        )
+                    }
                 )
+            ds[var_name].attrs.pop("_FillValue")
             encoding.update({var_name: var_encoding})
-
         ds.to_netcdf(path, format="netCDF4", engine="netcdf4", encoding=encoding)
 
     @staticmethod
@@ -267,10 +285,15 @@ class HypernetsWriter:
         """
 
         if self.context is not None:
-            if (self.context.get_config_value("to_archive") is True) and (
-                self.context.archive_db is not None
+            if (
+                (self.context.get_config_value("to_archive") is True)
+                and (self.context.archive_db is not None)
+                and (self.context.metadata_db is not None)
             ):
                 self.context.archive_db.archive_product(ds, path)
+                self.context.metadata_db.archive_metadata(
+                    ds,
+                )
 
 
 if __name__ == "__main__":

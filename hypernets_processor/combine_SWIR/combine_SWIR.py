@@ -68,7 +68,6 @@ class CombineSWIR:
         dataset_l1b_comb = self.templ.l1b_template_from_combine(
             measurandstring, dataset_l1b, dataset_l1b_swir
         )
-
         replace_dict_VIS = {"wavelength": "wavelength_VIS"}
         for var in dataset_l1b.variables:
             if measurandstring in var:
@@ -97,6 +96,20 @@ class CombineSWIR:
             ds_out_pre=dataset_l1b_comb,
             store_unc_percent=True,
         )
+
+        dataset_l1b_comb[
+            "std_" + measurandstring
+        ].values = combine_function.meas_function(
+            dataset_l1b["wavelength"].values,
+            dataset_l1b["std_" + measurandstring].values,
+            dataset_l1b_swir["wavelength"].values,
+            dataset_l1b_swir["std_" + measurandstring].values,
+            1000,
+        )
+        dataset_l1b_comb["n_valid_scans"].values = dataset_l1b["n_valid_scans"].values
+        dataset_l1b_comb["n_valid_scans_SWIR"].values = dataset_l1b_swir[
+            "n_valid_scans"
+        ].values
 
         if measurandstring == "irradiance":
             dataset_l1b_comb = self.qual.perform_quality_irradiance(dataset_l1b_comb)

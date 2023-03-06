@@ -80,7 +80,7 @@ class Plotting:
                     ydata_subset,
                 )
 
-    def plot_series_in_sequence(self, measurandstring, dataset):
+    def plot_series_in_sequence(self, measurandstring, dataset, ylim=None):
         plotpath = os.path.join(
             self.path,
             "plot_"
@@ -101,13 +101,17 @@ class Plotting:
                 )
                 for i in range(len(dataset["viewing_zenith_angle"].values))
             ]
-        linestyles = [
-            (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
-            if ((np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180) and
-                (len(angle_labels)>10))
-            else (0, (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
-            for i in range(len(dataset["viewing_zenith_angle"].values))
-        ]
+
+        if len(angle_labels) > 10:
+            linestyles = [
+                (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
+                if (np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180)
+                else (0, (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
+                for i in range(len(dataset["viewing_zenith_angle"].values))
+            ]
+
+        else:
+            linestyles = ["solid"] * len(angle_labels)
 
         self.plot_variable(
             measurandstring,
@@ -116,6 +120,7 @@ class Plotting:
             dataset[measurandstring].values,
             labels=angle_labels,
             linestyles=linestyles,
+            ylim=ylim,
         )
 
     def plot_series_in_sequence_vza(self, measurandstring, dataset, vza):
@@ -333,7 +338,14 @@ class Plotting:
                 plt.close(fig1)
 
     def plot_radiance(
-        self, plotpath, xdata, ydata, labels=None, linestyles=None, linecolour=None
+        self,
+        plotpath,
+        xdata,
+        ydata,
+        labels=None,
+        linestyles=None,
+        linecolour=None,
+        ylim=None,
     ):
         fig1, ax1 = plt.subplots(figsize=(10, 5))
         if labels is None:
@@ -354,14 +366,24 @@ class Plotting:
                 ax1.legend(fontsize=8, loc="upper right")
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)")
-        ymax = np.percentile(ydata, 95) * 1.2
-        if np.isfinite(ymax):
-            ax1.set_ylim([0, ymax])
+        if ylim is not None:
+            ax1.set_ylim(ylim)
+        else:
+            ymax = np.percentile(ydata, 95) * 1.2
+            if np.isfinite(ymax):
+                ax1.set_ylim([0, ymax])
         fig1.savefig(plotpath, bbox_inches="tight")
         plt.close(fig1)
 
     def plot_irradiance(
-        self, plotpath, xdata, ydata, labels=None, linestyles=None, linecolour=None
+        self,
+        plotpath,
+        xdata,
+        ydata,
+        labels=None,
+        linestyles=None,
+        linecolour=None,
+        ylim=None,
     ):
         fig1, ax1 = plt.subplots(figsize=(10, 5))
         if labels is None:
@@ -372,14 +394,24 @@ class Plotting:
             ax1.legend(fontsize=8)
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Irradiance ($mW\ nm^{-1}\ m^{-2}$)")
-        ymax = np.percentile(ydata, 95) * 1.2
-        if np.isfinite(ymax):
-            ax1.set_ylim([0, ymax])
+        if ylim is not None:
+            ax1.set_ylim(ylim)
+        else:
+            ymax = np.percentile(ydata, 95) * 1.2
+            if np.isfinite(ymax):
+                ax1.set_ylim([0, ymax])
         fig1.savefig(plotpath, bbox_inches="tight")
         plt.close(fig1)
 
     def plot_DN(
-        self, plotpath, xdata, ydata, labels=None, linestyles=None, linecolour=None
+        self,
+        plotpath,
+        xdata,
+        ydata,
+        labels=None,
+        linestyles=None,
+        linecolour=None,
+        ylim=None,
     ):
         fig1, ax1 = plt.subplots(figsize=(10, 5))
         if labels is None:
@@ -395,11 +427,20 @@ class Plotting:
             ax1.legend(fontsize=8, ncol=2)
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"digital_number")
+        if ylim is not None:
+            ax1.set_ylim(ylim)
         fig1.savefig(plotpath, bbox_inches="tight")
         plt.close(fig1)
 
     def plot_reflectance(
-        self, plotpath, xdata, ydata, labels=None, linestyles=None, linecolour=None
+        self,
+        plotpath,
+        xdata,
+        ydata,
+        labels=None,
+        linestyles=None,
+        linecolour=None,
+        ylim=None,
     ):
         fig1, ax1 = plt.subplots(figsize=(10, 5))
         if labels is None:
@@ -420,9 +461,12 @@ class Plotting:
                 ax1.legend(loc="lower right", fontsize=8)
         ax1.set_xlabel("Wavelength (nm)")
         ax1.set_ylabel(r"Reflectance")
-        ymax = np.percentile(ydata, 95) * 1.2
-        if np.isfinite(ymax):
-            ax1.set_ylim([0, ymax])
+        if ylim is not None:
+            ax1.set_ylim(ylim)
+        else:
+            ymax = np.percentile(ydata, 95) * 1.2
+            if np.isfinite(ymax):
+                ax1.set_ylim([0, ymax])
         fig1.savefig(plotpath, bbox_inches="tight")
         plt.close(fig1)
 

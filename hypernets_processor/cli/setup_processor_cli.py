@@ -5,7 +5,7 @@ hypernets_processor setup cli
 from hypernets_processor.version import __version__
 from hypernets_processor.main.setup_processor_main import main
 from hypernets_processor.data_io.format.databases import DB_DICT_DEFS
-from hypernets_processor.utils.config import PROCESSOR_CONFIG_PATH, read_config_file
+from hypernets_processor.utils.config import PROCESSOR_CONFIG_PATH, read_config_file, PROCESSOR_DEFAULT_CONFIG_PATH
 from hypernets_processor.utils.cli import cli_input_yn, determine_set_value
 from hypernets_processor.context import Context
 import argparse
@@ -47,20 +47,23 @@ def cli():
     """
     Command line interface for hypernets_processor setup
     """
-
-    processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
-    context = Context(processor_config)
-
     settings = dict()
 
     # Determine network
-    settings["network"] = determine_set_value(
-        "network", context, options=["l", "w"], return_existing=True
-    )
     settings["network_defaults"] = cli_input_yn(
         "set network default config values (overwrites existing)"
     )
 
+    if settings["network_defaults"]=="y":
+        processor_config = read_config_file(PROCESSOR_DEFAULT_CONFIG_PATH)
+    else:
+        processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
+
+    context = Context(processor_config)
+
+    settings["network"] = determine_set_value(
+        "network", context, options=["l", "w"], return_existing=True
+    )
     # Determine archive directory to set
     settings["archive_directory"] = os.path.abspath(
         determine_set_value("archive_directory", context, return_existing=True)

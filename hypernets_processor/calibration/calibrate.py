@@ -76,7 +76,7 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0[0], calibration_data)
             dataset_l1a[measurandstring].values = measurand
-            dataset_l1a=dataset_l1a.drop(
+            dataset_l1a = dataset_l1a.drop(
                 [
                     "u_rel_random_" + measurandstring,
                     "u_rel_systematic_indep_" + measurandstring,
@@ -162,14 +162,14 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
             dataset_l1a[measurandstring].values = measurand
-            dataset_l1a=dataset_l1a.drop(
+            dataset_l1a = dataset_l1a.drop(
                 [
                     "u_rel_random_" + measurandstring,
                     "u_rel_systematic_indep_" + measurandstring,
                     "u_rel_systematic_corr_rad_irr_" + measurandstring,
                     "err_corr_systematic_indep_" + measurandstring,
                     "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                    ]
+                ]
             )
 
         if self.context.get_config_value("write_l1a"):
@@ -189,73 +189,107 @@ class Calibrate:
 
         return dataset_l1a, dataset_l0_masked, dataset_l0_bla_masked
 
-    def calibrate_l1b(self,measurandstring,dataset_l0,dataset_l0_bla,calibration_data):
-        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l0)
-        flags = ["outliers","L0_thresholds", "L0_discontinuity"]
+    def calibrate_l1b(
+        self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data
+    ):
+        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(
+            measurandstring, dataset_l0
+        )
 
-        dataset_l0b = self.avg.average_l0(measurandstring, dataset_l0, dataset_l0_bla)
+        flags = ["outliers", "L0_thresholds", "L0_discontinuity"]
 
-        series_id = np.unique(dataset_l0['series_id'])
-        series_id_bla = np.unique(dataset_l0_bla['series_id'])
-        flag_halfmasked = [False]*len(series_id)
-        flag_allmasked = [False]*len(series_id)
-        flag_darkmasked = [False]*len(series_id)
+        dataset_l0b = self.avg.average_l0(dataset_l0, dataset_l0_bla)
+
+        series_id = np.unique(dataset_l0["series_id"])
+        series_id_bla = np.unique(dataset_l0_bla["series_id"])
+        flag_halfmasked = [False] * len(series_id)
+        flag_allmasked = [False] * len(series_id)
+        flag_darkmasked = [False] * len(series_id)
         for i in range(len(series_id)):
-            flagged_bla = DatasetUtil.get_flags_mask_or(dataset_l0_bla['quality_flag'],["dark_masked"])
-            flagged_bla = flagged_bla[np.where(dataset_l0_bla['series_id'] == series_id_bla[i])]
-            flagged = DatasetUtil.get_flags_mask_or(dataset_l0['quality_flag'],flags)
-            flagged = flagged[np.where(dataset_l0['series_id'] == series_id[i])]
-            if np.count_nonzero(flagged) > 0.5*len(flagged):
-                flag_halfmasked[i]=True
-                self.context.logger.info("less than half of the scans for series %s passed quality checks"%(series_id[i]))
+            flagged_bla = DatasetUtil.get_flags_mask_or(
+                dataset_l0_bla["quality_flag"], ["dark_masked"]
+            )
+            flagged_bla = flagged_bla[
+                np.where(dataset_l0_bla["series_id"] == series_id_bla[i])
+            ]
+            flagged = DatasetUtil.get_flags_mask_or(dataset_l0["quality_flag"], flags)
+            flagged = flagged[np.where(dataset_l0["series_id"] == series_id[i])]
+            if np.count_nonzero(flagged) > 0.5 * len(flagged):
+                flag_halfmasked[i] = True
+                self.context.logger.info(
+                    "less than half of the scans for series %s passed quality checks"
+                    % (series_id[i])
+                )
             if np.count_nonzero(flagged) == len(flagged):
-                flag_allmasked[i]=True
-                self.context.logger.info("None of the scans for series %s passed quality checks"%(series_id[i]))
-            if np.count_nonzero(flagged_bla==False)<3:
-                flag_darkmasked[i]=True
-                self.context.logger.info("less than 3 dark scans for series %s passed quality checks"%(series_id[i]))
+                flag_allmasked[i] = True
+                self.context.logger.info(
+                    "None of the scans for series %s passed quality checks"
+                    % (series_id[i])
+                )
+            if np.count_nonzero(flagged_bla == False) < 3:
+                flag_darkmasked[i] = True
+                self.context.logger.info(
+                    "less than 3 dark scans for series %s passed quality checks"
+                    % (series_id[i])
+                )
 
         dataset_l1b["quality_flag"][np.where(flag_halfmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_halfmasked)], "half_of_scans_masked"
+            dataset_l1b["quality_flag"][np.where(flag_halfmasked)],
+            "half_of_scans_masked",
         )
         dataset_l1b["quality_flag"][np.where(flag_allmasked)] = DatasetUtil.set_flag(
             dataset_l1b["quality_flag"][np.where(flag_allmasked)], "angles_missing"
         )
         dataset_l1b["quality_flag"][np.where(flag_darkmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_darkmasked)], "less_than_three_darks"
+            dataset_l1b["quality_flag"][np.where(flag_darkmasked)],
+            "less_than_three_darks",
         )
 
-        prop = punpy.MCPropagation(self.context.get_config_value("mcsteps"),dtype="float32",MCdimlast=True)
-        calibrate_function = self._measurement_function_factory(prop=prop,repeat_dims="series",yvariable=measurandstring).get_measurement_function(
-            self.context.get_config_value("measurement_function_calibrate"))
+        prop = punpy.MCPropagation(
+            self.context.get_config_value("mcsteps"), dtype="float32", MCdimlast=True
+        )
+        calibrate_function = self._measurement_function_factory(
+            prop=prop, repeat_dims="series", yvariable=measurandstring
+        ).get_measurement_function(
+            self.context.get_config_value("measurement_function_calibrate")
+        )
 
-        dataset_l1b=calibrate_function.propagate_ds_specific(["random","systematic_indep","systematic_corr_rad_irr"],dataset_l0b,calibration_data,ds_out_pre=dataset_l1b,store_unc_percent=True)
+        dataset_l1b = calibrate_function.propagate_ds_specific(
+            ["random", "systematic_indep", "systematic_corr_rad_irr"],
+            dataset_l0b,
+            calibration_data,
+            ds_out_pre=dataset_l1b,
+            store_unc_percent=True,
+        )
 
-        if self.context.get_config_value("write_l1b"):
-            self.writer.write(
-                dataset_l1b,
-                overwrite=True,
-                remove_vars_strings=self.context.get_config_value(
-                    "remove_vars_strings"
-                ),
-            )
+        dataset_l1b["std_" + measurandstring].values = (
+            dataset_l1b[measurandstring].values
+            * dataset_l0b["std_digital_number"].values
+            / dataset_l0b["digital_number"].values
+        )
 
-        if self.context.get_config_value("plot_l1b"):
-            self.plot.plot_series_in_sequence(measurandstring, dataset_l1b)
-            if measurandstring == "radiance" and self.context.get_config_value("network") == "l":
-                self.plot.plot_series_in_sequence_vaa(
-                    measurandstring, dataset_l1b, 98
+        dataset_l1b["n_valid_scans"].values = dataset_l0b["n_valid_scans"].values
+
+        if self.context.get_config_value("network") == "w":
+            dataset_l1b=dataset_l1b.drop("n_valid_scans_SWIR")
+
+            if self.context.get_config_value("write_l1b"):
+                self.writer.write(
+                    dataset_l1b,
+                    overwrite=True,
+                    remove_vars_strings=self.context.get_config_value(
+                        "remove_vars_strings"
+                    ),
                 )
-                self.plot.plot_series_in_sequence_vza(
-                    measurandstring, dataset_l1b, 30
-                )
 
-        if self.context.get_config_value("plot_uncertainty"):
-            self.plot.plot_relative_uncertainty(measurandstring, dataset_l1b)
+            if self.context.get_config_value("plot_l1b"):
+                self.plot.plot_series_in_sequence(measurandstring, dataset_l1b)
 
-        if self.context.get_config_value("plot_correlation"):
-            self.plot.plot_correlation(measurandstring, dataset_l1b)
+            if self.context.get_config_value("plot_uncertainty"):
+                self.plot.plot_relative_uncertainty(measurandstring, dataset_l1b)
 
+            if self.context.get_config_value("plot_correlation"):
+                self.plot.plot_correlation(measurandstring, dataset_l1b)
 
         return dataset_l1b
 
@@ -313,7 +347,7 @@ class Calibrate:
         )
         datasetl0masked_bla = datasetl0masked_bla.isel(scan=scanids)
 
-        #add variables for dark and uncertainties
+        # add variables for dark and uncertainties
         DN_rand = DatasetUtil.create_unc_variable(
             [len(datasetl0masked["wavelength"]), len(datasetl0masked["scan"])],
             dim_names=["wavelength", "scan"],
@@ -398,7 +432,7 @@ class Calibrate:
                     dark_outliers_radscans[id],
                 ) = (
                     dark_signal_rad,
-                    std_dark_signal_rad/dark_signal_rad*100,
+                    std_dark_signal_rad / dark_signal_rad * 100,
                     dark_outlier_rad,
                 )
 
@@ -413,7 +447,7 @@ class Calibrate:
         )  # for i in range(len(mask))]
 
         # calculate and store random uncertainties on radiance/irradiance
-        rand = np.zeros_like(datasetl0masked["digital_number"].values,dtype=float)
+        rand = np.zeros_like(datasetl0masked["digital_number"].values, dtype=float)
         for i in range(len(series_ids)):
             ids = np.where(datasetl0masked["series_id"] == series_ids[i])[0]
             ids_notmasked = np.where(

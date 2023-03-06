@@ -145,22 +145,23 @@ class ArchiveDB(dataset.Database):
             dict(
                 product_name=ds.attrs["product_name"],
                 product_path=path,
+                rel_product_dir=self.writer.return_rel_directory(),
                 product_level=ds.attrs["product_level"],
                 datetime=self.context.get_config_value("time"),
                 sequence_name=self.context.get_config_value("sequence_name"),
                 sequence_path=self.context.get_config_value("sequence_path"),
                 site_id=ds.attrs["site_id"],
                 system_id=ds.attrs["system_id"],
-                plot_path=self.writer.return_plot_directory(),
-                image_path=self.writer.return_image_directory(),
-                solar_zenith_angle_min=np.min(ds["solar_zenith_angle"].values),
-                solar_zenith_angle_max=np.max(ds["solar_zenith_angle"].values),
-                solar_azimuth_angle_min=np.min(ds["solar_azimuth_angle"].values),
-                solar_azimuth_angle_max=np.max(ds["solar_azimuth_angle"].values),
-                viewing_zenith_angle_min=np.min(ds["viewing_zenith_angle"].values),
-                viewing_zenith_angle_max=np.max(ds["viewing_zenith_angle"].values),
-                viewing_azimuth_angle_min=np.min(ds["viewing_azimuth_angle"].values),
-                viewing_azimuth_angle_max=np.max(ds["viewing_azimuth_angle"].values),
+                latitude=ds.attrs["site_latitude"],
+                longitude=ds.attrs["site_longitude"],
+                solar_zenith_angle_min=np.nanmin(ds["solar_zenith_angle"].values),
+                solar_zenith_angle_max=np.nanmax(ds["solar_zenith_angle"].values),
+                solar_azimuth_angle_min=np.nanmin(ds["solar_azimuth_angle"].values),
+                solar_azimuth_angle_max=np.nanmax(ds["solar_azimuth_angle"].values),
+                viewing_zenith_angle_min=np.nanmin(ds["viewing_zenith_angle"].values),
+                viewing_zenith_angle_max=np.nanmax(ds["viewing_zenith_angle"].values),
+                viewing_azimuth_angle_min=np.nanmin(ds["viewing_azimuth_angle"].values),
+                viewing_azimuth_angle_max=np.nanmax(ds["viewing_azimuth_angle"].values),
             )
         )
 
@@ -247,6 +248,20 @@ class MetadataDB(dataset.Database):
     def __init__(self, url, context):
         self.context = context
         super().__init__(url)
+
+    def archive_metadata(self, ds):
+        """
+        Adds product to archive database
+
+        :type ds: xarray.dataset
+        :param ds: product to archive
+
+        :type path: str
+        :param path: path product is being written to
+        """
+
+        tbl = self.get_table(ds.attrs["product_level"])
+        tbl.insert(ds.attrs)
 
 
 if __name__ == "__main__":

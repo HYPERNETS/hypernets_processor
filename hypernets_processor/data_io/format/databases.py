@@ -37,8 +37,16 @@ Database schema specification for Hypernets land and water network
 # Database formats are defined following the specification defined in:
 # Hypernets Team, Product Data Format Specification, v0.5 (2020)
 
+from hypernets_processor.data_io.format.metadata import METADATA_DEFS
+
 # Metadata Database
 METADATA_DB = {}
+
+for level in METADATA_DEFS.keys():
+    coldict = {}
+    for key in METADATA_DEFS[level].keys():
+        coldict[key] = {"type": str}
+    METADATA_DB[level] = {"columns": coldict}
 
 # Anomaly Database
 ANOMALY_DB = {
@@ -49,6 +57,13 @@ ANOMALY_DB = {
             "sequence_path": {"type": str},
             "site_id": {"type": str},
             "datetime": {"type": str},
+            "product_level_fail": {"type": str},
+            "product_path_last": {"type": str},
+            "rel_product_dir": {"type": str},
+            "solar_zenith_angle_min": {"type": str},
+            "solar_zenith_angle_max": {"type": str},
+            "solar_azimuth_angle_min": {"type": str},
+            "solar_azimuth_angle_max": {"type": str},
         }
     }
 }
@@ -64,9 +79,10 @@ ARCHIVE_DB = {
             "system_id": {"type": str},
             "product_level": {"type": str},
             "product_path": {"type": str},
-            "plot_path": {"type": str},
-            "image_path": {"type": str},
+            "rel_product_dir": {"type": str},
             "sequence_path": {"type": str},
+            "latitude": {"type": str},
+            "longitude": {"type": str},
             "solar_zenith_angle_min": {"type": str},
             "solar_zenith_angle_max": {"type": str},
             "solar_azimuth_angle_min": {"type": str},

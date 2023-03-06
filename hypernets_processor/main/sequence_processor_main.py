@@ -50,6 +50,9 @@ def get_target_sequences(context, to_archive):
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
     if to_archive is True:
+        if context.archive_db is None:
+            raise ValueError("archive db has not been set!")
+
         processed_products = [
             product["sequence_name"]
             for product in context.archive_db["products"].find(
