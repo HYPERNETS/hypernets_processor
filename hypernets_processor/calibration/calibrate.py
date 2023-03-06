@@ -272,6 +272,8 @@ class Calibrate:
 
         if self.context.get_config_value("network") == "w":
             dataset_l1b=dataset_l1b.drop("n_valid_scans_SWIR")
+            if measurandstring == "irradiance":
+                dataset_l1b = self.qual.perform_quality_irradiance(dataset_l1b)
 
             if self.context.get_config_value("write_l1b"):
                 self.writer.write(
@@ -408,7 +410,7 @@ class Calibrate:
         # set up arrays for storing the best dark for each scan of the radiance/irradiance
         dark_signals_radscans = np.zeros_like(datasetl0masked["digital_number"].values)
         urand_dark_signals_radscans = np.zeros_like(
-            datasetl0masked["digital_number"].values
+            datasetl0masked["digital_number"].values,dtype=np.float32
         )
         dark_outliers_radscans = np.zeros_like(datasetl0masked["quality_flag"].values)
 
@@ -447,7 +449,7 @@ class Calibrate:
         )  # for i in range(len(mask))]
 
         # calculate and store random uncertainties on radiance/irradiance
-        rand = np.zeros_like(datasetl0masked["digital_number"].values, dtype=float)
+        rand = np.zeros_like(datasetl0masked["digital_number"].values, dtype=np.float32)
         for i in range(len(series_ids)):
             ids = np.where(datasetl0masked["series_id"] == series_ids[i])[0]
             ids_notmasked = np.where(
@@ -459,14 +461,14 @@ class Calibrate:
                         datasetl0masked["digital_number"].values[:, ids_notmasked]
                         - dark_signals_radscans[:, ids_notmasked]
                     ),
-                    axis=1,
+                    axis=1,dtype=np.float32,
                 )
                 avg = np.mean(
                     (
                         datasetl0masked["digital_number"].values[:, ids_notmasked]
                         - dark_signals_radscans[:, ids_notmasked]
                     ),
-                    axis=1,
+                    axis=1,dtype=np.float32,
                 )
                 for ii, id in enumerate(ids):
                     rand[:, id] = std / avg * 100

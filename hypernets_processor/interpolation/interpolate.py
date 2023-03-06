@@ -70,6 +70,7 @@ class Interpolate:
         ].values = dataset_l1a_uprad["err_corr_systematic_corr_rad_irr_radiance"].values
 
         self.context.logger.info("interpolate sky radiance")
+
         dataset_l1c_int = self.interpolate_skyradiance(
             dataset_l1c_int, dataset_l1b_downrad
         )

@@ -581,7 +581,7 @@ CAL_VARIABLES = {
 L1A_RAD_VARIABLES = {
     "u_rel_random_radiance": {
         "dim": [WL_DIM, SCAN_DIM],
-        "dtype": np.uint16,
+        "dtype": np.float32,
         "attributes": {
             "standard_name": "random relative uncertainty on radiance",
             "long_name": "random relative uncertainty on upwelling radiance",
@@ -595,7 +595,7 @@ L1A_RAD_VARIABLES = {
     },
     "u_rel_systematic_indep_radiance": {
         "dim": [WL_DIM, SCAN_DIM],
-        "dtype": np.uint16,
+        "dtype": np.float32,
         "attributes": {
             "standard_name": "independent systematic relative uncertainty on radiance",
             "long_name": "the systematic relative uncertainty component on radiance that is not correlated with irradiance",
@@ -614,7 +614,7 @@ L1A_RAD_VARIABLES = {
     },
     "u_rel_systematic_corr_rad_irr_radiance": {
         "dim": [WL_DIM, SCAN_DIM],
-        "dtype": np.uint16,
+        "dtype": np.float32,
         "attributes": {
             "standard_name": "systematic relative uncertainty on radiance, correlated with irradiance",
             "long_name": "the systematic relative uncertainty component on radiance that is correlated with irradiance",
@@ -670,7 +670,7 @@ L1A_RAD_VARIABLES = {
 L1A_IRR_VARIABLES = {
     "u_rel_random_irradiance": {
         "dim": [WL_DIM, SCAN_DIM],
-        "dtype": np.uint16,
+        "dtype": np.float32,
         "attributes": {
             "standard_name": "random relative uncertainty on irradiance",
             "long_name": "random relative uncertainty on downwelling irradiance",
@@ -684,7 +684,7 @@ L1A_IRR_VARIABLES = {
     },
     "u_rel_systematic_indep_irradiance": {
         "dim": [WL_DIM, SCAN_DIM],
-        "dtype": np.uint16,
+        "dtype": np.float32,
         "attributes": {
             "standard_name": "independent systematic relative uncertainty on irradiance",
             "long_name": "the systematic relative uncertainty component on downwelling irradiance that is not correlated with radiance",
@@ -703,7 +703,7 @@ L1A_IRR_VARIABLES = {
     },
     "u_rel_systematic_corr_rad_irr_irradiance": {
         "dim": [WL_DIM, SCAN_DIM],
-        "dtype": np.uint16,
+        "dtype": np.float32,
         "attributes": {
             "standard_name": "systematic relative uncertainty on irradiance, correlated with radiance",
             "long_name": "the systematic relative uncertainty component on downwelling irradiance that is correlated with radiance",
