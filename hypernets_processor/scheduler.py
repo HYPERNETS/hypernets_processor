@@ -149,7 +149,7 @@ class Scheduler:
             job = with_logging(job, logger, name)
 
         if parallel:
-            pool = ThreadPool(processes=1)
+            pool = ThreadPool(processes=4)
             async_result = pool.apply_async(job, args, kwargs)
             return async_result.get()
         else:

@@ -181,7 +181,7 @@ class QualityChecks:
                     )
                     * np.cos(np.pi / 180.0 * ref_sza)
                 )
-                if np.count_nonzero(irr_scaled[:, i] < 0.5 * ref_data_irr) > 20:
+                if np.count_nonzero(irr_scaled[:, i] < 0.5 * ref_data_irr) > 0.1*len(irr_scaled[:, i]):
                     dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
                         dataset_l1b_irr["quality_flag"][i], "clear_sky_irradiance"
                     )
