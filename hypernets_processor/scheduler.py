@@ -4,7 +4,6 @@ Contains class for scheduling and automating hypernets data processing jobs
 
 from hypernets_processor.version import __version__
 import time
-from multiprocessing.pool import ThreadPool
 import functools
 from schedule import Scheduler as Sched
 
@@ -148,12 +147,8 @@ class Scheduler:
 
             job = with_logging(job, logger, name)
 
-        if parallel:
-            pool = ThreadPool(processes=4)
-            async_result = pool.apply_async(job, args, kwargs)
-            return async_result.get()
-        else:
-            return job(*args, **kwargs)
+        return job(*args, **kwargs, parallel=parallel)
+
 
     def run(self, start_time=None):
         """
