@@ -20,6 +20,7 @@ from hypernets_processor.data_utils.quality_checks import QualityChecks
 
 import punpy
 import numpy as np
+import obsarray
 from obsarray.templater.dataset_util import DatasetUtil
 
 """___Authorship___"""
@@ -134,6 +135,11 @@ class SurfaceReflectance:
             dataset_l2a = self.avg.average_L2(
                 dataset
             )  # template and propagation is in average_L2
+
+            #propagate flags
+            for flag_i in ["single_irradiance_used"]:
+                if any(dataset.flag["quality_flag"][flag_i].value.values):
+                    dataset_l2a["quality_flag"].values = DatasetUtil.set_flag(dataset_l2a["quality_flag"].values,flag_i)
 
             for measurandstring in [
                 "water_leaving_radiance",

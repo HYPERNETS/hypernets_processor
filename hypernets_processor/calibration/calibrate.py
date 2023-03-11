@@ -159,6 +159,13 @@ class Calibrate:
                 store_unc_percent=True,
             )
 
+            if self.context.get_config_value("bad_wavelenth_ranges"):
+                for maskrange in self.context.get_config_value("bad_wavelenth_ranges").split(","):
+                    start_mask=float(maskrange.split("-")[0])
+                    end_mask=float(maskrange.split("-")[1])
+                    dataset_l1a["u_rel_systematic_indep_"+measurandstring].values[np.where((dataset_l1a.wavelength>start_mask) & (dataset_l1a.wavelength<end_mask))[0],:] += 100
+
+
         else:
             measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
             dataset_l1a[measurandstring].values = measurand
@@ -261,6 +268,12 @@ class Calibrate:
             ds_out_pre=dataset_l1b,
             store_unc_percent=True,
         )
+
+        if self.context.get_config_value("bad_wavelenth_ranges"):
+            for maskrange in self.context.get_config_value("bad_wavelenth_ranges").split(","):
+                start_mask=float(maskrange.split("-")[0])
+                end_mask=float(maskrange.split("-")[1])
+                dataset_l1b["u_rel_systematic_indep_"+measurandstring].values[np.where((dataset_l1b.wavelength>start_mask) & (dataset_l1b.wavelength<end_mask))[0],:] += 100
 
         dataset_l1b["std_" + measurandstring].values = (
             dataset_l1b[measurandstring].values
@@ -477,7 +490,6 @@ class Calibrate:
                     rand[:, id] = np.nan
 
         datasetl0masked["u_rel_random_digital_number"].values = rand
-
         datasetl0masked["dark_signal"].values = dark_signals_radscans
         datasetl0masked["u_rel_random_dark_signal"].values = urand_dark_signals_radscans
 

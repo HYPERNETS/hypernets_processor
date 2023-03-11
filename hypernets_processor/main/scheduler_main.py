@@ -61,7 +61,7 @@ def unpack_scheduler_config(scheduler_config):
             scheduler_config, sch, "start_time", dtype=str
         )
         scheduler_config_dict[sch]["parallel"] = get_config_value(
-            scheduler_config, sch, "parallel", dtype=bool
+            scheduler_config, sch, "parallel", dtype=int
         )
 
         # Use custom jobs list provided, else use default
