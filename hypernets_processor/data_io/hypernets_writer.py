@@ -133,6 +133,8 @@ class HypernetsWriter:
         :param fmt: (optional, required if self.context is None) format to write to, may be 'netCDF4' or 'csv'.
         overwrites directory determined from self.context
         """
+        fmt = self.return_fmt(fmt)
+
         directory = self.return_directory(directory)
 
         if not os.path.exists(directory):
