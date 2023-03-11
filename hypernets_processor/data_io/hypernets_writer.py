@@ -56,6 +56,7 @@ class HypernetsWriter:
         :type compression_level: int
         :param compression_level: the file compression level if 'netCDF4' fmt, 0 - 9 (default is 5)
         """
+        fmt = self.return_fmt(fmt)
 
         path = self.return_path(ds, directory, fmt)
 
@@ -132,7 +133,6 @@ class HypernetsWriter:
         :param fmt: (optional, required if self.context is None) format to write to, may be 'netCDF4' or 'csv'.
         overwrites directory determined from self.context
         """
-        fmt = self.return_fmt(fmt)
         directory = self.return_directory(directory)
 
         if not os.path.exists(directory):
