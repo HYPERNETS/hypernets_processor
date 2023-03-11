@@ -149,7 +149,6 @@ class Scheduler:
 
         return job(*args, **kwargs, parallel=parallel)
 
-
     def run(self, start_time=None):
         """
         Run scheduled jobs

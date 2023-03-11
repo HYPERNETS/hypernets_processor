@@ -34,6 +34,7 @@ class HypernetsWriter:
         fmt=None,
         compression_level=None,
         remove_vars_strings=None,
+        encodefloat32=True,
     ):
         """
         Write xarray dataset to file
@@ -56,13 +57,7 @@ class HypernetsWriter:
         :param compression_level: the file compression level if 'netCDF4' fmt, 0 - 9 (default is 5)
         """
 
-        fmt = self.return_fmt(fmt)
-        directory = self.return_directory(directory)
-
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        path = os.path.join(directory, ds.attrs["product_name"]) + "." + fmt
+        path = self.return_path(ds, directory, fmt)
 
         if os.path.isfile(path):
             if overwrite is True:
@@ -78,7 +73,12 @@ class HypernetsWriter:
 
         # ds = HypernetsWriter.fill_ds(ds)
         if fmt == "nc":
-            HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
+            HypernetsWriter._write_netcdf(
+                ds,
+                path,
+                compression_level=compression_level,
+                encodefloat32=encodefloat32,
+            )
 
         elif fmt == "csv":
             HypernetsWriter._write_csv(ds, path)
@@ -111,6 +111,35 @@ class HypernetsWriter:
             return "csv"
         else:
             raise NameError("Invalid fmt: " + fmt)
+
+    def return_path(
+        self,
+        ds,
+        directory=None,
+        fmt=None,
+    ):
+        """
+        make product path
+
+        :type ds: xarray.Dataset
+        :param ds: dataset
+
+        :type directory: str
+        :param directory: (optional, required if self.context is None) directory to write to.
+        overwrites directory determined from self.context
+
+        :type fmt: str
+        :param fmt: (optional, required if self.context is None) format to write to, may be 'netCDF4' or 'csv'.
+        overwrites directory determined from self.context
+        """
+        fmt = self.return_fmt(fmt)
+        directory = self.return_directory(directory)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        path = os.path.join(directory, ds.attrs["product_name"]) + "." + fmt
+        return path
 
     def return_directory(self, directory=None):
         """
@@ -218,8 +247,8 @@ class HypernetsWriter:
         for var_name in ds.data_vars:
             var_encoding = dict(comp)
             var_encoding.update(ds[var_name].encoding)
-            if ds[var_name].values.dtype==np.float64 and encodefloat32:
-                var_encoding["dtype"]=np.float32
+            if ds[var_name].values.dtype == np.float64 and encodefloat32:
+                var_encoding["dtype"] = np.float32
             if "dtype" in var_encoding.keys():
                 var_encoding.update(
                     {

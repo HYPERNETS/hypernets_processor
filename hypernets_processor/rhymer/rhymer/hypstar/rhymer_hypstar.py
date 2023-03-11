@@ -281,7 +281,7 @@ class RhymerHypstar:
                             )
                         )
                         self.context.logger.error("Ld missing for fresnel correction")
-                        self.context.anomaly_handler.add_anomaly("l",dataset_l1b)
+                        self.context.anomaly_handler.add_anomaly("l", dataset_l1b)
 
             # check if we have the required fresnel angle for lsky
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
@@ -317,7 +317,7 @@ class RhymerHypstar:
                         )
                     )
                     self.context.logger.error("Ld missing for fresnel correction")
-                    self.context.anomaly_handler.add_anomaly("l",dataset_l1b)
+                    self.context.anomaly_handler.add_anomaly("l", dataset_l1b)
 
             # check if correct number of radiance and irradiance data
             flags = ["saturation", "nonlinearity", "bad_pointing", "outliers"]
@@ -338,7 +338,7 @@ class RhymerHypstar:
                         lu.attrs["sequence_id"]
                     )
                 )
-                self.context.anomaly_handler.add_anomaly("nlu",dataset_l1b)
+                self.context.anomaly_handler.add_anomaly("nlu", dataset_l1b)
 
             flagged = np.any(
                 [du.unpack_flags(lsky["quality_flag"])[x] for x in flags], axis=0
@@ -356,7 +356,7 @@ class RhymerHypstar:
                         lsky.attrs["sequence_id"]
                     )
                 )
-                self.context.anomaly_handler.add_anomaly("nls",dataset_l1b)
+                self.context.anomaly_handler.add_anomaly("nls", dataset_l1b)
 
             flagged = np.any(
                 [du.unpack_flags(irr["quality_flag"])[x] for x in flags], axis=0
@@ -507,7 +507,7 @@ class RhymerHypstar:
                             )
                         )
                         self.context.logger.error("Ld missing for fresnel correction")
-                        self.context.anomaly_handler.add_anomaly("l",dataset_l1b)
+                        self.context.anomaly_handler.add_anomaly("l", dataset_l1b)
 
             # check if we have the required fresnel angle for lsky
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
@@ -543,7 +543,7 @@ class RhymerHypstar:
                         )
                     )
                     self.context.logger.error("Ld missing for fresnel correction")
-                    self.context.anomaly_handler.add_anomaly("l",dataset_l1b)
+                    self.context.anomaly_handler.add_anomaly("l", dataset_l1b)
 
             # check if correct number of radiance and irradiance data
             flags = ["saturation", "nonlinearity", "bad_pointing", "outliers"]
@@ -563,7 +563,7 @@ class RhymerHypstar:
                         lu.attrs["sequence_id"]
                     )
                 )
-                self.context.anomaly_handler.add_anomaly("nlu",dataset_l1b)
+                self.context.anomaly_handler.add_anomaly("nlu", dataset_l1b)
 
             flagged = np.any(
                 [du.unpack_flags(lsky["quality_flag"])[x] for x in flags], axis=0
@@ -580,7 +580,7 @@ class RhymerHypstar:
                         lsky.attrs["sequence_id"]
                     )
                 )
-                self.context.anomaly_handler.add_anomaly("nls",dataset_l1b)
+                self.context.anomaly_handler.add_anomaly("nls", dataset_l1b)
 
             flagged = np.any(
                 [du.unpack_flags(irr["quality_flag"])[x] for x in flags], axis=0

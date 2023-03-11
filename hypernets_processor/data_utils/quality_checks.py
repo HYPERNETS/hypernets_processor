@@ -57,7 +57,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the scans for series passed the quality control criteria"
                 )
-                self.context.anomaly_handler.add_anomaly("q",datasetl0)
+                self.context.anomaly_handler.add_anomaly("q", datasetl0)
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
@@ -99,7 +99,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the dark scans for series passed the quality control criteria"
                 )
-                self.context.anomaly_handler.add_anomaly("q",datasetl0)
+                self.context.anomaly_handler.add_anomaly("q", datasetl0)
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
@@ -181,7 +181,9 @@ class QualityChecks:
                     )
                     * np.cos(np.pi / 180.0 * ref_sza)
                 )
-                if np.count_nonzero(irr_scaled[:, i] < 0.5 * ref_data_irr) > 0.1*len(irr_scaled[:, i]):
+                if np.count_nonzero(irr_scaled[:, i] < 0.5 * ref_data_irr) > 0.1 * len(
+                    irr_scaled[:, i]
+                ):
                     dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
                         dataset_l1b_irr["quality_flag"][i], "clear_sky_irradiance"
                     )

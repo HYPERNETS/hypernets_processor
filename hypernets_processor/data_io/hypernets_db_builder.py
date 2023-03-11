@@ -140,6 +140,8 @@ class ArchiveDB(dataset.Database):
         :param path: path product is being written to
         """
 
+        print(np.nanmin(ds["solar_zenith_angle"].values),ds["solar_zenith_angle"].values)
+
         tbl = self.get_table("products")
         tbl.insert(
             dict(
@@ -179,6 +181,7 @@ class AnomalyDB(dataset.Database):
 
     def __init__(self, url, context):
         self.context = context
+        self.writer = HypernetsWriter(context)
         super().__init__(url)
 
     def add_anomaly(self, anomaly_id, ds=None):
@@ -205,15 +208,23 @@ class AnomalyDB(dataset.Database):
                     datetime=self.context.get_config_value("time"),
                     rel_product_dir=self.writer.return_rel_directory(),
                     product_level_last=ds.attrs["product_level"],
-                    product_path_last=ds.attrs["product_path"],
+                    product_path_last=self.writer.return_path(ds),
                     solar_zenith_angle_min=np.nanmin(ds["solar_zenith_angle"].values),
                     solar_zenith_angle_max=np.nanmax(ds["solar_zenith_angle"].values),
                     solar_azimuth_angle_min=np.nanmin(ds["solar_azimuth_angle"].values),
                     solar_azimuth_angle_max=np.nanmax(ds["solar_azimuth_angle"].values),
-                    viewing_zenith_angle_min=np.nanmin(ds["viewing_zenith_angle"].values),
-                    viewing_zenith_angle_max=np.nanmax(ds["viewing_zenith_angle"].values),
-                    viewing_azimuth_angle_min=np.nanmin(ds["viewing_azimuth_angle"].values),
-                    viewing_azimuth_angle_max=np.nanmax(ds["viewing_azimuth_angle"].values),
+                    viewing_zenith_angle_min=np.nanmin(
+                        ds["viewing_zenith_angle"].values
+                    ),
+                    viewing_zenith_angle_max=np.nanmax(
+                        ds["viewing_zenith_angle"].values
+                    ),
+                    viewing_azimuth_angle_min=np.nanmin(
+                        ds["viewing_azimuth_angle"].values
+                    ),
+                    viewing_azimuth_angle_max=np.nanmax(
+                        ds["viewing_azimuth_angle"].values
+                    ),
                 )
             )
         else:

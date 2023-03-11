@@ -37,77 +37,6 @@ class Calibrate:
         self.avg = Average(context)
         self.context = context
 
-    def calibrate_l1a_water(
-        self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data, swir=False
-    ):
-        if measurandstring != "radiance" and measurandstring != "irradiance":
-            self.context.logger.error(
-                "the measurandstring needs to be either 'radiance' or 'irradiance"
-            )
-            exit()
-
-        if self.context.get_config_value("plot_l0"):
-            self.plot.plot_scans_in_series("digital_number", dataset_l0)
-
-        # dataset_l0 = self.preprocess_l0(dataset_l0,dataset_l0_bla, calibration_data)
-        # self.context.logger.info("preprocessing done")
-        dataset_l1a = self.templ.l1a_template_from_l0_dataset(
-            measurandstring, dataset_l0[0], swir
-        )
-
-        prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32", MCdimlast=True
-        )
-        calibrate_function = self._measurement_function_factory(
-            prop=prop, repeat_dims="series", yvariable=measurandstring
-        ).get_measurement_function(
-            self.context.get_config_value("measurement_function_calibrate")
-        )
-
-        if self.context.get_config_value("uncertainty_l1a"):
-            dataset_l1a = calibrate_function.propagate_ds_specific(
-                ["random", "systematic_indep", "systematic_corr_rad_irr"],
-                dataset_l0,
-                calibration_data,
-                ds_out_pre=dataset_l1a,
-                store_unc_percent=True,
-            )
-
-        else:
-            measurand = calibrate_function.run(dataset_l0[0], calibration_data)
-            dataset_l1a[measurandstring].values = measurand
-            dataset_l1a = dataset_l1a.drop(
-                [
-                    "u_rel_random_" + measurandstring,
-                    "u_rel_systematic_indep_" + measurandstring,
-                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "err_corr_systematic_indep_" + measurandstring,
-                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
-            )
-        if self.context.get_config_value("write_l1a"):
-            self.writer.write(
-                dataset_l1a,
-                overwrite=True,
-                remove_vars_strings=self.context.get_config_value(
-                    "remove_vars_strings"
-                ),
-            )
-
-        if self.context.get_config_value("plot_l1a"):
-            self.plot.plot_scans_in_series(measurandstring, dataset_l1a)
-
-        if self.context.get_config_value("plot_l1a_diff"):
-            self.plot.plot_diff_scans(measurandstring, dataset_l1a)
-
-        if self.context.get_config_value("plot_uncertainty"):
-            self.plot.plot_relative_uncertainty(measurandstring, dataset_l1a)
-
-        if self.context.get_config_value("plot_correlation"):
-            self.plot.plot_correlation(measurandstring, dataset_l1a)
-
-        return dataset_l1a
-
     def calibrate_l1a(
         self,
         measurandstring,
@@ -158,13 +87,27 @@ class Calibrate:
                 ds_out_pre=dataset_l1a,
                 store_unc_percent=True,
             )
+            if (
+                np.count_nonzero(
+                    dataset_l1a["u_rel_random_" + measurandstring].values > 100
+                )
+                > 0.05 * dataset_l1a["u_rel_random_" + measurandstring].values.size
+            ):
+                self.context.anomaly_handler.add_anomaly("o", dataset_l1a)
 
             if self.context.get_config_value("bad_wavelenth_ranges"):
-                for maskrange in self.context.get_config_value("bad_wavelenth_ranges").split(","):
-                    start_mask=float(maskrange.split("-")[0])
-                    end_mask=float(maskrange.split("-")[1])
-                    dataset_l1a["u_rel_systematic_indep_"+measurandstring].values[np.where((dataset_l1a.wavelength>start_mask) & (dataset_l1a.wavelength<end_mask))[0],:] += 100
-
+                for maskrange in self.context.get_config_value(
+                    "bad_wavelenth_ranges"
+                ).split(","):
+                    start_mask = float(maskrange.split("-")[0])
+                    end_mask = float(maskrange.split("-")[1])
+                    dataset_l1a["u_rel_systematic_indep_" + measurandstring].values[
+                        np.where(
+                            (dataset_l1a.wavelength > start_mask)
+                            & (dataset_l1a.wavelength < end_mask)
+                        )[0],
+                        :,
+                    ] += 50
 
         else:
             measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
@@ -269,11 +212,27 @@ class Calibrate:
             store_unc_percent=True,
         )
 
+        if (
+            np.count_nonzero(
+                dataset_l1b["u_rel_random_" + measurandstring].values > 100
+            )
+            > 0.05 * dataset_l1b["u_rel_random_" + measurandstring].values.size
+        ):
+            self.context.anomaly_handler.add_anomaly("o", dataset_l1b)
+
         if self.context.get_config_value("bad_wavelenth_ranges"):
-            for maskrange in self.context.get_config_value("bad_wavelenth_ranges").split(","):
-                start_mask=float(maskrange.split("-")[0])
-                end_mask=float(maskrange.split("-")[1])
-                dataset_l1b["u_rel_systematic_indep_"+measurandstring].values[np.where((dataset_l1b.wavelength>start_mask) & (dataset_l1b.wavelength<end_mask))[0],:] += 100
+            for maskrange in self.context.get_config_value(
+                "bad_wavelenth_ranges"
+            ).split(","):
+                start_mask = float(maskrange.split("-")[0])
+                end_mask = float(maskrange.split("-")[1])
+                dataset_l1b["u_rel_systematic_indep_" + measurandstring].values[
+                    np.where(
+                        (dataset_l1b.wavelength > start_mask)
+                        & (dataset_l1b.wavelength < end_mask)
+                    )[0],
+                    :,
+                ] += 50
 
         dataset_l1b["std_" + measurandstring].values = (
             dataset_l1b[measurandstring].values
@@ -284,7 +243,7 @@ class Calibrate:
         dataset_l1b["n_valid_scans"].values = dataset_l0b["n_valid_scans"].values
 
         if self.context.get_config_value("network") == "w":
-            dataset_l1b=dataset_l1b.drop("n_valid_scans_SWIR")
+            dataset_l1b = dataset_l1b.drop("n_valid_scans_SWIR")
             if measurandstring == "irradiance":
                 dataset_l1b = self.qual.perform_quality_irradiance(dataset_l1b)
 
@@ -423,7 +382,7 @@ class Calibrate:
         # set up arrays for storing the best dark for each scan of the radiance/irradiance
         dark_signals_radscans = np.zeros_like(datasetl0masked["digital_number"].values)
         urand_dark_signals_radscans = np.zeros_like(
-            datasetl0masked["digital_number"].values,dtype=np.float32
+            datasetl0masked["digital_number"].values, dtype=np.float32
         )
         dark_outliers_radscans = np.zeros_like(datasetl0masked["quality_flag"].values)
 
@@ -474,14 +433,16 @@ class Calibrate:
                         datasetl0masked["digital_number"].values[:, ids_notmasked]
                         - dark_signals_radscans[:, ids_notmasked]
                     ),
-                    axis=1,dtype=np.float32,
+                    axis=1,
+                    dtype=np.float32,
                 )
                 avg = np.mean(
                     (
                         datasetl0masked["digital_number"].values[:, ids_notmasked]
                         - dark_signals_radscans[:, ids_notmasked]
                     ),
-                    axis=1,dtype=np.float32,
+                    axis=1,
+                    dtype=np.float32,
                 )
                 for ii, id in enumerate(ids):
                     rand[:, id] = std / avg * 100

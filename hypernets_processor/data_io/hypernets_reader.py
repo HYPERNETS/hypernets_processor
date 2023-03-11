@@ -389,7 +389,7 @@ class HypernetsReader:
                 # Acceleration for each axis can be calculated per Eq. (4).
 
                 a = 19.6
-                b = 2 ** 15
+                b = 2**15
                 ds["acceleration_x_mean"][scan_number] = (
                     header["acceleration_x_mean"] * a / b
                 )
@@ -436,7 +436,7 @@ class HypernetsReader:
         # read all spectra (== spe files with concanated files) in a series
         vnir = []
         swir = []
-        missingfiles=False
+        missingfiles = False
         for spectra in series:
             self.context.logger.debug("processing " + spectra)
             model = dict(zip(model_name, spectra.split("_")[:-1]))
@@ -502,14 +502,22 @@ class HypernetsReader:
                         chunk_counter += 1
             except:
                 self.context.logger.info("%s file missing" % (spectra))
-                missingfiles=True
-                vnir = np.vstack([vnir, np.nan * np.array(spectrum_vnir.body)])
-                swir = np.vstack([swir, np.nan * np.array(spectrum_swir.body)])
+                missingfiles = True
+                try:
+                    vnir = np.vstack([vnir, np.nan * np.array(spectrum_vnir.body)])
+                    swir = np.vstack([swir, np.nan * np.array(spectrum_swir.body)])
+                except:
+                    vnir.append(np.nan)
+                    swir.append(np.nan)
                 continue
 
-        self.context.logger.info(
-            spectrum_vnir.return_header(),
-        )
+        try:
+            self.context.logger.info(
+                spectrum_vnir.return_header(),
+            )
+        except:
+            self.context.anomaly_handler.add_anomaly("b")
+
         # self.context.logger.info(spectrum_swir.return_header())
         print(spectrum_swir.return_header())
 
@@ -610,7 +618,7 @@ class HypernetsReader:
                             # Acceleration for each axis can be calculated per Eq. (4).
 
                             a = 19.6
-                            b = 2 ** 15
+                            b = 2**15
                             ds["acceleration_x_mean"][scan_number] = (
                                 spectrum.header.accel_stats.mean_x * a / b
                             )
@@ -676,7 +684,7 @@ class HypernetsReader:
                             # Acceleration for each axis can be calculated per Eq. (4).
 
                             a = 19.6
-                            b = 2 ** 15
+                            b = 2**15
                             ds_swir["acceleration_x_mean"][scan_number_swir] = (
                                 spectrum.header.accel_stats.mean_x * a / b
                             )
@@ -1058,8 +1066,6 @@ class HypernetsReader:
                     site_id,
                 )
                 if self.context.get_config_value("write_l0"):
-                    print(np.nanmin(l0_irr["solar_zenith_angle"].values))
-                    stop
                     self.writer.write(l0_irr, overwrite=True)
                     self.writer.write(l0_swir_irr, overwrite=True)
 

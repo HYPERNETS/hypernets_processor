@@ -535,7 +535,7 @@ CAL_VARIABLES = {
     },
     "non_linearity_coefficients": {
         "dim": [ND_DIM, NL_DIM],
-        "dtype": np.float32,
+        "dtype": np.float64,
         "attributes": {
             "standard_name": "non linearity coefficients",
             "long_name": "non linearity coefficients",
@@ -1686,47 +1686,46 @@ W_L2A_REFLECTANCE_VARIABLES["n_valid_scans"] = {
     },
 }
 W_L2A_REFLECTANCE_VARIABLES["std_reflectance"] = {
-        "dim": [WL_DIM, SERIES_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "standard deviation reflectance",
-            "long_name": "standard deviation on reflectance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
-            "units": "-",
-        },
+    "dim": [WL_DIM, SERIES_DIM],
+    "dtype": np.float32,
+    "attributes": {
+        "standard_name": "standard deviation reflectance",
+        "long_name": "standard deviation on reflectance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+        "units": "-",
+    },
 }
 
 
 W_L2A_REFLECTANCE_VARIABLES["std_water_leaving_radiance"] = {
-        "dim": [WL_DIM, SERIES_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "standard deviation water_leaving_radiance",
-            "long_name": "standard deviation on water leaving radiance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
-            "units": "mW m^-2 nm^-1 sr^-1",
-        },
+    "dim": [WL_DIM, SERIES_DIM],
+    "dtype": np.float32,
+    "attributes": {
+        "standard_name": "standard deviation water_leaving_radiance",
+        "long_name": "standard deviation on water leaving radiance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+        "units": "mW m^-2 nm^-1 sr^-1",
+    },
 }
 
 W_L2A_REFLECTANCE_VARIABLES["std_reflectance_nosc"] = {
-        "dim": [WL_DIM, SERIES_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "standard deviation reflectance_nosc",
-            "long_name": "standard deviation on Reflectance of the water column at the "
-            "surface without correction for the NIR that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance) ",
-            "units": "-",
-        },
+    "dim": [WL_DIM, SERIES_DIM],
+    "dtype": np.float32,
+    "attributes": {
+        "standard_name": "standard deviation reflectance_nosc",
+        "long_name": "standard deviation on Reflectance of the water column at the "
+        "surface without correction for the NIR that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance) ",
+        "units": "-",
+    },
 }
 
 W_L2A_REFLECTANCE_VARIABLES["std_epsilon"] = {
-        "dim": [SERIES_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "standard deviation epsilon",
-            "long_name": "standard deviation on Similarity spectrum ratio at two wavelengths see Ruddick et al. (2016)  that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
-            "units": "-",
-        },
+    "dim": [SERIES_DIM],
+    "dtype": np.float32,
+    "attributes": {
+        "standard_name": "standard deviation epsilon",
+        "long_name": "standard deviation on Similarity spectrum ratio at two wavelengths see Ruddick et al. (2016)  that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+        "units": "-",
+    },
 }
-
 
 
 # L_L2B_REFLECTANCE_VARIABLES - Reflectance variables required for L2B land data product

@@ -16,33 +16,54 @@ ANOMALIES_DICT = {
         "error_msg": None,
     },
     "s": {"description": "missing scans", "error": None, "error_msg": None},
-    "b": {"description": "Not a standard sequence", "error": None, "error_msg": None},
+    "b": {
+        "description": "Not a standard sequence (too much missing data to keep processing)",
+        "error": IOError,
+        "error_msg": "Not a standard sequence (too much missing data to keep processing)",
+    },
     "x": {
         "description": "unexpected error during processing",
         "error": None,
         "error_msg": None,
     },
-    "m": {"description": "Metadata file missing", "error": IOError, "error_msg": None},
-    "e": {"description": "Meteo file missing", "error": IOError, "error_msg": None},
-    "l": {
-        "description": "Ld missing for fresnel correction",
+    "m": {
+        "description": "Metadata file missing",
         "error": IOError,
-        "error_msg": None,
+        "error_msg": "Metadata file missing",
+    },
+    "e": {
+        "description": "Meteo file missing",
+        "error": IOError,
+        "error_msg": "Meteo file missing",
+    },
+    "o": {
+        "description": "more than 5% of data has random error above 100% (probably corrupted data)",
+        "error": ValueError,
+        "error_msg": "more than 5% of data has random error above 100% (probably corrupted data)",
     },
     "q": {
         "description": "None of the scans in a series passed the quality controll",
         "error": None,
         "error_msg": None,
     },
-    "nlu": {"description": "Not enough Lu scans", "error": IOError, "error_msg": None},
+    "l": {
+        "description": "Ld missing for fresnel correction",
+        "error": ValueError,
+        "error_msg": "Ld missing for fresnel correction",
+    },
+    "nlu": {
+        "description": "Not enough Lu scans",
+        "error": ValueError,
+        "error_msg": "Not enough Lu scans",
+    },
     "nls": {
         "description": "Not enough Lsky scans",
-        "error": IOError,
-        "error_msg": None,
+        "error": ValueError,
+        "error_msg": "Not enough Lsky scans",
     },
     "i": {
         "description": "No valid irradiance measurements",
-        "error": None,
-        "error_msg": None,
+        "error": ValueError,
+        "error_msg": "No valid irradiance measurements",
     },
 }

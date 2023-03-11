@@ -60,10 +60,10 @@ ANOMALY_DB = {
             "rel_product_dir": {"type": str},
             "product_level_last": {"type": str},
             "product_path_last": {"type": str},
-            "solar_zenith_angle_min": {"type": str},
-            "solar_zenith_angle_max": {"type": str},
-            "solar_azimuth_angle_min": {"type": str},
-            "solar_azimuth_angle_max": {"type": str},
+            "solar_zenith_angle_min": {"type": float},
+            "solar_zenith_angle_max": {"type": float},
+            "solar_azimuth_angle_min": {"type": float},
+            "solar_azimuth_angle_max": {"type": float},
         }
     }
 }
@@ -81,16 +81,16 @@ ARCHIVE_DB = {
             "product_path": {"type": str},
             "rel_product_dir": {"type": str},
             "sequence_path": {"type": str},
-            "latitude": {"type": str},
-            "longitude": {"type": str},
-            "solar_zenith_angle_min": {"type": str},
-            "solar_zenith_angle_max": {"type": str},
-            "solar_azimuth_angle_min": {"type": str},
-            "solar_azimuth_angle_max": {"type": str},
-            "viewing_zenith_angle_min": {"type": str},
-            "viewing_zenith_angle_max": {"type": str},
-            "viewing_azimuth_angle_min": {"type": str},
-            "viewing_azimuth_angle_max": {"type": str},
+            "latitude": {"type": float},
+            "longitude": {"type": float},
+            "solar_zenith_angle_min": {"type": float},
+            "solar_zenith_angle_max": {"type": float},
+            "solar_azimuth_angle_min": {"type": float},
+            "solar_azimuth_angle_max": {"type": float},
+            "viewing_zenith_angle_min": {"type": float},
+            "viewing_zenith_angle_max": {"type": float},
+            "viewing_azimuth_angle_min": {"type": float},
+            "viewing_azimuth_angle_max": {"type": float},
         }
     }
 }

@@ -66,7 +66,7 @@ class AnomalyHandler:
 
         # Add anomaly to db
         if self.anomaly_db is not None:
-            self.anomaly_db.add_anomaly(anomaly_id,ds)
+            self.anomaly_db.add_anomaly(anomaly_id, ds)
 
         # Exit if anomaly requires error
         error = self.get_anomaly_error(anomaly_id)

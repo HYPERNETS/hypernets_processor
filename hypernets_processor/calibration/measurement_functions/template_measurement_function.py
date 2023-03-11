@@ -8,7 +8,7 @@ class TemplateMeasurementFunction(MeasurementFunction):
         Each of the arguments can be either a scalar or a vector (1D-array).
         """
 
-        return gains * (digital_number - dark_signal) + temp ** 0.3
+        return gains * (digital_number - dark_signal) + temp**0.3
 
     @staticmethod
     def get_name():

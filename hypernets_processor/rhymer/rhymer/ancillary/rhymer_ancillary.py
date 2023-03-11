@@ -20,14 +20,14 @@ class RhymerAncillary:
             ts = (float(v) for v in isotime.split(":"))
             ftime = 0
             for i, t in enumerate(ts):
-                ftime += t / (60 ** i)
+                ftime += t / (60**i)
 
         anc = self.ancillary_get(isodate, lon, lat, ftime=ftime)
 
         if ("z_wind" in anc) and ("m_wind" in anc):
             u = anc["z_wind"]["interp"]
             v = anc["m_wind"]["interp"]
-            wind = (u ** 2 + v ** 2) ** 0.5
+            wind = (u**2 + v**2) ** 0.5
             return wind
         else:
             return None

@@ -197,7 +197,12 @@ class CalibrationConverter:
                 calib_data.attrs["product_name"] = (
                     "HYPERNETS_CAL_" + hypstar.upper() + tag + "v" + str(self.version)
                 )
-                self.writer.write(calib_data, directory=hypstar_path, overwrite=True)
+                self.writer.write(
+                    calib_data,
+                    directory=hypstar_path,
+                    overwrite=True,
+                    encodefloat32=False,
+                )
                 if hypstar[8] == "2":
                     tag = tag + "SWIR_"
                     calib_data = self.prepare_calibration_data(
@@ -211,7 +216,10 @@ class CalibrationConverter:
                         + str(self.version)
                     )
                     self.writer.write(
-                        calib_data, directory=hypstar_path, overwrite=True
+                        calib_data,
+                        directory=hypstar_path,
+                        overwrite=True,
+                        encodefloat32=False,
                     )
 
     def prepare_calibration_data(self, measurandstring, hypstar, swir=False):
@@ -288,7 +296,10 @@ class CalibrationConverter:
 
             if os.path.exists(nonlinpath):
                 nonlindates = np.append(nonlindates, lincaldatepath)
-                non_linear_cals = np.genfromtxt(nonlinpath)[:, 0]
+                if swir:
+                    non_linear_cals = np.genfromtxt(nonlinpath)[:, 1]
+                else:
+                    non_linear_cals = np.genfromtxt(nonlinpath)[:, 0]
 
         wavcaldatepaths = [
             os.path.basename(path)
@@ -335,7 +346,23 @@ class CalibrationConverter:
                 )
             )[0]
             if os.path.exists(nonlinpath):
-                non_linear_cals = np.genfromtxt(nonlinpath)[:, 0]
+                if swir:
+                    non_linear_cals = np.genfromtxt(nonlinpath)[:, 1]
+                    with open(nonlinpath, "r") as fp:
+                        for i, line in enumerate(fp):
+                            if i == 5:
+                                nonlin_unc = (
+                                    float(line.strip()[8::]) / 2
+                                )  # reading in from comments in non_lin files, and convert to k=1
+                else:
+                    non_linear_cals = np.genfromtxt(nonlinpath)[:, 0]
+                    with open(nonlinpath, "r") as fp:
+                        for i, line in enumerate(fp):
+                            if i == 4:
+                                nonlin_unc = (
+                                    float(line.strip()[8::]) / 2
+                                )  # reading in from comments in non_lin files, and convert to k=1
+
                 calibration_data["non_linearity_coefficients"].values[
                     i_nonlin
                 ] = non_linear_cals
@@ -403,6 +430,8 @@ class CalibrationConverter:
                 caldates = np.append(caldates, caldate)
                 gains = np.genfromtxt(calpath)
 
+                placeholder_unc = 2
+
                 try:
                     # calibration_data["wavelength"].values = gains[:, 1]
                     calibration_data["wavpix"].values[i_cal] = gains[:, 0]
@@ -423,6 +452,8 @@ class CalibrationConverter:
                         + gains[:, 16] ** 2
                         + gains[:, 17] ** 2
                         + gains[:, 19] ** 2
+                        + nonlin_unc**2
+                        + placeholder_unc**2
                     ) ** 0.5
 
                     cov_diag = cm.convert_corr_to_cov(
@@ -438,6 +469,7 @@ class CalibrationConverter:
                             + gains[:, 11] ** 2
                             + gains[:, 16] ** 2
                             + gains[:, 17] ** 2
+                            + nonlin_unc**2
                         )
                         ** 0.5,
                     )
@@ -452,6 +484,8 @@ class CalibrationConverter:
                             + gains[:, 13] ** 2
                             + gains[:, 14] ** 2
                             + gains[:, 15] ** 2
+                            + placeholder_unc ** 2
+
                         )
                         ** 0.5,
                     )

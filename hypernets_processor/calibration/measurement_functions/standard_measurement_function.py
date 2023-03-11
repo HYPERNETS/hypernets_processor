@@ -1,4 +1,5 @@
 from punpy import MeasurementFunction
+import numpy as np
 
 
 class StandardMeasurementFunction(MeasurementFunction):
@@ -9,21 +10,26 @@ class StandardMeasurementFunction(MeasurementFunction):
         """
         DN = digital_number - dark_signal
         DN[DN == 0] = 1
-        corrected_DN = DN / (
-            non_linear[0]
-            + non_linear[1] * DN
-            + non_linear[2] * DN ** 2
-            + non_linear[3] * DN ** 3
-            + non_linear[4] * DN ** 4
-            + non_linear[5] * DN ** 5
-            + non_linear[6] * DN ** 6
-            + non_linear[7] * DN ** 7
-        )
+
+        corrected_DN = self.correct_nonlin(DN, non_linear)
 
         if gains.ndim == 1:
             return gains[:, None] * corrected_DN / int_time * 1000
         else:
             return gains * corrected_DN / int_time * 1000
+
+    def correct_nonlin(self, DN, non_linear):
+        corrected_DN = np.zeros_like(DN)
+        if non_linear.ndim > 1:
+            for i in range(len(non_linear[0])):
+                corrected_DN[..., i] = self.correct_nonlin(DN[..., i], non_linear[:, i])
+
+        else:
+            non_lin_func = np.poly1d(np.flip(non_linear))
+            corrected_DN = DN / non_lin_func(DN)
+
+            # print(np.mean((corrected_DN)/DN),non_linear,non_linear.dtype)
+        return corrected_DN
 
     @staticmethod
     def get_name():

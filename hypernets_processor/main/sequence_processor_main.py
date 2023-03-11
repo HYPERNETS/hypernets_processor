@@ -81,9 +81,9 @@ def get_target_sequences(context, to_archive):
 
     return raw_paths
 
+
 def run_sequence(inputs):
-    target_sequence,sp,context,logger=inputs
-    print("running!")
+    target_sequence, sp, context, logger = inputs
     context.logger.info("Processing sequence: " + target_sequence)
     try:
         # profiler = cProfile.Profile()
@@ -94,7 +94,7 @@ def run_sequence(inputs):
         # stats.print_stats(100)
         if context.anomaly_handler.anomalies_added is not []:
             context.logger.info(
-                "Processing Anomalies for %s: "%target_sequence
+                "Processing Anomalies for %s: " % target_sequence
                 + str(context.anomaly_handler.anomalies_added)
             )
 
@@ -106,13 +106,14 @@ def run_sequence(inputs):
         context.anomaly_handler.add_x_anomaly()
         if context.anomaly_handler.anomalies_added is not []:
             context.logger.info(
-                "Processing Anomalies for %s: "%target_sequence
+                "Processing Anomalies for %s: " % target_sequence
                 + str(context.anomaly_handler.anomalies_added)
             )
 
         logger.error(target_sequence + "Failed: " + repr(e))
         logger.info(traceback.format_exc())
         return 0
+
 
 def main(processor_config, job_config, to_archive, parallel=None):
     """
@@ -127,8 +128,6 @@ def main(processor_config, job_config, to_archive, parallel=None):
     :type to_archive: bool
     :param to_archive: switch for if to add processed data to data archive
     """
-    print("testhere")
-
     # Configure logging
     name = __name__
     if "job_name" in job_config["Job"].keys():
@@ -153,19 +152,16 @@ def main(processor_config, job_config, to_archive, parallel=None):
         msg = "No sequences to process"
 
     else:
-
-
-        success=np.zeros_like(target_sequences)
+        success = np.zeros_like(target_sequences, dtype=int)
         if parallel:
-            inputs=np.empty(len(target_sequences),dtype=object)
-            for i,target_sequence in enumerate(target_sequences):
-                inputs[i]=(target_sequence,sp,context,logger)
-            pool=Pool(parallel)
-            success=list(pool.map(run_sequence,inputs))
-            print(success)
+            inputs = np.empty(len(target_sequences), dtype=object)
+            for i, target_sequence in enumerate(target_sequences):
+                inputs[i] = (target_sequence, sp, context, logger)
+            pool = Pool(parallel)
+            success = list(pool.map(run_sequence, inputs))
         else:
-            for i,target_sequence in enumerate(target_sequences):
-                success[i]=run_sequence((target_sequence,sp,context,logger))
+            for i, target_sequence in enumerate(target_sequences):
+                success[i] = run_sequence((target_sequence, sp, context, logger))
 
         msg = (
             str(np.sum(success))
@@ -173,7 +169,6 @@ def main(processor_config, job_config, to_archive, parallel=None):
             + str(target_sequences_total)
             + " sequences successfully processed"
         )
-
 
     return msg
 

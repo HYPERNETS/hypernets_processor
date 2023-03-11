@@ -136,10 +136,12 @@ class SurfaceReflectance:
                 dataset
             )  # template and propagation is in average_L2
 
-            #propagate flags
+            # propagate flags
             for flag_i in ["single_irradiance_used"]:
                 if any(dataset.flag["quality_flag"][flag_i].value.values):
-                    dataset_l2a["quality_flag"].values = DatasetUtil.set_flag(dataset_l2a["quality_flag"].values,flag_i)
+                    dataset_l2a["quality_flag"].values = DatasetUtil.set_flag(
+                        dataset_l2a["quality_flag"].values, flag_i
+                    )
 
             for measurandstring in [
                 "water_leaving_radiance",
@@ -148,7 +150,9 @@ class SurfaceReflectance:
             ]:
                 try:
                     if self.context.get_config_value("plot_l2a"):
-                        self.plot.plot_series_in_sequence(measurandstring, dataset_l2a, ylim=[0,0.05])
+                        self.plot.plot_series_in_sequence(
+                            measurandstring, dataset_l2a, ylim=[0, 0.05]
+                        )
 
                     if self.context.get_config_value("plot_uncertainty"):
                         self.plot.plot_relative_uncertainty(
