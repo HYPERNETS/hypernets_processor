@@ -15,7 +15,8 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
-    "s": {"description": "sequence data incomplete", "error": None, "error_msg": None},
+    "s": {"description": "missing scans", "error": None, "error_msg": None},
+    "b": {"description": "Not a standard sequence", "error": None, "error_msg": None},
     "x": {
         "description": "unexpected error during processing",
         "error": None,

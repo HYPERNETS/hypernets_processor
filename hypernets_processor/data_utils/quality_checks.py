@@ -57,7 +57,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the scans for series passed the quality control criteria"
                 )
-                self.context.anomaly_handler.add_anomaly("q")
+                self.context.anomaly_handler.add_anomaly("q",datasetl0)
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
@@ -99,7 +99,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the dark scans for series passed the quality control criteria"
                 )
-                self.context.anomaly_handler.add_anomaly("q")
+                self.context.anomaly_handler.add_anomaly("q",datasetl0)
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)

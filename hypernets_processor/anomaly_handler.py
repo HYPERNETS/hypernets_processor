@@ -44,12 +44,14 @@ class AnomalyHandler:
         self.anomalies_dict = anomalies_dict
         self.anomalies_added = []
 
-    def add_anomaly(self, anomaly_id):
+    def add_anomaly(self, anomaly_id, ds=None):
         """
         Adds anomaly to anomaly database
 
         :type anomaly_id: str
         :param anomaly_id: anomaly id, must match name of entry in self.anomalies dict
+        :type ds: xarray.Dataset
+        :param ds: producgt that was being processed when anomaly was raised
         """
 
         # Check anomaly defined
@@ -64,7 +66,7 @@ class AnomalyHandler:
 
         # Add anomaly to db
         if self.anomaly_db is not None:
-            self.anomaly_db.add_anomaly(anomaly_id)
+            self.anomaly_db.add_anomaly(anomaly_id,ds)
 
         # Exit if anomaly requires error
         error = self.get_anomaly_error(anomaly_id)

@@ -436,6 +436,7 @@ class HypernetsReader:
         # read all spectra (== spe files with concanated files) in a series
         vnir = []
         swir = []
+        missingfiles=False
         for spectra in series:
             self.context.logger.debug("processing " + spectra)
             model = dict(zip(model_name, spectra.split("_")[:-1]))
@@ -501,7 +502,7 @@ class HypernetsReader:
                         chunk_counter += 1
             except:
                 self.context.logger.info("%s file missing" % (spectra))
-                self.context.anomaly_handler.add_anomaly("s")
+                missingfiles=True
                 vnir = np.vstack([vnir, np.nan * np.array(spectrum_vnir.body)])
                 swir = np.vstack([swir, np.nan * np.array(spectrum_swir.body)])
                 continue
@@ -742,6 +743,9 @@ class HypernetsReader:
                 scan_number += 1
                 scan_number_swir += 1
                 continue
+
+        if missingfiles:
+            self.context.anomaly_handler.add_anomaly("s", ds)
 
         return ds, ds_swir
 
@@ -987,7 +991,7 @@ class HypernetsReader:
             self.context.logger.error(
                 "Missing meteo file in sequence directory. No meteo data added to your output file."
             )
-            self.context.anomaly_handler.add_anomaly("s")
+            self.context.anomaly_handler.add_anomaly("e")
 
         return data["temp"], data["RH"], data["pressure"], data["lux"]
 
@@ -1054,6 +1058,8 @@ class HypernetsReader:
                     site_id,
                 )
                 if self.context.get_config_value("write_l0"):
+                    print(np.nanmin(l0_irr["solar_zenith_angle"].values))
+                    stop
                     self.writer.write(l0_irr, overwrite=True)
                     self.writer.write(l0_swir_irr, overwrite=True)
 

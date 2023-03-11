@@ -181,26 +181,53 @@ class AnomalyDB(dataset.Database):
         self.context = context
         super().__init__(url)
 
-    def add_anomaly(self, anomaly_id):
+    def add_anomaly(self, anomaly_id, ds=None):
         """
         Adds anomaly to anomaly database
 
         :type anomaly_id: str
         :param anomaly_id: anomaly id, must match name of entry in self.anomalies dict
+        :type ds: xarray.Dataset
+        :param ds: producgt that was being processed when anomaly was raised
         """
 
         # Add anomaly to db
         tbl = self.get_table("anomalies")
-        tbl.insert(
-            dict(
-                anomaly_id=anomaly_id,
-                sequence_name=self.context.get_config_value("sequence_name"),
-                sequence_path=self.context.get_config_value("sequence_path"),
-                site_id=self.context.get_config_value("site_id"),
-                system_id=self.context.get_config_value("system_id"),
-                datetime=self.context.get_config_value("time"),
+
+        if ds:
+            tbl.insert(
+                dict(
+                    anomaly_id=anomaly_id,
+                    sequence_name=self.context.get_config_value("sequence_name"),
+                    sequence_path=self.context.get_config_value("sequence_path"),
+                    site_id=self.context.get_config_value("site_id"),
+                    system_id=self.context.get_config_value("system_id"),
+                    datetime=self.context.get_config_value("time"),
+                    rel_product_dir=self.writer.return_rel_directory(),
+                    product_level_last=ds.attrs["product_level"],
+                    product_path_last=ds.attrs["product_path"],
+                    solar_zenith_angle_min=np.nanmin(ds["solar_zenith_angle"].values),
+                    solar_zenith_angle_max=np.nanmax(ds["solar_zenith_angle"].values),
+                    solar_azimuth_angle_min=np.nanmin(ds["solar_azimuth_angle"].values),
+                    solar_azimuth_angle_max=np.nanmax(ds["solar_azimuth_angle"].values),
+                    viewing_zenith_angle_min=np.nanmin(ds["viewing_zenith_angle"].values),
+                    viewing_zenith_angle_max=np.nanmax(ds["viewing_zenith_angle"].values),
+                    viewing_azimuth_angle_min=np.nanmin(ds["viewing_azimuth_angle"].values),
+                    viewing_azimuth_angle_max=np.nanmax(ds["viewing_azimuth_angle"].values),
+                )
             )
-        )
+        else:
+            tbl.insert(
+                dict(
+                    anomaly_id=anomaly_id,
+                    sequence_name=self.context.get_config_value("sequence_name"),
+                    sequence_path=self.context.get_config_value("sequence_path"),
+                    site_id=self.context.get_config_value("site_id"),
+                    system_id=self.context.get_config_value("system_id"),
+                    datetime=self.context.get_config_value("time"),
+                    rel_product_dir=self.writer.return_rel_directory(),
+                )
+            )
 
     def get_sequence_anomalies(self, sequence_name=None, site_id=None):
         """
