@@ -106,7 +106,7 @@ class HypernetsWriter:
                 )
             fmt = self.context.get_config_value("product_format")
 
-        if (fmt.lower() == "netcdf4") or (fmt.lower() == "netcdf"):
+        if (fmt.lower() == "netcdf4") or (fmt.lower() == "netcdf") or (fmt.lower() == "nc"):
             return "nc"
         elif fmt.lower() == "csv":
             return "csv"
