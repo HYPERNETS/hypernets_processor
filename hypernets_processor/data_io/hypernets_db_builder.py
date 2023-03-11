@@ -140,8 +140,6 @@ class ArchiveDB(dataset.Database):
         :param path: path product is being written to
         """
 
-        print(np.nanmin(ds["solar_zenith_angle"].values),ds["solar_zenith_angle"].values)
-
         tbl = self.get_table("products")
         tbl.insert(
             dict(
