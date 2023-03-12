@@ -40,6 +40,7 @@ class QualityChecks:
         mask_threshold = []
         mask_outliers = []
         mask_discontinuity = []
+        raise_mask_anomaly=False
         for i in range(len(series_ids)):
             ids = np.where(datasetl0["series_id"] == series_ids[i])[0]
 
@@ -57,7 +58,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the scans for series passed the quality control criteria"
                 )
-                self.context.anomaly_handler.add_anomaly("q", datasetl0)
+                raise_mask_anomaly=True
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
@@ -75,6 +76,8 @@ class QualityChecks:
             datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
             "L0_discontinuity",
         )  # for i in range(len(mask))]
+        if raise_mask_anomaly:
+            self.context.anomaly_handler.add_anomaly("q", datasetl0)
         return datasetl0, mask
 
     def perform_quality_check_black(self, datasetl0, series_ids):
@@ -82,6 +85,7 @@ class QualityChecks:
         mask_outliers = []
         mask_threshold = []
         mask_discontinuity = []
+        raise_mask_anomaly=False
         for i in range(len(series_ids)):
             ids = np.where(datasetl0["series_id"] == series_ids[i])[0]
 
@@ -99,7 +103,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the dark scans for series passed the quality control criteria"
                 )
-                self.context.anomaly_handler.add_anomaly("q", datasetl0)
+                raise_mask_anomaly=True
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
@@ -110,7 +114,8 @@ class QualityChecks:
         # datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
         #     datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_thresholds"
         # )  # for i in range(len(mask))]
-
+        if raise_mask_anomaly:
+            self.context.anomaly_handler.add_anomaly("q", datasetl0)
         return datasetl0, mask
 
     def perform_quality_check_comb(self, dataset_l1b, dataset_l1b_swir):
