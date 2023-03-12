@@ -37,9 +37,9 @@ ANOMALIES_DICT = {
         "error_msg": "Meteo file missing",
     },
     "o": {
-        "description": "more than 5% of data has random error above 100% (probably corrupted data)",
+        "description": "more than 10% of data has random error above 100% (probably corrupted data)",
         "error": ValueError,
-        "error_msg": "more than 5% of data has random error above 100% (probably corrupted data)",
+        "error_msg": "more than 10% of data has random error above 100% (probably corrupted data)",
     },
     "q": {
         "description": "None of the scans in a series passed the quality controll",
