@@ -105,6 +105,7 @@ class HypernetsDBBuilder:
             db.__class__ = AnomalyDB
             db.context = self.context
             db.anomalies_dict = ANOMALIES_DICT
+            db.writer = HypernetsWriter(self.context)
 
         elif db_format == "metadata":
             db.__class__ = MetadataDB
