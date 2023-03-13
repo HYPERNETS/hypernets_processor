@@ -43,7 +43,7 @@ class SurfaceReflectance:
         self.rhp = RhymerProcessing(context)
         self.rhs = RhymerShared(context)
 
-    def process_l1c(self, dataset):
+    def process_l1c(self, dataset, l1birr):
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset)
         dataset_l1c = self.rh.get_wind(dataset_l1c)
         dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
@@ -65,6 +65,11 @@ class SurfaceReflectance:
         failSimil=self.rh.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
             L1c["quality_flag"][np.where(failSimil == 1)], "simil_fail")  # for i in range(len(mask))]
+
+        L1c.attrs["IRR_acceleration_x_mean"] = str(np.mean(l1birr['acceleration_x_mean'].values))
+        L1c.attrs["IRR_acceleration_x_std"] = str(np.mean(l1birr['acceleration_x_std'].values))
+        print(L1c.attrs["IRR_acceleration_x_mean"])
+
 
         if self.context.get_config_value("write_l1c"):
             self.writer.write(L1c, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
@@ -93,6 +98,10 @@ class SurfaceReflectance:
         if self.context.get_config_value("network").lower() == "w":
 
             dataset_l2a = self.avg.average_L2(dataset) # template and propagation is in average_L2
+            # metada data not copied, so add the mean acceleration
+            dataset_l2a.attrs["IRR_acceleration_x_mean"] = dataset.attrs['IRR_acceleration_x_mean']
+            dataset_l2a.attrs["IRR_acceleration_x_std"] = dataset.attrs['IRR_acceleration_x_std']
+
             for measurandstring in ["water_leaving_radiance", "reflectance_nosc",
                                     "reflectance", "epsilon"]:
                 try:
@@ -126,6 +135,7 @@ class SurfaceReflectance:
             self.context.logger.error("network is not correctly defined")
 
         if self.context.get_config_value("write_l2a"):
+            print(dataset_l2a.attrs["IRR_acceleration_x_mean"])
             self.writer.write(dataset_l2a, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
 
         return dataset_l2a

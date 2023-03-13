@@ -62,7 +62,7 @@ STANDARD_METADATA = {"type": "dataset",
                      "system_temperature": "NaN",
                      "system_pressure": "NaN",
                      "illuminance": "NaN",
-                     "system_relative_humidity": "NaN",
+                     "system_relative_humidity": "NaN"
                      }
 COMPONENTS_METADATA = {  # "system_id": system_id,
     "instrument_id": "TBD",  # key metadata
@@ -104,8 +104,13 @@ CAL_METADATA = {"type": "dataset",
                 "instrument_id": "NaN",
                 }
 
+QC_METADATA={"IRR_acceleration_x_mean": "NaN",
+               "IRR_acceleration_x_std": "NaN"
+               }
+
 L1A_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file
-                    "instrument_calibration_file_rad": "NaN"}
+                    "instrument_calibration_file_rad": "NaN",
+                    }
 
 L1A_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance",  # example of irradiance file
                     "instrument_calibration_file_irr": "NaN"}
@@ -306,18 +311,18 @@ METADATA_DEFS = {"L0_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA},
                  "L_L1A_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L1A_RAD_METADATA},
                  "W_L1A_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA,
                                **L1A_RAD_METADATA},
-                 "L_L1A_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA},
+                 "L_L1A_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA, **QC_METADATA},
                  "W_L1A_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA,
-                               **L1A_IRR_METADATA},
+                               **L1A_IRR_METADATA, **QC_METADATA},
                  "L_L1B_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L1A_RAD_METADATA},
                  "W_L1B_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA,
                                **L1A_RAD_METADATA},
-                 "L_L1B_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA},
-                 "W_L1B_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **L1A_IRR_METADATA},
-                 "L_L1C": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L_L1C_METADATA},
-                 "W_L1C": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **W_L1C_WLR_METADATA},
-                 "L_L2A": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L_L2A_REF_METADATA},
-                 "W_L2A": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **W_L2A_REF_METADATA},
-                 "L_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA},
-                 "W_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA}
+                 "L_L1B_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L1A_IRR_METADATA, **QC_METADATA},
+                 "W_L1B_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **L1A_IRR_METADATA, **QC_METADATA},
+                 "L_L1C": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L_L1C_METADATA, **QC_METADATA},
+                 "W_L1C": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **W_L1C_WLR_METADATA, **QC_METADATA},
+                 "L_L2A": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L_L2A_REF_METADATA, **QC_METADATA},
+                 "W_L2A": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **W_L2A_REF_METADATA, **QC_METADATA},
+                 "L_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **QC_METADATA},
+                 "W_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **QC_METADATA}
                  }

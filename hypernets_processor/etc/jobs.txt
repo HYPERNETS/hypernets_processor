@@ -1,5 +1,7 @@
-/home/cgoyens/.hypernets/BSBEtest.config
-/home/cgoyens/.hypernets/BSBEtest.config
-/home/cgoyens/.hypernets/BSBE20210928.config
-/home/cgoyens/.hypernets/BSBE20210928.config
-/home/cgoyens/.hypernets/BSBE20210928.config
+/home/rhymer/.hypernets/LPAR.config
+/home/rhymer/.hypernets/VEIT.config
+/home/rhymer/.hypernets/BSBE.config
+/home/rhymer/.hypernets/MAFR.config
+/home/rhymer/.hypernets/BEFR.config
+/home/rhymer/.hypernets/GAIT.config
+/home/rhymer/.hypernets/M1BE.config

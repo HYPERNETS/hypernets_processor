@@ -22,7 +22,7 @@ class RhymerAncillary:
             ftime = 0
             for i, t in enumerate(ts):
                 ftime += t / (60 ** i)
-
+        print('isodate:{}, lat:{}, lon:{}'.format(isodate, lat, lon))
         anc = self.ancillary_get(isodate, lon, lat, ftime=ftime)
 
         if ('z_wind' in anc) and ('m_wind' in anc):
@@ -161,6 +161,7 @@ class RhymerAncillary:
 
     def ancillary_interp_met(self, files, lon, lat, time, datasets=['z_wind', 'm_wind', 'press', 'rel_hum', 'p_water'],
                              kind='linear'):
+        print("pyhdf")
         import os, bz2
         from pyhdf.SD import SD, SDC
         from numpy import linspace

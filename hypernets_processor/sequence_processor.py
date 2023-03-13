@@ -13,9 +13,11 @@ from hypernets_processor.data_io.hypernets_reader import HypernetsReader
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.calibration.calibration_converter import CalibrationConverter
+from hypernets_processor.data_io.dataset_util import DatasetUtil as du
 
 import os
-
+import pandas as pd
+import numpy as np
 '''___Authorship___'''
 __author__ = "Sam Hunt"
 __created__ = "21/10/2020"
@@ -88,12 +90,21 @@ class SequenceProcessor:
                     if self.context.get_config_value("write_l1b"):
                         writer.write(L1b_irr, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
                     self.context.logger.info("Done")
+                    print(rhymer.qc_illumination(L1a_irr))
+                    if rhymer.qc_illumination(L1a_irr)> 0.1:
+                        self.context.logger.info("Non constant illumination for sequence {}".format(L1a_irr.attrs['sequence_id']))
+                        self.context.anomaly_handler.add_anomaly("nu")
+
+            # pd.set_option('display.max_columns', None)  # or 1000
+            # pd.set_option('display.max_rows', None)  # or 1000
+            # pd.set_option('display.max_colwidth', -1)  # or 199
+            # print(pd.DataFrame(du.unpack_flags(L1a_rad['quality_flag']).to_dataframe()))
 
             if L1b_rad and L1b_irr:
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:
                     self.context.logger.info("Processing to L1c...")
                     L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)
-                    L1c = surf.process_l1c(L1c_int)
+                    L1c = surf.process_l1c(L1c_int, L1b_irr)
                     self.context.logger.info("Done")
 
                 if self.context.get_config_value("max_level")=="L2A":

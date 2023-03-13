@@ -26,7 +26,6 @@ class Average:
 
 
     def average_l1b(self, measurandstring, dataset_l1a):
-
         if self.context.get_config_value("network") == "w":
             dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
         else:
@@ -52,6 +51,11 @@ class Average:
                 dataset_l1a["corr_systematic_indep_"+measurandstring].values
         dataset_l1b["corr_systematic_corr_rad_irr_"+measurandstring].values = \
                 dataset_l1a["corr_systematic_corr_rad_irr_"+measurandstring].values
+        accel_var=["acceleration_x_mean","acceleration_x_std",
+                   "acceleration_y_mean","acceleration_y_std",
+                   "acceleration_z_mean","acceleration_z_std"]
+        for a in accel_var:
+            dataset_l1b[a].values = self.calc_mean_masked(dataset_l1a,a,flags)
 
         return dataset_l1b
 
@@ -66,7 +70,7 @@ class Average:
                          "fresnel_default","temp_variability_ed","temp_variability_lu", "simil_fail"]
 
         dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags)
-
+        print([i for i in dataset_l2a.data_vars])
 
         for measurandstring in ["water_leaving_radiance","reflectance_nosc",
                                 "reflectance"]:
@@ -80,6 +84,11 @@ class Average:
                 len(dataset_l2a["u_rel_systematic_"+measurandstring].values))
             dataset_l2a["corr_systematic_"+measurandstring].values = \
                 dataset["corr_systematic_"+measurandstring].values
+
+        for measurandstring in ["water_leaving_radiance","reflectance_nosc",
+                                "reflectance"]:
+            dataset_l2a["{}_std".format(measurandstring)].values = self.calc_std_masked(
+                dataset,measurandstring,flags)
 
         return dataset_l2a
 
@@ -99,17 +108,44 @@ class Average:
             out = np.mean(out, axis=0)
 
         else:
-            out = np.empty((len(series_id), len(dataset['wavelength'])))
+            if 'wavelength' in dataset[var].coords:
 
-            for i in range(len(series_id)):
-                flagged = np.any(
-                    [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
-                     flags],axis=0)
-                ids = np.where(
-                    (dataset['series_id'] == series_id[i]) & (flagged == False))
-                out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
+                out = np.empty((len(series_id), len(dataset['wavelength'])))
 
-                if rand_unc:
-                    out[i] = (np.sum(dataset[var].values[:, ids]**2, axis=2)[:, 0])**0.5 / len(ids[0])
+                for i in range(len(series_id)):
+                    flagged = np.any(
+                        [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
+                         flags],axis=0)
+                    ids = np.where(
+                        (dataset['series_id'] == series_id[i]) & (flagged == False))
+                    out[i] = np.mean(dataset[var].values[:, ids], axis=2)[:, 0]
+
+                    if rand_unc:
+                        out[i] = (np.sum(dataset[var].values[:, ids]**2, axis=2)[:, 0])**0.5 / len(ids[0])
+            else:
+                out = np.empty(len(series_id))
+                for i in range(len(series_id)):
+                    flagged = np.any(
+                        [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
+                         flags], axis=0)
+                    ids = np.where(
+                        (dataset['series_id'] == series_id[i]) & (flagged == False))
+                    out[i] = np.mean(dataset[var].values[ids])
+
+        return out.T
+
+
+    def calc_std_masked(self, dataset, var, flags, rand_unc=False, corr=False):
+        series_id = np.unique(dataset['series_id'])
+
+        out = np.empty((len(series_id), len(dataset['wavelength'])))
+
+        for i in range(len(series_id)):
+            flagged = np.any(
+                [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
+                 flags],axis=0)
+            ids = np.where(
+                (dataset['series_id'] == series_id[i]) & (flagged == False))
+            out[i] = np.std(dataset[var].values[:, ids], axis=2)[:, 0]
 
         return out.T
