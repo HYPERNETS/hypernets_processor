@@ -670,6 +670,8 @@ class HypernetsReader:
             else:
                 globalattr = []
 
+            print(globalattr)
+
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
             # look for latitude and longitude or lat and lon , more elegant way??
@@ -715,10 +717,14 @@ class HypernetsReader:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
                 self.context.logger.error("No SN for hypstar instrument!")
                 #self.context.anomaly_handler.add_anomaly("x")
-            # if 'site_name' in (globalattr.keys()):
-            #     site_id = str(globalattr['site_name']).strip()
-            # else:
-            site_id = self.context.get_config_value("site_id")
+            if 'site_name' in (globalattr.keys()):
+                site_id = str(globalattr['site_name']).strip()
+            elif 'site_id' in (globalattr.keys()):
+                site_id = str(globalattr['site_id']).strip()
+            else:
+                site_id = self.context.get_config_value("site_id")
+
+            print(site_id)
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------

@@ -1074,6 +1074,14 @@ W_L1C_REFLECTANCE_VARIABLES = {"reflectance": {"dim": [WL_DIM, Lu_SCAN_DIM],
                                                                            "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",
                                                                            "units": "-",
                                                                            "preferred_symbol": "rhof"}},
+                               "fresnel_wind": {"dim": [Lu_SCAN_DIM],
+                                                "dtype": np.float32,
+                                                "attributes": {"standard_name": "fresnel_wind",
+                                                               "long_name": "Surface wind speed used for the retrieval of the "
+                                                                            "fraction of downwelling sky radiance reflected at "
+                                                                            "the air-water interface",
+                                                               "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",
+                                                               "units": "ms^-1"}},
                               }
 
 

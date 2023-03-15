@@ -17,7 +17,8 @@ from hypernets_processor.data_io.dataset_util import DatasetUtil as du
 import numpy as np
 import math
 import sys
-
+from scipy.optimize import curve_fit
+import configparser
 class RhymerHypstar:
 
     def __init__(self, context):
@@ -37,9 +38,35 @@ class RhymerHypstar:
 
     def qc_illumination(self, dataset):
         wv=dataset['wavelength'].values
-        covvar=np.std(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]/np.mean(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]
+        covvar=np.std(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]/\
+               np.mean(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]
         print(covvar)
         return covvar
+
+    def fitcurve(self, wv, ld, ed):
+        def func(x, a, b):
+            return a + b * (x / 100) ** (-4)
+
+        if ld.ndim > 1:
+            y = np.mean(ld / ed, axis=1)
+        else:
+            y = ld / ed
+        popt, pcov = curve_fit(func, wv, y)
+        residuals = y - func(wv, *popt)
+        ss_res = np.sum(residuals ** 2)
+        return (popt, pcov, ss_res)
+    def qc_bird(self, l1c):
+        ld = np.mean(l1c.downwelling_radiance.values, axis=1)
+        ed = np.mean(l1c.irradiance.values, axis=1)
+        wv=l1c.wavelength.values
+        popt, pcov, ss_res = self.fitcurve(wv, ld, ed)
+        # popt[0]+popt[1]*(x/100)**(-4)
+        #plt.plot(wv, popt[0] + popt[1] * (wv / 100) ** (-4), label="Fitted Curve")
+
+        #sum of squares regression
+        #sum of the differences between the predicted value by the model and the mean of the dependent variable
+        l1c.attrs['ss_res'] = str(ss_res)
+        return l1c
 
     def qc_scan(self, dataset, measurandstring, dataset_l1b):
         ## no inclination
@@ -270,10 +297,8 @@ class RhymerHypstar:
                                                                     "def_wind_flag")
                 wind.append(self.context.get_config_value("wind_default"))
             else:
-                isodate = datetime.utcfromtimestamp(l1b['acquisition_time'].values[i]).strftime('%Y-%m-%d')
-                isotime = datetime.utcfromtimestamp(l1b['acquisition_time'].values[i]).strftime('%H:%M:%S')
-                print(datetime.utcfromtimestamp(l1b['acquisition_time'].values[i]).strftime('%j'))
-                anc_wind = self.rhymeranc.get_wind(isodate, lon, lat, isotime=isotime)
+                isotime = datetime.utcfromtimestamp(l1b['acquisition_time'].values[i]).strftime('%Y-%m-%d %H:%M:%S')
+                anc_wind = self.rhymeranc.ts_wind(isotime, l1b.attrs['site_id'])
                 if anc_wind is not None:
                     wind.append(anc_wind)
         l1b['fresnel_wind'].values = wind
@@ -376,7 +401,7 @@ class RhymerHypstar:
         L1c_int = self.intp.interpolate_l1b_w(dataset_l1b,L1a_uprad, L1b_downrad, L1b_irr)
 
         flags = ["saturation", "nonlinearity", "bad_pointing", "outliers",
-                 "angles_missing", "lu_eq_missing", "fresnel_angle_missing",
+                 "angles_missing", "lu_eq_missing", "fresnel_angle_missing","ld_ed_clearsky_failing",
                  "fresnel_default", "temp_variability_ed", "temp_variability_lu", "simil_fail"]
 
         for measurandstring in ["irradiance", "downwelling_radiance"]:
@@ -387,5 +412,5 @@ class RhymerHypstar:
         # pd.set_option('display.max_rows', None)  # or 1000
         # pd.set_option('display.max_colwidth', -1)  # or 199
         # print(pd.DataFrame(du.unpack_flags(L1c_int['quality_flag']).to_dataframe()))
-
+        print(L1c_int.attrs["ss_res"])
         return L1c_int

@@ -45,6 +45,8 @@ class SequenceProcessor:
         """
         Processes sequence file
         """
+        import sys
+        print(sys.executable)
 
         # update context
         self.context.set_config_value("time", parse_sequence_path(sequence_path)["datetime"])
@@ -104,7 +106,11 @@ class SequenceProcessor:
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:
                     self.context.logger.info("Processing to L1c...")
                     L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)
+#                    if rhymer.qc_bird(L1c_int) < 0.1:
+#                        L1c_int["quality_flag"] = \
+#                            du.set_flag(L1c_int["quality_flag"],"ld_ed_clearsky_failing")
                     L1c = surf.process_l1c(L1c_int, L1b_irr)
+                    print(pd.DataFrame(du.unpack_flags(L1c['quality_flag']).to_dataframe()))
                     self.context.logger.info("Done")
 
                 if self.context.get_config_value("max_level")=="L2A":

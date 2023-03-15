@@ -47,6 +47,7 @@ class SurfaceReflectance:
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset)
         dataset_l1c = self.rh.get_wind(dataset_l1c)
         dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
+        dataset_l1c = self.rh.qc_bird(dataset_l1c)
 
         l1ctol1b_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
@@ -101,6 +102,7 @@ class SurfaceReflectance:
             # metada data not copied, so add the mean acceleration
             dataset_l2a.attrs["IRR_acceleration_x_mean"] = dataset.attrs['IRR_acceleration_x_mean']
             dataset_l2a.attrs["IRR_acceleration_x_std"] = dataset.attrs['IRR_acceleration_x_std']
+            dataset_l2a.attrs["ss_res"] = dataset.attrs['ss_res']
 
             for measurandstring in ["water_leaving_radiance", "reflectance_nosc",
                                     "reflectance", "epsilon"]:
