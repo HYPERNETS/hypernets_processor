@@ -94,8 +94,7 @@ def run_sequence(inputs):
         # stats.print_stats(100)
         if context.anomaly_handler.anomalies_added is not []:
             context.logger.info(
-                "Processing Anomalies: "
-                + str(context.anomaly_handler.anomalies_added)
+                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)
             )
 
         context.logger.info(target_sequence + " Complete")
@@ -106,8 +105,7 @@ def run_sequence(inputs):
         context.anomaly_handler.add_x_anomaly()
         if context.anomaly_handler.anomalies_added is not []:
             context.logger.info(
-                "Processing Anomalies: "
-                + str(context.anomaly_handler.anomalies_added)
+                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)
             )
 
         logger.error(target_sequence + "Failed: " + repr(e))

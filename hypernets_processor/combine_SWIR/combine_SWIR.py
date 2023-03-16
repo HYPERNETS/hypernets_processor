@@ -68,25 +68,13 @@ class CombineSWIR:
         dataset_l1b_comb = self.templ.l1b_template_from_combine(
             measurandstring, dataset_l1b, dataset_l1b_swir
         )
-        replace_dict_VIS = {"wavelength": "wavelength_VIS"}
-        for var in dataset_l1b.variables:
-            if measurandstring in var:
-                replace_dict_VIS[var] = var.replace(measurandstring, "measurand_VIS")
-        dataset_l1b_temp = dataset_l1b.rename(replace_dict_VIS)
-        dataset_l1b_temp["measurand_VIS"].attrs["unc_comps"] = [
-            comp.replace(measurandstring, "measurand_VIS")
-            for comp in dataset_l1b_temp["measurand_VIS"].attrs["unc_comps"]
-        ]
 
-        replace_dict_SWIR = {"wavelength": "wavelength_SWIR"}
-        for var in dataset_l1b.variables:
-            if measurandstring in var:
-                replace_dict_SWIR[var] = var.replace(measurandstring, "measurand_SWIR")
-        dataset_l1b_swir_temp = dataset_l1b_swir.rename(replace_dict_SWIR)
-        dataset_l1b_swir_temp["measurand_SWIR"].attrs["unc_comps"] = [
-            comp.replace(measurandstring, "measurand_SWIR")
-            for comp in dataset_l1b_swir_temp["measurand_SWIR"].attrs["unc_comps"]
-        ]
+        dataset_l1b_temp = self.templ.rename_var(
+            dataset_l1b, measurandstring, "measurand_VIS", "wavelength", "wavelength_VIS"
+        )
+        dataset_l1b_swir_temp = self.templ.rename_var(
+            dataset_l1b_swir, measurandstring, "measurand_SWIR", "wavelength", "wavelength_SWIR"
+        )
 
         dataset_l1b_comb = combine_function.propagate_ds_specific(
             ["random", "systematic_indep", "systematic_corr_rad_irr"],

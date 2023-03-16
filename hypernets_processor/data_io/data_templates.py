@@ -450,3 +450,24 @@ class DataTemplates:
             dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
 
         return dataset_l2a
+
+    def rename_var(self, dataset, varname, varname_new, wavvar, wavvar_new):
+        replace_dict = {wavvar: wavvar_new}
+        for var in dataset.variables:
+            if varname in var:
+                replace_dict[var] = var.replace(varname, varname_new)
+        dataset_temp = dataset.rename(replace_dict)
+        if "unc_comps" in dataset_temp[varname_new].attrs.keys():
+            dataset_temp[varname_new].attrs["unc_comps"] = [
+                comp.replace(varname, varname_new)
+                for comp in dataset_temp[varname_new].attrs["unc_comps"]
+            ]
+            for comp in dataset_temp[varname_new].attrs["unc_comps"]:
+                for i in range(2):
+                    if wavvar == dataset_temp[comp].attrs["err_corr_%s_dim"%(i+1)]:
+                        dataset_temp[comp].attrs["err_corr_%s_dim"%(i+1)]=wavvar_new
+                    if len(dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)]) > 0:
+                        if "err_corr" in dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)][0]:
+                            dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)][0] = \
+                            dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)][0].replace(varname, varname_new)
+        return dataset_temp

@@ -484,8 +484,7 @@ class CalibrationConverter:
                             + gains[:, 13] ** 2
                             + gains[:, 14] ** 2
                             + gains[:, 15] ** 2
-                            + placeholder_unc ** 2
-
+                            + placeholder_unc**2
                         )
                         ** 0.5,
                     )

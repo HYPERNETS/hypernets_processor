@@ -40,7 +40,7 @@ class QualityChecks:
         mask_threshold = []
         mask_outliers = []
         mask_discontinuity = []
-        raise_mask_anomaly=False
+        raise_mask_anomaly = False
         for i in range(len(series_ids)):
             ids = np.where(datasetl0["series_id"] == series_ids[i])[0]
 
@@ -58,7 +58,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the scans for series passed the quality control criteria"
                 )
-                raise_mask_anomaly=True
+                raise_mask_anomaly = True
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
@@ -85,7 +85,7 @@ class QualityChecks:
         mask_outliers = []
         mask_threshold = []
         mask_discontinuity = []
-        raise_mask_anomaly=False
+        raise_mask_anomaly = False
         for i in range(len(series_ids)):
             ids = np.where(datasetl0["series_id"] == series_ids[i])[0]
 
@@ -103,7 +103,7 @@ class QualityChecks:
                 self.context.logger.error(
                     "None of the dark scans for series passed the quality control criteria"
                 )
-                raise_mask_anomaly=True
+                raise_mask_anomaly = True
 
             mask = np.append(mask, mask_all_i)
             mask_threshold = np.append(mask_threshold, mask_threshold_i)
