@@ -107,14 +107,24 @@ CAL_METADATA = {"type": "dataset",
 QC_METADATA={"IRR_acceleration_x_mean": "NaN",
                "IRR_acceleration_x_std": "NaN",
              "ss_res":"NaN",
+             "nlu":"NaN",
+            "nld":"NaN",
+             "ned":"NaN",
                }
 
 L1A_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file
                     "instrument_calibration_file_rad": "NaN",
+                    "vaa_ask": "NaN",
+                    "vaa_abs": "NaN",
+                    "vaa_ref": "NaN",
                     }
 
 L1A_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance",  # example of irradiance file
-                    "instrument_calibration_file_irr": "NaN"}
+                    "instrument_calibration_file_irr": "NaN",
+                    "vaa_ask": "NaN",
+                    "vaa_abs": "NaN",
+                    "vaa_ref": "NaN",
+                    }
 
 W_L1C_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
                                " radiance and water leaving radiance",  # example of irradiance file

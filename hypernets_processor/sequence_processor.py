@@ -100,7 +100,7 @@ class SequenceProcessor:
             # pd.set_option('display.max_columns', None)  # or 1000
             # pd.set_option('display.max_rows', None)  # or 1000
             # pd.set_option('display.max_colwidth', -1)  # or 199
-            # print(pd.DataFrame(du.unpack_flags(L1a_rad['quality_flag']).to_dataframe()))
+            print(pd.DataFrame(du.unpack_flags(L1a_irr['quality_flag']).to_dataframe()))
 
             if L1b_rad and L1b_irr:
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:

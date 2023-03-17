@@ -40,7 +40,7 @@ class RhymerHypstar:
         wv=dataset['wavelength'].values
         covvar=np.std(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]/\
                np.mean(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]
-        print(covvar)
+        print("Coefficient of variation: {}".format(covvar))
         return covvar
 
     def fitcurve(self, wv, ld, ed):
@@ -60,6 +60,7 @@ class RhymerHypstar:
         ed = np.mean(l1c.irradiance.values, axis=1)
         wv=l1c.wavelength.values
         popt, pcov, ss_res = self.fitcurve(wv, ld, ed)
+        print("this is ss_res:{}".format(ss_res))
         # popt[0]+popt[1]*(x/100)**(-4)
         #plt.plot(wv, popt[0] + popt[1] * (wv / 100) ** (-4), label="Fitted Curve")
 
@@ -175,6 +176,7 @@ class RhymerHypstar:
                 if senz >= 90:
                     measurement = 'downwelling_radiance'
                     downrad.append(int(i))
+                    downrad.append(int(i))
                 if measurement is None: continue
 
             lu = rad.sel(scan=uprad)
@@ -203,10 +205,8 @@ class RhymerHypstar:
             sena_lu=np.array([sena_lu[i] + 360 if sena_lu[i] < 0 else sena_lu[i] for i in range(0, len(sena_lu))])
             sena_lsky=np.array([sena_lsky[i] + 360 if sena_lsky[i] < 0 else sena_lsky[i] for i in range(0, len(sena_lsky))])
 
-
             for i in sena_lu:
-                if np.round(i) < np.min(np.round(sena_lsky)) or np.round(i) > np.max(np.round(sena_lsky)):
-                #if np.min(np.round(sena_lsky)) > np.round(i) or np.max(np.round(sena_lsky)) < np.round(i):
+                if np.round(i) not in np.round(sena_lsky):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "lu_eq_missing")
                     if self.context.get_config_value("verbosity") > 2:
@@ -224,7 +224,7 @@ class RhymerHypstar:
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
             for i in senz_lu:
-                if np.round(i) < np.min(np.round(senz_lsky)) or np.round(i) > np.max(np.round(senz_lsky)):
+                if np.round(i) not in np.round(senz_lsky):
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "fresnel_angle_missing")
                     ts = [datetime.utcfromtimestamp(x) for x in
@@ -244,7 +244,8 @@ class RhymerHypstar:
                 [du.unpack_flags(lu['quality_flag'])[x] for x in
                  flags], axis=0)
             ids = np.where(flagged == False)[0]
-            print(nbrlu)
+            dataset_l1b.attrs["nlu"]=len(ids)
+            print("Number of valid Lu: {}".format(len(ids)))
             if len(ids) < nbrlu:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
@@ -257,7 +258,10 @@ class RhymerHypstar:
                 [du.unpack_flags(lsky['quality_flag'])[x] for x in
                  flags], axis=0)
             ids = np.where(flagged == False)[0]
-            print(nbrlsky)
+            dataset_l1b.attrs["nld"]=len(ids)
+
+            print("Number of valid Ld: {}".format(len(ids)))
+
             if len(ids) < nbrlsky:
                 for i in range(len(dataset_l1b["scan"])):
                     dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
@@ -270,6 +274,7 @@ class RhymerHypstar:
                 [du.unpack_flags(irr['quality_flag'])[x] for x in
                  flags], axis=0)
             ids = np.where(flagged == False)[0]
+            dataset_l1b.attrs["ned"]=len(ids)
 
             if len(ids) < nbred:
                 for i in range(len(dataset_l1b["scan"])):
@@ -412,5 +417,9 @@ class RhymerHypstar:
         # pd.set_option('display.max_rows', None)  # or 1000
         # pd.set_option('display.max_colwidth', -1)  # or 199
         # print(pd.DataFrame(du.unpack_flags(L1c_int['quality_flag']).to_dataframe()))
-        print(L1c_int.attrs["ss_res"])
+
+        L1c_int.attrs['nld']=dataset_l1b.attrs['nld']
+        L1c_int.attrs['nlu']=dataset_l1b.attrs['nlu']
+        L1c_int.attrs['ned']=dataset_l1b.attrs['ned']
+
         return L1c_int

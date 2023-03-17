@@ -289,7 +289,7 @@ class DataTemplates:
             dataset_l2a["series_id"].values = series_id
             for variablestring in ["acquisition_time", "viewing_azimuth_angle",
                                    "viewing_zenith_angle", "solar_azimuth_angle",
-                                   "solar_zenith_angle", "epsilon", "rhof", "fresnel_wind"]:
+                                   "solar_zenith_angle", "epsilon", "rhof", "fresnel_wind", "vaa_ref","vaa_abs","vaa_ask"]:
                 temp_arr = np.empty(len(series_id))
                 for i in range(len(series_id)):
                     flagged = np.any(

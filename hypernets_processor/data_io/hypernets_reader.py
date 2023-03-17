@@ -315,8 +315,22 @@ class HypernetsReader:
                     ds.attrs["site_longitude"] = lon
                     ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
                     ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
+                    print(ds["solar_azimuth_angle"][scan_number].values)
                     vaa_rel, vza = map(float, specattr['pt_ask'].split(";"))
-                    vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360-int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360))*360
+                    vaa_abs, vza_abs = map(float, specattr['pt_abs'].split(";"))
+                    if specattr.get('pt_ref'):
+                        vaa_ref, vza_ref = map(float, specattr['pt_ref'].split(";"))
+                        ds["vaa_ref"][scan_number] = vaa_ref
+                    else:
+                        vaa_ref=-999999
+                    ds["vaa_ask"][scan_number] = vaa_rel
+                    ds["vaa_abs"][scan_number] = vaa_abs
+
+                    vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360
+                           -int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360))*360
+                    print("vaa_ref:{}, vaa_abs:{}, vaa_ask:{}, saa: {}".format(vaa_ref,vaa_abs, vaa_rel,
+                                                                               ds["solar_azimuth_angle"][scan_number].values))
+
                 else:
                     self.context.logger.error(
                         "Lattitude is not found, using default values instead for lat, lon, sza and saa.")

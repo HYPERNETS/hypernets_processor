@@ -69,8 +69,12 @@ class SurfaceReflectance:
 
         L1c.attrs["IRR_acceleration_x_mean"] = str(np.mean(l1birr['acceleration_x_mean'].values))
         L1c.attrs["IRR_acceleration_x_std"] = str(np.mean(l1birr['acceleration_x_std'].values))
-        print(L1c.attrs["IRR_acceleration_x_mean"])
+        print("IRR_acceleration_x_mean:{}".format(L1c.attrs["IRR_acceleration_x_mean"]))
+        L1c.attrs["ned"] = str(dataset.attrs['ned'])
+        L1c.attrs["nld"] = str(dataset.attrs['nld'])
+        L1c.attrs["nlu"] = str(dataset.attrs['nlu'])
 
+        print("nld:{}, nlu:{}, ned:{}".format(L1c.attrs["nld"], L1c.attrs["nlu"], L1c.attrs["ned"]))
 
         if self.context.get_config_value("write_l1c"):
             self.writer.write(L1c, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
@@ -137,7 +141,6 @@ class SurfaceReflectance:
             self.context.logger.error("network is not correctly defined")
 
         if self.context.get_config_value("write_l2a"):
-            print(dataset_l2a.attrs["IRR_acceleration_x_mean"])
             self.writer.write(dataset_l2a, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
 
         return dataset_l2a

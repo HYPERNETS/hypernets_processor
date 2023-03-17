@@ -71,6 +71,7 @@ class HypernetsWriter:
 
         #ds = HypernetsWriter.fill_ds(ds)
         if fmt == "nc":
+            print(path)
             HypernetsWriter._write_netcdf(ds, path, compression_level=compression_level)
 
         elif fmt == "csv":
