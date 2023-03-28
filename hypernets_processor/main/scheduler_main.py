@@ -2,6 +2,7 @@
 Main function for running scheduler
 """
 
+import os
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import read_config_file, read_jobs_list
 from hypernets_processor.utils.logging import configure_logging
@@ -19,7 +20,7 @@ __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
 
-def unpack_scheduler_config(scheduler_config):
+def unpack_scheduler_config(scheduler_config, processor_config):
     """
     Returns information from scheduler configuration information
 
@@ -57,6 +58,8 @@ def unpack_scheduler_config(scheduler_config):
         # Use custom jobs list provided, else use default
         scheduler_config_dict[sch]["jobs_list"] = get_config_value(scheduler_config, sch, "jobs_list", dtype=str)
         if scheduler_config_dict[sch]["jobs_list"] is None:
+            proc_dir=processor_config["Processor"]["processor_working_directory"]
+            JOBS_FILE_PATH = os.path.join(proc_dir, "jobs.txt")
             scheduler_config_dict[sch]["jobs_list"] = JOBS_FILE_PATH
 
         # todo - sort out start time format
@@ -84,7 +87,7 @@ def main(scheduler_config, processor_config):
 
     logger = configure_logging(config=scheduler_config, name=__name__)
 
-    scheduler_config = unpack_scheduler_config(scheduler_config)
+    scheduler_config = unpack_scheduler_config(scheduler_config, processor_config)
 
     jobs_list = read_jobs_list(scheduler_config["Processor Schedule"]["jobs_list"])
 
