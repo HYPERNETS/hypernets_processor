@@ -1,11 +1,11 @@
 import xarray as xr
 import obsarray
-from obsarray import DatasetUtil
+from obsarray.templater.dataset_util import DatasetUtil
 import numpy as np
 
 path = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\archive_test\\"
 data = xr.open_dataset(
-    path + "HYPERNETS_W_TEST_L1C_ALL_20211216T1240_20230307T1101_v0.3.nc"
+    path + "HYPERNETS_W_TEST_L2A_REF_20211106T0700_20230320T1214_v0.3.nc"
 )
 
 print(data.flag["quality_flag"])
