@@ -91,6 +91,7 @@ ARCHIVE_DB = {
             "viewing_zenith_angle_max": {"type": float},
             "viewing_azimuth_angle_min": {"type": float},
             "viewing_azimuth_angle_max": {"type": float},
+            "percent_zero_flags": {"type": float},
         }
     }
 }

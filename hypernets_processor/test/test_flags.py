@@ -9,7 +9,7 @@ data = xr.open_dataset(
 )
 
 print(data.flag["quality_flag"])
-print(data["quality_flag"] > 0)
+print(data["quality_flag"].values,data["quality_flag"] > 0)
 print("here", data.flag["quality_flag"]["saturation"].value.values)
 print([DatasetUtil.get_set_flags(flag) for flag in data["quality_flag"]])
 print(DatasetUtil.get_flags_mask_or(data["quality_flag"], ["outliers", "saturation"]))
