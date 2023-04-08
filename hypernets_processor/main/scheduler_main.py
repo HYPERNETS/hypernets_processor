@@ -163,7 +163,7 @@ def main(scheduler_config, processor_config):
 
     if scheduler_job_config["parallel"]:
         pool = Pool(len(jobs_list))
-        pool.map(processor_main, inputs)
+        pool.starmap(processor_main, inputs)
     else:
         # run scheduled jobs
         processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
