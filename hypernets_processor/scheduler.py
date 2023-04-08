@@ -80,7 +80,12 @@ class Scheduler:
             else None
         )
 
-        if seconds is not None:
+        if parallel:
+            self.scheduler.every().month.do(
+                self.job_wrapper, job, parallel, self.logger, name, *args, **kwargs
+            )
+
+        elif seconds is not None:
             self.scheduler.every(seconds).seconds.do(
                 self.job_wrapper, job, parallel, self.logger, name, *args, **kwargs
             )
