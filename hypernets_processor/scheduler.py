@@ -81,7 +81,7 @@ class Scheduler:
         )
 
         if parallel:
-            self.scheduler.every().months.do(
+            self.scheduler.every(4).weeks.do(
                 self.job_wrapper, job, parallel, self.logger, name, *args, **kwargs
             )
 
