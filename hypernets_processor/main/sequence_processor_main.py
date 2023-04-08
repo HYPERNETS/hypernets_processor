@@ -151,15 +151,9 @@ def main(processor_config, job_config, to_archive, parallel=None):
 
     else:
         success = np.zeros_like(target_sequences, dtype=int)
-        if parallel:
-            inputs = np.empty(len(target_sequences), dtype=object)
-            for i, target_sequence in enumerate(target_sequences):
-                inputs[i] = (target_sequence, sp, context, logger)
-            pool = Pool(parallel)
-            success = list(pool.map(run_sequence, inputs))
-        else:
-            for i, target_sequence in enumerate(target_sequences):
-                success[i] = run_sequence((target_sequence, sp, context, logger))
+
+        for i, target_sequence in enumerate(target_sequences):
+            success[i] = run_sequence((target_sequence, sp, context, logger))
 
         msg = (
             str(np.sum(success))

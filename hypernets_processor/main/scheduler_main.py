@@ -61,7 +61,7 @@ def unpack_scheduler_config(scheduler_config):
             scheduler_config, sch, "start_time", dtype=str
         )
         scheduler_config_dict[sch]["parallel"] = get_config_value(
-            scheduler_config, sch, "parallel", dtype=int
+            scheduler_config, sch, "parallel", dtype=bool
         )
 
         # Use custom jobs list provided, else use default
@@ -131,6 +131,19 @@ def main(scheduler_config, processor_config):
         scheduler_job_config["parallel"] = scheduler_config["Processor Schedule"][
             "parallel"
         ]
+
+        if scheduler_job_config["parallel"]:
+            job_config["Databases"] = {
+                "metadata_db_url": processor_config["Databases"][
+                    "metadata_db_url"
+                ].replace(".db", "_" + job_config["Job"]["site_id"] + ".db")
+            }
+            job_config["Databases"]["archive_db_url"] = processor_config["Databases"][
+                "archive_db_url"
+            ].replace(".db", "_" + job_config["Job"]["site_id"] + ".db")
+            job_config["Databases"]["anomaly_db_url"] = processor_config["Databases"][
+                "anomaly_db_url"
+            ].replace(".db", "_" + job_config["Job"]["site_id"] + ".db")
 
         # schedule job
         processor_sch.schedule(

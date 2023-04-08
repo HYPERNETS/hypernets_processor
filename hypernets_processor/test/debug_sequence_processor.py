@@ -24,6 +24,7 @@ __maintainer__ = "Pieter De Vis"
 __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
+
 def process_sequence():
     """
     Command line interface to sequence_processor_main for ad-hoc job processing
@@ -44,9 +45,13 @@ def process_sequence():
     # Read config file
     job_config = read_config_file([job_config_path, processor_defaults])
 
-    job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\SEQ20220426T113243"
+    job_config["Input"][
+        "raw_data_directory"
+    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\SEQ20220426T113243"
 
-    job_config["Output"]["archive_directory"] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\archive_test"
+    job_config["Output"][
+        "archive_directory"
+    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\archive_test"
 
     job_config["Processor"]["max_level"] = "L2A"
 

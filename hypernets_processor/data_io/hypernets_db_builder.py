@@ -163,7 +163,11 @@ class ArchiveDB(dataset.Database):
                 viewing_zenith_angle_max=np.nanmax(ds["viewing_zenith_angle"].values),
                 viewing_azimuth_angle_min=np.nanmin(ds["viewing_azimuth_angle"].values),
                 viewing_azimuth_angle_max=np.nanmax(ds["viewing_azimuth_angle"].values),
-                percent_zero_flags=(np.count_nonzero(ds["quality_flag"]==0)/ds["quality_flag"].size*100),
+                percent_zero_flags=(
+                    np.count_nonzero(ds["quality_flag"] == 0)
+                    / ds["quality_flag"].size
+                    * 100
+                ),
             )
         )
 

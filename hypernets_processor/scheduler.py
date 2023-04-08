@@ -6,6 +6,7 @@ from hypernets_processor.version import __version__
 import time
 import functools
 from schedule import Scheduler as Sched
+import threading
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -145,9 +146,14 @@ class Scheduler:
 
                 return wrapper
 
-            job = with_logging(job, logger, name)
-
-        return job(*args, **kwargs, parallel=parallel)
+            if parallel:
+                job_thread = threading.Thread(
+                    target=with_logging(job, logger, name), args=args, kwargs=kwargs
+                )
+                return job_thread.start()
+            else:
+                job = with_logging(job, logger, name)
+                return job(*args, **kwargs)
 
     def run(self, start_time=None):
         """

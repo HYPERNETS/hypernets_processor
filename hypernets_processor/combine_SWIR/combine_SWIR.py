@@ -70,10 +70,18 @@ class CombineSWIR:
         )
 
         dataset_l1b_temp = self.templ.rename_var(
-            dataset_l1b, measurandstring, "measurand_VIS", "wavelength", "wavelength_VIS"
+            dataset_l1b,
+            measurandstring,
+            "measurand_VIS",
+            "wavelength",
+            "wavelength_VIS",
         )
         dataset_l1b_swir_temp = self.templ.rename_var(
-            dataset_l1b_swir, measurandstring, "measurand_SWIR", "wavelength", "wavelength_SWIR"
+            dataset_l1b_swir,
+            measurandstring,
+            "measurand_SWIR",
+            "wavelength",
+            "wavelength_SWIR",
         )
 
         dataset_l1b_comb = combine_function.propagate_ds_specific(

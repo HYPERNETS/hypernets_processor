@@ -464,10 +464,25 @@ class DataTemplates:
             ]
             for comp in dataset_temp[varname_new].attrs["unc_comps"]:
                 for i in range(2):
-                    if wavvar == dataset_temp[comp].attrs["err_corr_%s_dim"%(i+1)]:
-                        dataset_temp[comp].attrs["err_corr_%s_dim"%(i+1)]=wavvar_new
-                    if len(dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)]) > 0:
-                        if "err_corr" in dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)][0]:
-                            dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)][0] = \
-                            dataset_temp[comp].attrs["err_corr_%s_params"%(i+1)][0].replace(varname, varname_new)
+                    if wavvar == dataset_temp[comp].attrs["err_corr_%s_dim" % (i + 1)]:
+                        dataset_temp[comp].attrs[
+                            "err_corr_%s_dim" % (i + 1)
+                        ] = wavvar_new
+                    if (
+                        len(dataset_temp[comp].attrs["err_corr_%s_params" % (i + 1)])
+                        > 0
+                    ):
+                        if (
+                            "err_corr"
+                            in dataset_temp[comp].attrs["err_corr_%s_params" % (i + 1)][
+                                0
+                            ]
+                        ):
+                            dataset_temp[comp].attrs["err_corr_%s_params" % (i + 1)][
+                                0
+                            ] = (
+                                dataset_temp[comp]
+                                .attrs["err_corr_%s_params" % (i + 1)][0]
+                                .replace(varname, varname_new)
+                            )
         return dataset_temp
