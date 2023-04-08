@@ -151,14 +151,14 @@ class Scheduler:
 
                 return wrapper
 
-            if parallel:
-                job_thread = threading.Thread(
-                    target=with_logging(job, logger, name), args=args, kwargs=kwargs
-                )
-                return job_thread.start()
-            else:
-                job = with_logging(job, logger, name)
-                return job(*args, **kwargs)
+            # if parallel:
+            #     job_thread = threading.Thread(
+            #         target=with_logging(job, logger, name), args=args, kwargs=kwargs
+            #     )
+            #     return job_thread.start()
+            # else:
+            job = with_logging(job, logger, name)
+            return job(*args, **kwargs)
 
     def run(self, start_time=None):
         """
