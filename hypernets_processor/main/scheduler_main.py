@@ -9,6 +9,8 @@ from hypernets_processor.utils.config import get_config_value, JOBS_FILE_PATH
 from hypernets_processor import Scheduler
 from hypernets_processor.main.sequence_processor_main import main as processor_main
 
+import numpy as np
+from multiprocessing import Pool
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -109,7 +111,9 @@ def main(scheduler_config, processor_config):
     # schedule jobs
     processor_sch = Scheduler(logger=logger)
 
-    for job_config_path in jobs_list:
+    inputs = np.empty(len(jobs_list), dtype=object)
+
+    for ij,job_config_path in enumerate(jobs_list):
 
         # define scheduler job config
         scheduler_job_config = dict()
@@ -145,17 +149,24 @@ def main(scheduler_config, processor_config):
                 "anomaly_db_url"
             ].replace(".db", "_" + job_config["Job"]["site_id"] + ".db")
 
-        # schedule job
-        processor_sch.schedule(
-            processor_main,
-            scheduler_job_config=scheduler_job_config,
-            job_config=job_config,
-            processor_config=processor_config,
-            to_archive=True,
-        )
+            inputs[ij] = (processor_config, job_config, True)
 
-    # run scheduled jobs
-    processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
+        else:
+            # schedule job
+            processor_sch.schedule(
+                processor_main,
+                scheduler_job_config=scheduler_job_config,
+                job_config=job_config,
+                processor_config=processor_config,
+                to_archive=True,
+            )
+
+    if scheduler_job_config["parallel"]:
+        pool = Pool(len(jobs_list))
+        pool.map(processor_main, inputs)
+    else:
+        # run scheduled jobs
+        processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
 
     return None
 
