@@ -255,10 +255,10 @@ class HypernetsReader:
 
         # add auxiliary data to the L0 data
         temp, RH, pressure, lux = self.read_aux(seq_dir)
-        ds.attrs["system_temperature"] = temp.values
-        ds.attrs["system_relative_humidity"] = RH.values
-        ds.attrs["system_pressure"] = pressure.values
-        ds.attrs["illuminance"] = lux.values
+        ds.attrs["system_temperature"] = temp
+        ds.attrs["system_relative_humidity"] = RH
+        ds.attrs["system_pressure"] = pressure
+        ds.attrs["illuminance"] = lux
 
         # Keep track of scan number!
         scan_number = 0
@@ -866,7 +866,10 @@ class HypernetsReader:
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
             # look for latitude and longitude or lat and lon , more elegant way??
-            if "latitude" in (globalattr.keys()):
+            if self.context.get_config_value("use_config_latlon"):
+                lat = self.context.get_config_value("lat")
+
+            elif "latitude" in (globalattr.keys()):
                 lat = float(globalattr["latitude"])
                 if lat == 0.0:
                     print("Latitude is 0.0, use default or add it in metadata.txt")
@@ -883,7 +886,10 @@ class HypernetsReader:
                 lat = self.context.get_config_value("lat")
                 flag = flag + 2 ** FLAG_COMMON.index("lat_default")
 
-            if "longitude" in (globalattr.keys()):
+            if self.context.get_config_value("use_config_latlon"):
+                lon = self.context.get_config_value("lon")
+
+            elif "longitude" in (globalattr.keys()):
                 lon = float(globalattr["longitude"])
                 if lon == 0.0:
                     print("Latitude is 0.0, use default or add it in metadata.txt")
@@ -990,18 +996,15 @@ class HypernetsReader:
                     ignore_index=True,
                 )
 
-            # aux = pd.read_csv(os.path.join(seq_dir, "meteo.csv"), sep=";", header=None)
-            # data = pd.concat(
-            #     [pd.DataFrame(aux.iloc[:, i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
-            #     axis=1, ignore_index=True)
             data.columns = ["temp", "RH", "pressure", "lux"]
+            return data["temp"].values, data["RH"].values, data["pressure"].values, data["lux"].values
+
         else:
             self.context.logger.error(
                 "Missing meteo file in sequence directory. No meteo data added to your output file."
             )
             self.context.anomaly_handler.add_anomaly("e")
-
-        return data["temp"], data["RH"], data["pressure"], data["lux"]
+            return None, None, None, None
 
     def read_sequence(
         self,

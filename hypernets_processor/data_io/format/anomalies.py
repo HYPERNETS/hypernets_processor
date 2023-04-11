@@ -33,8 +33,8 @@ ANOMALIES_DICT = {
     },
     "e": {
         "description": "Meteo file missing",
-        "error": IOError,
-        "error_msg": "Meteo file missing",
+        "error": None,
+        "error_msg": None,
     },
     "o": {
         "description": "more than 50% of data has random error above 100% (probably corrupted data)",
@@ -63,7 +63,7 @@ ANOMALIES_DICT = {
     },
     "i": {
         "description": "No valid irradiance measurements",
-        "error": ValueError,
-        "error_msg": "No valid irradiance measurements",
+        "error": None,
+        "error_msg": None,
     },
 }

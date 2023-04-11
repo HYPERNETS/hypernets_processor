@@ -169,6 +169,9 @@ class Interpolate:
         if len(mask_notflagged) == 0:
             self.context.anomaly_handler.add_anomaly("i", dataset_l1b_irr)
             acqui_irr = dataset_l1b_irr["acquisition_time"].values
+            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+                dataset_l1c["quality_flag"], "no_clear_sky"
+            )
         else:
             if self.context.get_config_value("network") == "w":
                 dataset_l1c_temp = dataset_l1c_temp.isel(scan=mask_notflagged)

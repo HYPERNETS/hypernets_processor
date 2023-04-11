@@ -14,6 +14,7 @@ FLAG_COMMON = [
     "vza_irradiance",
     "clear_sky_irradiance",
     "single_irradiance_used",
+    "no_clear_sky",
     "less_than_three_darks",
 ]
 
