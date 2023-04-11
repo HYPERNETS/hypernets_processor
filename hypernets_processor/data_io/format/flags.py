@@ -29,6 +29,7 @@ FLAG_WATER = [
     "min_nbrlsky",
     "def_wind_flag",
     "simil_fail",
+    "ld_ed_clearsky_failing"
 ]
 
 FLAG_LAND = []

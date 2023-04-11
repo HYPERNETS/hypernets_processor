@@ -1,0 +1,12 @@
+[Processor Schedule]
+hours = 
+minutes =
+seconds = 
+start_time = 17:00 
+parallel = 
+
+[Log]
+log_path = /home/rhymer/.hypernets/scheduler.log
+verbose = 
+quiet = 
+

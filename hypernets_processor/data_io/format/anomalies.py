@@ -15,7 +15,11 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
-    "s": {"description": "missing scans", "error": None, "error_msg": None},
+    "s": {
+            "description": "sequence data incomplete",
+            "error": IOError,
+            "error_msg": "sequence data incomplete (review log for more details)"
+        },
     "b": {
         "description": "Not a standard sequence (too much missing data to keep processing)",
         "error": IOError,
@@ -65,5 +69,10 @@ ANOMALIES_DICT = {
         "description": "No valid irradiance measurements",
         "error": None,
         "error_msg": None,
+    },
+    "nu": {
+        "description": "Non constant illumination",
+        "error": IOError,
+        "error_msg": None
     },
 }

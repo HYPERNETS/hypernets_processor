@@ -46,70 +46,42 @@ class SurfaceReflectance:
         self.rhp = RhymerProcessing(context)
         self.rhs = RhymerShared(context)
 
-    def process_l1c(self, dataset):
+    def process_l1c(self, dataset, l1birr):
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset)
         dataset_l1c = self.rh.get_wind(dataset_l1c)
         dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
+        dataset_l1c = self.rh.qc_bird(dataset_l1c)
 
-        prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
-        )
-        l1ctol1b_function = self._measurement_function_factory(
-            prop=prop,
-            yvariable=[
-                "water_leaving_radiance",
-                "reflectance_nosc",
-                "reflectance",
-                "epsilon",
-            ],
-            repeat_dims=["scan"],
-            param_fixed=[False, False, False, False, True],
-        ).get_measurement_function(
-            self.context.get_config_value("measurement_function_surface_reflectance")
-        )
+        l1ctol1b_function = self._measurement_function_factory.get_measurement_function(
+            self.context.get_config_value("measurement_function_surface_reflectance"))
 
-        l1ctol1b_function.setup(self.context)
+        input_vars = l1ctol1b_function.get_argument_names()
+        input_qty = self.prop.find_input(input_vars, dataset_l1c)
+        u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset_l1c)
+        u_systematic_input_qty, corr_systematic_input_qty = \
+            self.prop.find_u_systematic_input(input_vars, dataset_l1c)
 
-        L1c = l1ctol1b_function.propagate_ds_specific(
-            ["random", "systematic_indep"],
-            dataset_l1c,
-            comp_list_out=["random", "systematic"],
-            ds_out_pre=dataset_l1c,
-            use_ds_out_pre_unmodified=True,
-            store_unc_percent=True,
-            simple_systematic=False,
-        )
+        L1c = self.prop.process_measurement_function_l2(
+            ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
+            dataset_l1c, l1ctol1b_function.function, input_qty,
+            u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
 
-        # input_vars = l1ctol1b_function.get_argument_names()
-        # input_qty = self.prop.find_input(input_vars, dataset_l1c)
-        # u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset_l1c)
-        # u_systematic_input_qty, corr_systematic_input_qty = \
-        #     self.prop.find_u_systematic_input(input_vars, dataset_l1c)
-        #
-        # L1c = self.prop.process_measurement_function_l2(
-        #     ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
-        #     dataset_l1c, l1ctol1b_function.meas_function, input_qty,
-        #     u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
-
-        failSimil = self.rh.qc_similarity(L1c)
+        failSimil=self.rh.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
-            L1c["quality_flag"][np.where(failSimil == 1)], "simil_fail"
-        )  # for i in range(len(mask))]
+            L1c["quality_flag"][np.where(failSimil == 1)], "simil_fail")  # for i in range(len(mask))]
+
+        L1c.attrs["IRR_acceleration_x_mean"] = str(np.mean(l1birr['acceleration_x_mean'].values))
+        L1c.attrs["IRR_acceleration_x_std"] = str(np.mean(l1birr['acceleration_x_std'].values))
+        print("IRR_acceleration_x_mean:{}".format(L1c.attrs["IRR_acceleration_x_mean"]))
+        L1c.attrs["ned"] = str(dataset.attrs['ned'])
+        L1c.attrs["nld"] = str(dataset.attrs['nld'])
+        L1c.attrs["nlu"] = str(dataset.attrs['nlu'])
+
+        print("nld:{}, nlu:{}, ned:{}".format(L1c.attrs["nld"], L1c.attrs["nlu"], L1c.attrs["ned"]))
 
         if self.context.get_config_value("write_l1c"):
-            self.writer.write(
-                L1c,
-                overwrite=True,
-                remove_vars_strings=self.context.get_config_value(
-                    "remove_vars_strings_L2"
-                ),
-            )
-
-        for measurandstring in [
-            "water_leaving_radiance",
-            "reflectance_nosc",
-            "reflectance",
-        ]:
+            self.writer.write(L1c, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
+        for measurandstring in ["water_leaving_radiance","reflectance_nosc","reflectance","epsilon"]:
             try:
                 if self.context.get_config_value("plot_l1c"):
                     self.plot.plot_series_in_sequence(measurandstring, L1c)
@@ -117,7 +89,7 @@ class SurfaceReflectance:
                 if self.context.get_config_value("plot_uncertainty"):
                     self.plot.plot_relative_uncertainty(measurandstring, L1c, L2=True)
             except:
-                print("not plotting ", measurandstring)
+                print("not plotting ",measurandstring)
         return L1c
 
     def process_l2(self, dataset):
