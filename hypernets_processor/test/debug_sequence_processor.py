@@ -47,7 +47,7 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\SEQ20220426T113243"
+    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\WWUK\SEQ20220426T113243"
 
     job_config["Output"][
         "archive_directory"

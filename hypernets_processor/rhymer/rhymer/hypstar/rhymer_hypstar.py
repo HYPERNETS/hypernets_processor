@@ -12,7 +12,7 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_utils.average import Average
-from hypernets_processor.data_io.dataset_util import DatasetUtil as du
+# from hypernets_processor.data_io.dataset_util import DatasetUtil as du
 
 import numpy as np
 import math
