@@ -121,6 +121,7 @@ setup(
         "obsarray",
         "freezegun",
         "importlib-metadata==4.0.1",
+        "pyhdf",
         # "psycopg2",
     ],
     entry_points={

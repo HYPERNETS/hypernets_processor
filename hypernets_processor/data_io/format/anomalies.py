@@ -17,8 +17,8 @@ ANOMALIES_DICT = {
     },
     "s": {
             "description": "sequence data incomplete",
-            "error": IOError,
-            "error_msg": "sequence data incomplete (review log for more details)"
+            "error": None,
+            "error_msg": None,
         },
     "b": {
         "description": "Not a standard sequence (too much missing data to keep processing)",
