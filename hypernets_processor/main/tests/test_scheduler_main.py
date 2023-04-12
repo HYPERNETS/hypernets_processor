@@ -14,7 +14,7 @@ import random
 import string
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "16/4/2020"
 __version__ = __version__
@@ -22,16 +22,16 @@ __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
-SCHEDULE_CONFIG_DICT = {"minutes": 3,
-                        "seconds": "",
-                        "hours": "",
-                        "start_time": "2",
-                        "parallel": False,
-                        "jobs_list": "path"}
+SCHEDULE_CONFIG_DICT = {
+    "minutes": 3,
+    "seconds": "",
+    "hours": "",
+    "start_time": "2",
+    "parallel": False,
+    "jobs_list": "path",
+}
 
-SCHEDULE_LOG_DICT = {"path": None,
-                     "verbose": False,
-                     "quiet": False}
+SCHEDULE_LOG_DICT = {"path": None, "verbose": False, "quiet": False}
 
 JOBS_LIST = ["job1.config", "job2.config"]
 
@@ -48,7 +48,7 @@ def create_scheduler_config():
 def write_test_config_files(directory=this_directory):
 
     # Define temporary file paths
-    temp_name = ''.join(random.choices(string.ascii_lowercase, k=6))
+    temp_name = "".join(random.choices(string.ascii_lowercase, k=6))
     sched_path = os.path.join(directory, "schedule_" + temp_name + ".config")
     jobs_path = os.path.join(directory, "jobs_" + temp_name + ".txt")
     job_config1_path = os.path.join(directory, "job1_" + temp_name + ".config")
@@ -59,7 +59,7 @@ def write_test_config_files(directory=this_directory):
     sc = create_scheduler_config()
     sc["Processor Schedule"]["jobs_list"] = jobs_path
 
-    with open(sched_path, 'w') as configfile:
+    with open(sched_path, "w") as configfile:
         sc.write(configfile)
 
     # Create job list file
@@ -77,8 +77,7 @@ def write_test_config_files(directory=this_directory):
 
 
 class TestHypernetsSchedulerMain(unittest.TestCase):
-
-    @patch('hypernets_processor.main.scheduler_main.Scheduler')
+    @patch("hypernets_processor.main.scheduler_main.Scheduler")
     def test_main(self, mock_sched):
 
         # main input parameters
@@ -101,19 +100,19 @@ class TestHypernetsSchedulerMain(unittest.TestCase):
                     job_config_path=job,
                     to_archive=True,
                     scheduler_job_config={
-                        'name': job,
-                        'seconds': None,
-                        'minutes': 3,
-                        'hours': None,
-                        'parallel': False
-                    }
+                        "name": job,
+                        "seconds": None,
+                        "minutes": 3,
+                        "hours": None,
+                        "parallel": False,
+                    },
                 ),
             )
 
         mock_sched.return_value.schedule.assert_has_calls(calls)
 
         # test run call
-        mock_sched.return_value.run.assert_called_once_with(start_time='2')
+        mock_sched.return_value.run.assert_called_once_with(start_time="2")
 
         os.remove(sched_path)
         os.remove(jobs_path)
@@ -125,12 +124,16 @@ class TestHypernetsSchedulerMain(unittest.TestCase):
         d = unpack_scheduler_config(schedule_config)
         self.assertEqual(type(d), dict)
 
-        expected_d = {"Processor Schedule": {"minutes": 3,
-                                             "seconds": None,
-                                             "hours": None,
-                                             "start_time": "2",
-                                             "parallel": False,
-                                             "jobs_list": "path"}}
+        expected_d = {
+            "Processor Schedule": {
+                "minutes": 3,
+                "seconds": None,
+                "hours": None,
+                "start_time": "2",
+                "parallel": False,
+                "jobs_list": "path",
+            }
+        }
         self.assertDictEqual(expected_d, d)
 
     def test_unpack_scheduler_config_nojoblist(self):
@@ -140,12 +143,16 @@ class TestHypernetsSchedulerMain(unittest.TestCase):
         d = unpack_scheduler_config(schedule_config)
         self.assertEqual(type(d), dict)
 
-        expected_d = {"Processor Schedule": {"minutes": 3,
-                                             "seconds": None,
-                                             "hours": None,
-                                             "start_time": "2",
-                                             "parallel": False,
-                                             "jobs_list": JOBS_FILE_PATH}}
+        expected_d = {
+            "Processor Schedule": {
+                "minutes": 3,
+                "seconds": None,
+                "hours": None,
+                "start_time": "2",
+                "parallel": False,
+                "jobs_list": JOBS_FILE_PATH,
+            }
+        }
         self.assertDictEqual(expected_d, d)
 
 

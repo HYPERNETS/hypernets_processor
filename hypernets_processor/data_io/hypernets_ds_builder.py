@@ -3,11 +3,13 @@ HypernetsDSBuilder class
 """
 
 from hypernets_processor.version import __version__
-from hypernets_processor.data_io.template_util import create_template_dataset
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
+
 from datetime import datetime
+import obsarray
+import copy
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -36,17 +38,23 @@ class HypernetsDSBuilder:
     """
 
     def __init__(
-            self,
-            context=None,
-            variables_dict_defs=VARIABLES_DICT_DEFS,
-            metadata_defs=METADATA_DEFS,
+        self,
+        context=None,
+        variables_dict_defs=VARIABLES_DICT_DEFS,
+        metadata_defs=METADATA_DEFS,
     ):
         self.context = context
         self.variables_dict_defs = variables_dict_defs
         self.metadata_defs = metadata_defs
 
-    def create_ds_template(self, dim_sizes_dict: object, ds_format: object, propagate_ds: object = None,
-                           swir: object = False, ds=None) -> object:
+    def create_ds_template(
+        self,
+        dim_sizes_dict: object,
+        ds_format: object,
+        propagate_ds: object = None,
+        swir: object = False,
+        ds=None,
+    ) -> object:
 
         """
         Returns empty Hypernets dataset
@@ -70,7 +78,7 @@ class HypernetsDSBuilder:
 
         # Find variables
         if ds_format in self.return_ds_formats():
-            variables_dict = self.variables_dict_defs[ds_format]
+            variables_dict = copy.deepcopy(self.variables_dict_defs[ds_format])
         else:
             raise NameError(
                 "Invalid format name: "
@@ -109,17 +117,21 @@ class HypernetsDSBuilder:
             # calibration metadata
             metadata["data_created"] = "TBD"  # should be the calibration data
         else:
-            hypstar = "hypstar_"+ str(self.context.get_config_value("hypstar_cal_number"))
+            hypstar = "hypstar_" + str(
+                self.context.get_config_value("hypstar_cal_number")
+            )
             if ds is not None:
                 hypstar = "hypstar_" + str(ds.attrs["instrument_id"])
-                metadata["site_latitude"] =ds.attrs["site_latitude"]
-                metadata["site_longitude"] =ds.attrs["site_longitude"]
+                metadata["site_latitude"] = ds.attrs["site_latitude"]
+                metadata["site_longitude"] = ds.attrs["site_longitude"]
                 metadata["source_file"] = ds.attrs["source_file"]
                 metadata["sequence_id"] = ds.attrs["sequence_id"]
                 metadata["instrument_id"] = ds.attrs["instrument_id"]
                 metadata["site_id"] = ds.attrs["site_id"]
                 metadata["system_temperature"] = ds.attrs["system_temperature"]
-                metadata["system_relative_humidity"] = ds.attrs["system_relative_humidity"]
+                metadata["system_relative_humidity"] = ds.attrs[
+                    "system_relative_humidity"
+                ]
                 metadata["system_pressure"] = ds.attrs["system_pressure"]
                 metadata["illuminance"] = ds.attrs["illuminance"]
 
@@ -128,36 +140,53 @@ class HypernetsDSBuilder:
             metadata["system_id"] = hypstar.upper()
             # take lat and lon from GPS data from the raw data???? of shouldcome from metadata database?
 
-            if ds_format in ['L_L1A_RAD', 'W_L1A_RAD', 'L_L1B_RAD']:
-                metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(
-                    version) + ".nc"
-            if ds_format in ['L_L1A_IRR', 'W_L1A_IRR', 'L_L1B_IRR']:
-                metadata["instrument_calibration_file_irr"] = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(
-                    version) + ".nc"
-            if ds_format in ['W_L1B', 'L_L1C', 'L_L2A']:
-                metadata["instrument_calibration_file_irr"] = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(
-                    version) + ".nc"
-                metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(
-                    version) + ".nc"
-            if ds_format in ['W_L1C','W_L2A']:
+            if ds_format in ["L_L1A_RAD", "W_L1A_RAD", "L_L1B_RAD"]:
+                metadata["instrument_calibration_file_rad"] = (
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(version) + ".nc"
+                )
+            if ds_format in ["L_L1A_IRR", "W_L1A_IRR", "L_L1B_IRR"]:
+                metadata["instrument_calibration_file_irr"] = (
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                )
+            if ds_format in ["W_L1B", "L_L1C", "L_L2A"]:
+                metadata["instrument_calibration_file_irr"] = (
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                )
+                metadata["instrument_calibration_file_rad"] = (
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(version) + ".nc"
+                )
+            if ds_format in ["W_L1C", "W_L2A"]:
                 # W_L1C
-                metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(
-                    version) + ".nc"
-                metadata["instrument_calibration_file_irr"] = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(
-                    version) + ".nc"
-                metadata["fresnel_option"] = self.context.get_config_value("fresnel_option")
-                metadata["similarity_waveref"] = self.context.get_config_value("similarity_wr")
-                metadata["similarity_wavethres"] = self.context.get_config_value("similarity_wp")
-                metadata["similarity_wavelen1"] = self.context.get_config_value("similarity_w1")
-                metadata["similarity_wavelen2"] = self.context.get_config_value("similarity_w2")
-                metadata["similarity_alpha"] = self.context.get_config_value("similarity_alpha")
-        return create_template_dataset(
-            variables_dict,
-            dim_sizes_dict,
-            metadata=metadata,
-            propagate_ds=propagate_ds,
-            metadata_db=metadata_db,
-            metadata_db_query=metadata_db_query,
+                metadata["instrument_calibration_file_rad"] = (
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(version) + ".nc"
+                )
+                metadata["instrument_calibration_file_irr"] = (
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                )
+                metadata["fresnel_option"] = self.context.get_config_value(
+                    "fresnel_option"
+                )
+                metadata["similarity_waveref"] = self.context.get_config_value(
+                    "similarity_wr"
+                )
+                metadata["similarity_wavethres"] = self.context.get_config_value(
+                    "similarity_wp"
+                )
+                metadata["similarity_wavelen1"] = self.context.get_config_value(
+                    "similarity_w1"
+                )
+                metadata["similarity_wavelen2"] = self.context.get_config_value(
+                    "similarity_w2"
+                )
+                metadata["similarity_alpha"] = self.context.get_config_value(
+                    "similarity_alpha"
+                )
+
+        if (metadata_db is not None) and (metadata_db_query is not None):
+            metadata = self.find_metadata(metadata, metadata_db, metadata_db_query)
+
+        return obsarray.create_ds(
+            variables_dict, dim_sizes_dict, metadata=metadata, propagate_ds=propagate_ds
         )
 
     def return_ds_formats(self):
@@ -235,6 +264,44 @@ class HypernetsDSBuilder:
             dim_sizes_dict[dim] = None
 
         return dim_sizes_dict
+
+    @staticmethod
+    def find_metadata(metadata, db, query):
+        """
+        Populate metadata dictionary with values from database query
+
+        :type metadata: dict
+        :param metadata: dictionary of dataset metadata
+
+        :type db: dataset.Database
+        :param db: metadata database
+
+        :type query: dict/list
+        :param query: database query, defined as {"table_name": query_dict} where query_dict defines. Can be a list of
+        such database queries
+        """
+
+        if isinstance(query, dict):
+            query = [query]
+
+        for q in query:
+            table_name = list(q.keys())[0]
+
+            row = deepcopy(db[table_name].find_one(**q[table_name]))
+
+            if row is None:
+                raise LookupError("query does not find unique metadata value")
+
+            not_required_keys = [
+                key for key in row.keys() if key not in metadata.keys()
+            ]
+
+            for key in not_required_keys:
+                row.pop(key)
+
+            metadata.update(row)
+
+        return metadata
 
 
 if __name__ == "__main__":

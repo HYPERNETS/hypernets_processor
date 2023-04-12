@@ -8,7 +8,7 @@ from hypernets_processor.version import __version__
 import os
 import glob
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Clémence Goyens"
 __created__ = "21/2/2020"
 __version__ = __version__
@@ -48,6 +48,5 @@ this_directory = os.path.dirname(__file__)
 #         du.read_seq(seq_dir)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

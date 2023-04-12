@@ -18,27 +18,30 @@ TIME_FMT_L12A = "%Y%m%dT%H%M"
 TIME_FMT_L2B = "%Y%m%d"
 
 
-DS_FORMAT_FNAMES = {"L0_RAD": "L0_RAD",
-                    "L0_BLA": "L0_BLA",
-                    "L0_IRR": "L0_IRR",
-                    "CAL": "CAL",
-                    "L_L1A_RAD": "L1A_RAD",
-                    "W_L1A_RAD": "L1A_RAD",
-                    "L_L1A_IRR": "L1A_IRR",
-                    "W_L1A_IRR": "L1A_IRR",
-                    "L_L1B_RAD": "L1B_RAD",
-                    "L_L1B_IRR": "L1B_IRR",
-                    "W_L1B_RAD": "L1B_RAD",
-                    "W_L1B_IRR": "L1B_IRR",
-                    "W_L1B": "L1B",
-                    "L_L1C": "L1C",
-                    "W_L1C": "L1C_ALL",
-                    "W_L1D": "L1D",
-                    "L_L2A": "L2A_REF",
-                    "W_L2A": "L2A_REF",
-                    "L_L2B": "L2B_REF",
-                    "W_L2B": "L2B_REF",
-                    "IMG": "IMG"}
+DS_FORMAT_FNAMES = {
+    "L0_RAD": "L0_RAD",
+    "L0_BLA": "L0_BLA",
+    "L0_IRR": "L0_IRR",
+    "CAL": "CAL",
+    "L_L0B": "L_L0B",
+    "L_L1A_RAD": "L1A_RAD",
+    "W_L1A_RAD": "L1A_RAD",
+    "L_L1A_IRR": "L1A_IRR",
+    "W_L1A_IRR": "L1A_IRR",
+    "L_L1B_RAD": "L1B_RAD",
+    "L_L1B_IRR": "L1B_IRR",
+    "W_L1B_RAD": "L1B_RAD",
+    "W_L1B_IRR": "L1B_IRR",
+    "W_L1B": "L1B",
+    "L_L1C": "L1C",
+    "W_L1C": "L1C_ALL",
+    "W_L1D": "L1D",
+    "L_L2A": "L2A_REF",
+    "W_L2A": "L2A_REF",
+    "L_L2B": "L2B_REF",
+    "W_L2B": "L2B_REF",
+    "IMG": "IMG",
+}
 
 
 class ProductNameUtil:
@@ -50,7 +53,15 @@ class ProductNameUtil:
         self.context = context
 
     def create_product_name(
-        self, ds_format, network=None, site_id=None, time=None, version=None, swir=None, angles=None):
+        self,
+        ds_format,
+        network=None,
+        site_id=None,
+        time=None,
+        version=None,
+        swir=None,
+        angles=None,
+    ):
         """
         Return a valid product name for Hypernets file
 
@@ -93,15 +104,15 @@ class ProductNameUtil:
             version = str(self.context.get_config_value("version"))
 
         if swir:
-            swir="SWIR"
+            swir = "SWIR"
         if angles:
-            angles=angles
+            angles = angles
 
         # Prepare product name parts
         ptype = DS_FORMAT_FNAMES[ds_format]
 
         if type(time) is not datetime and time is not None:
-            time = datetime.strptime(time, '%Y%m%dT%H%M%S')
+            time = datetime.strptime(time, "%Y%m%dT%H%M%S")
 
         time_string = time.strftime(TIME_FMT_L12A) if time is not None else None
         network = network.upper() if network is not None else None
@@ -111,7 +122,17 @@ class ProductNameUtil:
         today_time_string = datetime.now().strftime(TIME_FMT_L12A)
 
         # Assemble parts
-        product_name_parts = ["HYPERNETS", network, site_id, ptype, time_string, today_time_string, angles, version, swir]
+        product_name_parts = [
+            "HYPERNETS",
+            network,
+            site_id,
+            ptype,
+            time_string,
+            today_time_string,
+            angles,
+            version,
+            swir,
+        ]
         product_name_parts = filter(None, product_name_parts)
         return "_".join(product_name_parts)
 

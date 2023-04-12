@@ -1,4 +1,13 @@
-import os
+#import os, bz2
+import pyhdf
+from numpy import linspace
+import os, dateutil.parser
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy
+from scipy import interpolate
+from datetime import datetime
+
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 
 
@@ -12,6 +21,25 @@ class RhymerAncillary:
     def __init__(self, context):
         self.context = context
 
+    def ts_wind(self, isodate, siteid):
+        met_dir = self.context.get_config_value("met_dir")
+        file = "{}/{}_obpg.csv".format(met_dir,siteid)
+        print(file)
+        data = np.loadtxt(file, delimiter=',', skiprows=1, dtype=str)
+        dtime = [dateutil.parser.parse(d) for d in data[:, 0]]
+        tseries = [np.nan if d == 'None' else float(d) for d in data[:, 1]]
+        output_time = dateutil.parser.parse(isodate)
+        print(isodate)
+        tstime = [dtime[i].timestamp() for i in range(0, len(dtime))]
+        if output_time.timestamp() > max(tstime):
+            out = tseries[:, tstime == max(tstime)]
+        elif output_time.timestamp() < min(tstime):
+            out = tseries[:, tstime == min(tstime)]
+        else:
+            intfunc = scipy.interpolate.interp1d(tstime, tseries)
+            out = intfunc(output_time.timestamp())
+        print(out)
+        return out
 
     def get_wind(self, isodate, lon, lat, isotime=None, ftime=12):
 
@@ -22,7 +50,7 @@ class RhymerAncillary:
             ftime = 0
             for i, t in enumerate(ts):
                 ftime += t / (60 ** i)
-
+        print('isodate:{}, lat:{}, lon:{}'.format(isodate, lat, lon))
         anc = self.ancillary_get(isodate, lon, lat, ftime=ftime)
 
         if ('z_wind' in anc) and ('m_wind' in anc):
@@ -161,6 +189,7 @@ class RhymerAncillary:
 
     def ancillary_interp_met(self, files, lon, lat, time, datasets=['z_wind', 'm_wind', 'press', 'rel_hum', 'p_water'],
                              kind='linear'):
+
         import os, bz2
         from pyhdf.SD import SD, SDC
         from numpy import linspace

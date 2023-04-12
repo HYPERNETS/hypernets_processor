@@ -7,7 +7,7 @@ import argparse
 from hypernets_processor.main.init_job_main import main
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "20/10/2020"
 __version__ = __version__
@@ -27,23 +27,43 @@ def configure_parser():
     description = "Tool for initialising hypernets_processor jobs"
 
     # Initialise argument parser
-    parser = argparse.ArgumentParser(description=description,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
 
-    parser.add_argument("-n", "--job-name", action="store", required=True,
-                        help="Job name")
+    parser.add_argument(
+        "-n", "--job-name", action="store", required=True, help="Job name"
+    )
 
-    parser.add_argument("-s", "--site-id", action="store", required=True,
-                        help="Site ID (four letter abbreviation)")
+    parser.add_argument(
+        "-s",
+        "--site-id",
+        action="store",
+        required=True,
+        help="Site ID (four letter abbreviation)",
+    )
 
-    parser.add_argument("-w", "--job-working-directory", action="store", required=True,
-                        help="Working directory of job (will write config here)")
+    parser.add_argument(
+        "-w",
+        "--job-working-directory",
+        action="store",
+        required=True,
+        help="Working directory of job (will write config here)",
+    )
 
-    parser.add_argument("-i", "--raw-data-directory", action="store", required=True,
-                        help="Directory of input data")
+    parser.add_argument(
+        "-i",
+        "--raw-data-directory",
+        action="store",
+        required=True,
+        help="Directory of input data",
+    )
 
-    parser.add_argument("--add-to-scheduler", action="store_true",
-                        help="Option to add job to automatically hypernets_scheduler jobs")
+    parser.add_argument(
+        "--add-to-scheduler",
+        action="store_true",
+        help="Option to add job to automatically hypernets_scheduler jobs",
+    )
 
     return parser
 

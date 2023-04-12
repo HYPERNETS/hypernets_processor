@@ -30,7 +30,9 @@ class AnomalyHandler:
     :param anomalies_dict: anomaly definitions (default defined in hypernets_processor.data_io.format.anomalies)
     """
 
-    def __init__(self, context, anomaly_db=None, url=None, anomalies_dict=ANOMALIES_DICT):
+    def __init__(
+        self, context, anomaly_db=None, url=None, anomalies_dict=ANOMALIES_DICT
+    ):
         self.context = context
         self.anomaly_db = None
 
@@ -42,17 +44,21 @@ class AnomalyHandler:
         self.anomalies_dict = anomalies_dict
         self.anomalies_added = []
 
-    def add_anomaly(self, anomaly_id):
+    def add_anomaly(self, anomaly_id, ds=None):
         """
         Adds anomaly to anomaly database
 
         :type anomaly_id: str
         :param anomaly_id: anomaly id, must match name of entry in self.anomalies dict
+        :type ds: xarray.Dataset
+        :param ds: producgt that was being processed when anomaly was raised
         """
 
         # Check anomaly defined
         if anomaly_id not in self.get_anomaly_ids():
-            self.context.logger.debug("Unknown anomaly_id (" + anomaly_id + ") - not add to anomaly database")
+            self.context.logger.debug(
+                "Unknown anomaly_id (" + anomaly_id + ") - not add to anomaly database"
+            )
             return
 
         # Add anomaly to list of anomalies added during current processing
@@ -60,13 +66,14 @@ class AnomalyHandler:
 
         # Add anomaly to db
         if self.anomaly_db is not None:
-            self.anomaly_db.add_anomaly(anomaly_id)
+            self.anomaly_db.add_anomaly(anomaly_id, ds)
 
         # Exit if anomaly requires error
         error = self.get_anomaly_error(anomaly_id)
         error_msg = self.get_anomaly_error_msg(anomaly_id)
         if error is not None:
             self.context.logger.error(error_msg)
+            print(error_msg)
             raise error(error_msg)
 
     def add_x_anomaly(self):

@@ -14,7 +14,7 @@ import time
 from hypernets_processor.scheduler import Scheduler
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "29/3/2020"
 __version__ = __version__
@@ -39,7 +39,7 @@ def test_job(a, b):
 
 
 def bad_job():
-    return 1/0
+    return 1 / 0
 
 
 def return_test_logger(fname=None):
@@ -47,13 +47,13 @@ def return_test_logger(fname=None):
     logger.setLevel(logging.INFO)
 
     if fname is None:
-        stream_formatter = logging.Formatter('%(message)s')
+        stream_formatter = logging.Formatter("%(message)s")
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setFormatter(stream_formatter)
         logger.addHandler(stream_handler)
 
     else:
-        file_formatter = logging.Formatter('%(message)s')
+        file_formatter = logging.Formatter("%(message)s")
         file_handler = logging.FileHandler(fname)
         file_handler.setFormatter(file_formatter)
         logger.addHandler(file_handler)
@@ -69,7 +69,7 @@ class TestScheduler(unittest.TestCase):
         a = 2
         b = 4
         c = s.job_wrapper(test_job, parallel=False, logger=None, a=a, b=b)
-        self.assertEqual(c, a+b)
+        self.assertEqual(c, a + b)
 
     def test_job_wrapper_parallel_no_logger(self):
 
@@ -78,7 +78,7 @@ class TestScheduler(unittest.TestCase):
         a = 2
         b = 4
         c = s.job_wrapper(test_job, parallel=True, logger=None, a=a, b=b)
-        self.assertEqual(a+b, c)
+        self.assertEqual(a + b, c)
 
     def test_job_wrapper_parallel_logger(self):
 
@@ -88,32 +88,42 @@ class TestScheduler(unittest.TestCase):
         b = 4
 
         with captured_output() as (out, err):
-            c = s.job_wrapper(test_job, parallel=True, logger=return_test_logger(), name="Test Job", a=a, b=b)
+            c = s.job_wrapper(
+                test_job,
+                parallel=True,
+                logger=return_test_logger(),
+                name="Test Job",
+                a=a,
+                b=b,
+            )
 
         # This can go inside or outside the `with` block
         output = out.getvalue().strip()
-        self.assertEqual(output, 'Started: Test Job\nCompleted: Test Job')
+        self.assertEqual(output, "Started: Test Job\nCompleted: Test Job")
 
-        self.assertEqual(a+b, c)
+        self.assertEqual(a + b, c)
 
     def test_job_wrapper_parallel_logger_bad_job(self):
 
         s = Scheduler()
 
         with captured_output() as (out, err):
-            c = s.job_wrapper(bad_job, parallel=True, logger=return_test_logger(), name="Test Job")
+            c = s.job_wrapper(
+                bad_job, parallel=True, logger=return_test_logger(), name="Test Job"
+            )
 
         # This can go inside or outside the `with` block
         output = out.getvalue().strip()
-        self.assertEqual(output, 'Started: Test Job\nFailed: Test Job - ZeroDivisionError: division by zero')
+        self.assertEqual(
+            output,
+            "Started: Test Job\nFailed: Test Job - ZeroDivisionError: division by zero",
+        )
 
     def test_schedule_seconds(self):
 
         s = Scheduler(logger=return_test_logger())
 
-        scheduler_job_config = {"seconds": 2,
-                                "parallel": False,
-                                "name": "test name"}
+        scheduler_job_config = {"seconds": 2, "parallel": False, "name": "test name"}
 
         s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
         jobs = s.get_scheduled_jobs()
@@ -135,9 +145,7 @@ class TestScheduler(unittest.TestCase):
 
         s = Scheduler(logger=return_test_logger())
 
-        scheduler_job_config = {"minutes": 2,
-                                "parallel": False,
-                                "name": "test name"}
+        scheduler_job_config = {"minutes": 2, "parallel": False, "name": "test name"}
 
         s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
         jobs = s.get_scheduled_jobs()
@@ -159,9 +167,7 @@ class TestScheduler(unittest.TestCase):
 
         s = Scheduler(logger=return_test_logger())
 
-        scheduler_job_config = {"hours": 2,
-                                "parallel": False,
-                                "name": "test name"}
+        scheduler_job_config = {"hours": 2, "parallel": False, "name": "test name"}
 
         s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
         jobs = s.get_scheduled_jobs()
@@ -187,9 +193,7 @@ class TestScheduler(unittest.TestCase):
 
         s = Scheduler(logger=logger)
 
-        scheduler_job_config = {"seconds": 2,
-                                "parallel": False,
-                                "name": "test name"}
+        scheduler_job_config = {"seconds": 2, "parallel": False, "name": "test name"}
 
         s.schedule(test_job, 2, 4, scheduler_job_config=scheduler_job_config)
 
@@ -205,10 +209,13 @@ class TestScheduler(unittest.TestCase):
         with open(log_fname) as f:
             log = f.read()
 
-        self.assertEqual(log, 'Started: test name\nCompleted: test name\nStarted: test name\nCompleted: test name\n')
+        self.assertEqual(
+            log,
+            "Started: test name\nCompleted: test name\nStarted: test name\nCompleted: test name\n",
+        )
 
         os.remove(log_fname)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

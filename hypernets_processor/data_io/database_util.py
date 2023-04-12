@@ -11,7 +11,7 @@ from sqlalchemy.engine.url import make_url
 from sqlalchemy_utils import drop_database
 from datetime import date, datetime
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "28/7/2020"
 __version__ = __version__
@@ -93,17 +93,19 @@ class DatabaseUtil:
 
         database = url.database
 
-        if url.drivername.startswith('sqlite'):
+        if url.drivername.startswith("sqlite"):
             pass
 
-        elif url.drivername.startswith('postgres'):
+        elif url.drivername.startswith("postgres"):
 
             # Open issue with sqlalchemy.create_database for postgresql running in pycharm debug env
             # https://github.com/kvesteri/sqlalchemy-utils/issues/432
 
-            url.database = 'postgres'
+            url.database = "postgres"
             engine = create_engine(url, isolation_level="AUTOCOMMIT")
-            engine.execute("CREATE DATABASE " + database + " ENCODING 'utf8' TEMPLATE template1")
+            engine.execute(
+                "CREATE DATABASE " + database + " ENCODING 'utf8' TEMPLATE template1"
+            )
             url.database = database
 
         else:
@@ -141,7 +143,7 @@ class DatabaseUtil:
              NB: This is not supported for defining sqlite databases. If this is required, please define as SQL command
              (option b)
            - other entries may be kwargs supported by dataset.table.Table.create_column
-        
+
         * "primary_key" - defines the tables primary key, value is the column name.
         * other entries may be kwargs supported by dataset.database.Database.create_table
         """
@@ -159,7 +161,9 @@ class DatabaseUtil:
             columns_dict = table_dict["columns"]
 
             # Get primary key info
-            primary_key = table_dict["primary_key"] if "primary_key" in table_dict else None
+            primary_key = (
+                table_dict["primary_key"] if "primary_key" in table_dict else None
+            )
 
             primary_db_type = None
             if primary_key is not None:
@@ -168,7 +172,9 @@ class DatabaseUtil:
                 primary_db_type = DatabaseUtil.get_db_type(primary_python_type)
 
             # Create table
-            tbl = db.create_table(table_name, primary_id=primary_key, primary_type=primary_db_type)
+            tbl = db.create_table(
+                table_name, primary_id=primary_key, primary_type=primary_db_type
+            )
 
             # Add columns
             column_names = columns_dict.keys()
@@ -198,9 +204,13 @@ class DatabaseUtil:
                 column_dict = columns_dict[column]
 
                 if "foreign_key" in column_dict:
-                    DatabaseUtil.update_to_foreign_key(db, table_name, column,
-                                                       column_dict["foreign_key"]["reference_table"],
-                                                       column_dict["foreign_key"]["reference_column"])
+                    DatabaseUtil.update_to_foreign_key(
+                        db,
+                        table_name,
+                        column,
+                        column_dict["foreign_key"]["reference_table"],
+                        column_dict["foreign_key"]["reference_column"],
+                    )
 
     @staticmethod
     def update_to_foreign_key(db, table, column, reference_table, reference_column):
@@ -228,9 +238,11 @@ class DatabaseUtil:
 
         db.begin()
 
-        query_string = "ALTER TABLE " + table + ""\
-                       " ADD FOREIGN KEY ("+column+")"\
-                       " REFERENCES "+reference_table+"("+reference_column+");"
+        query_string = (
+            "ALTER TABLE " + table + ""
+            " ADD FOREIGN KEY (" + column + ")"
+            " REFERENCES " + reference_table + "(" + reference_column + ");"
+        )
 
         db.query(query_string)
 
@@ -264,5 +276,5 @@ class DatabaseUtil:
             return db_types.text
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

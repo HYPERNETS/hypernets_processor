@@ -7,7 +7,8 @@ from hypernets_processor.utils.config import (
     PROCESSOR_CONFIG_PATH,
     JOB_CONFIG_TEMPLATE_PATH,
     PROCESSOR_WATER_DEFAULTS_CONFIG_PATH,
-    PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
+    PROCESSOR_LAND_DEFAULTS_CONFIG_PATH,
+    PROCESSOR_DEFAULT_CONFIG_PATH,
 )
 from hypernets_processor.utils.cli import configure_std_parser
 from hypernets_processor.utils.config import read_config_file, get_config_value
@@ -15,7 +16,7 @@ from hypernets_processor.main.sequence_processor_main import main
 import os
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "26/3/2020"
 __version__ = __version__
@@ -32,30 +33,55 @@ def configure_parser():
     :rtype: argparse.ArgumentParser
     """
 
-    description = "Tool for processing Hypernets Land and Water Network hyperspectral field data"
+    description = (
+        "Tool for processing Hypernets Land and Water Network hyperspectral field data"
+    )
 
     # Create standard parser
     parser = configure_std_parser(description=description)
 
     # Add specific arguments
-    parser.add_argument("-i", "--input-directory", action="store",
-                        help="Directory of input data")
-    parser.add_argument("-o", "--output-directory", action="store",
-                        help="Directory to write output data to")
-    parser.add_argument("-n", "--network", action="store", choices=["land", "water"],
-                        help="Network to process file for")
-    parser.add_argument("-ml","--max-level",action="store",choices=["L0","L1A","L1B","L1C","L2A"],
-                        help="Only process the data to the specified level.")
+    parser.add_argument(
+        "-i", "--input-directory", action="store", help="Directory of input data"
+    )
+    parser.add_argument(
+        "-o",
+        "--output-directory",
+        action="store",
+        help="Directory to write output data to",
+    )
+    parser.add_argument(
+        "-n",
+        "--network",
+        action="store",
+        choices=["land", "water"],
+        help="Network to process file for",
+    )
+    parser.add_argument(
+        "-ml",
+        "--max-level",
+        action="store",
+        choices=["L0", "L1A", "L1B", "L1C", "L2A"],
+        help="Only process the data to the specified level.",
+    )
     # parser.add_argument("--plot", action="store_true",
     #                     help="Generate plots of processed data")
-    parser.add_argument("--write-all",action="store_true",
-                        help="Write all products at intermediate data processing levels before final product")
-    parser.add_argument("--no-unc",action="store_true",
-                        help="Do not include uncertainty propagation")
-    parser.add_argument("-j", "--job-config", action="store",
-                        help="Job configuration file path. May be used to specify job instead of/along with commandline"
-                             "arguments (any fields in both job configuration file overwritten by commandline "
-                             "arguments)")
+    parser.add_argument(
+        "--write-all",
+        action="store_true",
+        help="Write all products at intermediate data processing levels before final product",
+    )
+    parser.add_argument(
+        "--no-unc", action="store_true", help="Do not include uncertainty propagation"
+    )
+    parser.add_argument(
+        "-j",
+        "--job-config",
+        action="store",
+        help="Job configuration file path. May be used to specify job instead of/along with commandline"
+        "arguments (any fields in both job configuration file overwritten by commandline "
+        "arguments)",
+    )
     return parser
 
 
@@ -99,10 +125,14 @@ def cli():
 
     # Overwrite config values with any args from commandline
     if parsed_args.input_directory is not None:
-        job_config["Input"]["raw_data_directory"] = os.path.abspath(parsed_args.input_directory)
+        job_config["Input"]["raw_data_directory"] = os.path.abspath(
+            parsed_args.input_directory
+        )
 
     if parsed_args.output_directory is not None:
-        job_config["Output"]["archive_directory"] = os.path.abspath(parsed_args.output_directory)
+        job_config["Output"]["archive_directory"] = os.path.abspath(
+            parsed_args.output_directory
+        )
 
     if parsed_args.max_level is not None:
         job_config["Processor"]["max_level"] = parsed_args.max_level
@@ -123,11 +153,11 @@ def cli():
     if parsed_args.verbose is not None:
         job_config["Log"]["verbose"] = str(parsed_args.verbose)
 
-    if parsed_args.verbose is not None:
+    if parsed_args.quiet is not None:
         job_config["Log"]["quiet"] = str(parsed_args.quiet)
 
     # run main
-    processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
+    processor_config = read_config_file(PROCESSOR_DEFAULT_CONFIG_PATH)
     main(processor_config=processor_config, job_config=job_config, to_archive=False)
 
     return None

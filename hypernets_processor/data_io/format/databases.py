@@ -37,41 +37,68 @@ Database schema specification for Hypernets land and water network
 # Database formats are defined following the specification defined in:
 # Hypernets Team, Product Data Format Specification, v0.5 (2020)
 
+from hypernets_processor.data_io.format.metadata import METADATA_DEFS
+
 # Metadata Database
 METADATA_DB = {}
 
+for level in METADATA_DEFS.keys():
+    coldict = {}
+    for key in METADATA_DEFS[level].keys():
+        coldict[key] = {"type": str}
+    METADATA_DB[level] = {"columns": coldict}
+
 # Anomaly Database
-ANOMALY_DB = {"anomalies": {"columns": {"anomaly_id": {"type": str},
-                                        "sequence_name": {"type": str},
-                                        "sequence_path": {"type": str},
-                                        "site_id": {"type": str},
-                                        "datetime": {"type": str},
-                                        }
-                            }
-              }
+ANOMALY_DB = {
+    "anomalies": {
+        "columns": {
+            "anomaly_id": {"type": str},
+            "sequence_name": {"type": str},
+            "sequence_path": {"type": str},
+            "site_id": {"type": str},
+            "datetime": {"type": str},
+            "rel_product_dir": {"type": str},
+            "product_level_last": {"type": str},
+            "product_path_last": {"type": str},
+            "solar_zenith_angle_min": {"type": float},
+            "solar_zenith_angle_max": {"type": float},
+            "solar_azimuth_angle_min": {"type": float},
+            "solar_azimuth_angle_max": {"type": float},
+            "viewing_zenith_angle_min": {"type": str},
+            "viewing_zenith_angle_max": {"type": str},
+            "viewing_azimuth_angle_min": {"type": str},
+            "viewing_azimuth_angle_max": {"type": str}
+        }
+    }
+}
 
 # Archive Database
-ARCHIVE_DB = {"products": {"columns": {"product_name": {"type": str},
-                                       "datetime": {"type": str},
-                                       "sequence_name": {"type": str},
-                                       "site_id": {"type": str},
-                                       "system_id":{"type":str},
-                                       "product_level":{"type":str},
-                                       "product_path": {"type": str},
-                                       "plot_path": {"type": str},
-                                       "image_path": {"type": str},
-                                       "sequence_path":{"type":str},
-                                       "solar_zenith_angle_min": {"type": str},
-                                       "solar_zenith_angle_max": {"type": str},
-                                       "solar_azimuth_angle_min": {"type": str},
-                                       "solar_azimuth_angle_max": {"type": str},
-                                       "viewing_zenith_angle_min": {"type": str},
-                                       "viewing_zenith_angle_max": {"type": str},
-                                       "viewing_azimuth_angle_min": {"type": str},
-                                       "viewing_azimuth_angle_max": {"type": str}
-                                       }
-                           }
-              }
+ARCHIVE_DB = {
+    "products": {
+        "columns": {
+            "product_name": {"type": str},
+            "datetime": {"type": str},
+            "sequence_name": {"type": str},
+            "site_id": {"type": str},
+            "system_id": {"type": str},
+            "product_level": {"type": str},
+            "product_path": {"type": str},
+            "rel_product_dir": {"type": str},
+            "sequence_path": {"type": str},
+            "latitude": {"type": float},
+            "longitude": {"type": float},
+            "solar_zenith_angle_min": {"type": float},
+            "solar_zenith_angle_max": {"type": float},
+            "solar_azimuth_angle_min": {"type": float},
+            "solar_azimuth_angle_max": {"type": float},
+            "viewing_zenith_angle_min": {"type": float},
+            "viewing_zenith_angle_max": {"type": float},
+            "viewing_azimuth_angle_min": {"type": float},
+            "viewing_azimuth_angle_max": {"type": float},
+            "percent_zero_flags": {"type": float},
+        }
+    }
+}
 
 
 # Database format defs

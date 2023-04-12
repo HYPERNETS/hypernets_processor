@@ -1,7 +1,7 @@
 """
 Module of helper functions for configfile operations
 """
-
+import numpy as np
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.paths import relative_path
 import os
@@ -19,12 +19,23 @@ __status__ = "Development"
 
 this_directory = os.path.dirname(__file__)
 etc_directory = os.path.join(os.path.dirname(this_directory), "etc")
-PROCESSOR_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
-PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_land_defaults.config")
-PROCESSOR_WATER_DEFAULTS_CONFIG_PATH = os.path.join(etc_directory, "processor_water_defaults.config")
-SCHEDULER_CONFIG_PATH = os.path.join(etc_directory, "scheduler.config")
+WORKING_DIRECTORY_FILE_PATH = os.path.join(etc_directory, "working_directory.txt")
+working_directory = os.path.abspath(
+    str(np.genfromtxt(WORKING_DIRECTORY_FILE_PATH, dtype=str))
+)
+
+PROCESSOR_CONFIG_PATH = os.path.join(working_directory, "processor.config")
+PROCESSOR_DEFAULT_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
+PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(
+    etc_directory, "processor_land_defaults.config"
+)
+PROCESSOR_WATER_DEFAULTS_CONFIG_PATH = os.path.join(
+    etc_directory, "processor_water_defaults.config"
+)
+SCHEDULER_CONFIG_PATH = os.path.join(working_directory, "scheduler.config")
+SCHEDULER_DEFAULT_CONFIG_PATH = os.path.join(etc_directory, "scheduler_default.config")
 JOB_CONFIG_TEMPLATE_PATH = os.path.join(etc_directory, "job_template.config")
-JOBS_FILE_PATH = os.path.join(etc_directory, "jobs.txt")
+JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
 
 
 def read_config_file(fname):
@@ -58,8 +69,11 @@ def read_jobs_list(fname):
 
     # Read lines for file
     with open(fname, "r") as f:
-        #lines = [line.rstrip() for line in f.readlines()]
-        jobs = [relative_path(line.rstrip(), os.path.dirname(fname)) for line in f.readlines()]
+        # lines = [line.rstrip() for line in f.readlines()]
+        jobs = [
+            relative_path(line.rstrip(), os.path.dirname(fname))
+            for line in f.readlines()
+        ]
 
     return jobs
 

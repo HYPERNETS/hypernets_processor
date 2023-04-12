@@ -13,7 +13,7 @@ import os
 import shutil
 
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "21/10/2020"
 __version__ = __version__
@@ -23,15 +23,18 @@ __status__ = "Development"
 
 
 class TestSequenceProcessorMain(unittest.TestCase):
-
-    @patch('hypernets_processor.main.sequence_processor_main.configure_logging')
-    @patch('hypernets_processor.main.sequence_processor_main.SequenceProcessor')
-    @patch('hypernets_processor.main.sequence_processor_main.get_target_sequences')
-    @patch('hypernets_processor.main.sequence_processor_main.Context')
+    @patch("hypernets_processor.main.sequence_processor_main.configure_logging")
+    @patch("hypernets_processor.main.sequence_processor_main.SequenceProcessor")
+    @patch("hypernets_processor.main.sequence_processor_main.get_target_sequences")
+    @patch("hypernets_processor.main.sequence_processor_main.Context")
     def test_main(self, mock_con, mock_gts, mock_sp, mock_cf):
         job_config_path = "jpath"
         processor_config_path = "ppath"
-        main(job_config_path=job_config_path, processor_config_path=processor_config_path, to_archive=True)
+        main(
+            job_config_path=job_config_path,
+            processor_config_path=processor_config_path,
+            to_archive=True,
+        )
 
         self.assertTrue(mock_sp.called)
         mock_sp.assert_called_once_with(context=mock_con.return_value)
@@ -41,11 +44,11 @@ class TestSequenceProcessorMain(unittest.TestCase):
         context = setup_test_context(
             raw_data_directory=os.path.join(tmpdir, "data"),
             archive_directory=os.path.join(tmpdir, "out"),
-            metadata_db_url="sqlite:///"+tmpdir+"/metadata.db",
-            anomaly_db_url="sqlite:///"+tmpdir+"/anomaly.db",
-            archive_db_url="sqlite:///"+tmpdir+"/archive.db",
+            metadata_db_url="sqlite:///" + tmpdir + "/metadata.db",
+            anomaly_db_url="sqlite:///" + tmpdir + "/anomaly.db",
+            archive_db_url="sqlite:///" + tmpdir + "/archive.db",
             create_directories=True,
-            create_dbs=True
+            create_dbs=True,
         )
 
         expected_sequences = [os.path.join(tmpdir, "data", "SEQ20200311T112530")]
@@ -64,14 +67,14 @@ class TestSequenceProcessorMain(unittest.TestCase):
             anomaly_db_url="sqlite:///" + tmpdir + "/anomaly.db",
             archive_db_url="sqlite:///" + tmpdir + "/archive.db",
             create_directories=True,
-            create_dbs=True
+            create_dbs=True,
         )
 
         expected_sequences = [
             os.path.join(tmpdir, "data", "SEQ20200311T112230"),
             os.path.join(tmpdir, "data", "SEQ20200311T112330"),
             os.path.join(tmpdir, "data", "SEQ20200311T112430"),
-            os.path.join(tmpdir, "data", "SEQ20200311T112530")
+            os.path.join(tmpdir, "data", "SEQ20200311T112530"),
         ]
         sequences = get_target_sequences(context, False)
 
@@ -88,12 +91,14 @@ class TestSequenceProcessorMain(unittest.TestCase):
             anomaly_db_url="sqlite:///" + tmpdir + "/anomaly.db",
             archive_db_url="sqlite:///" + tmpdir + "/archive.db",
             create_directories=True,
-            create_dbs=True
+            create_dbs=True,
         )
 
         context.set_config_value(
             "raw_data_directory",
-            os.path.join(context.get_config_value("raw_data_directory"), "SEQ20200311T112230"),
+            os.path.join(
+                context.get_config_value("raw_data_directory"), "SEQ20200311T112230"
+            ),
         )
 
         expected_sequences = [os.path.join(tmpdir, "data", "SEQ20200311T112230")]
@@ -112,7 +117,7 @@ class TestSequenceProcessorMain(unittest.TestCase):
             anomaly_db_url="sqlite:///" + tmpdir + "/anomaly.db",
             archive_db_url="sqlite:///" + tmpdir + "/archive.db",
             create_directories=True,
-            create_dbs=True
+            create_dbs=True,
         )
 
         context.set_config_value(

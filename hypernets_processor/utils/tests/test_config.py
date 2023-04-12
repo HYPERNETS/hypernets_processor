@@ -4,7 +4,12 @@ Tests for config module
 
 import unittest
 from hypernets_processor.version import __version__
-from hypernets_processor.utils.config import get_config_value, infer_dtype, read_config_file, read_jobs_list
+from hypernets_processor.utils.config import (
+    get_config_value,
+    infer_dtype,
+    read_config_file,
+    read_jobs_list,
+)
 from configparser import RawConfigParser
 import os
 import shutil
@@ -143,13 +148,14 @@ class TestConfig(unittest.TestCase):
 
         jobs = read_jobs_list(os.path.abspath(os.path.join(test_dir, "file.config")))
 
-        expected_jobs = [os.path.abspath(os.path.join(test_dir, "job1.config")),
-                         os.path.abspath(os.path.join(test_dir, "job2.config"))]
+        expected_jobs = [
+            os.path.abspath(os.path.join(test_dir, "job1.config")),
+            os.path.abspath(os.path.join(test_dir, "job2.config")),
+        ]
 
         self.assertCountEqual(jobs, expected_jobs)
 
         shutil.rmtree(test_dir)
-
 
 
 if __name__ == "__main__":

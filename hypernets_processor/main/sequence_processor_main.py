@@ -10,7 +10,10 @@ from hypernets_processor.context import Context
 from hypernets_processor.sequence_processor import SequenceProcessor
 import os
 import traceback
-import cProfile,pstats
+import cProfile, pstats
+from itertools import repeat
+import numpy as np
+from multiprocessing import Pool
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -49,8 +52,10 @@ def get_target_sequences(context, to_archive):
 
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
-
     if to_archive is True:
+        if context.archive_db is None:
+            raise ValueError("archive db has not been set!")
+
         processed_products = [
             product["sequence_name"]
             for product in context.archive_db["products"].find(
@@ -64,7 +69,6 @@ def get_target_sequences(context, to_archive):
                 site_id=context.get_config_value("site_id")
             )
         ]
-
         complete_products = processed_products + failed_products
 
         directory = os.path.dirname(raw_paths[0])
@@ -78,7 +82,38 @@ def get_target_sequences(context, to_archive):
     return raw_paths
 
 
-def main(processor_config, job_config, to_archive):
+def run_sequence(inputs):
+    target_sequence, sp, context, logger = inputs
+    context.logger.info("Processing sequence: " + target_sequence)
+    try:
+        # profiler = cProfile.Profile()
+        # profiler.enable()
+        sp.process_sequence(target_sequence)
+        # profiler.disable()
+        # stats = pstats.Stats(profiler).sort_stats('tottime')
+        # stats.print_stats(100)
+        if context.anomaly_handler.anomalies_added is not []:
+            context.logger.info(
+                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)
+            )
+
+        context.logger.info(target_sequence + " Complete")
+        return 1
+
+    except Exception as e:
+
+        context.anomaly_handler.add_x_anomaly()
+        if context.anomaly_handler.anomalies_added is not []:
+            context.logger.info(
+                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)
+            )
+
+        logger.error(target_sequence + "Failed: " + repr(e))
+        logger.info(traceback.format_exc())
+        return 0
+
+
+def main(processor_config, job_config, to_archive, parallel=None):
     """
     Main function to run processing chain for sequence files
 
@@ -91,7 +126,6 @@ def main(processor_config, job_config, to_archive):
     :type to_archive: bool
     :param to_archive: switch for if to add processed data to data archive
     """
-
     # Configure logging
     name = __name__
     if "job_name" in job_config["Job"].keys():
@@ -103,47 +137,30 @@ def main(processor_config, job_config, to_archive):
     context = Context(
         processor_config=processor_config, job_config=job_config, logger=logger
     )
+
     context.set_config_value("to_archive", to_archive)
     # Determine target sequences
     target_sequences = get_target_sequences(context, to_archive)
 
     # Run processor
     sp = SequenceProcessor(context=context)
-    target_sequences_passed = 0
     target_sequences_total = len(target_sequences)
 
     if target_sequences_total == 0:
         msg = "No sequences to process"
 
     else:
-        for target_sequence in target_sequences:
+        success = np.zeros_like(target_sequences, dtype=int)
 
-            context.logger.info("Processing sequence: " + target_sequence)
+        for i, target_sequence in enumerate(target_sequences):
+            success[i] = run_sequence((target_sequence, sp, context, logger))
 
-            try:
-                # profiler = cProfile.Profile()
-                # profiler.enable()
-                sp.process_sequence(target_sequence)
-                # profiler.disable()
-                # stats = pstats.Stats(profiler).sort_stats('tottime')
-                # stats.print_stats(100)
-                target_sequences_passed += 1
-
-                if context.anomaly_handler.anomalies_added is not []:
-                    context.logger.info("Processing Anomalies: " + str(context.anomaly_handler.anomalies_added))
-
-                context.logger.info("Complete")
-            except Exception as e:
-
-                context.anomaly_handler.add_x_anomaly()
-                if context.anomaly_handler.anomalies_added is not []:
-                    context.logger.info("Processing Anomalies: " + str(context.anomaly_handler.anomalies_added))
-
-                logger.error("Failed: " + repr(e))
-                logger.debug(traceback.format_exc())
-
-        msg = str(target_sequences_passed) + "/" + str(target_sequences_total) + \
-              " sequences successfully processed"
+        msg = (
+            str(np.sum(success))
+            + "/"
+            + str(target_sequences_total)
+            + " sequences successfully processed"
+        )
 
     return msg
 
