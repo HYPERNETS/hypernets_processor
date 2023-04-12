@@ -19,18 +19,13 @@ This measurement function is defined by::
         
         	DN=digital_number-dark_signal
         	DN[DN==0]=1
-        	corrected_DN = DN /(non_linear[0]+non_linear[1]*DN+
-                                       non_linear[2]*DN**2+
-                                       non_linear[3]*DN**3+
-                                       non_linear[4]*DN**4+
-                                       non_linear[5]*DN**5+
-                                       non_linear[6]*DN**6+
-                                       non_linear[7]*DN**7)
+        	non_lin_func = np.poly1d(np.flip(non_linear))
+            corrected_DN = DN / non_lin_func(DN)
 
         	return gains*corrected_DN/int_time*1000
 
 where digital_number gives the measured signal (in digital numbers), dark_signal gives the dark signal in digital numbers, 
-gains gives the calibration coefficients, non_linear has the (8th order polynomial) non-linearity coefficients, and int_time 
+gains gives the calibration coefficients, non_linear has the polynomial non-linearity coefficients, and int_time
 is the integration time of the measurement. 
 An update to this default measurement function is foreseen, which will include temperature and straylight corrections.
 The gains and non-linearity coefficients are taken from the most recent calibration data for the given instrument. 
