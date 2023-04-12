@@ -13,6 +13,7 @@ FLAG_COMMON = [
     "half_of_scans_masked",
     "vza_irradiance",
     "clear_sky_irradiance",
+    "variable_irradiance",
     "single_irradiance_used",
     "no_clear_sky",
     "less_than_three_darks",

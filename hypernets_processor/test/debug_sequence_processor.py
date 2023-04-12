@@ -30,7 +30,7 @@ def process_sequence():
     Command line interface to sequence_processor_main for ad-hoc job processing
     """
 
-    network = "water"
+    network = "land"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
 
@@ -47,7 +47,7 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\water\SEQ20211106T070050"
+    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\WWUK\SEQ20220426T113243"
 
     job_config["Output"][
         "archive_directory"
