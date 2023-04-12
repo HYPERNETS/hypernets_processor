@@ -72,7 +72,7 @@ ANOMALIES_DICT = {
     },
     "nu": {
         "description": "Non constant illumination",
-        "error": IOError,
+        "error": None,
         "error_msg": None
     },
 }
