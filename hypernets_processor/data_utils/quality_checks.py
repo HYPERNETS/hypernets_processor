@@ -142,6 +142,10 @@ class QualityChecks:
                     dataset_l1b_irr["quality_flag"][i], "vza_irradiance"
                 )  # for i in range(len(mask))]
 
+        if self.qc_illumination(dataset_l1b_irr)> 0.1:
+            self.context.logger.info("Non constant illumination for sequence {}".format(dataset_l1b_irr.attrs['sequence_id']))
+            self.context.anomaly_handler.add_anomaly("nu")
+
         if self.context.get_config_value("clear_sky_check"):
             # could also be done by: https://pvlib-python.readthedocs.io/en/stable/auto_examples/plot_spectrl2_fig51A.html
             ref_szas = [0, 10, 20, 40, 60, 70, 80]
@@ -202,6 +206,15 @@ class QualityChecks:
                 )
 
         return dataset_l1b_irr
+
+    def qc_illumination(self, dataset):
+        wv=dataset['wavelength'].values
+        covvar=(np.std(dataset.irradiance.values[self.closest_idx(wv, 550)[0],:]/
+                      np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values))/
+               np.mean(dataset.irradiance.values[self.closest_idx(wv, 550)[0],:]/
+                      np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values)))
+        print("Coefficient of variation: {}".format(covvar))
+        return covvar
 
     def perform_quality_check_L2a(self, dataset):
         # todo add these checks

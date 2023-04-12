@@ -12,7 +12,7 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.interpolation.interpolate import Interpolate
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_utils.average import Average
-# from hypernets_processor.data_io.dataset_util import DatasetUtil as du
+from obsarray.templater.dataset_util import DatasetUtil as du
 
 import numpy as np
 import math
@@ -35,13 +35,6 @@ class RhymerHypstar:
     def closest_idx(self, xlist, xval):
         idx, xret = min(enumerate(xlist), key=lambda x: abs(float(x[1]) - float(xval)))
         return (idx, xret)
-
-    def qc_illumination(self, dataset):
-        wv=dataset['wavelength'].values
-        covvar=np.std(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]/\
-               np.mean(dataset.irradiance.values, axis=1)[self.closest_idx(wv, 550)[0]]
-        print("Coefficient of variation: {}".format(covvar))
-        return covvar
 
     def fitcurve(self, wv, ld, ed):
         def func(x, a, b):
@@ -398,8 +391,8 @@ class RhymerHypstar:
         # check number of scans per cycle for up, down radiance and irradiance
         L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = self.cycleparse(l1a_rad, l1a_irr, dataset_l1b)
 
-        L1b_downrad = self.avg.average_l1b("radiance", L1a_downrad)
-        L1b_irr = self.avg.average_l1b("irradiance", L1a_irr)
+        L1b_downrad = self.avg.average_l1a("radiance", L1a_downrad)
+        L1b_irr = self.avg.average_l1a("irradiance", L1a_irr)
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the
         # irradiance wavelength to the radiance wavelength
