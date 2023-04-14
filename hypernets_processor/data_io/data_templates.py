@@ -36,7 +36,7 @@ class DataTemplates:
 
         cal_dim_sizes_dict = {
             "wavelength": len(wavs),
-            "nonlinearcoef": len(nonlinearcals),
+            "nonlinearcoef": 13,
             "wavcoef": len(wavcoef),
             "calibrationdates": len(caldates),
             "nonlineardates": len(nonlineardates),
@@ -45,7 +45,7 @@ class DataTemplates:
         dataset_cal = self.hdsb.create_ds_template(cal_dim_sizes_dict, ds_format="CAL")
 
         dataset_cal = dataset_cal.assign_coords(wavelength=wavs)
-        dataset_cal = dataset_cal.assign_coords(nonlinearcoef=range(len(nonlinearcals)))
+        dataset_cal = dataset_cal.assign_coords(nonlinearcoef=range(13))
         dataset_cal = dataset_cal.assign_coords(wavcoef=range(len(wavcoef)))
         dataset_cal = dataset_cal.assign_coords(calibrationdates=caldates)
         dataset_cal = dataset_cal.assign_coords(nonlineardates=nonlineardates)

@@ -5,6 +5,7 @@ from hypernets_processor.test.test_functions import (
     teardown_test_context,
 )
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
+from hypernets_processor.utils.paths import parse_sequence_path
 
 import numpy as np
 import os.path
@@ -12,6 +13,7 @@ import glob
 import comet_maths as cm
 import xarray
 from configparser import ConfigParser
+from datetime import datetime
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -89,22 +91,43 @@ class CalibrationConverter:
                 os.path.join(hypstar_path, name) + " calibration file does not exist"
             )
 
-        # todo set the -1 index to something appropriate or use interpolating
+        sequence_datetime=parse_sequence_path(sequence_path)["datetime"]
 
         calibration_data_times = calibration_data_rad["calibrationdates"].values
         nonlin_times = calibration_data_rad["nonlineardates"].values
         wav_times = calibration_data_rad["wavdates"].values
 
+        calib_i=[x for x, date in enumerate(calibration_data_times)
+                   if datetime.strptime(date,"%y%m%d") < sequence_datetime][-1]
+        nlin_i=[x for x, date in enumerate(nonlin_times)
+                   if datetime.strptime(date,"%y%m%d") < sequence_datetime][-1]
+        wav_i=[x for x, date in enumerate(wav_times)
+                   if datetime.strptime(date,"%y%m%d") < sequence_datetime][-1]
+
         calibration_data_rad = calibration_data_rad.sel(
-            calibrationdates=calibration_data_times[-1]
+            calibrationdates=calibration_data_times[calib_i]
         )
-        calibration_data_rad = calibration_data_rad.sel(nonlineardates=nonlin_times[-1])
-        calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[-1])
+        calibration_data_rad = calibration_data_rad.sel(nonlineardates=nonlin_times[nlin_i])
+        calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[wav_i])
+
+        calibration_data_times_irr = calibration_data_irr["calibrationdates"].values
+        nonlin_times_irr = calibration_data_irr["nonlineardates"].values
+        wav_times_irr = calibration_data_irr["wavdates"].values
+
+        calib_i_irr = [x for x, date in enumerate(calibration_data_times_irr)
+                   if datetime.strptime(date, "%y%m%d") < sequence_datetime][-1]
+        nlin_i_irr = [x for x, date in enumerate(nonlin_times_irr)
+                  if datetime.strptime(date, "%y%m%d") < sequence_datetime][-1]
+        wav_i_irr = [x for x, date in enumerate(wav_times_irr)
+                 if datetime.strptime(date, "%y%m%d") < sequence_datetime][-1]
+
+
         calibration_data_irr = calibration_data_irr.sel(
-            calibrationdates=calibration_data_times[-1]
+            calibrationdates=calibration_data_times_irr[calib_i_irr]
         )
-        calibration_data_irr = calibration_data_irr.sel(nonlineardates=nonlin_times[-1])
-        calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times[-1])
+        calibration_data_irr = calibration_data_irr.sel(nonlineardates=nonlin_times_irr[nlin_i_irr])
+        calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times_irr[wav_i_irr])
+
         if self.context.get_config_value("network") == "l":
             name = (
                 "HYPERNETS_CAL_"
@@ -145,22 +168,22 @@ class CalibrationConverter:
             ].values
             nonlin_times = calibration_data_rad_swir["nonlineardates"].values
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                calibrationdates=calibration_data_times[-1]
+                calibrationdates=calibration_data_times[calib_i]
             )
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                nonlineardates=nonlin_times[-1]
+                nonlineardates=nonlin_times[nlin_i]
             )
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                wavdates=wav_times[-1]
+                wavdates=wav_times[wav_i]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                calibrationdates=calibration_data_times[-1]
+                calibrationdates=calibration_data_times_irr[calib_i_irr]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                nonlineardates=nonlin_times[-1]
+                nonlineardates=nonlin_times_irr[nlin_i_irr]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                wavdates=wav_times[-1]
+                wavdates=wav_times_irr[wav_i_irr]
             )
 
             return (
@@ -230,99 +253,107 @@ class CalibrationConverter:
 
         directory = self.path_ascii
         caldatepaths = [
-            os.path.basename(path)
+            path
             for path in glob.glob(
-                os.path.join(directory, "hypstar_" + str(hypstar) + "/radiometric/*")
+                os.path.join(directory, "hypstar_" + str(hypstar), "radiometric", "*")
             )
+            if ".pdf" not in path
         ]
         caldates = []
-
+        gains=[]
+        minwav=350
         for caldatepath in caldatepaths:
-            caldate = caldatepath
             if measurandstring == "radiance":
                 calpath = glob.glob(
                     os.path.join(
-                        directory,
+                        caldatepath,
                         "hypstar_"
-                        + str(hypstar)
-                        + "\\radiometric\\"
-                        + str(caldatepath)
-                        + "\\hypstar_"
-                        + str(hypstar)
-                        + "_radcal_L_*_%s.dat" % (sensortag),
+                        + str(hypstar) +
+                        "_radcal_L_*_%s.dat" % (sensortag),
                     )
                 )[0]
+                caldate = calpath[-15:-9]
 
             else:
                 calpath = glob.glob(
                     os.path.join(
-                        directory,
+                        caldatepath,
                         "hypstar_"
-                        + str(hypstar)
-                        + "\\radiometric\\"
-                        + str(caldatepath)
-                        + "\\hypstar_"
-                        + str(hypstar)
-                        + "_radcal_E_*_%s.dat" % (sensortag),
+                        + str(hypstar) +
+                        "_radcal_E_*_%s.dat" % (sensortag)
                     )
                 )[0]
+                caldate = calpath[-15:-9]
 
             if os.path.exists(calpath):
                 caldates = np.append(caldates, caldate)
-                gains = np.genfromtxt(calpath)
-                wavs = gains[:, 1]
+                gains_temp = np.genfromtxt(calpath)
+                if len(gains_temp)>len(gains):
+                    gains=gains_temp
+                    wavs = gains[:, 1]
+                    gains = gains[np.where(wavs>minwav)[0]]
+                    wavs = wavs[np.where(wavs>minwav)[0]]
 
         lincaldatepaths = [
-            os.path.basename(path)
+            path
             for path in glob.glob(
-                os.path.join(directory, "hypstar_" + str(hypstar) + "/linearity/*")
+                os.path.join(directory, "hypstar_" + str(hypstar),"linearity","*")
             )
         ]
-        nonlindates = []
 
+        if len(lincaldatepaths)==0:
+            lincaldatepaths = [
+                path
+                for path in glob.glob(
+                    os.path.join(directory, "hypstar_" + str(hypstar), "radiometric", "*")
+                ) if len(glob.glob(
+                    os.path.join(
+                        path,
+                        "hypstar_"
+                        + str(hypstar)
+                        + "_nonlin_corr_coefs_*.dat",
+                    )
+                ))>0
+            ]
+
+        nonlindates = []
         for lincaldatepath in lincaldatepaths:
             nonlinpath = glob.glob(
-                os.path.join(
-                    directory,
-                    "hypstar_"
-                    + str(hypstar)
-                    + "\\linearity\\"
-                    + str(lincaldatepath)
-                    + "\\hypstar_"
-                    + str(hypstar)
-                    + "_nonlin_corr_coefs_*.dat",
-                )
-            )[0]
+                    os.path.join(
+                        lincaldatepath,
+                        "hypstar_"
+                        + str(hypstar)
+                        + "_nonlin_corr_coefs_*.dat",
+                    )
+                )[0]
+            lincaldate=nonlinpath[-10:-4]
 
             if os.path.exists(nonlinpath):
-                nonlindates = np.append(nonlindates, lincaldatepath)
+                nonlindates = np.append(nonlindates, lincaldate)
                 if swir:
                     non_linear_cals = np.genfromtxt(nonlinpath)[:, 1]
                 else:
                     non_linear_cals = np.genfromtxt(nonlinpath)[:, 0]
 
         wavcaldatepaths = [
-            os.path.basename(path)
+            path
             for path in glob.glob(
-                os.path.join(directory, "hypstar_" + str(hypstar) + "/wavelength/*")
+                os.path.join(directory, "hypstar_" + str(hypstar), "wavelength", "*")
             )
+            if ".pdf" not in path
         ]
         wavcaldates = []
 
         for wavcaldatepath in wavcaldatepaths:
-            wavcaldate = wavcaldatepath
             wavcalpath = glob.glob(
                 os.path.join(
-                    directory,
-                    "hypstar_"
-                    + str(hypstar)
-                    + "\\wavelength\\"
-                    + str(wavcaldatepath)
-                    + "\\hypstar_"
-                    + str(hypstar)
+                    wavcaldatepath,
+                    "hypstar_"+ str(hypstar)
                     + "_wl_coefs_*.dat",
                 )
             )[0]
+            wavcaldate = wavcalpath[-10:-4]
+
             if os.path.exists(wavcalpath):
                 wavcaldates = np.append(wavcaldates, wavcaldate)
                 wav_cals = np.genfromtxt(wavcalpath)[:, 0]
@@ -335,12 +366,8 @@ class CalibrationConverter:
         for lincaldatepath in lincaldatepaths:
             nonlinpath = glob.glob(
                 os.path.join(
-                    directory,
+                    lincaldatepath,
                     "hypstar_"
-                    + str(hypstar)
-                    + "\\linearity\\"
-                    + str(lincaldatepath)
-                    + "\\hypstar_"
                     + str(hypstar)
                     + "_nonlin_corr_coefs_*.dat",
                 )
@@ -363,9 +390,10 @@ class CalibrationConverter:
                                     float(line.strip()[8::]) / 2
                                 )  # reading in from comments in non_lin files, and convert to k=1
 
+
                 calibration_data["non_linearity_coefficients"].values[
                     i_nonlin
-                ] = non_linear_cals
+                ] = np.pad(non_linear_cals,(0,13-len(non_linear_cals)),'constant', constant_values=(0,0))
                 i_nonlin += 1
 
         i_wavcoef = 0
@@ -373,12 +401,8 @@ class CalibrationConverter:
             wavcaldate = wavcaldatepath
             wavcalpath = glob.glob(
                 os.path.join(
-                    directory,
+                    wavcaldatepath,
                     "hypstar_"
-                    + str(hypstar)
-                    + "\\wavelength\\"
-                    + str(wavcaldatepath)
-                    + "\\hypstar_"
                     + str(hypstar)
                     + "_wl_coefs_*.dat",
                 )
@@ -402,12 +426,8 @@ class CalibrationConverter:
             if measurandstring == "radiance":
                 calpath = glob.glob(
                     os.path.join(
-                        directory,
+                        caldatepath,
                         "hypstar_"
-                        + str(hypstar)
-                        + "\\radiometric\\"
-                        + str(caldatepath)
-                        + "\\hypstar_"
                         + str(hypstar)
                         + "_radcal_L_*_%s.dat" % (sensortag),
                     )
@@ -415,12 +435,8 @@ class CalibrationConverter:
             else:
                 calpath = glob.glob(
                     os.path.join(
-                        directory,
+                        caldatepath,
                         "hypstar_"
-                        + str(hypstar)
-                        + "\\radiometric\\"
-                        + str(caldatepath)
-                        + "\\hypstar_"
                         + str(hypstar)
                         + "_radcal_E_*_%s.dat" % (sensortag),
                     )
@@ -429,16 +445,18 @@ class CalibrationConverter:
             if os.path.exists(calpath):
                 caldates = np.append(caldates, caldate)
                 gains = np.genfromtxt(calpath)
-
+                wavs = gains[:, 1]
+                gains = gains[np.where(wavs > 350)[0]]
+                wavs = wavs[np.where(wavs > 350)[0]]
                 placeholder_unc = 2
 
-                try:
+                if True:
                     # calibration_data["wavelength"].values = gains[:, 1]
-                    calibration_data["wavpix"].values[i_cal] = gains[:, 0]
-                    calibration_data["gains"].values[i_cal] = gains[:, 2]
+                    calibration_data["wavpix"].values[i_cal,:len(gains)] = gains[:, 0]
+                    calibration_data["gains"].values[i_cal,:len(gains)] = gains[:, 2]
                     # calibration_data["u_rel_random_gains"].values = None
 
-                    calibration_data["u_rel_systematic_indep_gains"].values[i_cal] = (
+                    calibration_data["u_rel_systematic_indep_gains"].values[i_cal,:len(gains)] = (
                         gains[:, 6] ** 2
                         + gains[:, 7] ** 2
                         + gains[:, 8] ** 2
@@ -495,13 +513,13 @@ class CalibrationConverter:
                     )
 
                     calibration_data["err_corr_systematic_indep_gains"].values[
-                        i_cal
+                        i_cal,:len(gains),:len(gains)
                     ] = cm.correlation_from_covariance(
                         cov_diag + cov_other + cov_full + cov_filament
                     )
 
                     calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[
-                        i_cal
+                        i_cal,:len(gains)
                     ] = (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5
 
                     cov_other = cm.convert_corr_to_cov(
@@ -515,10 +533,10 @@ class CalibrationConverter:
                     )
 
                     calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
-                        i_cal
+                        i_cal,:len(gains),:len(gains)
                     ] = cm.correlation_from_covariance(cov_other + cov_filament)
-                except:
-                    print(caldatepath, " failed")
+                # except:
+                #     print(caldatepath, " failed")
             i_cal += 1
 
         return calibration_data

@@ -23,3 +23,4 @@ docs/sphinx/content/API
 /hypernets_processor/etc/scheduler.config
 /hypernets_processor/etc/working_directory.txt
 /hypernets_processor/etc/processor.config
+/data/calibration_files_ascii

@@ -40,6 +40,8 @@ All PDF are assumed to be Gaussian with the input quantities as the mean and the
 
 Once all the uncertainties and their correlation have been quantified, punpy can be used to perform the Propagation and summarizing stage of MC. 
 Punpy returns the measurand (calibrated (ir)radiances for L1A) as well as the uncertainties and correlation matrix w.r.t. wavelength.
+All the HYPERNETS products are stored as digital effects tables (see `https://www.comet-toolkit.org/tools/obsarray/`_), meaning that all the uncertainties and error correlation information
+have been stored in a machine-readable format using a structured metadata standard.
 
 For the processing to L1B, the input quantities are simply the measurands from L1A, for which the uncertainties and error-correlation are already defined. 
 The measurement function is a simple averaging function. Uncertainties are again propagated with punpy.
@@ -50,7 +52,8 @@ This tool also handles uncertainty propagation (which internally uses punpy) in 
 The measurand (interpolated irradiances) and asoociated uncertainties and error-correlations are returned by the tool.
 
 Finally, uncertainty are propagated to L2A with punpy using the measurement functions in :ref:`calibrate` and the input quantities from the L1C products. 
-
+Some basic information on how to interface with the information with the uncertainty information in the HYPERNETS products is given in the :ref:`user_using_hypernets` page.
+Further information and examples can be found on the CoMet website (``https://www.comet-toolkit.org/`_).
 
 
 

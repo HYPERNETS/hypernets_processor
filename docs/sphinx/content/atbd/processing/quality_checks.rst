@@ -8,7 +8,7 @@
 
 Quality checks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Throughout the processing chain, a number of qulaity checks are performed on the hypernets data. 
+Throughout the processing chain, a number of quality checks are performed on the HYPERNETS data.
 Each of the quality checks will be described in this section. First quality checks in common to water and land network will be described,
 followed by sections with quality checks specific to only the water and land networks individually.
 
@@ -48,3 +48,10 @@ L2A
 :::::
 Currently, no further quality checks are applied. It is expected further checks will be added, either as part of the hypernets_processor, or in quality assurance pipelines per site.
 
+Water Network quality checks
+-----------------------------
+
+
+Land Network quality checks
+-----------------------------
+There are currently no quality checks that are applied only to the land network (all land checks also apply to water network processing).
