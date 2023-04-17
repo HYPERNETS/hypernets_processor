@@ -13,72 +13,79 @@ __status__ = "Development"
 
 archive_path=r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\archive"
 
-files_archive=["archive_GONA.db","archive_WWUK.db"]
-files_anomaly=["anomaly_GONA.db","anomaly_WWUK.db"]
-files_metadata=["metadata_GONA.db","metadata_WWUK.db"]
+files_archive=["archive_WWUK.db","archive_DEGE.db"]
+files_anomaly=["anomaly_WWUK.db","anomaly_DEGE.db"]
+files_metadata=["metadata_WWUK.db","metadata_DEGE.db"]
 
-def merge(db_a, db_b, table_name):
-    cursor_a = db_a.cursor()
+out_archive="archive.db"
+out_anomaly="anomaly.db"
+out_metadata="metadata.db"
+
+
+def merge(outfile, file, table_name):
+    db_out = sqlite3.connect(os.path.join(archive_path, outfile))
+    cursor_a = db_out.cursor()
+    db_b = sqlite3.connect(os.path.join(archive_path, file))
     cursor_b = db_b.cursor()
 
     new_table_name = table_name + "_new"
 
-    try:
-        cursor_a.execute("CREATE TABLE IF NOT EXISTS " + new_table_name + " AS SELECT * FROM " + table_name)
-        for row in cursor_b.execute("SELECT * FROM " + table_name):
-            print(row)
-            cursor_a.execute("INSERT INTO " + new_table_name + " VALUES" + str(row) + ";")
+    table_names_out=load_table_names(db_out)
+    if True:
+        if len(table_names_out)==0:
+            cursor_a.execute("ATTACH DATABASE '%s' AS table_new"%(os.path.join(archive_path, file)))
+            cursor_a.execute(
+                "CREATE TABLE IF NOT EXISTS " + new_table_name + " AS SELECT * FROM table_new." + table_name)
 
-        cursor_a.execute("DROP TABLE IF EXISTS " + table_name);
-        cursor_a.execute("ALTER TABLE " + new_table_name + " RENAME TO " + table_name);
-        db_a.commit()
+        else:
+            cursor_a.execute("CREATE TABLE IF NOT EXISTS " + new_table_name + " AS SELECT * FROM " + table_name)
+            index_prev=list(cursor_a.execute("SELECT id FROM " + table_name))[-1]
+            print(index_prev)
+            for i,row in enumerate(cursor_b.execute("SELECT * FROM " + table_name)):
+                row=["none" if v is None else v for v in row]
+                row[0]+=int(index_prev[0])
+                row=tuple(row)
+                cursor_a.execute("INSERT INTO " + new_table_name + " VALUES " + str(row))
+            cursor_a.execute("DROP TABLE IF EXISTS " + table_name)
+        cursor_a.execute("ALTER TABLE " + new_table_name + " RENAME TO " + table_name)
+        db_out.commit()
 
         print("\n\nMerge Successful!\n")
+    db_b.close()
+    db_out.close()
 
-    except sqlite3.OperationalError:
-        print("ERROR!: Merge Failed")
-        cursor_a.execute("DROP TABLE IF EXISTS " + new_table_name);
-
-def loadTables(db_a):
+def load_table_names(db_a):
     cursor_a = db_a.cursor()
     cursor_a.execute("SELECT name FROM sqlite_master WHERE type='table';")
 
     table_counter = 0
-    print("SQL Tables available: \n===================================================\n")
     table_names=[]
     for table_item in cursor_a.fetchall():
         current_table = table_item[0]
         table_counter += 1
-        print("-> " + current_table)
+        # print("-> " + current_table)
         table_names.append(current_table)
-    print("\n===================================================\n")
 
     return table_names
 
 if __name__ == "__main__":
     db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
-    table_names = loadTables(db_a)
-    for file in files_archive[1::]:
-        db_b = sqlite3.connect(os.path.join(archive_path, file))
-        for table_name in table_names:
-            merge(db_a, db_b, table_name)
-        db_b.close()
+    table_names = load_table_names(db_a)
     db_a.close()
+    for file in enumerate(files_archive):
+        for table_name in table_names:
+            merge(out_archive, file, table_name)
 
-    db_a = sqlite3.connect(os.path.join(archive_path,files_anomaly[0]))
-    table_names = loadTables(db_a)
-    for file in files_anomaly[1::]:
-        db_b = sqlite3.connect(os.path.join(archive_path,file))
-        for table_name in table_names:
-            merge(db_a,db_b,table_name)
-        db_b.close()
+    db_a = sqlite3.connect(os.path.join(archive_path, files_anomaly[0]))
+    table_names = load_table_names(db_a)
     db_a.close()
+    for file in enumerate(files_anomaly):
+        for table_name in table_names:
+            merge(out_archive, file, table_name)
 
-    db_a = sqlite3.connect(os.path.join(archive_path,files_metadata[0]))
-    table_names = loadTables(db_a)
-    for file in files_metadata[1::]:
-        db_b = sqlite3.connect(os.path.join(archive_path,file))
-        for table_name in table_names:
-            merge(db_a,db_b,table_name)
-        db_b.close()
+    db_a = sqlite3.connect(os.path.join(archive_path, files_metadata[0]))
+    table_names = load_table_names(db_a)
     db_a.close()
+    for file in enumerate(files_metadata):
+        for table_name in table_names:
+            merge(out_archive, file, table_name)
