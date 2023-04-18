@@ -13,6 +13,7 @@ import glob
 import comet_maths as cm
 import xarray
 from configparser import ConfigParser
+import pandas as pd
 from datetime import datetime
 
 """___Authorship___"""
@@ -73,7 +74,7 @@ class CalibrationConverter:
         hypstar_path = os.path.join(self.path_netcdf, hypstar)
         name = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(self.version) + ".nc"
 
-        # print("using calibration file:", name)
+        print("using calibration file - radiance:", name)
 
         if os.path.exists(os.path.join(hypstar_path, name)):
             calibration_data_rad = xarray.open_dataset(os.path.join(hypstar_path, name))
@@ -83,6 +84,7 @@ class CalibrationConverter:
             )
 
         name = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(self.version) + ".nc"
+        print("using calibration file - irradiance:", name)
 
         if os.path.exists(os.path.join(hypstar_path, name)):
             calibration_data_irr = xarray.open_dataset(os.path.join(hypstar_path, name))
@@ -91,43 +93,28 @@ class CalibrationConverter:
                 os.path.join(hypstar_path, name) + " calibration file does not exist"
             )
 
-        sequence_datetime=parse_sequence_path(sequence_path)["datetime"]
+        # todo set the -1 index to something appropriate or use interpolating
+
+        # ensure datatime coordinates and not object
+        datecoordinates=['calibrationdates','nonlineardates','wavdates']
+        for dc in datecoordinates:
+            calibration_data_rad[dc] = pd.DatetimeIndex(pd.to_datetime(calibration_data_rad[dc].values,format="%y%m%d"))
+            calibration_data_irr[dc] = pd.DatetimeIndex(pd.to_datetime(calibration_data_irr[dc].values,format="%y%m%d"))
 
         calibration_data_times = calibration_data_rad["calibrationdates"].values
         nonlin_times = calibration_data_rad["nonlineardates"].values
         wav_times = calibration_data_rad["wavdates"].values
 
-        calib_i=[x for x, date in enumerate(calibration_data_times)
-                   if datetime.strptime(date,"%y%m%d") < sequence_datetime][-1]
-        nlin_i=[x for x, date in enumerate(nonlin_times)
-                   if datetime.strptime(date,"%y%m%d") < sequence_datetime][-1]
-        wav_i=[x for x, date in enumerate(wav_times)
-                   if datetime.strptime(date,"%y%m%d") < sequence_datetime][-1]
-
-        calibration_data_rad = calibration_data_rad.sel(
-            calibrationdates=calibration_data_times[calib_i]
+        calibration_data_rad.sel(
+            calibrationdates=calibration_data_times[-1]
         )
-        calibration_data_rad = calibration_data_rad.sel(nonlineardates=nonlin_times[nlin_i])
-        calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[wav_i])
+        calibration_data_rad = calibration_data_rad.sel(nonlineardates=nonlin_times[-1])
+        calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[-1])
 
-        calibration_data_times_irr = calibration_data_irr["calibrationdates"].values
-        nonlin_times_irr = calibration_data_irr["nonlineardates"].values
-        wav_times_irr = calibration_data_irr["wavdates"].values
-
-        calib_i_irr = [x for x, date in enumerate(calibration_data_times_irr)
-                   if datetime.strptime(date, "%y%m%d") < sequence_datetime][-1]
-        nlin_i_irr = [x for x, date in enumerate(nonlin_times_irr)
-                  if datetime.strptime(date, "%y%m%d") < sequence_datetime][-1]
-        wav_i_irr = [x for x, date in enumerate(wav_times_irr)
-                 if datetime.strptime(date, "%y%m%d") < sequence_datetime][-1]
-
-
-        calibration_data_irr = calibration_data_irr.sel(
-            calibrationdates=calibration_data_times_irr[calib_i_irr]
-        )
-        calibration_data_irr = calibration_data_irr.sel(nonlineardates=nonlin_times_irr[nlin_i_irr])
-        calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times_irr[wav_i_irr])
-
+        calibration_data_irr = calibration_data_irr.sel(calibrationdates=calibration_data_times[-1],
+                                                        method='nearest')
+        calibration_data_irr = calibration_data_irr.sel(nonlineardates=nonlin_times[-1])
+        calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times[-1])
         if self.context.get_config_value("network") == "l":
             name = (
                 "HYPERNETS_CAL_"
@@ -168,22 +155,22 @@ class CalibrationConverter:
             ].values
             nonlin_times = calibration_data_rad_swir["nonlineardates"].values
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                calibrationdates=calibration_data_times[calib_i]
+                calibrationdates=calibration_data_times[-1]
             )
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                nonlineardates=nonlin_times[nlin_i]
+                nonlineardates=nonlin_times[-1]
             )
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                wavdates=wav_times[wav_i]
+                wavdates=wav_times[-1]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                calibrationdates=calibration_data_times_irr[calib_i_irr]
+                calibrationdates=calibration_data_times[-1]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                nonlineardates=nonlin_times_irr[nlin_i_irr]
+                nonlineardates=nonlin_times[-1]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                wavdates=wav_times_irr[wav_i_irr]
+                wavdates=wav_times[-1]
             )
 
             return (
