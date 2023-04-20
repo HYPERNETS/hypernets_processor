@@ -274,13 +274,13 @@ class CalibrationConverter:
                 )[0]
                 caldate = calpath[-15:-9]
                 print(os.path.basename(caldatepath))
-                if "b" in os.path.basename(caldatepath):
+                if ("b" in os.path.basename(caldatepath)) or ("10C" in os.path.basename(caldatepath)):
                     caldate += "T235959"
                 elif "a" in os.path.basename(caldatepath):
                     caldate += "T000000"
                 else:
                     caldate += "T120000"
-
+                print(caldate)
             else:
                 calpath = glob.glob(
                     os.path.join(
@@ -291,7 +291,7 @@ class CalibrationConverter:
                     )
                 )[0]
                 caldate = calpath[-15:-9]
-                if "b" in os.path.basename(caldatepath):
+                if ("b" in os.path.basename(caldatepath)) or ("10C" in os.path.basename(caldatepath)):
                     caldate += "T235959"
                 elif "a" in os.path.basename(caldatepath):
                     caldate += "T000000"
@@ -340,7 +340,7 @@ class CalibrationConverter:
                     )
                 )[0]
             lincaldate=nonlinpath[-10:-4]
-            if "b" in os.path.basename(lincaldatepath):
+            if ("b" in os.path.basename(lincaldatepath)) or ("10C" in os.path.basename(lincaldatepath)):
                 lincaldate += "T235959"
             elif "a" in os.path.basename(lincaldatepath):
                 lincaldate += "T000000"
@@ -372,7 +372,7 @@ class CalibrationConverter:
                 )
             )[0]
             wavcaldate = wavcalpath[-10:-4]
-            if "b" in os.path.basename(wavcaldatepath):
+            if ("b" in os.path.basename(wavcaldatepath)) or ("10C" in os.path.basename(wavcaldatepath)):
                 wavcaldate += "T235959"
             elif "a" in os.path.basename(wavcaldatepath):
                 wavcaldate += "T000000"

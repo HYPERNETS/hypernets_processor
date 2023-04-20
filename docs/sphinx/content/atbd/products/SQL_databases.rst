@@ -17,16 +17,17 @@ the listings in the other two databases). Each of these databases is stored in t
 Archive Database
 ----------------------
 SQLite database listing all succesfully processed data products, together with auxiliary information to enable queries
-(product_name,datetime,sequence_name,site_id,system_id,product_level,product_path,rel_product_dir,sequence_path,
-latitude,longitude,solar_zenith_angle_min,solar_zenith_angle_max,solar_azimuth_angle_min,solar_azimuth_angle_max,
-viewing_zenith_angle_min,viewing_zenith_angle_max,viewing_azimuth_angle_min,viewing_azimuth_angle_max,percent_zero_flags).
+(product_name, datetime, sequence_name, site_id, system_id, product_level, product_path, rel_product_dir, sequence_path, 
+latitude, longitude, solar_zenith_angle_min, solar_zenith_angle_max, solar_azimuth_angle_min, solar_azimuth_angle_max, 
+viewing_zenith_angle_min, viewing_zenith_angle_max, viewing_azimuth_angle_min, viewing_azimuth_angle_max, percent_zero_flags).
+
 Anomaly Database
 ----------------------
 SQLite database recording occurrences of defined anomalies, e.g. incomplete sequence data, instrument failure etc.
 (the different anomalies are listed on the :ref:`anomalies` page), together with auxiliary information to enable queries
-(anomaly_id,sequence_name,sequence_path,site_id,datetime,rel_product_dir,product_level_last,product_path_last,
-solar_zenith_angle_min,solar_zenith_angle_max,solar_azimuth_angle_min,solar_azimuth_angle_max,viewing_zenith_angle_min,
-viewing_zenith_angle_max,viewing_azimuth_angle_min,viewing_azimuth_angle_max).
+(anomaly_id, sequence_name, sequence_path, site_id, datetime, rel_product_dir, product_level_last, product_path_last, 
+solar_zenith_angle_min, solar_zenith_angle_max, solar_azimuth_angle_min, solar_azimuth_angle_max, viewing_zenith_angle_min, 
+viewing_zenith_angle_max, viewing_azimuth_angle_min, viewing_azimuth_angle_max).
 
 Metadata Database
 ----------------------
