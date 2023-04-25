@@ -110,9 +110,7 @@ class Calibrate:
                     ] += 50
 
         else:
-            print(dataset_l0_masked)
-            print(calibration_data)
-            measurand = calibrate_function.run(dataset_l0_masked, calibration_data.transpose())
+            measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
             dataset_l1a[measurandstring].values = measurand
             dataset_l1a = dataset_l1a.drop(
                 [
@@ -300,8 +298,8 @@ class Calibrate:
         :return:
         :rtype:
         """
-        wavs = dataset_calib["wavelength"][0].values
-        wavpix = dataset_calib["wavpix"][0].values
+        wavs = dataset_calib["wavelength"].values
+        wavpix = np.squeeze(dataset_calib["wavpix"].values)
         # set up datasets for storing the masked L0 data, with wavelengths corresponding to the ones present in calib files
         datasetl0masked = datasetl0.isel(
             wavelength=slice(int(wavpix[0]), int(wavpix[-1]) + 1)
