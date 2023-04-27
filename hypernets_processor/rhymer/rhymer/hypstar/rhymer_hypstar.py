@@ -390,9 +390,10 @@ class RhymerHypstar:
 
         # check number of scans per cycle for up, down radiance and irradiance
         L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = self.cycleparse(l1a_rad, l1a_irr, dataset_l1b)
-
+        print(L1a_downrad)
         L1b_downrad = self.avg.average_l1a("radiance", L1a_downrad)
         L1b_irr = self.avg.average_l1a("irradiance", L1a_irr)
+        print(L1b_downrad)
         # INTERPOLATE Lsky and Ed FOR EACH Lu SCAN! Threshold in time -> ASSIGN FLAG
         # interpolate_l1b_w calls interpolate_irradiance which includes interpolation of the
         # irradiance wavelength to the radiance wavelength
@@ -403,7 +404,7 @@ class RhymerHypstar:
                  "fresnel_default", "temp_variability_ed", "temp_variability_lu", "simil_fail"]
 
         for measurandstring in ["irradiance", "downwelling_radiance"]:
-            L1c_int["{}_std".format(measurandstring)].values = self.avg.calc_std_masked(
+            L1c_int["std_{}".format(measurandstring)].values = self.avg.calc_std_masked(
                 L1c_int, measurandstring, flags).ravel()
 
         # pd.set_option('display.max_columns', None)  # or 1000

@@ -349,36 +349,35 @@ class HypernetsReader:
 
                 #             print(datetime.fromtimestamp(int(ts+timereboot)))
                 #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
-                if lat is None:
-                    lat = np.nan
-                    lon = np.nan
-                    sza = np.nan
-                    saa = np.nan
-                    self.context.logger.error(
-                        "Lattitude is not found, using nan values instead for lat, lon, sza and saa."
-                    )
+                if lat is not None:
+                    ds.attrs["site_latitude"] = lat
+                    ds.attrs["site_longitude"] = lon
+                    ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
+                    ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
+                    vaa_rel, vza = map(float, specattr["pt_ask"].split(";"))
+                    vaa_abs, vza_abs = map(float, specattr['pt_abs'].split(";"))
+                    if specattr.get('pt_ref'):
+                        vaa_ref, vza_ref = map(float, specattr['pt_ref'].split(";"))
+                        ds["vaa_ref"][scan_number] = vaa_ref
+                    else:
+                        vaa_ref = -999999
+                    ds["vaa_ask"][scan_number] = vaa_rel
+                    ds["vaa_abs"][scan_number] = vaa_abs
+
+                    vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel) / 360
+                           - int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel) / 360)) * 360
+                    print("vaa_ref:{}, vaa_abs:{}, vaa_ask:{}, saa: {}".format(vaa_ref, vaa_abs, vaa_rel,
+                                                                               ds["solar_azimuth_angle"][
+                                                                                   scan_number].values))
                 else:
-                    sza = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
-                    saa = get_azimuth(float(lat), float(lon), acquisitionTime)
-
-                ds.attrs["site_latitude"] = lat
-                ds.attrs["site_longitude"] = lon
-                ds["solar_zenith_angle"][scan_number] = sza
-                ds["solar_azimuth_angle"][scan_number] = saa
-                vaa_rel, vza = map(float, specattr["pt_ask"].split(";"))
-                vaa = (
-                    (ds["solar_azimuth_angle"][scan_number].values + vaa_rel) / 360
-                    - int(
-                        (ds["solar_azimuth_angle"][scan_number].values + vaa_rel) / 360
-                    )
-                ) * 360
-
-                ds["quality_flag"][scan_number] = flag
-                ds["integration_time"][scan_number] = header["integration_time"]
-                ds["temperature"][scan_number] = header["temperature"]
-
+                    self.context.logger.error(
+                        "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
+                ds['quality_flag'][scan_number] = flag
+                ds['integration_time'][scan_number] = header['integration_time']
+                ds['temperature'][scan_number] = header['temperature']
                 ds["viewing_azimuth_angle"][scan_number] = vaa
                 ds["viewing_zenith_angle"][scan_number] = vza
+
                 # accelaration:
                 # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
                 # acceleration measurements respectively. These are factory-calibrated steady-state

@@ -421,6 +421,10 @@ class DataTemplates:
                 "solar_zenith_angle",
                 "epsilon",
                 "rhof",
+                "fresnel_wind",
+                "vaa_ref",
+                "vaa_abs",
+                "vaa_ask"
             ]:
                 temp_arr = np.empty(len(series_id))
                 for i in range(len(series_id)):
