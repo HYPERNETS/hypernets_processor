@@ -28,9 +28,7 @@ where digital_number gives the measured signal (in digital numbers), dark_signal
 gains gives the calibration coefficients, non_linear has the polynomial non-linearity coefficients, and int_time
 is the integration time of the measurement. 
 An update to this default measurement function is foreseen, which will include temperature and straylight corrections.
-The gains and non-linearity coefficients are taken from the most recent calibration data for the given instrument. 
-In a future version of the processor and when post-deployment calibration files are available, calibration data for a 
-single measurement will be estimated from a linear interpolation in time of the calibration data.
+The gains and non-linearity coefficients are taken from the most recent calibration data for the given instrument at the time of observation.
 
 The same measurement function is applied for radiance and irradiance measurements, but the gains and non_linearity coefficients 
 (as well as the measurements themselves) will be different. For the land network, the VNIR and SWIR sensors also both use the 

@@ -75,6 +75,7 @@ def load_table_names(db_a):
     return table_names
 
 if __name__ == "__main__":
+    print(os.path.join(archive_path, files_archive[0]))
     db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
     table_names = load_table_names(db_a)
     db_a.close()
