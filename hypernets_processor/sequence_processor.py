@@ -16,6 +16,8 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.calibration.calibration_converter import CalibrationConverter
 from obsarray.templater.dataset_util import DatasetUtil as du
+from hypernets_processor.data_utils.quality_checks import QualityChecks
+
 
 import os
 
@@ -58,7 +60,7 @@ class SequenceProcessor:
         calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
-        rhymer = RhymerHypstar(self.context)
+        qc = QualityChecks(self.context)
         avg = Average(self.context,)
         rhymer=RhymerHypstar(self.context)
         writer=HypernetsWriter(self.context)
@@ -105,8 +107,8 @@ class SequenceProcessor:
                         calibration_data_irr,
                     )
                     self.context.logger.info("Done")
-                    print(rhymer.qc_illumination(L1a_irr))
-                    if rhymer.qc_illumination(L1a_irr)> 0.1:
+                    print(qc.qc_illumination(L1a_irr))
+                    if qc.qc_illumination(L1a_irr)> 0.1:
                         self.context.logger.info("Non constant illumination for sequence {}".format(L1a_irr.attrs['sequence_id']))
                         self.context.anomaly_handler.add_anomaly("nu")
 
