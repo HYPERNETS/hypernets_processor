@@ -106,9 +106,9 @@ CAL_METADATA = {"type": "dataset",
 QC_METADATA={"IRR_acceleration_x_mean": "NaN",
                "IRR_acceleration_x_std": "NaN",
              "ss_res":"NaN",
-             "Number of valid upwelling radiance scans":"NaN",
-            "Number of valid downwelling radiance scans":"NaN",
-             "Number of valid downwelling irradiance scans":"NaN",
+             "nlu":"NaN",
+            "nld":"NaN",
+             "ned":"NaN",
                }
 
 L1A_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file

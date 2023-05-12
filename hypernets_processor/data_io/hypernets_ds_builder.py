@@ -171,6 +171,7 @@ class HypernetsDSBuilder:
 
                 hypstar_path = os.path.join(self.path_netcdf, hypstar.upper())
                 name = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                print(os.path.exists(os.path.join(hypstar_path, name)))
                 if os.path.exists(os.path.join(hypstar_path, name)):
                     irrcalfile = xr.open_dataset(os.path.join(hypstar_path, name))
                     name = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
