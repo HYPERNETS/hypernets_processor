@@ -22,6 +22,8 @@ from hypernets_processor.data_io.format.flags import FLAG_COMMON
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
+from hypernets_processor.data_io.normalize_360 import normalizedeg
+
 
 '''___Authorship___'''
 __author__ = "ClÃ©mence Goyens"
@@ -154,7 +156,7 @@ class HypernetsReader:
 
         return wvl
 
-    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, instrument_id, site_id):
+    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -316,25 +318,33 @@ class HypernetsReader:
                     ds.attrs["site_longitude"] = lon
                     ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
                     ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
-                    print(ds["solar_azimuth_angle"][scan_number].values)
                     vaa_rel, vza = map(float, specattr['pt_ask'].split(";"))
                     vaa_abs, vza_abs = map(float, specattr['pt_abs'].split(";"))
                     if specattr.get('pt_ref'):
                         vaa_ref, vza_ref = map(float, specattr['pt_ref'].split(";"))
-                        ds["vaa_ref"][scan_number] = vaa_ref
                     else:
                         vaa_ref=-999999
-                    ds["vaa_ask"][scan_number] = vaa_rel
-                    ds["vaa_abs"][scan_number] = vaa_abs
 
-                    vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360
-                           -int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360))*360
-                   # print("vaa_ref:{}, vaa_abs:{}, vaa_ask:{}, saa: {}".format(vaa_ref,vaa_abs, vaa_rel,
-                   #                                                            ds["solar_azimuth_angle"][scan_number].values))
+                    ds["vaa_ref"][scan_number] = normalizedeg(float(vaa_ref),0,360)
+                    ds["vaa_ask"][scan_number] = normalizedeg(float(vaa_rel),0,360)
+                    ds["vaa_abs"][scan_number] = normalizedeg(float(vaa_abs),0,360)
 
+
+                    angacc=abs(normalizedeg(float(vaa_abs),0,360)-normalizedeg(float(vaa_ref),0,360))
+                    print("Ange accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
+                    print("If azimuth switch is on, please check the following: switch:{}, vaa_rel:{:.4f}, vaa_abs:{:.4f}, saa:{:.4f}".format(
+                        azimuth_switch, vaa_rel, vaa_abs, ds["solar_azimuth_angle"][scan_number].values
+                    ))
+                    if angacc>3:
+                        self.context.logger.error("Accuracy of pan is above 3°. Check your system and/or data before processing.")
+
+                    vaa = normalizedeg(float(vaa_abs),0,360)-float(offset_pan)
+
+                    #raise SystemExit(0)
                 else:
                     self.context.logger.error(
-                        "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
+                        "Latitude is not found, using default values instead for lat, lon, sza and saa.")
+
                 ds['quality_flag'][scan_number] = flag
                 ds['integration_time'][scan_number] = header['integration_time']
                 ds['temperature'][scan_number] = header['temperature']
@@ -599,7 +609,7 @@ class HypernetsReader:
                             #     ds_swir["solar_azimuth_angle"][scan_number_swir]+vaa_rel))/360
                         else:
                             self.context.logger.error(
-                                "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
+                                "Latitude is not found, using default values instead for lat, lon, sza and saa.")
                         ds_swir['quality_flag'][scan_number_swir] = flag
                         if spectrum.header.exposure_time>0:
                             ds_swir['integration_time'][
@@ -739,7 +749,22 @@ class HypernetsReader:
             else:
                 site_id = self.context.get_config_value("site_id")
 
-            print(site_id)
+            if 'azimuth_switch' in (globalattr.keys()):
+                azimuth_switch = str(globalattr['azimuth_switch']).strip()
+            else:
+                azimuth_switch = self.context.get_config_value("azimuth_switch")
+            if 'offset_pan' in (globalattr.keys()):
+                offset_pan = str(globalattr['offset_pan']).strip()
+            else:
+                offset_pan = self.context.get_config_value("offset_pan")
+            if 'offset_tilt' in (globalattr.keys()):
+                offset_tilt = str(globalattr['offset_tilt']).strip()
+            else:
+                offset_tilt = self.context.get_config_value("offset_tilt")
+
+            print(offset_tilt)
+            print(offset_pan)
+            print(azimuth_switch)
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
@@ -785,7 +810,7 @@ class HypernetsReader:
             self.context.logger.error("Metadata missing")
             self.context.anomaly_handler.add_anomaly("m")
 
-        return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id
+        return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan
 
     def read_aux(self, seq_dir):
         if os.path.exists(os.path.join(seq_dir, "meteo.csv")):
@@ -818,14 +843,16 @@ class HypernetsReader:
         l0_swir_rad = None
         l0_swir_bla = None
 
-        lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id = self.read_metadata(
-            seq_dir)
+        lat, lon, cc, metadata, \
+            seriesIrr, seriesRad, seriesBlack, \
+            seriesPict, flag, instrument_id, site_id, \
+            azimuth_switch, offset_tilt, offset_pan = self.read_metadata(seq_dir)
 
         if seriesIrr:
             print("we got here-irradiance")
             if self.context.get_config_value("network") == "w":
                 l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
-                                          "L0_IRR", calibration_data_irr, instrument_id, site_id)
+                                          "L0_IRR", calibration_data_irr, instrument_id, site_id, azimuth_switch, offset_tilt, offset_pan)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_irr, overwrite=True)
             else:
@@ -844,7 +871,7 @@ class HypernetsReader:
             print("wegothere -radiance")
             if self.context.get_config_value("network") == "w":
                 l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
-                                          "L0_RAD", calibration_data_rad, instrument_id, site_id)
+                                          "L0_RAD", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_rad, overwrite=True)
             else:
@@ -863,7 +890,7 @@ class HypernetsReader:
         if seriesBlack:
             if self.context.get_config_value("network") == "w":
                 l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag,
-                                          "L0_BLA", calibration_data_rad, instrument_id, site_id)
+                                          "L0_BLA", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_bla, overwrite=True)
             else:

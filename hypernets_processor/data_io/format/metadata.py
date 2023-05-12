@@ -21,18 +21,18 @@ Standard metadata for Hypernets L1, L2a and L2b files, for the land a water netw
 STANDARD_METADATA = {"type": "dataset",
                      "abstract": "The HYPERNETS project (Horizon 2020 research and innovation, grant agreement "
                                  "No 775983) has the overall aim to provide high quality in situ measurements to"
-                                 "support the (visible/SWIR) optical Copernicus products. Therefore a new "
+                                 " support the (visible/SWIR) optical Copernicus products. Therefore a new "
                                  "multi-head hyperspectral spectroradiometer dedicated to land and water surface"
                                  " reflectance validation with instrument pointing capabilities and embedded "
                                  "calibration device has been established. The instrument has been deployed at "
                                  "24 sites covering a range of water and land types and a range of climatic and"
-                                 "logistic conditions (www.hypernets.eu).",
+                                 " logistic conditions (www.hypernets.eu).",
                      "conventions": "CFv72, NVS2.0",
                      "format_version": "v01.0",
                      "netcdf_version": "1.6",
                      "processor_name": "hypernets_processor",
                      "processor_version": "NaN",
-                     "processor_atbd": "TBD",
+                     "processor_atbd": "https://hypernets-processor.readthedocs.io/en/latest/",
                      "product_name": "NaN",
                      "data_created": "NaN",  # adds on write not working currently
                      "references": "https://hypernets-processor.readthedocs.io/en/latest/",
@@ -41,15 +41,14 @@ STANDARD_METADATA = {"type": "dataset",
                      "easting": "longitude",
                      "northing": "latitude",
                      "acknowledgement": "HYPERNETS project is funded by Horizon 2020 research and innovation program, "
-                                        "Grand Agreement No 775993. Consortium of project  of the Hypernets test sites,"
-                                        " .... are greatly acknowledged.",
+                                        "Grand Agreement No 775993. Consortium of project of the Hypernets test sites are greatly acknowledged.",
                      "project_name": "H2020 HYPERNETS GN 775993",
                      "language": "English",
                      "operational_status": "operational",
                      "limitations": "no limitations to public access",
                      "licence": "Attribution-NonCommercial-NoDerivs CC BY-NC-ND",
                      "conformity": "notEvaluated",
-                     "lineage": "Quality assured following www.hypernets.eu/docs/QC/",
+                     "lineage": "https://hypernets-processor.readthedocs.io/en/latest/",
                      "instrument_configuration_file": "TBD",
                      "history": "TBD",  # "2020-04-01T00:02:00Z :Creation, 2028-03-23T11:56:12Z :Reviewed calibration",
                      "processor_configuration_file": "NaN",
@@ -107,29 +106,24 @@ CAL_METADATA = {"type": "dataset",
 QC_METADATA={"IRR_acceleration_x_mean": "NaN",
                "IRR_acceleration_x_std": "NaN",
              "ss_res":"NaN",
-             "nlu":"NaN",
-            "nld":"NaN",
-             "ned":"NaN",
+             "Number of valid upwelling radiance scans":"NaN",
+            "Number of valid downwelling radiance scans":"NaN",
+             "Number of valid downwelling irradiance scans":"NaN",
                }
 
 L1A_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file
                     "instrument_calibration_file_rad": "NaN",
-                    "vaa_ask": "NaN",
-                    "vaa_abs": "NaN",
-                    "vaa_ref": "NaN",
                     }
 
 L1A_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance",  # example of irradiance file
                     "instrument_calibration_file_irr": "NaN",
-                    "vaa_ask": "NaN",
-                    "vaa_abs": "NaN",
-                    "vaa_ref": "NaN",
+
                     }
 
 W_L1C_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
                                " radiance and water leaving radiance",  # example of irradiance file
                       "instrument_calibration_file_rad": "NaN",
-                      "instrument_calibration_file_irr": "NaN"
+                      "instrument_calibration_file_irr": "NaN",
                       }
 
 L_L1C_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradiance",  # example of irradiance file
@@ -139,7 +133,7 @@ L_L1C_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradia
 
 W_L2A_REF_METADATA = {"title": "HYPSTAR Water network dataset of spectral surface reflectance",
                       "instrument_calibration_file_rad": "NaN",
-                      "instrument_calibration_file_irr": "NaN"
+                      "instrument_calibration_file_irr": "NaN",
                       }
 
 L_L2A_REF_METADATA = {"title": "HYPSTAR Land network dataset of spectral surface reflectance",

@@ -8,7 +8,8 @@ from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
 from hypernets_processor.data_io.format.variables import VARIABLES_DICT_DEFS
 from datetime import datetime
-
+import xarray as xr
+import os
 """___Authorship___"""
 __author__ = "Sam Hunt"
 __created__ = "6/5/2020"
@@ -44,6 +45,13 @@ class HypernetsDSBuilder:
         self.context = context
         self.variables_dict_defs = variables_dict_defs
         self.metadata_defs = metadata_defs
+        dir_path = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        )
+        self.path_netcdf = os.path.join(
+            dir_path, "hypernets_processor/calibration/calibration_files", "HYPSTAR_cal"
+        )
+
 
     def create_ds_template(self, dim_sizes_dict: object, ds_format: object, propagate_ds: object = None,
                            swir: object = False, ds=None) -> object:
@@ -131,14 +139,53 @@ class HypernetsDSBuilder:
             if ds_format in ['L_L1A_RAD', 'W_L1A_RAD', 'L_L1B_RAD']:
                 metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(
                     version) + ".nc"
+
+                hypstar_path = os.path.join(self.path_netcdf, hypstar.upper())
+                name = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(version) + ".nc"
+                if os.path.exists(os.path.join(hypstar_path, name)):
+                    calfile = xr.open_dataset(os.path.join(hypstar_path, name))
+                    metadata["history"] = "calibration dates:{}, nonlineardates:{}, wavdates{}:".format(
+                    calfile.calibrationdates.values,
+                    calfile.nonlineardates.values,
+                    calfile.wavdates.values)
+                    calfile.close()
+
             if ds_format in ['L_L1A_IRR', 'W_L1A_IRR', 'L_L1B_IRR']:
                 metadata["instrument_calibration_file_irr"] = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(
                     version) + ".nc"
+                hypstar_path = os.path.join(self.path_netcdf, hypstar.upper())
+                name = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                if os.path.exists(os.path.join(hypstar_path, name)):
+                    calfile = xr.open_dataset(os.path.join(hypstar_path, name))
+                    metadata["history"] = "calibration dates:{}, nonlineardates:{}, wavdates{}:".format(
+                    calfile.calibrationdates.values,
+                    calfile.nonlineardates.values,
+                    calfile.wavdates.values)
+                    calfile.close()
+
             if ds_format in ['W_L1B', 'L_L1C', 'L_L2A']:
                 metadata["instrument_calibration_file_irr"] = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(
                     version) + ".nc"
                 metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(
                     version) + ".nc"
+
+                hypstar_path = os.path.join(self.path_netcdf, hypstar.upper())
+                name = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                if os.path.exists(os.path.join(hypstar_path, name)):
+                    irrcalfile = xr.open_dataset(os.path.join(hypstar_path, name))
+                    name = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                    radcalfile = xr.open_dataset(os.path.join(hypstar_path, name))
+                    metadata["history"] = "IRR calibration dates:{}, nonlineardates:{}, wavdates:{}/RAD calibration dates:{}, nonlineardates:{}, wavdates:{}/".format(
+                        irrcalfile.calibrationdates.values,
+                        irrcalfile.nonlineardates.values,
+                        irrcalfile.wavdates.values,
+                        radcalfile.calibrationdates.values,
+                        radcalfile.nonlineardates.values,
+                        radcalfile.wavdates.values
+                    )
+                    irrcalfile.close()
+                    radcalfile.close()
+
             if ds_format in ['W_L1C','W_L2A']:
                 # W_L1C
                 metadata["instrument_calibration_file_rad"] = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(

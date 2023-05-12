@@ -90,6 +90,13 @@ class Average:
             dataset_l2a["{}_std".format(measurandstring)].values = self.calc_std_masked(
                 dataset,measurandstring,flags)
 
+        dataset_l2a.attrs["ned"] = str(dataset.attrs['ned'])
+        dataset_l2a.attrs["nld"] = str(dataset.attrs['nld'])
+        dataset_l2a.attrs["nlu"] = str(dataset.attrs['nlu'])
+
+        dataset_l2a.attrs["IRR_acceleration_x_mean"] = str(dataset.attrs['IRR_acceleration_x_mean'])
+        dataset_l2a.attrs["IRR_acceleration_x_std"] = str(dataset.attrs['IRR_acceleration_x_std'])
+
         return dataset_l2a
 
     def calc_mean_masked(self, dataset, var, flags, rand_unc=False, corr=False):
