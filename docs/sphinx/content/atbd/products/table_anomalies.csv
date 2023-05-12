@@ -1,23 +1,14 @@
-Bit #,Symbol,Description,Comment, Application*
-1,saturation,Pixel saturation,Too many pixels above an empirically defined threshold, L & W
-2,nonlinearity,Non-linearity,, L & W
-3,bad_pointing,Bad pointing,Pan/tilt angle versus requested angle - Not yet implemented, L & W
-4,placeholder1,,Placeholder for other potential calibration related quality flags, L & W
-5,lon_default,Missing longitude,When raised use default, L & W
-6,lat_default,Missing latitude,When raised use default, L & W
-7, outliers, Outliers and NaN, Scan masked if the spectrally integrated signal is more than 3 sigma/25% (whichever is largest) - process is repeated until convergance, L & W
-8, l0_thresholds,, ,L & W
-9, l0_discontinuity,, ,L & W
-10, dark_outliers, Outliers and NaN , Same as for outliers (see 7), L & W
-11,angles_missing,Missing angles,, W
-12,lu_eq_missing,missing azimuthal equivalent for upwelling radiance ,, W
-13,fresnel_angle_missing,no appropriate fresnel angle for downwelling radiance,, W
-14,fresnel_default,Default/Fixed fresnel reflectance/fresnel angles out of range for Mobleys look up table,"fresnel_default
-in get_fresnelrefl", W
-15,temp_variability_ed,Temporal variability in ED,diff_threshold from processing config, W
-16,temp_variability_lu,Temporal variability in Lsky,diff_threshold from processing config, W
-17,min_nbred,Min number of Ed required for averaging,Minimum number of valid scans (Nbred) from processing config, W
-18,min_nbrlu,Min number of Lt required for averaging,Minimum number of valid scans (Nrblu) from processing config,W
-19,min_nbrlsky,Min number of Lsky required for averaging,Minimum number of valid scans (Nbrlsky) from processing config,W
-20,def_wind_flag,Default wind value for fresnel retrieval,Default value taken from processing config, W
-21,simil_fail,Similarity test failure,Reference wavelength from processing config and LUT from Ruddick et al. (2006)., W
+ID, Description, Error raised, Application*
+a, angle achieved by pan tilt >5 deg away from target angle during sequence, None (see bad_pointing flag), L & W
+b, Not a standard sequence (too much missing data to keep processing), IOError, L & W
+e, Meteo file missing, None, L & W
+i, No valid irradiance measurements, None, L & W
+m, Metadata file missing, IOError, L & W
+nlu, Not enough Lu scans, ValueError, W
+nls, Not enough Lsky scans, ValueError, W
+nu, Non constant illumination, None, L & W
+l, Ld missing for fresnel correction, ValueError, W
+o, more than 50% of data has random error above 100% (probably corrupted data), ValueError, L & W
+q, None of the scans in a series passed the quality control, None, L & W
+s, sequence data incomplete (e.g. failed series present in data), None, L & W
+x, unexpected error during processing, catches all errors, L & W

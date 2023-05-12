@@ -1,15 +1,22 @@
-Bit #,Symbol,Description,Comment, Application*
-1,saturation,Pixel saturation,Too many pixels above an empirically defined threshold, L & W
-2,nonlinearity,Non-linearity,, L & W
-3,bad_pointing,Bad pointing,Pan/tilt angle versus requested angle - Not yet implemented, L & W
-4,placeholder1,,Placeholder for other potential calibration related quality flags, L & W
-5,lon_default,Missing longitude,When raised use default, L & W
-6,lat_default,Missing latitude,When raised use default, L & W
-7, outliers, Outliers and NaN, Scan masked if the spectrally integrated signal is more than 3 sigma/25% (whichever is largest) - process is repeated until convergance, L & W
-8, l0_thresholds,, ,L & W
-9, l0_discontinuity,, ,L & W
-10, dark_outliers, Outliers and NaN , Same as for outliers (see 7), L & W
-11,angles_missing,Missing angles,, W
+Bit #,name,Description,Comment, Application*
+1,angles_missing,Missing angles,, W
+2,saturation,Pixel saturation,Too many pixels above an empirically defined threshold, L & W
+3,nonlinearity,Non-linearity,, L & W
+4,bad_pointing,Bad pointing,Pan/tilt angle versus requested angle - Not yet implemented, L & W
+5,placeholder1,,Placeholder for other potential calibration related quality flags, L & W
+6,lon_default,Missing longitude,When raised use default, L & W
+7,lat_default,Missing latitude,When raised use default, L & W
+8, outliers, Outliers and NaN, Scan masked if the spectrally integrated signal is more than 3 sigma/25% (whichever is largest) - process is repeated until convergance, L & W
+9, l0_thresholds,, ,L & W
+10, l0_discontinuity,, ,L & W
+11, dark_masked, Outliers and NaN , Same as for outliers (see 7), L & W
+12, half_of_scans_masked,, ,L & W
+13, vza_irradiance,, ,L & W
+14, clear_sky_irradiance,, ,L & W
+15, variable_irradiance ,, ,L & W
+16, single_irradiance_used ,, ,L & W
+17, no_clear_sky ,, ,L & W
+18, less_than_three_darks,, ,L & W
 12,lu_eq_missing,missing azimuthal equivalent for upwelling radiance ,, W
 13,fresnel_angle_missing,no appropriate fresnel angle for downwelling radiance,, W
 14,fresnel_default,Default/Fixed fresnel reflectance/fresnel angles out of range for Mobleys look up table,"fresnel_default

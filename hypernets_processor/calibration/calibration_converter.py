@@ -13,7 +13,6 @@ import glob
 import comet_maths as cm
 import xarray
 from configparser import ConfigParser
-import pandas as pd
 from datetime import datetime
 
 """___Authorship___"""
@@ -74,7 +73,7 @@ class CalibrationConverter:
         hypstar_path = os.path.join(self.path_netcdf, hypstar)
         name = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(self.version) + ".nc"
 
-        print("using calibration file - radiance:", name)
+        # print("using calibration file:", name)
 
         if os.path.exists(os.path.join(hypstar_path, name)):
             calibration_data_rad = xarray.open_dataset(os.path.join(hypstar_path, name))
@@ -84,7 +83,6 @@ class CalibrationConverter:
             )
 
         name = "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(self.version) + ".nc"
-        print("using calibration file - irradiance:", name)
 
         if os.path.exists(os.path.join(hypstar_path, name)):
             calibration_data_irr = xarray.open_dataset(os.path.join(hypstar_path, name))
@@ -93,28 +91,43 @@ class CalibrationConverter:
                 os.path.join(hypstar_path, name) + " calibration file does not exist"
             )
 
-        # todo set the -1 index to something appropriate or use interpolating
-
-        # ensure datatime coordinates and not object
-        datecoordinates=['calibrationdates','nonlineardates','wavdates']
-        for dc in datecoordinates:
-            calibration_data_rad[dc] = pd.DatetimeIndex(pd.to_datetime(calibration_data_rad[dc].values,format="%y%m%d"))
-            calibration_data_irr[dc] = pd.DatetimeIndex(pd.to_datetime(calibration_data_irr[dc].values,format="%y%m%d"))
+        sequence_datetime=parse_sequence_path(sequence_path)["datetime"]
 
         calibration_data_times = calibration_data_rad["calibrationdates"].values
         nonlin_times = calibration_data_rad["nonlineardates"].values
         wav_times = calibration_data_rad["wavdates"].values
 
-        calibration_data_rad.sel(
-            calibrationdates=calibration_data_times[-1]
-        )
-        calibration_data_rad = calibration_data_rad.sel(nonlineardates=nonlin_times[-1])
-        calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[-1])
+        calib_i=[x for x, date in enumerate(calibration_data_times)
+                   if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
+        nlin_i=[x for x, date in enumerate(nonlin_times)
+                   if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
+        wav_i=[x for x, date in enumerate(wav_times)
+                   if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
 
-        calibration_data_irr = calibration_data_irr.sel(calibrationdates=calibration_data_times[-1],
-                                                        method='nearest')
-        calibration_data_irr = calibration_data_irr.sel(nonlineardates=nonlin_times[-1])
-        calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times[-1])
+        calibration_data_rad = calibration_data_rad.sel(
+            calibrationdates=calibration_data_times[calib_i]
+        )
+        calibration_data_rad = calibration_data_rad.sel(nonlineardates=nonlin_times[nlin_i])
+        calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[wav_i])
+
+        calibration_data_times_irr = calibration_data_irr["calibrationdates"].values
+        nonlin_times_irr = calibration_data_irr["nonlineardates"].values
+        wav_times_irr = calibration_data_irr["wavdates"].values
+
+        calib_i_irr = [x for x, date in enumerate(calibration_data_times_irr)
+                   if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
+        nlin_i_irr = [x for x, date in enumerate(nonlin_times_irr)
+                  if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
+        wav_i_irr = [x for x, date in enumerate(wav_times_irr)
+                 if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
+
+
+        calibration_data_irr = calibration_data_irr.sel(
+            calibrationdates=calibration_data_times_irr[calib_i_irr]
+        )
+        calibration_data_irr = calibration_data_irr.sel(nonlineardates=nonlin_times_irr[nlin_i_irr])
+        calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times_irr[wav_i_irr])
+
         if self.context.get_config_value("network") == "l":
             name = (
                 "HYPERNETS_CAL_"
@@ -155,22 +168,22 @@ class CalibrationConverter:
             ].values
             nonlin_times = calibration_data_rad_swir["nonlineardates"].values
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                calibrationdates=calibration_data_times[-1]
+                calibrationdates=calibration_data_times[calib_i]
             )
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                nonlineardates=nonlin_times[-1]
+                nonlineardates=nonlin_times[nlin_i]
             )
             calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                wavdates=wav_times[-1]
+                wavdates=wav_times[wav_i]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                calibrationdates=calibration_data_times[-1]
+                calibrationdates=calibration_data_times_irr[calib_i_irr]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                nonlineardates=nonlin_times[-1]
+                nonlineardates=nonlin_times_irr[nlin_i_irr]
             )
             calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                wavdates=wav_times[-1]
+                wavdates=wav_times_irr[wav_i_irr]
             )
 
             return (
@@ -247,7 +260,7 @@ class CalibrationConverter:
             if ".pdf" not in path
         ]
         caldates = []
-        gains=[]
+        gains=np.zeros(9999)
         minwav=350
         for caldatepath in caldatepaths:
             if measurandstring == "radiance":
@@ -260,7 +273,14 @@ class CalibrationConverter:
                     )
                 )[0]
                 caldate = calpath[-15:-9]
-
+                print(os.path.basename(caldatepath))
+                if ("b" in os.path.basename(caldatepath)) or ("10C" in os.path.basename(caldatepath)):
+                    caldate += "T235959"
+                elif "a" in os.path.basename(caldatepath):
+                    caldate += "T000000"
+                else:
+                    caldate += "T120000"
+                print(caldate)
             else:
                 calpath = glob.glob(
                     os.path.join(
@@ -271,15 +291,21 @@ class CalibrationConverter:
                     )
                 )[0]
                 caldate = calpath[-15:-9]
+                if ("b" in os.path.basename(caldatepath)) or ("10C" in os.path.basename(caldatepath)):
+                    caldate += "T235959"
+                elif "a" in os.path.basename(caldatepath):
+                    caldate += "T000000"
+                else:
+                    caldate += "T120000"
 
             if os.path.exists(calpath):
                 caldates = np.append(caldates, caldate)
                 gains_temp = np.genfromtxt(calpath)
-                if len(gains_temp)>len(gains):
+                wavs_temp = gains_temp[:, 1]
+                gains_temp = gains_temp[np.where(wavs_temp > minwav)[0]]
+                if len(gains_temp)<len(gains):
                     gains=gains_temp
                     wavs = gains[:, 1]
-                    gains = gains[np.where(wavs>minwav)[0]]
-                    wavs = wavs[np.where(wavs>minwav)[0]]
 
         lincaldatepaths = [
             path
@@ -314,6 +340,12 @@ class CalibrationConverter:
                     )
                 )[0]
             lincaldate=nonlinpath[-10:-4]
+            if ("b" in os.path.basename(lincaldatepath)) or ("10C" in os.path.basename(lincaldatepath)):
+                lincaldate += "T235959"
+            elif "a" in os.path.basename(lincaldatepath):
+                lincaldate += "T000000"
+            else:
+                lincaldate += "T120000"
 
             if os.path.exists(nonlinpath):
                 nonlindates = np.append(nonlindates, lincaldate)
@@ -340,6 +372,12 @@ class CalibrationConverter:
                 )
             )[0]
             wavcaldate = wavcalpath[-10:-4]
+            if ("b" in os.path.basename(wavcaldatepath)) or ("10C" in os.path.basename(wavcaldatepath)):
+                wavcaldate += "T235959"
+            elif "a" in os.path.basename(wavcaldatepath):
+                wavcaldate += "T000000"
+            else:
+                wavcaldate += "T120000"
 
             if os.path.exists(wavcalpath):
                 wavcaldates = np.append(wavcaldates, wavcaldate)
@@ -436,14 +474,14 @@ class CalibrationConverter:
                 gains = gains[np.where(wavs > 350)[0]]
                 wavs = wavs[np.where(wavs > 350)[0]]
                 placeholder_unc = 2
-
+                gainlen=len(calibration_data["wavpix"].values[i_cal,:])
                 if True:
                     # calibration_data["wavelength"].values = gains[:, 1]
-                    calibration_data["wavpix"].values[i_cal,:len(gains)] = gains[:, 0]
-                    calibration_data["gains"].values[i_cal,:len(gains)] = gains[:, 2]
+                    calibration_data["wavpix"].values[i_cal,:] = gains[:gainlen, 0]
+                    calibration_data["gains"].values[i_cal,:] = gains[:gainlen, 2]
                     # calibration_data["u_rel_random_gains"].values = None
 
-                    calibration_data["u_rel_systematic_indep_gains"].values[i_cal,:len(gains)] = (
+                    calibration_data["u_rel_systematic_indep_gains"].values[i_cal,:] = ((
                         gains[:, 6] ** 2
                         + gains[:, 7] ** 2
                         + gains[:, 8] ** 2
@@ -459,7 +497,7 @@ class CalibrationConverter:
                         + gains[:, 19] ** 2
                         + nonlin_unc**2
                         + placeholder_unc**2
-                    ) ** 0.5
+                    ) ** 0.5)[:gainlen]
 
                     cov_diag = cm.convert_corr_to_cov(
                         np.eye(len(gains[:, 2])), gains[:, 2] * (gains[:, 19])
@@ -500,14 +538,14 @@ class CalibrationConverter:
                     )
 
                     calibration_data["err_corr_systematic_indep_gains"].values[
-                        i_cal,:len(gains),:len(gains)
+                        i_cal,:,:
                     ] = cm.correlation_from_covariance(
                         cov_diag + cov_other + cov_full + cov_filament
-                    )
+                    )[:gainlen,:gainlen]
 
                     calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[
-                        i_cal,:len(gains)
-                    ] = (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5
+                        i_cal,:
+                    ] = ((gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5)[:gainlen]
 
                     cov_other = cm.convert_corr_to_cov(
                         np.eye(len(gains[:, 2])),
@@ -520,8 +558,8 @@ class CalibrationConverter:
                     )
 
                     calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
-                        i_cal,:len(gains),:len(gains)
-                    ] = cm.correlation_from_covariance(cov_other + cov_filament)
+                        i_cal,:,:
+                    ] = cm.correlation_from_covariance(cov_other + cov_filament)[:gainlen,:gainlen]
                 # except:
                 #     print(caldatepath, " failed")
             i_cal += 1

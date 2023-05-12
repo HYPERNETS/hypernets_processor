@@ -18,7 +18,7 @@ The different quality flags are described on the :ref:`flags` page.
 
 The following table lists the different anomalies, their description and whether they stop the processing.
 
-**Table 1: Flags description**
+**Table 1: Anomalies description**
 
 .. csv-table::
    :file: table_anomalies.csv

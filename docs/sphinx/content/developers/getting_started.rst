@@ -29,7 +29,7 @@ The software is defined by the following:
 * The processing algorithm is defined in the :ref:`atbd` section.
 * The software design is defined in the :ref:`software_design` section.
 
-Tasks and issues are then organised in the GitHub `project board <https://github.com/HYPERNETS/hypernets_processor/projects/1>`_. Discuss how you can contribute to this with either Sam or Clémence :)
+Tasks and issues are then organised in the GitHub `project board <https://github.com/HYPERNETS/hypernets_processor/projects/1>`_. Discuss how you can contribute to this with either Pieter or Clémence :)
 
 The following has some information and tips to help you make your contributions.
 

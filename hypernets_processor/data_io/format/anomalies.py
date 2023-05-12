@@ -46,7 +46,7 @@ ANOMALIES_DICT = {
         "error_msg": "more than 50% of data has random error above 100% (probably corrupted data)",
     },
     "q": {
-        "description": "None of the scans in a series passed the quality controll",
+        "description": "None of the scans in a series passed the quality control",
         "error": None,
         "error_msg": None,
     },

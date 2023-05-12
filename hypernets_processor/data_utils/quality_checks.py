@@ -158,8 +158,8 @@ class QualityChecks:
 
             band_centres = dataset_l1b_irr["wavelength"].values
             bandwidth = np.append(
-                3.0 * np.ones_like(band_centres[band_centres < 1000]),
-                10.0 * np.ones_like(band_centres[band_centres > 1000]),
+                3.0 * np.ones_like(band_centres[band_centres <= self.context.get_config_value("combine_lim_wav")]),
+                10.0 * np.ones_like(band_centres[band_centres > self.context.get_config_value("combine_lim_wav")]),
             )
 
             ref_data_irr = bi.pixel_int(
