@@ -336,7 +336,8 @@ class RhymerHypstar:
                 diffa = diffa
             else:
                 diffa = diffa + 360
-            fresnel_raa[i] = abs((diffa - 180))
+            fresnel_raa[i] = abs(diffa)
+            print("this is diffa{}".format(abs(diffa)))
 
             ## get fresnel reflectance
             if self.context.get_config_value("fresnel_option") == 'Mobley':

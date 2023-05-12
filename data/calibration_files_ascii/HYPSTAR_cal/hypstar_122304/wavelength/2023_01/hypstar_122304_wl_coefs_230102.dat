@@ -1,0 +1,19 @@
+# hypstar_122304_wl_coefs_230102.dat
+# File was created 2023-01-03 14:04:54 UTC
+#
+# Polynomial coefficients for wavelength scale
+# Wavelength [nm] = c0 + c1 * px + c2 * px^2 + ...)
+# px is pixel number, counting from 0
+# Residual standard deviation [nm]:
+# sigma_VNIR_L	0.09
+# sigma_VNIR_E	0.09
+# sigma_SWIR_L	0.00
+# sigma_SWIR_E	0.00
+#
+# row1 - c0, row2 - c1, ...
+# VNIR_L	VNIR_E	SWIR_L	SWIR_E
+165.166981106479	164.585513951473	0	0
+0.434496935357342	0.43422154931339	0	0
+3.88568098503961e-05	3.97196153982306e-05	0	0
+-2.26094023156337e-09	-2.68820487662979e-09	0	0
+-2.94244991535736e-12	-2.88875958313572e-12	0	0

@@ -74,6 +74,7 @@ class SequenceProcessor:
             if self.context.get_config_value("max_level") in ["L1A","L1B","L1C","L2A"]:
                 self.context.logger.info("Processing to L1a...")
                 if l0_rad:
+                    print(calibration_data_rad)
                     L1a_rad = cal.calibrate_l1a("radiance",l0_rad,l0_bla,calibration_data_rad)
                 if l0_irr:
                     L1a_irr = cal.calibrate_l1a("irradiance",l0_irr,l0_bla,calibration_data_irr)
@@ -100,7 +101,7 @@ class SequenceProcessor:
             # pd.set_option('display.max_columns', None)  # or 1000
             # pd.set_option('display.max_rows', None)  # or 1000
             # pd.set_option('display.max_colwidth', -1)  # or 199
-            print(pd.DataFrame(du.unpack_flags(L1a_irr['quality_flag']).to_dataframe()))
+            #print(pd.DataFrame(du.unpack_flags(L1a_irr['quality_flag']).to_dataframe()))
 
             if L1b_rad and L1b_irr:
                 if self.context.get_config_value("max_level") in ["L1C","L2A"]:

@@ -192,6 +192,7 @@ class HypernetsReader:
 
         # wvl dimensions
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
+        print(FOLDER_NAME)
         f = open(FOLDER_NAME + series[1], "rb")
 
         # Header definition with length, description and decoding format
@@ -328,8 +329,8 @@ class HypernetsReader:
 
                     vaa = ((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360
                            -int((ds["solar_azimuth_angle"][scan_number].values + vaa_rel)/360))*360
-                    print("vaa_ref:{}, vaa_abs:{}, vaa_ask:{}, saa: {}".format(vaa_ref,vaa_abs, vaa_rel,
-                                                                               ds["solar_azimuth_angle"][scan_number].values))
+                   # print("vaa_ref:{}, vaa_abs:{}, vaa_ask:{}, saa: {}".format(vaa_ref,vaa_abs, vaa_rel,
+                   #                                                            ds["solar_azimuth_angle"][scan_number].values))
 
                 else:
                     self.context.logger.error(
@@ -821,6 +822,7 @@ class HypernetsReader:
             seq_dir)
 
         if seriesIrr:
+            print("we got here-irradiance")
             if self.context.get_config_value("network") == "w":
                 l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
                                           "L0_IRR", calibration_data_irr, instrument_id, site_id)
@@ -839,6 +841,7 @@ class HypernetsReader:
             self.context.logger.error("No irradiance data for this sequence")
 
         if seriesRad:
+            print("wegothere -radiance")
             if self.context.get_config_value("network") == "w":
                 l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
                                           "L0_RAD", calibration_data_rad, instrument_id, site_id)

@@ -1,5 +1,5 @@
 #import os, bz2
-import pyhdf
+#import pyhdf
 from numpy import linspace
 import os, dateutil.parser
 import numpy as np
