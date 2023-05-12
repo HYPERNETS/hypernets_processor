@@ -55,6 +55,12 @@ class SurfaceReflectance:
         l1ctol1b_function = self._measurement_function_factory.get_measurement_function(
             self.context.get_config_value("measurement_function_surface_reflectance"))
 
+        calibrate_function = self._measurement_function_factory(
+            prop=prop, repeat_dims="scan", yvariable=measurandstring
+        ).get_measurement_function(
+            self.context.get_config_value("measurement_function_calibrate")
+        )
+
         input_vars = l1ctol1b_function.get_argument_names()
         input_qty = self.prop.find_input(input_vars, dataset_l1c)
         u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset_l1c)
