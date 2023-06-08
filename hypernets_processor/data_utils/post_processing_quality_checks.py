@@ -40,6 +40,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
         plt.xlabel("datetime")
         plt.savefig(archive_path+r"\qc_%s_%s.png"%(tag,wavs[i]))
         plt.clf()
+        print("plot done")
 
 def time_between(time,start_hour,end_hour):
     if time<datetime.time(start_hour,0,0):
@@ -152,5 +153,4 @@ if __name__ == "__main__":
         for vza in vzas:
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
-                if len(times)>0:
-                    make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
+                make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
