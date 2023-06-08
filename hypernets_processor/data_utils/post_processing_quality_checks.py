@@ -30,9 +30,13 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
     for i in range(len(wavs)):
         valids=measurands[np.where(mask==0)[0],i]
         valid_times=times[np.where(mask==0)[0]]
+        ax = plt.gca()
         for ii in range(len(hour_bins)-1):
+            color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in valid_times])[0]
-            plt.plot(valid_times[hour_ids],valids[hour_ids],"o", label="%s:00-%s:00"%(hour_bins[ii],hour_bins[ii+1]))
+            plt.plot(valid_times[hour_ids], valids[hour_ids], "o", color=color,
+                     label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
+            plt.axhline(y=np.mean(valids[hour_ids]), color=color, linestyle='-')
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"go",alpha=0.2,label="masked by processor")
         plt.ylim([min(valids),max(valids)])
         plt.legend()
