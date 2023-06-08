@@ -49,7 +49,8 @@ def time_between(time,start_hour,end_hour):
 
 
 def extract_reflectances(site, wavs, vza, vaa):
-    files=glob.glob(archive_path+r"\%s\*\*\*\*\*L2A*"%site)
+    # files=glob.glob(archive_path+r"\%s\*\*\*\*\*L2A*"%site)
+    files=glob.glob(archive_path+r"/%s/*/*/*/*/*L2A*"%site)
     refl=np.zeros((len(files),len(wavs)))
     mask=np.ones(len(files))
     times=np.empty(len(files),dtype=datetime.datetime)
@@ -149,4 +150,5 @@ if __name__ == "__main__":
         for vza in vzas:
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
-                make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
+                if len(times)>0:
+                    make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
