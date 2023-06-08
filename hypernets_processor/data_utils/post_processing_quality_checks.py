@@ -40,7 +40,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
         plt.xlabel("datetime")
         plt.savefig(archive_path+r"\qc_%s_%s.png"%(tag,wavs[i]))
         plt.clf()
-        print("plot done")
+        print("plot done ", archive_path+r"\qc_%s_%s.png"%(tag,wavs[i]))
 
 def time_between(time,start_hour,end_hour):
     if time<datetime.time(start_hour,0,0):
