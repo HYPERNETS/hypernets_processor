@@ -42,7 +42,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
-        plt.savefig(archive_path+r"\qc_%s_%s.png"%(tag,wavs[i]))
+        plt.savefig(os.path.join(archive_path,"qc_%s_%s.png"%(tag,wavs[i])))
         plt.clf()
         print("plot done ", archive_path+r"\qc_%s_%s.png"%(tag,wavs[i]))
 
