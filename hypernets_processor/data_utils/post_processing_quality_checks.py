@@ -38,7 +38,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
                      label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
             plt.axhline(y=np.mean(valids[hour_ids]), color=color, linestyle='-')
             plt.axhline(y=np.mean(valids[hour_ids])-np.std(valids[hour_ids]), color=color, linestyle=':')
-            plt.axhline(y=np.mean(valids[hour_ids])-np.std(valids[hour_ids]), color=color, linestyle=':')
+            plt.axhline(y=np.mean(valids[hour_ids])+np.std(valids[hour_ids]), color=color, linestyle=':')
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"go",alpha=0.2,label="masked by processor")
         plt.ylim([min(valids),max(valids)])
         plt.legend()
