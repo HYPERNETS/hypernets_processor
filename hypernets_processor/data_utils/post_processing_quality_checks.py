@@ -5,6 +5,8 @@ import numpy as np
 import warnings
 import os
 import xarray as xr
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import pysolar
 import datetime
