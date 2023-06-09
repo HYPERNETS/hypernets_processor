@@ -79,16 +79,18 @@ def extract_reflectances(site, wavs, vza, vaa):
     refl=np.zeros((len(files),len(wavs)))
     mask=np.ones(len(files))
     times=np.empty(len(files),dtype=datetime.datetime)
+    valid=np.ones(len(files),dtype=int)
     for i in range(len(files)):
         ds=read_hypernets_file(files[i],vza=vza, vaa=vaa, filter_flags=False,max_angle_tolerance=2)
         if ds is None:
+            valid[i]=0
             continue
         if ds.quality_flag.values == 0:
             mask[i]=0
         ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
         refl[i]=ds.reflectance.values[ids,0]
         times[i]=datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
-    return times[np.where(times is not None)[0]], refl[np.where(times is not None)[0]], mask[np.where(times is not None)[0]]
+    return times[np.where(valid==1)[0]], refl[np.where(valid==1)[0]], mask[np.where(valid==1)[0]]
 
 def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags=True, max_angle_tolerance=None):
     ds = xr.open_dataset(filepath)
