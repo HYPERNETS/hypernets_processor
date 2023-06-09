@@ -80,7 +80,9 @@ def extract_reflectances(site, wavs, vza, vaa):
     mask=np.ones(len(files))
     times=np.empty(len(files),dtype=datetime.datetime)
     for i in range(len(files)):
-        ds=read_hypernets_file(files[i],vza=vza, vaa=vaa, filter_flags=False)
+        ds=read_hypernets_file(files[i],vza=vza, vaa=vaa, filter_flags=False,max_angle_tolerance=2)
+        if ds is None:
+            continue
         if ds.quality_flag.values == 0:
             mask[i]=0
         ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
@@ -88,7 +90,7 @@ def extract_reflectances(site, wavs, vza, vaa):
         times[i]=datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
     return times, refl, mask
 
-def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags=True):
+def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags=True, max_angle_tolerance=None):
     ds = xr.open_dataset(filepath)
     if filter_flags:
         id_series = np.where(ds.quality_flag.values == 0)[0]
@@ -103,6 +105,9 @@ def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags
             angledif_series = (ds["viewing_zenith_angle"].values - vza) ** 2 + (
                 np.abs(ds["viewing_azimuth_angle"].values - vaa)
             ) ** 2
+            if max_angle_tolerance is not None:
+                if np.min(angledif_series)>max_angle_tolerance:
+                    return None
             id_series = np.where(angledif_series == np.min(angledif_series))[0]
         else:
             id_series = np.where(
