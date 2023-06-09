@@ -155,8 +155,9 @@ if __name__ == "__main__":
     hour_bins=[0,10,12,14,16,24]
     vzas=[0,5,10,20,30,40,50,60]
     vaas=[83,98,113,263,278,293]
-    for site in ["GHNA","BAES","WWUK","PEAN"]:
+    for site in ["BAES","WWUK","PEAN"]:
         for vza in vzas:
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
-                make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
+                if len(times)>0:
+                    make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
