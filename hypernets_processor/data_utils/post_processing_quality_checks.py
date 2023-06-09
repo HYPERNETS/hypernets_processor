@@ -56,7 +56,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
 
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"ko",alpha=0.1,label="masked by processor")
         valids=measurand_wav[np.where(mask==0)[0]]
-        plt.ylim([min(valids)-0.1,max(valids)+0.1])
+        plt.ylim([min(valids)-0.1*(max(valids)-min(valids)),max(valids)+0.1*(max(valids)-min(valids))])
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
