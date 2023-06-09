@@ -43,7 +43,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
             color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             std, mean =sigma_clip(measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
-            print("%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
+            print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
             plt.axhline(y=mean, color=color, linestyle='-')
             plt.axhline(y=mean-2*std, color=color, linestyle=':')
             plt.axhline(y=mean+2*std, color=color, linestyle=':')
