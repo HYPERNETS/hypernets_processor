@@ -32,11 +32,10 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             std, mean =sigma_clip(measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
-            print("%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
             ids_outliers=np.where((measurand_wav[hour_ids]>mean+2*std) | (measurand_wav[hour_ids]<mean-2*std))[0]
             mask[ids_outliers]=2
 
-    print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(new_mask==0)[0]]))
+    print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
     for i in range(len(wavs)):
         measurand_wav=measurands[:,i]
         ax = plt.gca()
