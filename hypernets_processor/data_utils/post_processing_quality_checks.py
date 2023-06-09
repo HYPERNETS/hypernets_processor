@@ -60,9 +60,9 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
-        plt.savefig(os.path.join(archive_path,"qc_%s_%s.png"%(tag,wavs[i])), dpi=300)
+        plt.savefig(os.path.join(archive_path,"qc_plots","qc_%s_%s.png"%(tag,wavs[i])), dpi=300)
         plt.clf()
-        print("plot done ", archive_path+r"\qc_%s_%s.png"%(tag,wavs[i]))
+        print("plot done ", os.path.join(archive_path,"qc_plots","qc_%s_%s.png"%(tag,wavs[i])))
 
 def time_between(time,start_hour,end_hour):
     if time<datetime.time(start_hour,0,0):
@@ -88,7 +88,7 @@ def extract_reflectances(site, wavs, vza, vaa):
         ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
         refl[i]=ds.reflectance.values[ids,0]
         times[i]=datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
-    return times, refl, mask
+    return times[np.where(times is not None)[0]], refl[np.where(times is not None)[0]], mask[np.where(times is not None)[0]]
 
 def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags=True, max_angle_tolerance=None):
     ds = xr.open_dataset(filepath)
