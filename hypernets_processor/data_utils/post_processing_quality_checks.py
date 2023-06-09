@@ -41,16 +41,17 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
         ax = plt.gca()
         for ii in range(len(hour_bins)-1):
             color = next(ax._get_lines.prop_cycler)['color']
-            hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
+            hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             std, mean =sigma_clip(measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
             print("%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
             plt.axhline(y=mean, color=color, linestyle='-')
             plt.axhline(y=mean-2*std, color=color, linestyle=':')
             plt.axhline(y=mean+2*std, color=color, linestyle=':')
-
-            plt.plot(times[np.where(mask==2)[0]], measurand_wav[np.where(mask==2)[0]], "o", color=color,
+            outlier_ids=np.where((mask==2) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
+            bestdata_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
+            plt.plot(times[outlier_ids], measurand_wav[outlier_ids], "o", color=color,
                      alpha=0.3)
-            plt.plot(times[np.where(mask==0)[0]], measurand_wav[np.where(mask==0)[0]], "o", color=color,
+            plt.plot(times[bestdata_ids], measurand_wav[bestdata_ids], "o", color=color,
                      label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
 
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"ko",alpha=0.1,label="masked by processor")
