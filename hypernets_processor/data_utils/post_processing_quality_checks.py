@@ -181,4 +181,7 @@ if __name__ == "__main__":
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
                 if len(times)>0:
-                    make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
+                    try:
+                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
+                    except:
+                        print("%s_%s_%s"%(site,vza,vaa), " failed")
