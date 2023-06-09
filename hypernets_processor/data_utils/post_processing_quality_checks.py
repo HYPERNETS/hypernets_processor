@@ -85,11 +85,19 @@ def extract_reflectances(site, wavs, vza, vaa):
         if ds is None:
             valid[i]=0
             continue
-        if ds.quality_flag.values == 0:
-            mask[i]=0
-        ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
-        refl[i]=ds.reflectance.values[ids,0]
-        times[i]=datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
+
+        if len(ds.quality_flag.values)==1:
+            if ds.quality_flag.values == 0:
+                mask[i]=0
+            ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
+            refl[i]=ds.reflectance.values[ids,0]
+            times[i]=datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
+        else:
+            if np.mean(ds.quality_flag.values) == 0:
+                mask[i]=0
+            ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
+            refl[i]=np.mean(ds.reflectance.values[ids,:])
+            times[i]=datetime.datetime.fromtimestamp(np.mean(ds.acquisition_time.values[:]))
     return times[np.where(valid==1)[0]], refl[np.where(valid==1)[0]], mask[np.where(valid==1)[0]]
 
 def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags=True, max_angle_tolerance=None):
@@ -176,7 +184,7 @@ if __name__ == "__main__":
     hour_bins=[0,10,12,14,16,24]
     vzas=[0,5,10,20,30,40,50,60]
     vaas=[83,98,113,263,278,293]
-    for site in ["GHNA","BASP","WWUK","PEAN","DEGE","ATGE","IFAR"]:
+    for site in ["IFAR","GHNA","BASP","WWUK","PEAN","DEGE","ATGE"]:
         for vza in vzas:
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
