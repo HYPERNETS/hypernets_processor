@@ -181,7 +181,7 @@ def sigma_clip(values, tolerance=0.01, median=True, sigma_thresh=3.0):
 
 if __name__ == "__main__":
     wavs=[500,900,1100,1600]
-    hour_bins=[0,10,12,14,16,24]
+    hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
     vzas=[0,5,10,20,30,40,50,60]
     vaas=[83,98,113,263,278,293]
     for site in ["IFAR","GHNA","BASP","WWUK","PEAN","DEGE","ATGE"]:
