@@ -40,8 +40,8 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
             plt.axhline(y=mean, color=color, linestyle='-')
             plt.axhline(y=mean-2*std, color=color, linestyle=':')
             plt.axhline(y=mean+2*std, color=color, linestyle=':')
-            ids_outliers=np.where((valids[hour_ids]>mean+2*std) or (valids[hour_ids]<mean-2*std))[0]
-            ids_bestdata=np.where((valids[hour_ids]<mean+2*std) and (valids[hour_ids]>mean-2*std))[0]
+            ids_outliers=np.where((valids[hour_ids]>mean+2*std) | (valids[hour_ids]<mean-2*std))[0]
+            ids_bestdata=np.where((valids[hour_ids]<mean+2*std) & (valids[hour_ids]>mean-2*std))[0]
             plt.plot(valid_times[hour_ids][ids_outliers], valids[hour_ids][ids_outliers], "o", color=color,
                      label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]), alpha=0.3)
             plt.plot(valid_times[hour_ids][ids_bestdata], valids[hour_ids][ids_bestdata], "o", color=color,
