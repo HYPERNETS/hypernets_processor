@@ -28,26 +28,35 @@ archive_path = r"/home/data/insitu/hypernets/archive_qc"
 
 def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
     for i in range(len(wavs)):
-        print(tag,len(times),len(times[np.where(mask==0)[0]]))
-        valids=measurands[np.where(mask==0)[0],i]
-        valid_times=times[np.where(mask==0)[0]]
+        measurand_wav=measurands[:,i]
+        for ii in range(len(hour_bins)-1):
+            hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
+            std, mean =sigma_clip(measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
+            print("%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
+            ids_outliers=np.where((measurand_wav[hour_ids]>mean+2*std) | (measurand_wav[hour_ids]<mean-2*std))[0]
+            mask[ids_outliers]=2
+
+    print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(new_mask==0)[0]]))
+    for i in range(len(wavs)):
+        measurand_wav=measurands[:,i]
         ax = plt.gca()
         for ii in range(len(hour_bins)-1):
             color = next(ax._get_lines.prop_cycler)['color']
-            hour_ids=np.where([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in valid_times])[0]
-            std, mean =sigma_clip(valids[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
+            hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
+            std, mean =sigma_clip(measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
             print("%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
             plt.axhline(y=mean, color=color, linestyle='-')
             plt.axhline(y=mean-2*std, color=color, linestyle=':')
             plt.axhline(y=mean+2*std, color=color, linestyle=':')
-            ids_outliers=np.where((valids[hour_ids]>mean+2*std) | (valids[hour_ids]<mean-2*std))[0]
-            ids_bestdata=np.where((valids[hour_ids]<mean+2*std) & (valids[hour_ids]>mean-2*std))[0]
-            plt.plot(valid_times[hour_ids][ids_outliers], valids[hour_ids][ids_outliers], "o", color=color,
-                     label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]), alpha=0.3)
-            plt.plot(valid_times[hour_ids][ids_bestdata], valids[hour_ids][ids_bestdata], "o", color=color,
+
+            plt.plot(times[np.where(mask==2)[0]], measurand_wav[np.where(mask==2)[0]], "o", color=color,
+                     alpha=0.3)
+            plt.plot(times[np.where(mask==0)[0]], measurand_wav[np.where(mask==0)[0]], "o", color=color,
                      label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
+
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"ko",alpha=0.1,label="masked by processor")
-        plt.ylim([min(valids),max(valids)])
+        valids=measurand_wav[np.where(mask==0)[0]]
+        plt.ylim([min(valids)-0.1,max(valids)+0.1])
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
@@ -160,7 +169,7 @@ if __name__ == "__main__":
     hour_bins=[0,10,12,14,16,24]
     vzas=[0,5,10,20,30,40,50,60]
     vaas=[83,98,113,263,278,293]
-    for site in ["GHNA","BASP","WWUK","PEAN"]:
+    for site in ["GHNA","BASP","WWUK","PEAN","DEGE","ATGE","IFAR"]:
         for vza in vzas:
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
