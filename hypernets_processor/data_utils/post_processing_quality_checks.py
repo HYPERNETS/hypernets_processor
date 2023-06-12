@@ -36,6 +36,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
                 std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
+                print(mask_clip)
                 mask[hour_ids][np.where(mask_clip>0)]=2
 
     print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
@@ -47,7 +48,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
                 std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n,n_max_points=n_max_points)
-                #print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
+                print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
                 plt.plot(times[hour_ids], mean, color=color, linestyle='-')
                 plt.plot(times[hour_ids], mean-2*std, color=color, linestyle=':')
                 plt.plot(times[hour_ids], mean+2*std, color=color, linestyle=':')
@@ -184,7 +185,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
 
         # Re-measure sigma and test for convergence
         sigma_new = np.std(values[np.where(mask < 1)]-average[np.where(mask < 1)])
-        print(sigma_old,sigma_new)
+        # print(sigma_old,sigma_new)
         diff = abs(sigma_old - sigma_new) / sigma_old
 
     return sigma_new, average, mask
