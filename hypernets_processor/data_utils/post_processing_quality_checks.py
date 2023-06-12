@@ -196,10 +196,10 @@ def fit_binfunc(xvals,yvals,maxpoints):
     else:
         x_bin=np.zeros(nbins)
         y_bin=np.zeros(nbins)
-        binpoints=np.floor(len(xvals)/nbins)
+        binpoints=int(np.ceil(len(xvals)/nbins))
         for i in range(nbins):
-            x_bin=np.mean(xvals[i*binpoints:(i+1)*binpoints])
-            y_bin=np.mean(yvals[i*binpoints:(i+1)*binpoints])
+            x_bin=np.mean(xvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
+            y_bin=np.mean(yvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
         return np.interp(xvals,x_bin,y_bin)
 
 if __name__ == "__main__":
