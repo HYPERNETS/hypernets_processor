@@ -162,15 +162,14 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
             poly_coeff = np.polyfit(xvals, values, fit_poly_n)
             poly_func = np.poly1d(poly_coeff)
             average = poly_func(xvals)
-            sigma_old = np.std(values-average)
 
         elif median == False:
             average = np.mean(values)
-            sigma_old = np.std(values)
 
         elif median == True:
             average = np.median(values)
-            sigma_old = np.std(values)
+
+        sigma_old = np.std(values-average)
         print(sigma_old)
         # Mask those pixels that lie more than 3 stdev away from mean
         check = np.zeros([len(values)])
@@ -180,7 +179,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         xvals = xvals[np.where(check < 1)]
 
         # Re-measure sigma and test for convergence
-        sigma_new = np.std(values)
+        sigma_new = np.std(values-average)
         diff = abs(sigma_old - sigma_new) / sigma_old
 
     # Perform final mask
