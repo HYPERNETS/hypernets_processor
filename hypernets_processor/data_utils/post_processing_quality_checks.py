@@ -35,9 +35,8 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
-                ids_outliers=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]) & ((measurand_wav>mean+2*std) | (measurand_wav<mean-2*std)))[0]
-                mask[ids_outliers]=2
+                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
+                mask[hour_ids][mask_clip]=2
 
     print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
     for i in range(len(wavs)):
@@ -47,11 +46,11 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
             color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean =sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
+                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
                 print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
-                plt.axhline(y=mean, color=color, linestyle='-')
-                plt.axhline(y=mean-2*std, color=color, linestyle=':')
-                plt.axhline(y=mean+2*std, color=color, linestyle=':')
+                plt.plot(times[hour_ids], mean, color=color, linestyle='-')
+                plt.plot(times[hour_ids], mean-2*std, color=color, linestyle=':')
+                plt.plot(times[hour_ids], mean+2*std, color=color, linestyle=':')
                 outlier_ids=np.where((mask==2) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
                 bestdata_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
                 plt.plot(times[outlier_ids], measurand_wav[outlier_ids], "o", color=color,
@@ -154,38 +153,36 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
     values = values[np.where(np.isnan(values) == False)]
     values_original = np.copy(values)
 
+    mask = np.zeros([len(values)])
+
     # Continue loop until result converges
     diff = 10e10
     while diff > tolerance:
         # Assess current input iteration
         if fit_poly_n>0:
-            poly_coeff = np.polyfit(xvals, values, fit_poly_n)
+            poly_coeff = np.polyfit(xvals, values[np.where(mask < 1)], fit_poly_n)
             poly_func = np.poly1d(poly_coeff)
             average = poly_func(xvals)
+            sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         elif median == False:
-            average = np.mean(values)
+            average = np.mean(values[np.where(mask < 1)])
+            sigma_old = np.std(values[np.where(mask < 1)])
 
         elif median == True:
-            average = np.median(values)
+            average = np.median(values[np.where(mask < 1)])
+            sigma_old = np.std(values[np.where(mask < 1)])
 
-        sigma_old = np.std(values-average)
-        print(sigma_old)
         # Mask those pixels that lie more than 3 stdev away from mean
-        check = np.zeros([len(values)])
-        check[np.where(values > (average + (sigma_thresh * sigma_old)))] = 1
-        # check[ np.where( values<(average-(sigma_thresh*sigma_old)) ) ] = 1
-        values = values[np.where(check < 1)]
-        xvals = xvals[np.where(check < 1)]
-        if fit_poly_n>0:
-            average = average[np.where(check < 1)]
+        mask[np.where(values > (average + (sigma_thresh * sigma_old)))] = 1
+        mask[np.where(values < (average - (sigma_thresh * sigma_old)))] = 1
 
         # Re-measure sigma and test for convergence
-        sigma_new = np.std(values-average)
+        sigma_new = np.std(values[np.where(mask < 1)]-average[np.where(mask < 1)])
+        print(sigma_old,sigma_new)
         diff = abs(sigma_old - sigma_new) / sigma_old
 
-    # Return results
-    return sigma_new, average
+    return sigma_new, average, mask
 
 
 if __name__ == "__main__":
