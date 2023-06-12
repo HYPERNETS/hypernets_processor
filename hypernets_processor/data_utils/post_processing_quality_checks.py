@@ -37,7 +37,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
             if len(hour_ids)>0:
                 std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
                 print(mask_clip)
-                mask[hour_ids][np.where(mask_clip>0)]=2
+                mask[hour_ids]=mask_clip
 
     print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
     for i in range(len(wavs)):
@@ -180,8 +180,8 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
             sigma_old = np.std(values[np.where(mask < 1)])
 
         # Mask those pixels that lie more than 3 stdev away from mean
-        mask[np.where(values > (average + (sigma_thresh * sigma_old)))] = 1
-        mask[np.where(values < (average - (sigma_thresh * sigma_old)))] = 1
+        mask[np.where(values > (average + (sigma_thresh * sigma_old)))] = 2
+        mask[np.where(values < (average - (sigma_thresh * sigma_old)))] = 2
 
         # Re-measure sigma and test for convergence
         sigma_new = np.std(values[np.where(mask < 1)]-average[np.where(mask < 1)])
