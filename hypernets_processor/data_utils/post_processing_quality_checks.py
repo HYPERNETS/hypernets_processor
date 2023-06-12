@@ -26,7 +26,7 @@ archive_path = r"/home/data/insitu/hypernets/archive_qc"
 
 
 
-def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly_n=0, n_max_points=0):
+def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_thresh=3.0, fit_poly_n=0, n_max_points=0):
     # get a datetime that is equal to epoch
     epoch = datetime.datetime(1970, 1, 1)
     times_sec=np.array([(d - epoch).total_seconds() for d in times])
@@ -35,7 +35,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.05, median=True, sigma_thresh=3.0,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
+                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.05, median=True, sigma_thresh=sigma_thresh,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
                 mask[hour_ids]=mask_clip
 
     print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
@@ -46,11 +46,11 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
             color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n,n_max_points=n_max_points)
+                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=sigma_thresh,fit_poly_n=fit_poly_n,n_max_points=n_max_points)
                 # print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
                 plt.plot(times[hour_ids], mean, color=color, linestyle='-')
-                plt.plot(times[hour_ids], mean-2*std, color=color, linestyle=':')
-                plt.plot(times[hour_ids], mean+2*std, color=color, linestyle=':')
+                plt.plot(times[hour_ids], mean-sigma_thresh*std, color=color, linestyle=':')
+                plt.plot(times[hour_ids], mean+sigma_thresh*std, color=color, linestyle=':')
                 outlier_ids=np.where((mask==2) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
                 bestdata_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
                 plt.plot(times[outlier_ids], measurand_wav[outlier_ids], "o", color=color,
