@@ -26,12 +26,12 @@ archive_path = r"/home/data/insitu/hypernets/archive_qc"
 
 
 
-def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
+def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly_n=0):
     for i in range(len(wavs)):
         measurand_wav=measurands[:,i]
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
-            std, mean =sigma_clip(measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
+            std, mean = sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
             ids_outliers=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]) & ((measurand_wav>mean+2*std) | (measurand_wav<mean-2*std)))[0]
             mask[ids_outliers]=2
 
@@ -42,7 +42,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag):
         for ii in range(len(hour_bins)-1):
             color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
-            std, mean =sigma_clip(measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
+            std, mean =sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
             print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
             plt.axhline(y=mean, color=color, linestyle='-')
             plt.axhline(y=mean-2*std, color=color, linestyle=':')
@@ -143,7 +143,7 @@ def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags
     #print(len(id_series), " series selected on angle (vza=%s, vaa=%s requested, vza=%s, vaa=%s found)"%(vza,vaa,ds["viewing_zenith_angle"].values,ds["viewing_azimuth_angle"].values))
     return ds
 
-def sigma_clip(values, tolerance=0.01, median=True, sigma_thresh=3.0):
+def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit_poly_n=0):
     # Remove NaNs from input values
     values = np.array(values)
     values = values[np.where(np.isnan(values) == False)]
@@ -153,11 +153,19 @@ def sigma_clip(values, tolerance=0.01, median=True, sigma_thresh=3.0):
     diff = 10e10
     while diff > tolerance:
         # Assess current input iteration
-        if median == False:
+        if fit_poly_n>0:
+            poly_coeff = np.polyfit(xvals, values, fit_poly_n)
+            poly_func = np.poly1d(poly_coeff)
+            average = poly_func(xvals)
+            sigma_old = np.std(values-average)
+
+        elif median == False:
             average = np.mean(values)
+            sigma_old = np.std(values)
+
         elif median == True:
             average = np.median(values)
-        sigma_old = np.std(values)
+            sigma_old = np.std(values)
 
         # Mask those pixels that lie more than 3 stdev away from mean
         check = np.zeros([len(values)])
@@ -184,12 +192,15 @@ if __name__ == "__main__":
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
     vzas=[0,5,10,20,30,40,50,60]
     vaas=[83,98,113,263,278,293]
-    for site in ["IFAR","GHNA","BASP","WWUK","PEAN","DEGE","ATGE"]:
+
+    sites=["IFAR", "GHNA", "BASP", "WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE"]
+    sites_polyn=[4,2,0,4,0,0,0,0]
+    for isite,site in enumerate(sites):
         for vza in vzas:
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
                 if len(times)>0:
                     try:
-                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa))
+                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite])
                     except:
                         print("%s_%s_%s"%(site,vza,vaa), " failed")
