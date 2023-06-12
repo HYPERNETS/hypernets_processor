@@ -23,6 +23,8 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.normalize_360 import normalizedeg
+from obsarray.templater.dataset_util import DatasetUtil as du
+
 
 
 '''___Authorship___'''
@@ -331,12 +333,15 @@ class HypernetsReader:
 
 
                     angacc=abs(normalizedeg(float(vaa_abs),0,360)-normalizedeg(float(vaa_ref),0,360))
+
+                    if angacc > 3:
+                        ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
+                        self.context.logger.error(
+                            "Accuracy of pan is above 3°. Check your system and/or data before processing.")
                     print("Ange accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
                     print("If azimuth switch is on, please check the following: switch:{}, vaa_rel:{:.4f}, vaa_abs:{:.4f}, saa:{:.4f}".format(
                         azimuth_switch, vaa_rel, vaa_abs, ds["solar_azimuth_angle"][scan_number].values
                     ))
-                    if angacc>3:
-                        self.context.logger.error("Accuracy of pan is above 3°. Check your system and/or data before processing.")
 
                     vaa = normalizedeg(float(vaa_abs),0,360)-float(offset_pan)
 
@@ -714,14 +719,14 @@ class HypernetsReader:
                     flag = flag+2**FLAG_COMMON.index("lat_default")
             else:
                 print("Latitude is not given, use default or add it in metadata.txt")
-                lat = self.context.get_config_value("lat")
+                lat = self.context.get_config_value("latitude")
                 flag = flag + 2 ** FLAG_COMMON.index("lat_default")
 
             if 'longitude' in (globalattr.keys()):
                 lon = float(globalattr['longitude'])
                 if lon == 0.:
                     print("Latitude is 0.0, use default or add it in metadata.txt")
-                    lon = self.context.get_config_value("lon")
+                    lon = self.context.get_config_value("longitude")
                     flag = flag+2**FLAG_COMMON.index("lon_default")
             elif 'lon' in (globalattr.keys()):
                 lon = float(globalattr['lon'])
@@ -849,7 +854,6 @@ class HypernetsReader:
             azimuth_switch, offset_tilt, offset_pan = self.read_metadata(seq_dir)
 
         if seriesIrr:
-            print("we got here-irradiance")
             if self.context.get_config_value("network") == "w":
                 l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
                                           "L0_IRR", calibration_data_irr, instrument_id, site_id, azimuth_switch, offset_tilt, offset_pan)
@@ -868,7 +872,6 @@ class HypernetsReader:
             self.context.logger.error("No irradiance data for this sequence")
 
         if seriesRad:
-            print("wegothere -radiance")
             if self.context.get_config_value("network") == "w":
                 l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
                                           "L0_RAD", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan)

@@ -30,15 +30,17 @@ def process_sequence():
     Command line interface to sequence_processor_main for ad-hoc job processing
     """
 
-    network = "land"
+    network = "water"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
+    print(job_config_path)
 
     # Select appropriate processor defaults
     if network in ["land", "l"]:
         processor_defaults = PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
     elif network in ["water", "w"]:
         processor_defaults = PROCESSOR_WATER_DEFAULTS_CONFIG_PATH
+        print(processor_defaults)
     else:
         raise ValueError("Invalid network name - " + network)
 
@@ -47,11 +49,11 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\GONA\SEQ20220829T153127"
+    ] = r"/home/cgoyens/waterhypernet/HYPSTAR/Raw/M1BE/Test/"
 
     job_config["Output"][
         "archive_directory"
-    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\archive_test"
+    ] = r"/home/cgoyens/waterhypernet/HYPSTAR/Processed/M1BE/"
 
     job_config["Processor"]["max_level"] = "L2A"
 

@@ -4,6 +4,8 @@ class RhymerShared:
         self.context = context
 
     def closest_idx(self, xlist, xval):
+        print(xlist)
+        print(xval)
         idx, xret = min(enumerate(xlist), key=lambda x: abs(float(x[1]) - float(xval)))
         return (idx, xret)
 

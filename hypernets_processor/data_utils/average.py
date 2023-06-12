@@ -71,15 +71,16 @@ class Average:
     def average_l1b(self, measurandstring, dataset_l1a):
         if self.context.get_config_value("network") == "w":
             dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
+            flags = ["outliers"]
+            out, out_std, n_valid = self.calc_mean_masked(dataset_l1a, measurandstring, flags, return_std=True)
+            dataset_l1b[measurandstring].values = out
+            dataset_l1b["std_{}".format(measurandstring)].values = out_std
+            dataset_l1b["n_valid_scans"].values=n_valid
+
         else:
             dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
-
-        if self.context.get_config_value("network") == "l":
             flags=["outliers"]
-        else:
-            flags = ["outliers"]
-
-        dataset_l1b[measurandstring].values = self.calc_mean_masked(dataset_l1a, measurandstring,flags)
+            dataset_l1b[measurandstring].values=self.calc_mean_masked(dataset_l1a, measurandstring,flags)
 
         dataset_l1b["u_rel_random_" + measurandstring].values = self.calc_mean_masked(\
             dataset_l1a,"u_rel_random_" + measurandstring,flags,rand_unc=True)

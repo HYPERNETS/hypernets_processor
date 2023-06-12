@@ -6,7 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import (
-    ProtocolFactory,
+    ProtocolFactory,ProtocolFactoryOld
 )
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
@@ -17,11 +17,13 @@ from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_utils.quality_checks import QualityChecks
+from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 
 import punpy
 import numpy as np
 import obsarray
 from obsarray.templater.dataset_util import DatasetUtil
+
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -35,6 +37,8 @@ __status__ = "Development"
 class SurfaceReflectance:
     def __init__(self, context, parallel_cores=1):
         self._measurement_function_factory = ProtocolFactory
+        self._measurement_function_factoryPrev = ProtocolFactoryOld(context)
+        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
         self.qual = QualityChecks(context)
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
@@ -52,14 +56,9 @@ class SurfaceReflectance:
         dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
         dataset_l1c = self.rh.qc_bird(dataset_l1c)
 
-        l1ctol1b_function = self._measurement_function_factory.get_measurement_function(
-            self.context.get_config_value("measurement_function_surface_reflectance"))
-
-        calibrate_function = self._measurement_function_factory(
-            prop=prop, repeat_dims="scan", yvariable=measurandstring
-        ).get_measurement_function(
-            self.context.get_config_value("measurement_function_calibrate")
-        )
+        measname=self.context.get_config_value("measurement_function_surface_reflectance")
+        print(measname)
+        l1ctol1b_function = self._measurement_function_factoryPrev.get_measurement_function(measname)
 
         input_vars = l1ctol1b_function.get_argument_names()
         input_qty = self.prop.find_input(input_vars, dataset_l1c)
@@ -69,7 +68,7 @@ class SurfaceReflectance:
 
         L1c = self.prop.process_measurement_function_l2(
             ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
-            dataset_l1c, l1ctol1b_function.function, input_qty,
+            dataset_l1c, l1ctol1b_function.meas_function, input_qty,
             u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
 
         failSimil=self.rh.qc_similarity(L1c)
@@ -79,11 +78,6 @@ class SurfaceReflectance:
         L1c.attrs["IRR_acceleration_x_mean"] = str(np.mean(l1birr['acceleration_x_mean'].values))
         L1c.attrs["IRR_acceleration_x_std"] = str(np.mean(l1birr['acceleration_x_std'].values))
         print("IRR_acceleration_x_mean:{}".format(L1c.attrs["IRR_acceleration_x_mean"]))
-        L1c.attrs["ned"] = str(dataset.attrs['ned'])
-        L1c.attrs["nld"] = str(dataset.attrs['nld'])
-        L1c.attrs["nlu"] = str(dataset.attrs['nlu'])
-
-        print("nld:{}, nlu:{}, ned:{}".format(L1c.attrs["nld"], L1c.attrs["nlu"], L1c.attrs["ned"]))
 
         if self.context.get_config_value("write_l1c"):
             self.writer.write(L1c, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
@@ -100,15 +94,6 @@ class SurfaceReflectance:
 
     def process_l2(self, dataset):
         dataset = self.qual.perform_quality_check_L2a(dataset)
-        prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32"
-        )
-        l1tol2_function = self._measurement_function_factory(
-            prop=prop, repeat_dims="series", yvariable="reflectance"
-        ).get_measurement_function(
-            self.context.get_config_value("measurement_function_surface_reflectance")
-        )
-
         if self.context.get_config_value("network").lower() == "w":
             dataset_l2a = self.avg.average_L2(
                 dataset
@@ -116,7 +101,7 @@ class SurfaceReflectance:
 
             # propagate flags
             for flag_i in ["single_irradiance_used"]:
-                if any(dataset.flag["quality_flag"][flag_i].value.values):
+                if any(DatasetUtil.get_flags_mask_or(dataset["quality_flag"],[flag_i])):
                     dataset_l2a["quality_flag"].values = DatasetUtil.set_flag(
                         dataset_l2a["quality_flag"].values, flag_i
                     )
@@ -145,6 +130,15 @@ class SurfaceReflectance:
                     print("not plotting ", measurandstring)
 
         elif self.context.get_config_value("network").lower() == "l":
+            prop = punpy.MCPropagation(
+                self.context.get_config_value("mcsteps"), dtype="float32"
+            )
+            l1tol2_function = self._measurement_function_factory(
+                prop=prop, repeat_dims="series", yvariable="reflectance"
+            ).get_measurement_function(
+                self.context.get_config_value("measurement_function_surface_reflectance")
+            )
+
             dataset_l2a = self.templ.l2_from_l1c_dataset(
                 dataset, ["outliers", "dark_outliers"]
             )

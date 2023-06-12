@@ -138,15 +138,14 @@ class Interpolate:
         )
 
         dataset_l1c_temp = self.templ.l1ctemp_dataset(dataset_l1c, dataset_l1b_irr)
-
-        # dataset_l1c_temp = interpolation_function_wav.propagate_ds_specific(
-        #     ["random", "systematic_indep", "systematic_corr_rad_irr"],
-        #     dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
-        #     dataset_l1b_irr,
-        #     ds_out_pre=dataset_l1c_temp,
-        #     use_ds_out_pre_unmodified=True,
-        #     store_unc_percent=True,
-        # )
+        dataset_l1c_temp = interpolation_function_wav.propagate_ds_specific(
+            ["random", "systematic_indep", "systematic_corr_rad_irr"],
+            dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
+            dataset_l1b_irr,
+            ds_out_pre=dataset_l1c_temp,
+            use_ds_out_pre_unmodified=True,
+            store_unc_percent=True,
+        )
 
         measurement_function_interpolate_time = self.context.get_config_value(
             "measurement_function_interpolate_time"
@@ -180,13 +179,13 @@ class Interpolate:
                 dataset_l1c_temp = dataset_l1c_temp.isel(series=mask_notflagged)
                 acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
 
-        # dataset_l1c = interpolation_function_time.propagate_ds_specific(
-        #     ["random", "systematic_indep", "systematic_corr_rad_irr"],
-        #     dataset_l1c_temp,
-        #     {"input_time": acqui_irr, "output_time": acqui_rad},
-        #     ds_out_pre=dataset_l1c,
-        #     store_unc_percent=True,
-        # )
+        dataset_l1c = interpolation_function_time.propagate_ds_specific(
+            ["random", "systematic_indep", "systematic_corr_rad_irr"],
+            dataset_l1c_temp,
+            {"input_time": acqui_irr, "output_time": acqui_rad},
+            ds_out_pre=dataset_l1c,
+            store_unc_percent=True,
+        )
 
         if len(acqui_irr) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
@@ -209,13 +208,13 @@ class Interpolate:
         acqui_irr = dataset_l1b_skyrad["acquisition_time"].values
         acqui_rad = dataset_l1c["acquisition_time"].values
 
-        # dataset_l1c = interpolation_function_time.propagate_ds_specific(
-        #     ["random", "systematic_indep", "systematic_corr_rad_irr"],
-        #     dataset_l1b_skyrad,
-        #     {"input_time": acqui_irr, "output_time": acqui_rad},
-        #     ds_out_pre=dataset_l1c,
-        #     store_unc_percent=True,
-        # )
+        dataset_l1c = interpolation_function_time.propagate_ds_specific(
+            ["random", "systematic_indep", "systematic_corr_rad_irr"],
+            dataset_l1b_skyrad,
+            {"input_time": acqui_irr, "output_time": acqui_rad},
+            ds_out_pre=dataset_l1c,
+            store_unc_percent=True,
+        )
 
         if len(acqui_irr) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(

@@ -36,3 +36,14 @@ class ProtocolFactory:
 
     def get_measurement_function(self, name):
         return self.measurement_functions[name]
+
+class ProtocolFactoryOld:
+    def __init__(self, context):
+        self.measurement_functions = dict([(LandNetworkProtocol.get_name(),LandNetworkProtocol()),
+                                        (WaterNetworkProtocol.get_name(),WaterNetworkProtocol(context))])
+
+    def get_names(self):
+        return self.measurement_functions.keys()
+
+    def get_measurement_function(self,name):
+        return self.measurement_functions[name]
