@@ -26,7 +26,7 @@ archive_path = r"/home/data/insitu/hypernets/archive_qc"
 
 
 
-def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly_n=0):
+def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly_n=0, n_max_points=0):
     # get a datetime that is equal to epoch
     epoch = datetime.datetime(1970, 1, 1)
     times_sec=np.array([(d - epoch).total_seconds() for d in times])
@@ -35,7 +35,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
+                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
                 mask[hour_ids][np.where(mask_clip>0)]=2
 
     print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
@@ -46,8 +46,8 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
             color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
-                print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
+                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n,n_max_points=n_max_points)
+                #print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
                 plt.plot(times[hour_ids], mean, color=color, linestyle='-')
                 plt.plot(times[hour_ids], mean-2*std, color=color, linestyle=':')
                 plt.plot(times[hour_ids], mean+2*std, color=color, linestyle=':')
@@ -148,7 +148,7 @@ def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags
     #print(len(id_series), " series selected on angle (vza=%s, vaa=%s requested, vza=%s, vaa=%s found)"%(vza,vaa,ds["viewing_zenith_angle"].values,ds["viewing_azimuth_angle"].values))
     return ds
 
-def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit_poly_n=0):
+def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit_poly_n=0,n_max_points=0):
     # Remove NaNs from input values
     values = np.array(values)
     values = values[np.where(np.isnan(values) == False)]
@@ -160,10 +160,14 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
     diff = 10e10
     while diff > tolerance:
         # Assess current input iteration
-        if fit_poly_n>0:
-            poly_coeff = np.polyfit(xvals[np.where(mask < 1)], values[np.where(mask < 1)], fit_poly_n)
-            poly_func = np.poly1d(poly_coeff)
-            average = poly_func(xvals)
+        # if fit_poly_n > 0:
+        #     poly_coeff = np.polyfit(xvals[np.where(mask < 1)], values[np.where(mask < 1)], fit_poly_n)
+        #     poly_func = np.poly1d(poly_coeff)
+        #     average = poly_func(xvals)
+        #     sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
+
+        if n_max_points>0:
+            average = fit_binfunc(xvals,values,n_max_points)
             sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         elif median == False:
@@ -185,6 +189,18 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
 
     return sigma_new, average, mask
 
+def fit_binfunc(xvals,yvals,maxpoints):
+    nbins=np.ceil(len(xvals)/maxpoints)
+    if nbins==1:
+        return np.mean(yvals)*np.ones_like(xvals)
+    else:
+        x_bin=np.zeros(nbins)
+        y_bin=np.zeros(nbins)
+        binpoints=np.floor(len(xvals)/nbins)
+        for i in range(nbins):
+            x_bin=np.mean(xvals[i*binpoints:(i+1)*binpoints])
+            y_bin=np.mean(yvals[i*binpoints:(i+1)*binpoints])
+        return np.interp(xvals,x_bin,y_bin)
 
 if __name__ == "__main__":
     wavs=[500,900,1100,1600]
@@ -200,6 +216,6 @@ if __name__ == "__main__":
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
                 if len(times)>0:
                     if True:
-                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite])
+                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=50)
                     # except:
                     #     print("%s_%s_%s"%(site,vza,vaa), " failed")
