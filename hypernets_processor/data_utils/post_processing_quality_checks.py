@@ -31,9 +31,10 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
         measurand_wav=measurands[:,i]
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
-            std, mean = sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
-            ids_outliers=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]) & ((measurand_wav>mean+2*std) | (measurand_wav<mean-2*std)))[0]
-            mask[ids_outliers]=2
+            if len(hour_ids)>0:
+                std, mean = sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
+                ids_outliers=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]) & ((measurand_wav>mean+2*std) | (measurand_wav<mean-2*std)))[0]
+                mask[ids_outliers]=2
 
     print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
     for i in range(len(wavs)):
@@ -42,17 +43,18 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
         for ii in range(len(hour_bins)-1):
             color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
-            std, mean =sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0)
-            print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
-            plt.axhline(y=mean, color=color, linestyle='-')
-            plt.axhline(y=mean-2*std, color=color, linestyle=':')
-            plt.axhline(y=mean+2*std, color=color, linestyle=':')
-            outlier_ids=np.where((mask==2) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
-            bestdata_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
-            plt.plot(times[outlier_ids], measurand_wav[outlier_ids], "o", color=color,
-                     alpha=0.3)
-            plt.plot(times[bestdata_ids], measurand_wav[bestdata_ids], "o", color=color,
-                     label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
+            if len(hour_ids)>0:
+                std, mean =sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
+                print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
+                plt.axhline(y=mean, color=color, linestyle='-')
+                plt.axhline(y=mean-2*std, color=color, linestyle=':')
+                plt.axhline(y=mean+2*std, color=color, linestyle=':')
+                outlier_ids=np.where((mask==2) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
+                bestdata_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
+                plt.plot(times[outlier_ids], measurand_wav[outlier_ids], "o", color=color,
+                         alpha=0.3)
+                plt.plot(times[bestdata_ids], measurand_wav[bestdata_ids], "o", color=color,
+                         label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
 
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"ko",alpha=0.1,label="masked by processor")
         valids=measurand_wav[np.where(mask==0)[0]]
