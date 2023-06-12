@@ -177,6 +177,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         check[np.where(values > (average + (sigma_thresh * sigma_old)))] = 1
         # check[ np.where( values<(average-(sigma_thresh*sigma_old)) ) ] = 1
         values = values[np.where(check < 1)]
+        xvals = values[np.where(check < 1)]
 
         # Re-measure sigma and test for convergence
         sigma_new = np.std(values)
