@@ -182,12 +182,6 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         sigma_new = np.std(values-average)
         diff = abs(sigma_old - sigma_new) / sigma_old
 
-    # Perform final mask
-    check = np.zeros([len(values)])
-    check[np.where(values > (average + (sigma_thresh * sigma_old)))] = 1
-    check[np.where(values < (average - (sigma_thresh * sigma_old)))] = 1
-    values = values[np.where(check < 1)]
-
     # Return results
     return sigma_new, average
 
