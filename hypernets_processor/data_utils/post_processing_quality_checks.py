@@ -85,6 +85,7 @@ def extract_reflectances(site, wavs, vza, vaa):
     times=np.empty(len(files),dtype=datetime.datetime)
     valid=np.ones(len(files),dtype=int)
     for i in range(len(files)):
+        print(files[i])
         ds=read_hypernets_file(files[i],vza=vza, vaa=vaa, filter_flags=False,max_angle_tolerance=2)
         if ds is None:
             valid[i]=0
