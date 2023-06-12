@@ -160,7 +160,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
     while diff > tolerance:
         # Assess current input iteration
         if fit_poly_n>0:
-            poly_coeff = np.polyfit(xvals, values[np.where(mask < 1)], fit_poly_n)
+            poly_coeff = np.polyfit(xvals[np.where(mask < 1)], values[np.where(mask < 1)], fit_poly_n)
             poly_func = np.poly1d(poly_coeff)
             average = poly_func(xvals)
             sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
