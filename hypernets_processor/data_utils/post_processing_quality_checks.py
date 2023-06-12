@@ -190,7 +190,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
     return sigma_new, average, mask
 
 def fit_binfunc(xvals,yvals,maxpoints):
-    nbins=np.ceil(len(xvals)/maxpoints)
+    nbins=int(np.ceil(len(xvals)/maxpoints))
     if nbins==1:
         return np.mean(yvals)*np.ones_like(xvals)
     else:
