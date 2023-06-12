@@ -80,6 +80,7 @@ def time_between(time,start_hour,end_hour):
 def extract_reflectances(site, wavs, vza, vaa):
     # files=glob.glob(archive_path+r"\%s\*\*\*\*\*L2A*"%site)
     files=glob.glob(archive_path+r"/%s/*/*/*/*/*L2A*"%site)
+    files=np.sort(files)
     refl=np.zeros((len(files),len(wavs)))
     mask=np.ones(len(files))
     times=np.empty(len(files),dtype=datetime.datetime)
