@@ -200,7 +200,6 @@ def fit_binfunc(xvals,yvals,maxpoints):
         for i in range(nbins):
             x_bin[i]=np.mean(xvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
             y_bin[i]=np.mean(yvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
-        print(x_bin,y_bin,len(xvals))
         return np.interp(xvals,x_bin,y_bin)
 
 if __name__ == "__main__":
@@ -217,6 +216,6 @@ if __name__ == "__main__":
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
                 if len(times)>0:
                     if True:
-                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=50)
+                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30)
                     # except:
                     #     print("%s_%s_%s"%(site,vza,vaa), " failed")
