@@ -171,7 +171,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         elif median == True:
             average = np.median(values)
             sigma_old = np.std(values)
-
+        print(sigma_old)
         # Mask those pixels that lie more than 3 stdev away from mean
         check = np.zeros([len(values)])
         check[np.where(values > (average + (sigma_thresh * sigma_old)))] = 1
