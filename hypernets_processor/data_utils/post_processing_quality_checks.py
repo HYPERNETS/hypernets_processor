@@ -27,12 +27,15 @@ archive_path = r"/home/data/insitu/hypernets/archive_qc"
 
 
 def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly_n=0):
+    # get a datetime that is equal to epoch
+    epoch = datetime.datetime(1970, 1, 1)
+
     for i in range(len(wavs)):
         measurand_wav=measurands[:,i]
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean = sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
+                std, mean = sigma_clip([(d - epoch).total_seconds() for d in times[hour_ids]], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
                 ids_outliers=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]) & ((measurand_wav>mean+2*std) | (measurand_wav<mean-2*std)))[0]
                 mask[ids_outliers]=2
 
@@ -44,7 +47,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
             color = next(ax._get_lines.prop_cycler)['color']
             hour_ids=np.where((mask!=1) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean =sigma_clip(times[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
+                std, mean =sigma_clip([(d - epoch).total_seconds() for d in times[hour_ids]], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n)
                 print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
                 plt.axhline(y=mean, color=color, linestyle='-')
                 plt.axhline(y=mean-2*std, color=color, linestyle=':')
