@@ -35,7 +35,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, fit_poly
         for ii in range(len(hour_bins)-1):
             hour_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
             if len(hour_ids)>0:
-                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.01, median=True, sigma_thresh=2.0,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
+                std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.05, median=True, sigma_thresh=3.0,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
                 print(mask_clip)
                 mask[hour_ids]=mask_clip
 
