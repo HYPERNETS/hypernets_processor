@@ -213,35 +213,33 @@ def fit_binfunc(xvals,yvals,maxpoints):
 if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
-    vzas=[0,5,10,20,30,40,50,60]
-    vaas=[83,98,113,263,278,293]
 
     sites=["IFAR", "GHNA", "BASP", "WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE"]
     sites_polyn=[4,2,0,4,0,0,0,0]
     sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
-        print(site_ds[0].viewing_zenith_angle.values)
-        print(site_ds[0].viewing_azimuth_angle.values)
 
         for ifile in range(len(site_ds)):
             ids_wav=np.where((site_ds[ifile].wavelength>380) & (site_ds[ifile].wavelength<1700))[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
 
-        for vza in vzas:
-            for vaa in vaas:
-                times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
-                if len(times[np.where(mask==0)])>0:
-                    if True:
-                        mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
-                        for ifile in range(len(site_ds)):
-                            if mask2[ifile]>0:
-                                angledif_series = (site_ds[ifile]["viewing_zenith_angle"].values - vza) ** 2 + (
-                                    np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
-                                ) ** 2
-                                id_series = np.where(angledif_series == np.min(angledif_series))[0]
-                                ds_curr=site_ds[ifile]
-                                site_ds[ifile] = ds_curr.where(ds_curr.series!=ds_curr.series[id_series])
+        for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
+            vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
+            vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
+            times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
+            if True:
+                mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
+                for ifile in range(len(site_ds)):
+                    if mask2[ifile]>0:
+                        angledif_series = (site_ds[ifile]["viewing_zenith_angle"].values - vza) ** 2 + (
+                            np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
+                        ) ** 2
+                        id_series = np.where(angledif_series == np.min(angledif_series))[0]
+                        print(id_series)
+                        print(ds_curr.series!=ds_curr.series[id_series])
+                        ds_curr=site_ds[ifile]
+                        site_ds[ifile] = ds_curr.where(ds_curr.series!=ds_curr.series[id_series])
 
-                    # except:
-                    #     print("%s_%s_%s"%(site,vza,vaa), " failed")
+            # except:
+            #     print("%s_%s_%s"%(site,vza,vaa), " failed")
