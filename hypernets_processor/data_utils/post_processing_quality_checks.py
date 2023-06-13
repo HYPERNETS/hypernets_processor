@@ -67,6 +67,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
         plt.savefig(os.path.join(archive_path,"qc_plots","qc_%s_%s.png"%(tag,wavs[i])), dpi=300)
         plt.clf()
         print("plot done ", os.path.join(archive_path,"qc_plots","qc_%s_%s.png"%(tag,wavs[i])))
+    return mask
 
 def time_between(time,start_hour,end_hour):
     if time<datetime.time(start_hour,0,0):
@@ -77,18 +78,25 @@ def time_between(time,start_hour,end_hour):
         return True
 
 
-def extract_reflectances(site, wavs, vza, vaa):
+def find_files(site)
     # files=glob.glob(archive_path+r"\%s\*\*\*\*\*L2A*"%site)
     files=glob.glob(archive_path+r"/%s/*/*/*/*/*L2A*"%site)
     files=np.sort(files)
+    list_ds=np.empty(files,dtype=object)
+    for ifile,file in enumerate(files):
+        list_ds[ifile]=xr.open_dataset(file)
+    return files,list_ds
+
+def extract_reflectances(files, wavs, vza, vaa):
     refl=np.zeros((len(files),len(wavs)))
     mask=np.ones(len(files))
     times=np.empty(len(files),dtype=datetime.datetime)
     valid=np.ones(len(files),dtype=int)
+    all_ds=np.empty(len(files),dtype=object)
     for i in range(len(files)):
         ds=read_hypernets_file(files[i],vza=vza, vaa=vaa, filter_flags=False,max_angle_tolerance=2)
         if ds is None:
-            valid[i]=0
+            mask[i]=1
             continue
 
         if len(ds.quality_flag.values)==1:
@@ -103,7 +111,7 @@ def extract_reflectances(site, wavs, vza, vaa):
             ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
             refl[i]=np.mean(ds.reflectance.values[ids,:])
             times[i]=datetime.datetime.fromtimestamp(np.mean(ds.acquisition_time.values[:]))
-    return times[np.where(valid==1)[0]], refl[np.where(valid==1)[0]], mask[np.where(valid==1)[0]]
+    return times, refl, mask
 
 def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags=True, max_angle_tolerance=None):
     ds = xr.open_dataset(filepath)
@@ -212,10 +220,13 @@ if __name__ == "__main__":
     sites_polyn=[4,2,0,4,0,0,0,0]
     sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
+        files,site_ds=find_files(site)
+        print(site_ds[0].viewing_zenith_angle.values)
+        print(site_ds[0].viewing_azimuth_angle.values)
         for vza in vzas:
             for vaa in vaas:
-                times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
-                if len(times)>0:
+                times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
+                if len(times[np.where(mask==0)])>0:
                     try:
                         make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
                     except:
