@@ -97,6 +97,7 @@ def extract_reflectances(files, wavs, vza, vaa):
         ds=read_hypernets_file(files[i],vza=vza, vaa=vaa, filter_flags=False,max_angle_tolerance=2)
         if ds is None:
             mask[i]=1
+            print("bad file:", files[i])
             continue
 
         if len(ds.quality_flag.values)==1:
@@ -215,7 +216,7 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
-    sites=["IFAR", "GHNA", "BASP", "WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE"]
+    sites=["WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE", "IFAR", "GHNA", "BASP",]
     sites_polyn=[4,2,0,4,0,0,0,0]
     sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
