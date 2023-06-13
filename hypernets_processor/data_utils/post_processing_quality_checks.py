@@ -237,8 +237,8 @@ if __name__ == "__main__":
                         ) ** 2
                         id_series = np.where(angledif_series == np.min(angledif_series))[0]
                         print(id_series)
-                        print(ds_curr.series!=ds_curr.series[id_series])
                         ds_curr=site_ds[ifile]
+                        print(ds_curr.series!=ds_curr.series[id_series])
                         site_ds[ifile] = ds_curr.where(ds_curr.series!=ds_curr.series[id_series])
 
             # except:
