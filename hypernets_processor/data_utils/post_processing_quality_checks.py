@@ -219,7 +219,7 @@ if __name__ == "__main__":
     sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
-
+        files_nmaskedseries=np.zeros(len(files))
         for ifile in range(len(site_ds)):
             ids_wav=np.where((site_ds[ifile].wavelength>380) & (site_ds[ifile].wavelength<1700))[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
@@ -236,7 +236,15 @@ if __name__ == "__main__":
                         ds_curr.reflectance[iseries]*=np.nan
                         ds_curr.u_rel_random_reflectance[iseries]*=np.nan
                         ds_curr.u_rel_systematic_reflectance[iseries]*=np.nan
+                        ds_curr.std_reflectance[iseries]*=np.nan
+                        ds_curr.n_valid_scans[iseries]*=np.nan
+                        ds_curr.n_valid_scans_SWIR[iseries]*=np.nan
+                        ds_curr.quality_flag[iseries]=16
+                        ds_curr.quality_flag.attrs["flag_meanings"]=ds_curr.quality_flag.attrs["flag_meanings"].replace("placeholder1","postprocessing_outliers")
+                        print(ds_curr.quality_flag)
                         site_ds[ifile] = ds_curr
-
+                        files_nmaskedseries[ifile]+=1
             # except:
             #     print("%s_%s_%s"%(site,vza,vaa), " failed")
+
+        print(files_nmaskedseries)
