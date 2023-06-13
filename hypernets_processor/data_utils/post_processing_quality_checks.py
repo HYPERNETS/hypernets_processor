@@ -23,7 +23,7 @@ dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 # archive_path = r"\\eoserver\home\data\insitu\hypernets\archive_qc"
 archive_path = r"/home/data/insitu/hypernets/archive_qc"
-
+out_path = r"/home/data/insitu/hypernets/archive_qc/best_files"
 
 
 def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_thresh=3.0, fit_poly_n=0, n_max_points=0):
@@ -211,6 +211,7 @@ def fit_binfunc(xvals,yvals,maxpoints):
         return np.interp(xvals,x_bin,y_bin)
 
 if __name__ == "__main__":
+
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
@@ -237,8 +238,8 @@ if __name__ == "__main__":
                         ds_curr.u_rel_random_reflectance[iseries]*=np.nan
                         ds_curr.u_rel_systematic_reflectance[iseries]*=np.nan
                         ds_curr.std_reflectance[iseries]*=np.nan
-                        ds_curr.n_valid_scans[iseries]*=np.nan
-                        ds_curr.n_valid_scans_SWIR[iseries]*=np.nan
+                        ds_curr.n_valid_scans[iseries]=0
+                        ds_curr.n_valid_scans_SWIR[iseries]=0
                         ds_curr.quality_flag[iseries]=16
                         ds_curr.quality_flag.attrs["flag_meanings"]=ds_curr.quality_flag.attrs["flag_meanings"].replace("placeholder1","postprocessing_outliers")
                         print(ds_curr.quality_flag)
@@ -249,8 +250,7 @@ if __name__ == "__main__":
             # except:
             #     print("%s_%s_%s"%(site,vza,vaa), " failed")
         for ifile in range(len(site_ds)):
-            if files_nmaskedseries[ifile]<len(site_ds[ifile].series):
-                print(files[ifile])
-                stop
-                site_ds[ifile].to_netcdf()
+            if files_nmaskedseries[ifile]<len(site_ds[ifile].series)/2:
+                print(files[ifile],os.path.basename(files[ifile]))
+                site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
         print(files_nmaskedseries)
