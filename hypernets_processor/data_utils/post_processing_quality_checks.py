@@ -82,7 +82,7 @@ def find_files(site):
     # files=glob.glob(archive_path+r"\%s\*\*\*\*\*L2A*"%site)
     files=glob.glob(archive_path+r"/%s/*/*/*/*/*L2A*"%site)
     files=np.sort(files)
-    list_ds=np.empty(files,dtype=object)
+    list_ds=np.empty(len(files),dtype=object)
     for ifile,file in enumerate(files):
         list_ds[ifile]=xr.open_dataset(file)
     return files,list_ds
