@@ -97,9 +97,14 @@ class CalibrationConverter:
         nonlin_times = calibration_data_rad["nonlineardates"].values
         wav_times = calibration_data_rad["wavdates"].values
 
+        print(enumerate(nonlin_times))
+
         calib_i=[x for x, date in enumerate(calibration_data_times)
                    if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
-        nlin_i=[x for x, date in enumerate(nonlin_times)
+        if len(nonlin_times) == 1:
+            nlin_i = 0
+        else:
+            nlin_i=[x for x, date in enumerate(nonlin_times)
                    if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
         wav_i=[x for x, date in enumerate(wav_times)
                    if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
@@ -116,7 +121,10 @@ class CalibrationConverter:
 
         calib_i_irr = [x for x, date in enumerate(calibration_data_times_irr)
                    if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
-        nlin_i_irr = [x for x, date in enumerate(nonlin_times_irr)
+        if len(nonlin_times) == 1:
+            nlin_i_irr = 0
+        else:
+            nlin_i_irr = [x for x, date in enumerate(nonlin_times_irr)
                   if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
         wav_i_irr = [x for x, date in enumerate(wav_times_irr)
                  if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]

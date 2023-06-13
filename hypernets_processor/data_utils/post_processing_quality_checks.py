@@ -215,7 +215,7 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
-    sites=["GHNA", "BASP", "WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE","IFAR"]
+    sites=["IFAR", "GHNA", "BASP", "WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE"]
     sites_polyn=[4,2,0,4,0,0,0,0]
     sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
@@ -229,7 +229,6 @@ if __name__ == "__main__":
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
-            print(site,iseries,vza,vaa,times)
             if True:
                 mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
                 for ifile in range(len(site_ds)):
