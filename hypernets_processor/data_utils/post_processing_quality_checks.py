@@ -78,7 +78,7 @@ def time_between(time,start_hour,end_hour):
         return True
 
 
-def find_files(site)
+def find_files(site):
     # files=glob.glob(archive_path+r"\%s\*\*\*\*\*L2A*"%site)
     files=glob.glob(archive_path+r"/%s/*/*/*/*/*L2A*"%site)
     files=np.sort(files)
