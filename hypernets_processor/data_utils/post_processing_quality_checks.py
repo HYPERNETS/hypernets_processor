@@ -210,12 +210,13 @@ if __name__ == "__main__":
 
     sites=["IFAR", "GHNA", "BASP", "WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE"]
     sites_polyn=[4,2,0,4,0,0,0,0]
+    sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
         for vza in vzas:
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(site,wavs,vza,vaa)
                 if len(times)>0:
                     try:
-                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30)
+                        make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
                     except:
                         print("%s_%s_%s"%(site,vza,vaa), " failed")
