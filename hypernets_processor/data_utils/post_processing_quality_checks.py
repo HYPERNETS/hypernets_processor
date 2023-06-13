@@ -225,7 +225,7 @@ if __name__ == "__main__":
             ids_wav=np.where((site_ds[ifile].wavelength>380) & (site_ds[ifile].wavelength<1700))[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
 
-        for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
+        for iseries in range(1):#len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
