@@ -232,14 +232,11 @@ if __name__ == "__main__":
                 mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
                 for ifile in range(len(site_ds)):
                     if mask2[ifile]>0:
-                        angledif_series = (site_ds[ifile]["viewing_zenith_angle"].values - vza) ** 2 + (
-                            np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
-                        ) ** 2
-                        id_series = np.where(angledif_series == np.min(angledif_series))[0]
-                        print(id_series)
-                        ds_curr=site_ds[ifile]
-                        print(ds_curr.series!=ds_curr.series[id_series])
-                        site_ds[ifile] = ds_curr.where(ds_curr.series!=ds_curr.series[id_series])
+                        ds_curr = site_ds[ifile]
+                        ds_curr.reflectance[iseries]*=np.nan
+                        ds_curr.u_rel_random_reflectance[iseries]*=np.nan
+                        ds_curr.u_rel_systematic_reflectance[iseries]*=np.nan
+                        site_ds[ifile] = ds_curr
 
             # except:
             #     print("%s_%s_%s"%(site,vza,vaa), " failed")
