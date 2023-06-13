@@ -225,7 +225,7 @@ if __name__ == "__main__":
             ids_wav=np.where((site_ds[ifile].wavelength>380) & (site_ds[ifile].wavelength<1700))[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
 
-        for iseries in range(1):#len(site_ds[0].viewing_zenith_angle.values)):
+        for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
@@ -234,10 +234,10 @@ if __name__ == "__main__":
                 for ifile in range(len(site_ds)):
                     if mask2[ifile]>0:
                         ds_curr = site_ds[ifile]
-                        ds_curr.reflectance[iseries]*=np.nan
-                        ds_curr.u_rel_random_reflectance[iseries]*=np.nan
-                        ds_curr.u_rel_systematic_reflectance[iseries]*=np.nan
-                        ds_curr.std_reflectance[iseries]*=np.nan
+                        ds_curr.reflectance[:,iseries]*=np.nan
+                        ds_curr.u_rel_random_reflectance[:,iseries]*=np.nan
+                        ds_curr.u_rel_systematic_reflectance[:,iseries]*=np.nan
+                        ds_curr.std_reflectance[:,iseries]*=np.nan
                         if mask2[ifile]==2:
                             ds_curr.quality_flag[iseries]=16
                         ds_curr.quality_flag.attrs["flag_meanings"]=ds_curr.quality_flag.attrs["flag_meanings"].replace("placeholder1","postprocessing_outliers")
@@ -249,6 +249,5 @@ if __name__ == "__main__":
             #     print("%s_%s_%s"%(site,vza,vaa), " failed")
         for ifile in range(len(site_ds)):
             if files_nmaskedseries[ifile]<len(site_ds[ifile].series)/2:
-                print(files[ifile],os.path.basename(files[ifile]))
+                print(files_nmaskedseries[ifile],os.path.basename(files[ifile]))
                 site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
-        print(files_nmaskedseries)
