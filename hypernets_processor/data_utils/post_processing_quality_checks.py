@@ -238,11 +238,9 @@ if __name__ == "__main__":
                         ds_curr.u_rel_random_reflectance[iseries]*=np.nan
                         ds_curr.u_rel_systematic_reflectance[iseries]*=np.nan
                         ds_curr.std_reflectance[iseries]*=np.nan
-                        ds_curr.n_valid_scans[iseries]=0
-                        ds_curr.n_valid_scans_SWIR[iseries]=0
-                        ds_curr.quality_flag[iseries]=16
+                        if mask2[ifile]==2:
+                            ds_curr.quality_flag[iseries]=16
                         ds_curr.quality_flag.attrs["flag_meanings"]=ds_curr.quality_flag.attrs["flag_meanings"].replace("placeholder1","postprocessing_outliers")
-                        print(ds_curr.quality_flag)
                         site_ds[ifile] = ds_curr
                         files_nmaskedseries[ifile]+=1
 
