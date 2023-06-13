@@ -244,7 +244,13 @@ if __name__ == "__main__":
                         print(ds_curr.quality_flag)
                         site_ds[ifile] = ds_curr
                         files_nmaskedseries[ifile]+=1
+
+
             # except:
             #     print("%s_%s_%s"%(site,vza,vaa), " failed")
-
+        for ifile in range(len(site_ds)):
+            if files_nmaskedseries[ifile]<len(site_ds[ifile].series):
+                print(files[ifile])
+                stop
+                site_ds[ifile].to_netcdf()
         print(files_nmaskedseries)
