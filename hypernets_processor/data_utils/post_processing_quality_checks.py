@@ -227,7 +227,7 @@ if __name__ == "__main__":
             for vaa in vaas:
                 times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
                 if len(times[np.where(mask==0)])>0:
-                    try:
+                    if True:
                         make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
-                    except:
-                        print("%s_%s_%s"%(site,vza,vaa), " failed")
+                    # except:
+                    #     print("%s_%s_%s"%(site,vza,vaa), " failed")
