@@ -214,14 +214,12 @@ def fit_binfunc(xvals,yvals,maxpoints):
         return np.interp(xvals,x_bin,y_bin)
 
 def vegetation_checks(ds,iseries):
-    print(ds.wavelength.values[296],np.where(ds.wavelength.values==490))
-    print(ds.wavelength.values[440],np.where(ds.wavelength.values==560))
-    b2 = ds["reflectance"].values[296, iseries]  # 490 nm
-    b3 = ds["reflectance"].values[440, iseries]  # 560 nm
-    b4 = ds["reflectance"].values[654, iseries]  # 665 nm
-    b5 = ds["reflectance"].values[734, iseries]  # 705 nm
-    b7 = ds["reflectance"].values[891, iseries]  # 783 nm
-    b8 = ds["reflectance"].values[1056, iseries]  # equivalent of 8a # 865 nm
+    b2 = ds["reflectance"].values[np.argmin(np.abs(ds.wavelength.values-490)), iseries]  # 490 nm
+    b3 = ds["reflectance"].values[np.argmin(np.abs(ds.wavelength.values-560)), iseries]  # 560 nm
+    b4 = ds["reflectance"].values[np.argmin(np.abs(ds.wavelength.values-665)), iseries]  # 665 nm
+    b5 = ds["reflectance"].values[np.argmin(np.abs(ds.wavelength.values-705)), iseries]  # 705 nm
+    b7 = ds["reflectance"].values[np.argmin(np.abs(ds.wavelength.values-783)), iseries]  # 783 nm
+    b8 = ds["reflectance"].values[np.argmin(np.abs(ds.wavelength.values-865)), iseries]  # equivalent of 8a # 865 nm
 
     vis_test = (b2 < b3) & (b3 > b4)  # Spot the peak in the green region of the visible
     ir_test = b7 > b5 * 2  # reflectance in b7 must be double that of b5 ... in effect detecting the red edge?
