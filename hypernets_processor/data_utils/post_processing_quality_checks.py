@@ -254,39 +254,39 @@ if __name__ == "__main__":
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times,refl,mask=extract_reflectances(files,wavs,vza,vaa, site)
-
-            if site == "WWUK":
-                for ifile in range(len(site_ds)):
-                    if not vegetation_checks(site_ds[ifile],iseries):
-                        mask[ifile]=3
-            if True:
-                mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),n_max_points=30,sigma_thresh=sites_thresh[isite])
-                for ifile in range(len(site_ds)):
-                    ds_curr = site_ds[ifile]
-                    ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
-                        "placeholder1", "postprocessing_outliers")
-                    if site == "WWUK":
-                        ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
-                        "placeholder1", "postprocessing_outliers")
-
-                    if mask2[ifile]>0:
-                        ds_curr.reflectance[:,iseries]*=np.nan
-                        ds_curr.u_rel_random_reflectance[:,iseries]*=np.nan
-                        ds_curr.u_rel_systematic_reflectance[:,iseries]*=np.nan
-                        ds_curr.std_reflectance[:,iseries]*=np.nan
-                        if mask2[ifile]==2:
-                            ds_curr.quality_flag[iseries]=16
-                        files_nmaskedseries[ifile]+=1
-                    site_ds[ifile] = ds_curr
-
-            # except:
-            #     print("%s_%s_%s"%(site,vza,vaa), " failed")
-
-        f = open(os.path.join(out_path,site,site+"_sequences.csv"), "w")
-        f.write("#filename, datetime, lat, lon \n")
-        for ifile in range(len(site_ds)):
-            if files_nmaskedseries[ifile]<len(site_ds[ifile].series)/2:
-                print(files_nmaskedseries[ifile],os.path.basename(files[ifile]))
-                site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
-                f.write("%s,%s,%s,%s \n"%(files[ifile],times[ifile],site_ds[ifile].attrs["site_latitude"],site_ds[ifile].attrs["site_longitude"]))
-        f.close()
+        #
+        #     if site == "WWUK":
+        #         for ifile in range(len(site_ds)):
+        #             if not vegetation_checks(site_ds[ifile],iseries):
+        #                 mask[ifile]=3
+        #     if True:
+        #         mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),n_max_points=30,sigma_thresh=sites_thresh[isite])
+        #         for ifile in range(len(site_ds)):
+        #             ds_curr = site_ds[ifile]
+        #             ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
+        #                 "placeholder1", "postprocessing_outliers")
+        #             if site == "WWUK":
+        #                 ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
+        #                 "placeholder1", "postprocessing_outliers")
+        #
+        #             if mask2[ifile]>0:
+        #                 ds_curr.reflectance[:,iseries]*=np.nan
+        #                 ds_curr.u_rel_random_reflectance[:,iseries]*=np.nan
+        #                 ds_curr.u_rel_systematic_reflectance[:,iseries]*=np.nan
+        #                 ds_curr.std_reflectance[:,iseries]*=np.nan
+        #                 if mask2[ifile]==2:
+        #                     ds_curr.quality_flag[iseries]=16
+        #                 files_nmaskedseries[ifile]+=1
+        #             site_ds[ifile] = ds_curr
+        #
+        #     # except:
+        #     #     print("%s_%s_%s"%(site,vza,vaa), " failed")
+        #
+        # f = open(os.path.join(out_path,site,site+"_sequences.csv"), "w")
+        # f.write("#filename, datetime, lat, lon \n")
+        # for ifile in range(len(site_ds)):
+        #     if files_nmaskedseries[ifile]<len(site_ds[ifile].series)/2:
+        #         print(files_nmaskedseries[ifile],os.path.basename(files[ifile]))
+        #         site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
+        #         f.write("%s,%s,%s,%s \n"%(files[ifile],times[ifile],site_ds[ifile].attrs["site_latitude"],site_ds[ifile].attrs["site_longitude"]))
+        # f.close()
