@@ -241,7 +241,7 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
-    sites=["PEAN1B", "PEAN1C", "PEAN2", "DEGE", "WWUK", "ATGE", "GHNA", "BASP","PEAN1A", "IFAR"]
+    sites=["PEAN2", "DEGE", "WWUK", "ATGE", "GHNA", "BASP","PEAN1A","PEAN1B", "PEAN1C","IFAR"]
     sites_thresh=[2,2,2,2,2,2,2,2,2,3]
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
