@@ -90,7 +90,7 @@ def find_files(site):
         list_ds[ifile]=xr.open_dataset(file)
     return files,list_ds
 
-def extract_reflectances(files, wavs, vza, vaa):
+def extract_reflectances(files, wavs, vza, vaa, site):
     refl=np.zeros((len(files),len(wavs)))
     mask=np.ones(len(files))
     times=np.empty(len(files),dtype=datetime.datetime)
@@ -104,10 +104,8 @@ def extract_reflectances(files, wavs, vza, vaa):
             continue
 
         if len(ds.quality_flag.values)==1:
-            if ds.quality_flag.values == 0:
+            if ds.quality_flag.values == 0 or (site=="WWUK" and ds.quality_flag.values == 32768):
                 mask[i]=0
-            else:
-                print([DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]])
 
             ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
             refl[i]=ds.reflectance.values[ids,0]
@@ -253,7 +251,7 @@ if __name__ == "__main__":
         for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
-            times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
+            times,refl,mask=extract_reflectances(files,wavs,vza,vaa, site)
 
             if site == "WWUK":
                 for ifile in range(len(site_ds)):
