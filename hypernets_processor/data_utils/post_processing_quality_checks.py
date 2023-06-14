@@ -97,7 +97,7 @@ def extract_reflectances(files, wavs, vza, vaa):
         ds=read_hypernets_file(files[i],vza=vza, vaa=vaa, filter_flags=False,max_angle_tolerance=2)
         if ds is None:
             mask[i]=1
-            print("bad file:", files[i])
+            print("bad angle for file:", vza, vaa, files[i])
             continue
 
         if len(ds.quality_flag.values)==1:
@@ -211,6 +211,25 @@ def fit_binfunc(xvals,yvals,maxpoints):
             y_bin[i]=np.mean(yvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
         return np.interp(xvals,x_bin,y_bin)
 
+def vegetation_checks(ds):
+    print(ds.wavelength.values[296],np.where(ds.wavelength.values==490))
+    print(ds.wavelength.values[440],np.where(ds.wavelength.values==560))
+    b2 = ds["reflectance"].values[296, :]  # 490 nm
+    b3 = ds["reflectance"].values[440, :]  # 560 nm
+    b4 = ds["reflectance"].values[654, :]  # 665 nm
+    b5 = ds["reflectance"].values[734, :]  # 705 nm
+    b7 = ds["reflectance"].values[891, :]  # 783 nm
+    b8 = ds["reflectance"].values[1056, :]  # equivalent of 8a # 865 nm
+
+    vis_test = (b2 < b3) & (b3 > b4)  # Spot the peak in the green region of the visible
+    ir_test = b7 > b5 * 2  # reflectance in b7 must be double that of b5 ... in effect detecting the red edge?
+    ndvi = (b8 - b4) / (b8 + b4)  # Calculate NDVI
+    ndvi_threshold = ndvi > 0.42
+
+    flags_combined = np.logical_and(vis_test, ir_test, ndvi_threshold)  # combine the three flags
+
+    return flags_combined
+
 if __name__ == "__main__":
 
     wavs=[500,900,1100,1600]
@@ -226,10 +245,14 @@ if __name__ == "__main__":
             ids_wav=np.where((site_ds[ifile].wavelength>380) & (site_ds[ifile].wavelength<1700))[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
 
+        if site=="WWUK":
+            for ifile in range(len(site_ds)):
+                print(vegetation_checks(site_ds[ifile]))
+
         for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
-            times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
+            times,refl,mask=extract_reflectances(site_ds,wavs,vza,vaa)
             if True:
                 mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
                 for ifile in range(len(site_ds)):
