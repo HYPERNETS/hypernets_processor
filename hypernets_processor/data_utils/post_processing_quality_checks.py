@@ -281,7 +281,12 @@ if __name__ == "__main__":
 
             # except:
             #     print("%s_%s_%s"%(site,vza,vaa), " failed")
+
+        f = open(os.path.join(out_path,site,site+"_sequences.csv"), "w")
+        f.write("#filename, datetime, lat, lon \n")
         for ifile in range(len(site_ds)):
             if files_nmaskedseries[ifile]<len(site_ds[ifile].series)/2:
                 print(files_nmaskedseries[ifile],os.path.basename(files[ifile]))
                 site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
+                f.write("%s,%s,%s,%s \n"%(files[ifile],times[ifile],site_ds[ifile].attrs["site_latitude"],site_ds[ifile].attrs["site_longitude"]))
+        f.close()
