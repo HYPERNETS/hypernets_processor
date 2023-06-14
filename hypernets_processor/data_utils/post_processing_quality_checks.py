@@ -225,10 +225,11 @@ def vegetation_checks(ds,iseries):
     ir_test = b7 > b5 * 2  # reflectance in b7 must be double that of b5 ... in effect detecting the red edge?
     ndvi = (b8 - b4) / (b8 + b4)  # Calculate NDVI
     ndvi_threshold = ndvi > 0.42
+    refl_threshold = b5<0.55 and b7<0.55 and b8<0.55
 
     #flags_combined = np.logical_and(vis_test, ir_test, ndvi_threshold)  # combine the three flags
 
-    return vis_test and ir_test and ndvi_threshold
+    return vis_test and ir_test and ndvi_threshold and refl_threshold
 
 if __name__ == "__main__":
 
