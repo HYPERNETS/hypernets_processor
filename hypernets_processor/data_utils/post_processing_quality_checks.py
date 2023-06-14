@@ -226,9 +226,9 @@ def vegetation_checks(ds,iseries):
     ndvi = (b8 - b4) / (b8 + b4)  # Calculate NDVI
     ndvi_threshold = ndvi > 0.42
 
-    flags_combined = np.logical_and(vis_test, ir_test, ndvi_threshold)  # combine the three flags
+    #flags_combined = np.logical_and(vis_test, ir_test, ndvi_threshold)  # combine the three flags
 
-    return flags_combined
+    return vis_test and ir_test and ndvi_threshold
 
 if __name__ == "__main__":
 
