@@ -55,7 +55,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
                 outlier_ids=np.where((mask==2) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
                 bestdata_ids=np.where((mask==0) & ([time_between(dt.time(),hour_bins[ii],hour_bins[ii+1]) for dt in times]))[0]
                 plt.plot(times[outlier_ids], measurand_wav[outlier_ids], "o", color=color,
-                         alpha=0.3)
+                         alpha=0.15)
                 plt.plot(times[bestdata_ids], measurand_wav[bestdata_ids], "o", color=color,
                          label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
 
