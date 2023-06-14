@@ -216,7 +216,7 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
-    sites=["WWUK", "PEAN1", "PEAN2", "DEGE", "ATGE", "IFAR", "GHNA", "BASP",]
+    sites=["PEAN1", "PEAN2", "DEGE", "ATGE", "IFAR", "GHNA", "BASP", "WWUK", ]
     sites_polyn=[4,2,0,4,0,0,0,0]
     sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
