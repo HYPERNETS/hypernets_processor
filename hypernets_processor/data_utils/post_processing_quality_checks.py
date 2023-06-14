@@ -252,7 +252,7 @@ if __name__ == "__main__":
         for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
-            times,refl,mask=extract_reflectances(site_ds,wavs,vza,vaa)
+            times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
             if True:
                 mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
                 for ifile in range(len(site_ds)):
