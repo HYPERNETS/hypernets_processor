@@ -104,12 +104,16 @@ def extract_reflectances(files, wavs, vza, vaa, site):
             continue
 
         if len(ds.quality_flag.values)==1:
+            ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
+            refl[i] = ds.reflectance.values[ids, 0]
+            times[i] = datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
+
             if ds.quality_flag.values == 0 or (site=="WWUK" and ds.quality_flag.values == 32768):
                 mask[i]=0
+            else:
+                print(site,times[i],[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
 
-            ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
-            refl[i]=ds.reflectance.values[ids,0]
-            times[i]=datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
+
         else:
             if np.mean(ds.quality_flag.values) == 0:
                 mask[i]=0
@@ -234,11 +238,10 @@ def vegetation_checks(ds,iseries):
     return vis_test and ir_test and ndvi_threshold and refl_threshold
 
 if __name__ == "__main__":
-
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
-    sites=["WWUK", "PEAN1A", "PEAN1B", "PEAN2", "DEGE", "ATGE", "GHNA", "BASP", "IFAR"]
+    sites=["DEGE", "WWUK", "PEAN1A", "PEAN1B", "PEAN2", "ATGE", "GHNA", "BASP", "IFAR"]
     sites_polyn=[4,2,0,4,0,0,0,0]
     sites_thresh=[2,2,2,2,2,2,2,3]
     for isite,site in enumerate(sites):
