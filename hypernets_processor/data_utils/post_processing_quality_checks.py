@@ -242,7 +242,7 @@ if __name__ == "__main__":
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
     sites=["DEGE", "WWUK", "ATGE", "GHNA", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2", "IFAR"]
-    sites_thresh=[2,2,2,2,2,2,2,2,2,3]
+    sites_thresh=[3,2,2,2,2,2,2,2,2,3]
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
         files_nmaskedseries=np.zeros(len(files))
