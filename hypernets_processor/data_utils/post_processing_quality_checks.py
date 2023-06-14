@@ -242,9 +242,9 @@ if __name__ == "__main__":
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
     # sites=["WWUK", "ATGE", "GHNA", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
-    sites=["ATGE", "GHNA", "BASP"]
+    sites=["DEGE",  "IFAR"]
     # sites_thresh=[2,2,2,2,2,2,2,2,3,3]
-    sites_thresh=[2,2,2]
+    sites_thresh=[3,3]
 
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
