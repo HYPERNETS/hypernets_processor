@@ -59,6 +59,8 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
                          label="%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]))
 
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"ko",alpha=0.1,label="masked by processor")
+        if len(np.where(mask==3)[0])>0:
+            plt.plot(times[np.where(mask==3)[0]],measurands[np.where(mask==3)[0],i],"ko",alpha=0.1,label="masked by vegetation checks")
         valids=measurand_wav[np.where(mask==0)[0]]
         plt.ylim([min(valids)-0.3*(max(valids)-min(valids)),max(valids)+0.3*(max(valids)-min(valids))])
         plt.legend()
@@ -235,7 +237,7 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
-    sites=["PEAN1", "PEAN2", "DEGE", "ATGE", "IFAR", "GHNA", "BASP", "WWUK", ]
+    sites=["WWUK", "PEAN1A", "PEAN1B", "PEAN2", "DEGE", "ATGE", "IFAR", "GHNA", "BASP", ]
     sites_polyn=[4,2,0,4,0,0,0,0]
     sites_thresh=[3,2,2,2,2,2,2,2]
     for isite,site in enumerate(sites):
@@ -245,29 +247,34 @@ if __name__ == "__main__":
             ids_wav=np.where((site_ds[ifile].wavelength>380) & (site_ds[ifile].wavelength<1700))[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
 
-        if site=="WWUK":
-            for ifile in range(len(site_ds)):
-                print(vegetation_checks(site_ds[ifile]))
-
         for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times,refl,mask=extract_reflectances(files,wavs,vza,vaa)
+
+            if site == "WWUK":
+                for ifile in range(len(site_ds)):
+                    print(vegetation_checks(site_ds[ifile],iseries))
+                    mask[ifile]=3
             if True:
                 mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),fit_poly_n=sites_polyn[isite],n_max_points=30,sigma_thresh=sites_thresh[isite])
                 for ifile in range(len(site_ds)):
+                    ds_curr = site_ds[ifile]
+                    ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
+                        "placeholder1", "postprocessing_outliers")
+                    if site == "WWUK":
+                        ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
+                        "placeholder1", "postprocessing_outliers")
+
                     if mask2[ifile]>0:
-                        ds_curr = site_ds[ifile]
                         ds_curr.reflectance[:,iseries]*=np.nan
                         ds_curr.u_rel_random_reflectance[:,iseries]*=np.nan
                         ds_curr.u_rel_systematic_reflectance[:,iseries]*=np.nan
                         ds_curr.std_reflectance[:,iseries]*=np.nan
                         if mask2[ifile]==2:
                             ds_curr.quality_flag[iseries]=16
-                        ds_curr.quality_flag.attrs["flag_meanings"]=ds_curr.quality_flag.attrs["flag_meanings"].replace("placeholder1","postprocessing_outliers")
-                        site_ds[ifile] = ds_curr
                         files_nmaskedseries[ifile]+=1
-
+                    site_ds[ifile] = ds_curr
 
             # except:
             #     print("%s_%s_%s"%(site,vza,vaa), " failed")
