@@ -111,7 +111,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
             if ds.quality_flag.values == 0 or (site=="WWUK" and ds.quality_flag.values == 32768):
                 mask[i]=0
             else:
-                print(site,times[i],[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+                print(site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
 
 
         else:
