@@ -60,7 +60,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
 
         plt.plot(times[np.where(mask==1)[0]],measurands[np.where(mask==1)[0],i],"ko",alpha=0.1,label="masked by processor")
         if len(np.where(mask==3)[0])>0:
-            plt.plot(times[np.where(mask==3)[0]],measurands[np.where(mask==3)[0],i],"ko",alpha=0.1,label="masked by vegetation checks")
+            plt.plot(times[np.where(mask==3)[0]],measurands[np.where(mask==3)[0],i],"mo",alpha=0.1,label="masked by vegetation checks")
         valids=measurand_wav[np.where(mask==0)[0]]
         plt.ylim([min(valids)-0.3*(max(valids)-min(valids)),max(valids)+0.3*(max(valids)-min(valids))])
         plt.legend()
@@ -213,15 +213,15 @@ def fit_binfunc(xvals,yvals,maxpoints):
             y_bin[i]=np.mean(yvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
         return np.interp(xvals,x_bin,y_bin)
 
-def vegetation_checks(ds):
+def vegetation_checks(ds,iseries):
     print(ds.wavelength.values[296],np.where(ds.wavelength.values==490))
     print(ds.wavelength.values[440],np.where(ds.wavelength.values==560))
-    b2 = ds["reflectance"].values[296, :]  # 490 nm
-    b3 = ds["reflectance"].values[440, :]  # 560 nm
-    b4 = ds["reflectance"].values[654, :]  # 665 nm
-    b5 = ds["reflectance"].values[734, :]  # 705 nm
-    b7 = ds["reflectance"].values[891, :]  # 783 nm
-    b8 = ds["reflectance"].values[1056, :]  # equivalent of 8a # 865 nm
+    b2 = ds["reflectance"].values[296, iseries]  # 490 nm
+    b3 = ds["reflectance"].values[440, iseries]  # 560 nm
+    b4 = ds["reflectance"].values[654, iseries]  # 665 nm
+    b5 = ds["reflectance"].values[734, iseries]  # 705 nm
+    b7 = ds["reflectance"].values[891, iseries]  # 783 nm
+    b8 = ds["reflectance"].values[1056, iseries]  # equivalent of 8a # 865 nm
 
     vis_test = (b2 < b3) & (b3 > b4)  # Spot the peak in the green region of the visible
     ir_test = b7 > b5 * 2  # reflectance in b7 must be double that of b5 ... in effect detecting the red edge?
