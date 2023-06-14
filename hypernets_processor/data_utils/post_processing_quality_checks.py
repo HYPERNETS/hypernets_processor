@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import pysolar
 import datetime
 import glob
+from obsarray.templater.dataset_util import DatasetUtil
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -105,6 +106,9 @@ def extract_reflectances(files, wavs, vza, vaa):
         if len(ds.quality_flag.values)==1:
             if ds.quality_flag.values == 0:
                 mask[i]=0
+            else:
+                print([DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]])
+
             ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
             refl[i]=ds.reflectance.values[ids,0]
             times[i]=datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
@@ -236,9 +240,9 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,6,8,10,12,14,16,18,24]
 
-    sites=["WWUK", "PEAN1A", "PEAN1B", "PEAN2", "DEGE", "ATGE", "IFAR", "GHNA", "BASP", ]
+    sites=["WWUK", "PEAN1A", "PEAN1B", "PEAN2", "DEGE", "ATGE", "GHNA", "BASP", "IFAR"]
     sites_polyn=[4,2,0,4,0,0,0,0]
-    sites_thresh=[2,2,2,2,2,2,2,2]
+    sites_thresh=[2,2,2,2,2,2,2,3]
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
         files_nmaskedseries=np.zeros(len(files))
