@@ -24,7 +24,7 @@ dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 # archive_path = r"\\eoserver\home\data\insitu\hypernets\archive_qc"
 archive_path = r"/home/data/insitu/hypernets/archive_qc"
-out_path = r"/home/data/insitu/hypernets/archive_qc/best_files"
+out_path = r"/home/data/insitu/hypernets/archive_qc/best_files2"
 
 
 def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_thresh=3.0, fit_poly_n=0, n_max_points=0):
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
-    sites=["PEAN2", "DEGE", "WWUK", "ATGE", "GHNA", "BASP","PEAN1A","PEAN1B", "PEAN1C","IFAR"]
+    sites=["DEGE", "WWUK", "ATGE", "GHNA", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2", "IFAR"]
     sites_thresh=[2,2,2,2,2,2,2,2,2,3]
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
