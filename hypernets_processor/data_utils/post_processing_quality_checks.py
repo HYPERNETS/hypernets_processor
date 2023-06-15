@@ -184,7 +184,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         #     sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         if n_max_points>0:
-            average = fit_binfunc(xvals,values,n_max_points)
+            average = fit_binfunc(xvals[np.where(mask < 1)],values[np.where(mask < 1)],n_max_points)
             sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         elif median == False:
