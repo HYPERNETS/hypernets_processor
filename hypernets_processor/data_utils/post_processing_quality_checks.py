@@ -204,6 +204,13 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         # print(sigma_old,sigma_new)
         diff = abs(sigma_old - sigma_new) / sigma_old
 
+    # Re-measure sigma and test for convergence
+    sigma_new = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
+    average = np.median(values[np.where(mask < 1)])
+
+    mask[np.where(values > (average + (sigma_thresh * sigma_old)))] = 2
+    mask[np.where(values < (average - (sigma_thresh * sigma_old)))] = 2
+
     return sigma_new, average, mask
 
 def fit_binfunc(xvals,yvals,maxpoints):
