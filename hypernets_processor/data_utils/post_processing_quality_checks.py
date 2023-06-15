@@ -39,7 +39,8 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
                 std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.05, median=True, sigma_thresh=sigma_thresh,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
                 mask[hour_ids]=mask_clip
 
-    print(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]))
+    f = open(os.path.join(archive_path,'stats_masking.txt'), 'a')
+    f.write(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]),len(times[np.where(mask==3)[0]]))
     for i in range(len(wavs)):
         measurand_wav=measurands[:,i]
         ax = plt.gca()
@@ -242,9 +243,9 @@ if __name__ == "__main__":
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
     #sites=["GHNA", "WWUK", "ATGE", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
-    sites=["DEGE","PEAN1A","PEAN1B", "PEAN1C", "PEAN2"]
+    sites=["WWUK"]
     # #sites_thresh=[2,2,2,2,2,2,2,2,3,3]
-    sites_thresh=[3,2,2,2,2]
+    sites_thresh=[2]
 
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
