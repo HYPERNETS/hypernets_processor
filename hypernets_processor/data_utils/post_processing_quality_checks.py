@@ -184,7 +184,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         #     sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         if n_max_points>0:
-            average = fit_binfunc(xvals[np.where(mask < 1)],values[np.where(mask < 1)],n_max_points)
+            average = fit_binfunc(xvals,values,n_max_points,mask)
             sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         elif median == False:
@@ -206,17 +206,17 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
 
     return sigma_old, average, mask
 
-def fit_binfunc(xvals,yvals,maxpoints):
-    nbins=int(np.ceil(len(xvals)/maxpoints))
+def fit_binfunc(xvals,yvals,maxpoints,mask):
+    nbins=int(np.ceil(len(xvals[np.where(mask < 1)])/maxpoints))
     if nbins==1:
-        return np.mean(yvals)*np.ones_like(xvals)
+        return np.mean(yvals[np.where(mask < 1)])*np.ones_like(xvals)
     else:
         x_bin=np.zeros(nbins)
         y_bin=np.zeros(nbins)
-        binpoints=int(np.ceil(len(xvals)/nbins))
+        binpoints=int(np.ceil(len(xvals[np.where(mask < 1)])/nbins))
         for i in range(nbins):
-            x_bin[i]=np.mean(xvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
-            y_bin[i]=np.mean(yvals[i*binpoints:min((i+1)*binpoints,len(xvals))])
+            x_bin[i]=np.mean(xvals[np.where(mask < 1)][i*binpoints:min((i+1)*binpoints,len(xvals))])
+            y_bin[i]=np.mean(yvals[np.where(mask < 1)][i*binpoints:min((i+1)*binpoints,len(xvals))])
         return np.interp(xvals,x_bin,y_bin)
 
 def vegetation_checks(ds,iseries):
