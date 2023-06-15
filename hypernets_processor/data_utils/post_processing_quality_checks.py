@@ -39,8 +39,9 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
                 std, mean, mask_clip = sigma_clip(times_sec[hour_ids], measurand_wav[hour_ids], tolerance=0.05, median=True, sigma_thresh=sigma_thresh,fit_poly_n=fit_poly_n, n_max_points=n_max_points)
                 mask[hour_ids]=mask_clip
 
-    f = open(os.path.join(archive_path,'stats_masking.txt'), 'a')
-    f.write(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]),len(times[np.where(mask==3)[0]]))
+    f = open(os.path.join(archive_path,'stats_masking.csv'), 'a')
+    f.write("%s,%s,%s,%s,%s,%s\n"%(tag,len(times),len(times[np.where(mask==0)[0]]),len(times[np.where(mask==1)[0]]),len(times[np.where(mask==2)[0]]),len(times[np.where(mask==3)[0]])))
+    f.close()
     for i in range(len(wavs)):
         measurand_wav=measurands[:,i]
         ax = plt.gca()
