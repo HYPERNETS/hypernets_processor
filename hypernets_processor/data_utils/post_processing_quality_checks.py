@@ -263,7 +263,7 @@ if __name__ == "__main__":
                     if not vegetation_checks(site_ds[ifile],iseries):
                         mask[ifile]=3
             if True:
-                mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),n_max_points=30,sigma_thresh=3.0)
+                mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),n_max_points=30,sigma_thresh=2.0)
                 for ifile in range(len(site_ds)):
                     ds_curr = site_ds[ifile]
                     ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
