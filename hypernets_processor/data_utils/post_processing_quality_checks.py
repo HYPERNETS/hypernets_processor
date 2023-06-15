@@ -244,7 +244,7 @@ if __name__ == "__main__":
     #sites=["GHNA", "WWUK", "ATGE", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
     sites=["IFAR"]
     # #sites_thresh=[2,2,2,2,2,2,2,2,3,3]
-    # sites_thresh=[2,2,2,2]
+    sites_thresh=[3,2,2,2]
 
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
@@ -263,7 +263,7 @@ if __name__ == "__main__":
                     if not vegetation_checks(site_ds[ifile],iseries):
                         mask[ifile]=3
             if True:
-                mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),n_max_points=30,sigma_thresh=2.0)
+                mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),n_max_points=30,sigma_thresh=sites_thresh[isite])
                 for ifile in range(len(site_ds)):
                     ds_curr = site_ds[ifile]
                     ds_curr.quality_flag.attrs["flag_meanings"] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
