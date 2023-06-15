@@ -186,7 +186,7 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
         #     sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         if n_max_points>0:
-            average = fit_binfunc(xvals,values,n_max_points,mask)
+            average = fit_2weekbins(xvals,values,mask)
             sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         elif median == False:
@@ -220,6 +220,16 @@ def fit_binfunc(xvals,yvals,maxpoints,mask):
             x_bin[i]=np.mean(xvals[np.where(mask < 1)][i*binpoints:min((i+1)*binpoints,len(xvals))])
             y_bin[i]=np.mean(yvals[np.where(mask < 1)][i*binpoints:min((i+1)*binpoints,len(xvals))])
         return np.interp(xvals,x_bin,y_bin)
+
+def fit_2weekbins(xvals,yvals,mask):
+    week_in_sec=604800
+    x_edges=np.arange(xvals[0],xvals[-1]+1,2*week_in_sec)
+    x_bin=np.zeros(len(x_edges)-1)
+    y_bin=np.zeros(len(x_edges)-1)
+    for i in range(len(x_bin)):
+        x_bin[i] = np.mean(xvals[np.where((mask < 1) & (xvals > x_edges[i]) & (xvals < x_edges[i+1]))])
+        y_bin[i] = np.mean(yvals[np.where((mask < 1) & (xvals > x_edges[i]) & (xvals < x_edges[i+1]))])
+    return np.interp(xvals, x_bin, y_bin)
 
 def vegetation_checks(ds,iseries):
     b2 = ds["reflectance"].values[np.argmin(np.abs(ds.wavelength.values-490)), iseries]  # 490 nm
