@@ -241,10 +241,10 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
-    # sites=["WWUK", "ATGE", "GHNA", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
-    sites=["IFAR","DEGE",  ]
-    # sites_thresh=[2,2,2,2,2,2,2,2,3,3]
-    sites_thresh=[3,3]
+    sites=["GHNA", "WWUK", "ATGE", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
+    # sites=["IFAR","DEGE",  ]
+    sites_thresh=[2,2,2,2,2,2,2,2,3,3]
+    # sites_thresh=[3,3]
 
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
@@ -291,5 +291,5 @@ if __name__ == "__main__":
             if files_nmaskedseries[ifile]<len(site_ds[ifile].series)/2:
                 print(files_nmaskedseries[ifile],os.path.basename(files[ifile]))
                 site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
-                f.write("%s,%s,%s,%s \n"%(files[ifile],times[ifile],site_ds[ifile].attrs["site_latitude"],site_ds[ifile].attrs["site_longitude"]))
+                f.write("%s,%s,%s,%s \n"%(os.path.basename(files[ifile]),times[ifile],site_ds[ifile].attrs["site_latitude"],site_ds[ifile].attrs["site_longitude"]))
         f.close()
