@@ -24,7 +24,7 @@ dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 # archive_path = r"\\eoserver\home\data\insitu\hypernets\archive_qc"
 archive_path = r"/home/data/insitu/hypernets/archive_qc"
-out_path = r"/home/data/insitu/hypernets/archive_qc/best_files2"
+out_path = r"/home/data/insitu/hypernets/archive_qc/best_files3"
 
 
 def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_thresh=3.0, fit_poly_n=0, n_max_points=0):
@@ -69,9 +69,9 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
-        plt.savefig(os.path.join(archive_path,"qc_plots","qc_%s_%s.png"%(tag,wavs[i])), dpi=300)
+        plt.savefig(os.path.join(archive_path,"qc_plots3","qc_%s_%s.png"%(tag,wavs[i])), dpi=300)
         plt.clf()
-        print("plot done ", os.path.join(archive_path,"qc_plots","qc_%s_%s.png"%(tag,wavs[i])))
+        print("plot done ", os.path.join(archive_path,"qc_plots3","qc_%s_%s.png"%(tag,wavs[i])))
     return mask
 
 def time_between(time,start_hour,end_hour):
@@ -243,10 +243,10 @@ if __name__ == "__main__":
     wavs=[500,900,1100,1600]
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
-    #sites=["GHNA", "WWUK", "ATGE", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
-    sites=["IFAR"]
-    # #sites_thresh=[2,2,2,2,2,2,2,2,3,3]
-    sites_thresh=[3]
+    sites=["GHNA", "WWUK", "ATGE", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
+    #sites=["IFAR"]
+    sites_thresh=[2,2,2,2,2,2,2,2,3,3]
+    #sites_thresh=[3]
 
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
