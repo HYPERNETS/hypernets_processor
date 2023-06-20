@@ -190,11 +190,11 @@ def sigma_clip(xvals, values, tolerance=0.01, median=True, sigma_thresh=3.0, fit
             sigma_old = np.std(values[np.where(mask < 1)] - average[np.where(mask < 1)])
 
         elif median == False:
-            average = np.mean(values[np.where(mask < 1)])
+            average = np.mean(values[np.where(mask < 1)])*np.ones_like(values)
             sigma_old = np.std(values[np.where(mask < 1)])
 
         elif median == True:
-            average = np.median(values[np.where(mask < 1)])
+            average = np.median(values[np.where(mask < 1)])*np.ones_like(values)
             sigma_old = np.std(values[np.where(mask < 1)])
 
         # Mask those pixels that lie more than 3 stdev away from mean
