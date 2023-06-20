@@ -285,7 +285,7 @@ if __name__ == "__main__":
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times,refl,mask=extract_reflectances(files,wavs,vza,vaa, site)
             print(vza,vaa)
-            if site == "WWUK" and "BASP":
+            if site == "WWUK" or site=="BASP":
                 for ifile in range(len(site_ds)):
                     if not vegetation_checks(site_ds[ifile],iseries):
                         mask[ifile]=3
