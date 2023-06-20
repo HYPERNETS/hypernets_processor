@@ -273,7 +273,7 @@ if __name__ == "__main__":
                 ids_series = np.where((site_ds[ifile]["viewing_zenith_angle"]<35))[0]
                 site_ds[ifile] = site_ds[ifile].isel(series=ids_series)
                 for vza in [5,10]:
-                    for vaa in [263,273]:
+                    for vaa in [263,273,293]:
                         angledif_series = (site_ds[ifile]["viewing_zenith_angle"].values - vza) ** 2 + (
                             np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
                         ) ** 2
