@@ -248,7 +248,7 @@ def vegetation_checks(ds,iseries):
     ndvi = (b8 - b4) / (b8 + b4)  # Calculate NDVI
     ndvi_threshold = ndvi > 0.42
     refl_threshold = b7<0.65 and b7>0.15
-
+    print(b7)
     #flags_combined = np.logical_and(vis_test, ir_test, ndvi_threshold)  # combine the three flags
 
     return vis_test and ir_test and ndvi_threshold and refl_threshold
@@ -289,6 +289,7 @@ if __name__ == "__main__":
                 for ifile in range(len(site_ds)):
                     if not vegetation_checks(site_ds[ifile],iseries):
                         mask[ifile]=3
+                print(mask)
             if True:
                 mask2 = make_time_series_plot(wavs,times,refl,mask,hour_bins,"%s_%s_%s"%(site,vza,vaa),n_max_points=sites_points[isite],sigma_thresh=sites_thresh[isite])
                 for ifile in range(len(site_ds)):
