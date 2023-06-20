@@ -69,7 +69,7 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
         if len(np.where(mask==3)[0])>0:
             plt.plot(times[np.where(mask==3)[0]],measurands[np.where(mask==3)[0],i],"mo",alpha=0.1,label="masked by vegetation checks")
         valids=measurand_wav[np.where(mask==0)[0]]
-        plt.ylim([min(valids)-0.3*(max(valids)-min(valids)),max(valids)+0.3*(max(valids)-min(valids))])
+        plt.ylim([min(valids)-0.3*(max(valids)-min(valids)),max(1,max(valids)+0.3*(max(valids)-min(valids)))])
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
