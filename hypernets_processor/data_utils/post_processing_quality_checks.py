@@ -26,7 +26,7 @@ dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 # archive_path = r"\\eoserver\home\data\insitu\hypernets\archive_qc"
 archive_path = r"/home/data/insitu/hypernets/archive_qc"
-out_path = r"/home/data/insitu/hypernets/archive_qc/best_files3"
+out_path = r"/home/data/insitu/hypernets/archive_qc/best_files2"
 plot_path = r"/home/data/insitu/hypernets/archive_qc/qc_plots3"
 plotter = Plotting("",plot_path,".png")
 
