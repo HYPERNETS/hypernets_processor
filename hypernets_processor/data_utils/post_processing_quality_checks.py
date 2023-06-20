@@ -254,9 +254,9 @@ if __name__ == "__main__":
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
     sites=["GHNA", "WWUK", "ATGE", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
-    #sites=["IFAR"]
+    sites=["BASP"]
     sites_thresh=[2,2,2,2,2,2,2,2,3,3]
-    #sites_thresh=[3]
+    sites_thresh=[3]
 
     for isite,site in enumerate(sites):
         files,site_ds=find_files(site)
@@ -264,6 +264,16 @@ if __name__ == "__main__":
         for ifile in range(len(site_ds)):
             ids_wav=np.where((site_ds[ifile].wavelength>380) & (site_ds[ifile].wavelength<1700))[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
+            if site=="BASP":
+                ids_series = np.where((site_ds[ifile]["viewing_zenith_angle"]<35))[0]
+                site_ds[ifile] = site_ds[ifile].isel(series_id=ids_series)
+                for vza in [5,10]:
+                    for vaa in [263,273]:
+                        angledif_series = (site_ds[ifile]["viewing_zenith_angle"].values - vza) ** 2 + (
+                            np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
+                        ) ** 2
+                        ids_series = np.where(angledif_series != np.min(angledif_series))[0]
+                        site_ds[ifile] = site_ds[ifile].isel(series_id=ids_series)
 
         for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
