@@ -27,12 +27,18 @@ __status__ = "Development"
 
 
 class Plotting:
-    def __init__(self, context, path=None):
+    def __init__(self, context, path=None, plot_format=None):
         self.context = context
         if path is None:
             self.path = HypernetsWriter(context).return_plot_directory()
+        else:
+            self.path = path
         if not os.path.exists(self.path):
             os.makedirs(self.path)
+        if plot_format is None:
+            self.plot_format = context.get_config_value("plotting_format")
+        else:
+            self.plot_format = plot_format
         pass
 
     def plot_variable(self, measurandstring, *args, **kwargs):
@@ -63,7 +69,7 @@ class Plotting:
                 + "_series_"
                 + str(series_id[i])
                 + "."
-                + self.context.get_config_value("plotting_format"),
+                + self.plot_format,
             )
 
             ids = np.where((dataset["series_id"] == series_id[i]))[0]
@@ -88,7 +94,7 @@ class Plotting:
             + "_"
             + dataset.attrs["product_name"]
             + "."
-            + self.context.get_config_value("plotting_format"),
+            + self.plot_format,
         )
 
         if measurandstring == "irradiance":
@@ -133,7 +139,7 @@ class Plotting:
             + "_vza"
             + str(vza)
             + "."
-            + self.context.get_config_value("plotting_format"),
+            + self.plot_format,
         )
 
         if measurandstring == "irradiance":
@@ -169,7 +175,7 @@ class Plotting:
             + "_vaa"
             + str(vaa)
             + "."
-            + self.context.get_config_value("plotting_format"),
+            + self.plot_format,
         )
 
         if measurandstring == "irradiance":
@@ -208,7 +214,7 @@ class Plotting:
                 + "_series_"
                 + str(series_id[i])
                 + "."
-                + self.context.get_config_value("plotting_format"),
+                + self.plot_format,
             )
 
             ids = np.where(dataset["series_id"] == series_id[i])[0]
@@ -249,7 +255,7 @@ class Plotting:
             + "_"
             + dataset.attrs["product_name"]
             + "."
-            + self.context.get_config_value("plotting_format"),
+            + self.plot_format,
         )
 
         yrand = dataset["u_rel_random_" + measurandstring].values
@@ -299,7 +305,7 @@ class Plotting:
                 + "_"
                 + dataset.attrs["product_name"]
                 + "."
-                + self.context.get_config_value("plotting_format"),
+                + self.plot_format,
             )
 
             if L2:
@@ -559,7 +565,7 @@ class Plotting:
             "plot_clearskycheck_irradiance_"
             + dataset.attrs["product_name"]
             + "."
-            + self.context.get_config_value("plotting_format"),
+            + self.plot_format,
         )
 
         angle_labels = [

@@ -12,6 +12,8 @@ import pysolar
 import datetime
 import glob
 from obsarray.templater.dataset_util import DatasetUtil
+from hypernets_processor.plotting.plotting import Plotting
+
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -25,6 +27,8 @@ refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 # archive_path = r"\\eoserver\home\data\insitu\hypernets\archive_qc"
 archive_path = r"/home/data/insitu/hypernets/archive_qc"
 out_path = r"/home/data/insitu/hypernets/archive_qc/best_files3"
+plot_path = r"/home/data/insitu/hypernets/archive_qc/qc_plots3"
+plotter = Plotting("",plot_path,".png")
 
 
 def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_thresh=3.0, fit_poly_n=0, n_max_points=0):
@@ -69,9 +73,9 @@ def make_time_series_plot(wavs,times, measurands, mask, hour_bins, tag, sigma_th
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
-        plt.savefig(os.path.join(archive_path,"qc_plots3","qc_%s_%s.png"%(tag,wavs[i])), dpi=300)
+        plt.savefig(os.path.join(plot_path,"qc_%s_%s.png"%(tag,wavs[i])), dpi=300)
         plt.clf()
-        print("plot done ", os.path.join(archive_path,"qc_plots3","qc_%s_%s.png"%(tag,wavs[i])))
+        print("plot done ", os.path.join(plot_path,"qc_%s_%s.png"%(tag,wavs[i])))
     return mask
 
 def time_between(time,start_hour,end_hour):
@@ -315,4 +319,8 @@ if __name__ == "__main__":
                 print(files_nmaskedseries[ifile],os.path.basename(files[ifile]))
                 site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
                 f.write("%s,%s,%s,%s \n"%(os.path.basename(files[ifile]),times[ifile],site_ds[ifile].attrs["site_latitude"],site_ds[ifile].attrs["site_longitude"]))
+
+                plotter.plot_series_in_sequence("reflectance", site_ds[ifile])
+                plotter.plot_series_in_sequence_vaa("reflectance", site_ds[ifile], 98)
+                plotter.plot_series_in_sequence_vza("reflectance", site_ds[ifile], 30)
         f.close()
