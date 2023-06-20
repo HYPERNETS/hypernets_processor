@@ -112,7 +112,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         if len(ds.quality_flag.values)==1:
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = ds.reflectance.values[ids, 0]
-            times[i] = datetime.datetime.fromtimestamp(ds.acquisition_time.values[0])
+            times[i] = datetime.datetime.utcfromtimestamp(ds.acquisition_time.values[0],)
 
             if ds.quality_flag.values == 0 or (site=="DEGE" and ds.quality_flag.values == 32768):
                 mask[i]=0
@@ -125,7 +125,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
                 mask[i]=0
             ids=[np.argmin(np.abs(ds.wavelength.values-wav)) for wav in wavs]
             refl[i]=np.mean(ds.reflectance.values[ids,:])
-            times[i]=datetime.datetime.fromtimestamp(np.mean(ds.acquisition_time.values[:]))
+            times[i]=datetime.datetime.utcfromtimestamp(np.mean(ds.acquisition_time.values[:]))
     return times, refl, mask
 
 def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags=True, max_angle_tolerance=None):
