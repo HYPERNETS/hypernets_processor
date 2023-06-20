@@ -266,14 +266,14 @@ if __name__ == "__main__":
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
             if site=="BASP":
                 ids_series = np.where((site_ds[ifile]["viewing_zenith_angle"]<35))[0]
-                site_ds[ifile] = site_ds[ifile].isel(series_id=ids_series)
+                site_ds[ifile] = site_ds[ifile].isel(series=ids_series)
                 for vza in [5,10]:
                     for vaa in [263,273]:
                         angledif_series = (site_ds[ifile]["viewing_zenith_angle"].values - vza) ** 2 + (
                             np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
                         ) ** 2
                         ids_series = np.where(angledif_series != np.min(angledif_series))[0]
-                        site_ds[ifile] = site_ds[ifile].isel(series_id=ids_series)
+                        site_ds[ifile] = site_ds[ifile].isel(series=ids_series)
 
         for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza= round(site_ds[0].viewing_zenith_angle.values[iseries])
