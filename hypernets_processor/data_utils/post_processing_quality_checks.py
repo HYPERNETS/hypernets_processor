@@ -317,9 +317,7 @@ if __name__ == "__main__":
             if files_nmaskedseries[ifile]<len(site_ds[ifile].series)/2:
                 print(files_nmaskedseries[ifile],os.path.basename(files[ifile]))
                 site_ds[ifile].to_netcdf(os.path.join(out_path,site,os.path.basename(files[ifile])))
-                print(times[ifile],"%s,%s \n"%(os.path.basename(files[ifile]),times[ifile]))
                 f.write("%s,%s,%s,%s \n"%(os.path.basename(files[ifile]),times[ifile],site_ds[ifile].attrs["site_latitude"],site_ds[ifile].attrs["site_longitude"]))
-
                 plotter.plot_series_in_sequence("reflectance", site_ds[ifile])
                 # plotter.plot_series_in_sequence_vaa("reflectance", site_ds[ifile], 98)
                 # plotter.plot_series_in_sequence_vza("reflectance", site_ds[ifile], 30)
