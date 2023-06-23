@@ -343,7 +343,7 @@ class HypernetsReader:
                         azimuth_switch, vaa_rel, vaa_abs, ds["solar_azimuth_angle"][scan_number].values
                     ))
 
-                    vaa = normalizedeg(float(vaa_abs),0,360)-float(offset_pan)
+                    vaa = normalizedeg(float(vaa_abs)-float(offset_pan),0,360)
 
                     #raise SystemExit(0)
                 else:

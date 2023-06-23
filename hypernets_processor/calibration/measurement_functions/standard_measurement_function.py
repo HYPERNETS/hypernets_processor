@@ -21,6 +21,8 @@ class StandardMeasurementFunction(MeasurementFunction):
 
     def correct_nonlin(self, DN, non_linear):
         corrected_DN = np.zeros_like(DN)
+        print(non_linear.ndim)
+        print(non_linear)
         if non_linear.ndim > 1:
             for i in range(len(non_linear[0])):
                 corrected_DN[..., i] = self.correct_nonlin(DN[..., i], non_linear[:, i])
