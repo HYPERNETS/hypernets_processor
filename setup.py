@@ -108,7 +108,7 @@ setup(
     install_requires=[
         "numpy",
         "netCDF4",
-        "xarray==0.19.0",
+        "xarray==2023.6.0",
         "schedule",
         "matplotlib",
         "pysolar",
