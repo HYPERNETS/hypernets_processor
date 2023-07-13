@@ -47,9 +47,9 @@ def process_sequence():
     # Read config file
     job_config = read_config_file([job_config_path, processor_defaults])
 
-    ["Input"][
+    job_config["Input"][
         "raw_data_directory"
-    ] = r"/home/cgoyens/waterhypernet/HYPSTAR/Raw/M1BE/Test/"
+    ] = r"/home/cgoyens/waterhypernet/HYPSTAR/Raw/M1BE/test/"
 
     job_config["Output"][
         "archive_directory"

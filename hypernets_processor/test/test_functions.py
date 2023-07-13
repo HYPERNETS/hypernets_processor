@@ -134,7 +134,7 @@ def setup_test_processor_config(
 
     processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
 
-    processor_config["Processor"]["version"] = "0.0"
+    #processor_config["Processor"]["version"] = "0.0"
 
     processor_config["Databases"]["metadata_db_url"] = (
         metadata_db_url if metadata_db_url is not None else "sqlite:///metadata.db"
