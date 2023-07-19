@@ -31,10 +31,11 @@ class RhymerAncillary:
         output_time = dateutil.parser.parse(isodate)
         print(isodate)
         tstime = [dtime[i].timestamp() for i in range(0, len(dtime))]
+        print(self.context.get_config_value("wind_default"))
         if output_time.timestamp() > max(tstime):
-            out = tseries[:, tstime == max(tstime)]
+            out = float(self.context.get_config_value("wind_default"))
         elif output_time.timestamp() < min(tstime):
-            out = tseries[:, tstime == min(tstime)]
+            out = float(self.context.get_config_value("wind_default"))
         else:
             intfunc = scipy.interpolate.interp1d(tstime, tseries)
             out = intfunc(output_time.timestamp())

@@ -138,7 +138,6 @@ class Interpolate:
         )
 
         dataset_l1c_temp = self.templ.l1ctemp_dataset(dataset_l1c, dataset_l1b_irr)
-
         dataset_l1c_temp = interpolation_function_wav.propagate_ds_specific(
             ["random", "systematic_indep", "systematic_corr_rad_irr"],
             dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
@@ -222,21 +221,22 @@ class Interpolate:
                 dataset_l1c["quality_flag"], "single_irradiance_used"
             )
 
-        # dataset_l1c = self.prop.process_measurement_function_l1("downwelling_radiance",dataset_l1c,
-        #                                                 interpolation_function_time.meas_function,
-        #                                                 [acqui_rad,acqui_irr,
-        #                                                  dataset_l1a_skyrad[
-        #                                                      'radiance'].values],
-        #                                                 [None,None,dataset_l1a_skyrad[
-        #                                                     'u_rel_random_radiance'].values*dataset_l1a_skyrad[
-        #                                                      'radiance'].values/100],
-        #                                                 [None,None,dataset_l1a_skyrad[
-        #                                                     'u_rel_systematic_indep_radiance'].values*dataset_l1a_skyrad[
-        #                                                      'radiance'].values/100],
-        #                                                 [None,None,dataset_l1a_skyrad[
-        #                                                     'u_rel_systematic_corr_rad_irr_radiance'].values*dataset_l1a_skyrad[
-        #                                                      'radiance'].values/100],
-        #                                                 [None,None,dataset_l1a_skyrad["err_corr_systematic_indep_radiance"].values],
-        #                                                 [None,None,dataset_l1a_skyrad["err_corr_systematic_corr_rad_irr_radiance"].values],
-        #                                                 param_fixed=[False,True,True])
+
+        dataset_l1c = self.prop.process_measurement_function_l1("downwelling_radiance",dataset_l1c,
+                                                        interpolation_function_time.meas_function,
+                                                        [acqui_rad,acqui_irr,
+                                                         dataset_l1b_skyrad[
+                                                             'radiance'].values],
+                                                        [None,None,dataset_l1b_skyrad[
+                                                            'u_rel_random_radiance'].values*dataset_l1b_skyrad[
+                                                             'radiance'].values/100],
+                                                        [None,None,dataset_l1b_skyrad[
+                                                            'u_rel_systematic_indep_radiance'].values*dataset_l1b_skyrad[
+                                                             'radiance'].values/100],
+                                                        [None,None,dataset_l1b_skyrad[
+                                                            'u_rel_systematic_corr_rad_irr_radiance'].values*dataset_l1b_skyrad[
+                                                             'radiance'].values/100],
+                                                        [None,None,dataset_l1b_skyrad["err_corr_systematic_indep_radiance"].values],
+                                                        [None,None,dataset_l1b_skyrad["err_corr_systematic_corr_rad_irr_radiance"].values],
+                                                        param_fixed=[False,True,True])
         return dataset_l1c

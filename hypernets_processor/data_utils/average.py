@@ -67,7 +67,43 @@ class Average:
 
         return dataset_l0b
 
+
+    def average_l1b(self, measurandstring, dataset_l1a):
+        if self.context.get_config_value("network") == "w":
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
+            flags = ["outliers"]
+            out, out_std, n_valid = self.calc_mean_masked(dataset_l1a, measurandstring, flags, return_std=True)
+            dataset_l1b[measurandstring].values = out
+            dataset_l1b["std_{}".format(measurandstring)].values = out_std
+            dataset_l1b["n_valid_scans"].values=n_valid
+
+        else:
+            dataset_l1b = self.templ.l1b_template_from_l1a_dataset_land(measurandstring, dataset_l1a)
+            flags=["outliers"]
+            dataset_l1b[measurandstring].values=self.calc_mean_masked(dataset_l1a, measurandstring,flags)
+
+        dataset_l1b["u_rel_random_" + measurandstring].values = self.calc_mean_masked(\
+            dataset_l1a,"u_rel_random_" + measurandstring,flags,rand_unc=True)
+        dataset_l1b["u_rel_systematic_indep_"+measurandstring].values = self.calc_mean_masked\
+        (dataset_l1a,"u_rel_systematic_indep_"+measurandstring,flags)
+        dataset_l1b["u_rel_systematic_corr_rad_irr_"+measurandstring].values = self.calc_mean_masked\
+        (dataset_l1a,"u_rel_systematic_corr_rad_irr_"+measurandstring,flags)
+
+        dataset_l1b["err_corr_systematic_indep_"+measurandstring].values = \
+                dataset_l1a["err_corr_systematic_indep_"+measurandstring].values
+        dataset_l1b["err_corr_systematic_corr_rad_irr_"+measurandstring].values = \
+                dataset_l1a["err_corr_systematic_corr_rad_irr_"+measurandstring].values
+        accel_var=["acceleration_x_mean","acceleration_x_std",
+                   "acceleration_y_mean","acceleration_y_std",
+                   "acceleration_z_mean","acceleration_z_std"]
+        for a in accel_var:
+            dataset_l1b[a].values = self.calc_mean_masked(dataset_l1a,a,flags)
+
+        return dataset_l1b
+
+
     def average_l1a(self, measurandstring, dataset_l1a):
+        print(dataset_l1a.keys())
 
         dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
         flags = ["outliers","L0_thresholds", "L0_discontinuity"]
@@ -81,6 +117,7 @@ class Average:
                 dataset_l1b["n_valid_scans"].values = n_valid.astype(dataset_l1b["n_valid_scans"].values.dtype)
 
             elif measurandstring in var:
+
                 if "u_rel_random" in var:
                     dataset_l1b[var].values=self.calc_mean_masked(dataset_l1a,var,flags,rand_unc=True)
                 elif "err_corr_" in var:
@@ -184,3 +221,18 @@ class Average:
             return out.T, out_std.T, n_valid
         else:
             return out.T
+
+    def calc_std_masked(self, dataset, var, flags, rand_unc=False, corr=False):
+        series_id = np.unique(dataset['series_id'])
+
+        out = np.empty((len(series_id), len(dataset['wavelength'])))
+
+        for i in range(len(series_id)):
+            flagged = np.any(
+                [DatasetUtil.unpack_flags(dataset['quality_flag'])[x] for x in
+                 flags],axis=0)
+            ids = np.where(
+                (dataset['series_id'] == series_id[i]) & (flagged == False))
+            out[i] = np.std(dataset[var].values[:, ids], axis=2)[:, 0]
+
+        return out.T

@@ -32,7 +32,7 @@ STANDARD_METADATA = {"type": "dataset",
                      "netcdf_version": "1.6",
                      "processor_name": "hypernets_processor",
                      "processor_version": "NaN",
-                     "processor_atbd": "TBD",
+                     "processor_atbd": "https://hypernets-processor.readthedocs.io/en/latest/",
                      "product_name": "NaN",
                      "data_created": "NaN",  # adds on write not working currently
                      "references": "https://hypernets-processor.readthedocs.io/en/latest/",
@@ -66,12 +66,12 @@ STANDARD_METADATA = {"type": "dataset",
                      }
 COMPONENTS_METADATA = {  # "system_id": system_id,
     "instrument_id": "TBD",  # key metadata
-    "pointing_system_id": "TBD",  # key metadata
-    "calibration_device_id": "TBD",  # key metadata
-    "irr_vis_head_id": "TBD",  # key metadata
-    "rad_vis_head_id": "TBD",  # key metadata
-    "rain_sensor_id": "TBD",  # key metadata
-    "rgb_camera_id": "TBD",  # key metadata
+    # "pointing_system_id": "TBD",  # key metadata
+    # "calibration_device_id": "TBD",  # key metadata
+    # "irr_vis_head_id": "TBD",  # key metadata
+    # "rad_vis_head_id": "TBD",  # key metadata
+    # "rain_sensor_id": "TBD",  # key metadata
+    # "rgb_camera_id": "TBD",  # key metadata
 }
 
 CAL_METADATA = {"type": "dataset",
@@ -106,24 +106,14 @@ CAL_METADATA = {"type": "dataset",
 
 QC_METADATA={"IRR_acceleration_x_mean": "NaN",
                "IRR_acceleration_x_std": "NaN",
-             "ss_res":"NaN",
-             "nlu":"NaN",
-            "nld":"NaN",
-             "ned":"NaN",
                }
 
 L1A_RAD_METADATA = {"title": "HYPSTAR dataset of radiance",  # example of irradiance file
                     "instrument_calibration_file_rad": "NaN",
-                    "vaa_ask": "NaN",
-                    "vaa_abs": "NaN",
-                    "vaa_ref": "NaN",
                     }
 
 L1A_IRR_METADATA = {"title": "HYPSTAR dataset of irradiance",  # example of irradiance file
                     "instrument_calibration_file_irr": "NaN",
-                    "vaa_ask": "NaN",
-                    "vaa_abs": "NaN",
-                    "vaa_ref": "NaN",
                     }
 
 L1B_RAD_METADATA = {
@@ -139,7 +129,13 @@ L1B_IRR_METADATA = {
 W_L1C_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irradiance, upwelling and downwelling"
                                " radiance and water leaving radiance",  # example of irradiance file
                       "instrument_calibration_file_rad": "NaN",
-                      "instrument_calibration_file_irr": "NaN"
+                      "instrument_calibration_file_irr": "NaN",
+                      "fresnel_option": "NaN",
+                      "similarity_waveref": "NaN",
+                      "similarity_wavethres": "NaN",
+                      "similarity_wavelen1": "NaN",
+                      "similarity_wavelen2": "NaN",
+                      "similarity_alpha": "NaN"
                       }
 
 L_L1C_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradiance",  # example of irradiance file
@@ -149,7 +145,13 @@ L_L1C_METADATA = {"title": "HYPSTAR Land network dataset of radiance and irradia
 
 W_L2A_REF_METADATA = {"title": "HYPSTAR Water network dataset of spectral surface reflectance",
                       "instrument_calibration_file_rad": "NaN",
-                      "instrument_calibration_file_irr": "NaN"
+                      "instrument_calibration_file_irr": "NaN",
+                      "fresnel_option": "NaN",
+                      "similarity_waveref": "NaN",
+                      "similarity_wavethres": "NaN",
+                      "similarity_wavelen1": "NaN",
+                      "similarity_wavelen2": "NaN",
+                      "similarity_alpha": "NaN"
                       }
 
 L_L2A_REF_METADATA = {"title": "HYPSTAR Land network dataset of spectral surface reflectance",
@@ -177,14 +179,8 @@ WATER_NETWORK_METADATA = {"topic_category": "oceans, environment, inland waters,
                           "locator": "https://github.com/HYPERNETS/hypernets_processor/",
                           "responsible_party": "Royal Belgian Institute for Natural Sciences, "
                                                "Directorate Natural Environment, REMSEM",
-                          "creator_name": "TBD",
-                          "creator_email": "TBD",
-                          "fresnel_option": "NaN",
-                          "similarity_waveref": "NaN",
-                          "similarity_wavethres": "NaN",
-                          "similarity_wavelen1": "NaN",
-                          "similarity_wavelen2": "NaN",
-                          "similarity_alpha": "NaN"
+                          "creator_name": "Clemence Goyens",
+                          "creator_email": "remsem@naturalsciences.be"
                           }
 
 NETWORK_METADATA = {"spectral_range_vnir": "400-1000",

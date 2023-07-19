@@ -86,21 +86,39 @@ class DataTemplates:
         }
 
         if measurandstring == "radiance":
-            dataset_l1a = self.hdsb.create_ds_template(
-                l1a_dim_sizes_dict,
-                ds_format="L_L1A_RAD",
-                propagate_ds=dataset_l0,
-                ds=dataset_l0,
-                swir=swir,
-            )
+            if self.context.get_config_value("network") == "w":
+                dataset_l1a = self.hdsb.create_ds_template(
+                    l1a_dim_sizes_dict,
+                    ds_format="W_L1A_RAD",
+                    propagate_ds=dataset_l0,
+                    ds=dataset_l0,
+                    swir=swir,
+                )
+            else:
+                dataset_l1a = self.hdsb.create_ds_template(
+                    l1a_dim_sizes_dict,
+                    ds_format="L_L1A_RAD",
+                    propagate_ds=dataset_l0,
+                    ds=dataset_l0,
+                    swir=swir,
+                )
         elif measurandstring == "irradiance":
-            dataset_l1a = self.hdsb.create_ds_template(
-                l1a_dim_sizes_dict,
-                "L_L1A_IRR",
-                propagate_ds=dataset_l0,
-                ds=dataset_l0,
-                swir=swir,
-            )
+            if self.context.get_config_value("network") == "w":
+                dataset_l1a = self.hdsb.create_ds_template(
+                    l1a_dim_sizes_dict,
+                    "W_L1A_IRR",
+                    propagate_ds=dataset_l0,
+                    ds=dataset_l0,
+                    swir=swir,
+                )
+            else:
+                dataset_l1a = self.hdsb.create_ds_template(
+                    l1a_dim_sizes_dict,
+                    "L_L1A_IRR",
+                    propagate_ds=dataset_l0,
+                    ds=dataset_l0,
+                    swir=swir,
+                )
 
         dataset_l1a = dataset_l1a.assign_coords(wavelength=dataset_l0.wavelength)
 

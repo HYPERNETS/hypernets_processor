@@ -299,8 +299,7 @@ class Calibrate:
         :rtype:
         """
         wavs = dataset_calib["wavelength"].values
-        wavpix = dataset_calib["wavpix"].values
-
+        wavpix = np.squeeze(dataset_calib["wavpix"].values)
         # set up datasets for storing the masked L0 data, with wavelengths corresponding to the ones present in calib files
         datasetl0masked = datasetl0.isel(
             wavelength=slice(int(wavpix[0]), int(wavpix[-1]) + 1)
@@ -308,8 +307,9 @@ class Calibrate:
         datasetl0masked_bla = datasetl0_bla.isel(
             wavelength=slice(int(wavpix[0]), int(wavpix[-1]) + 1)
         )
-        datasetl0masked = datasetl0masked.assign_coords(wavelength=wavs)
-        datasetl0masked_bla = datasetl0masked_bla.assign_coords(wavelength=wavs)
+#       Wavelength already exist as coordinate...?
+#        datasetl0masked = datasetl0masked.assign_coords(wavelength=wavs)
+#        datasetl0masked_bla = datasetl0masked_bla.assign_coords(wavelength=wavs)
 
         series_ids = np.unique(datasetl0masked["series_id"])
         series_ids_bla = np.unique(datasetl0masked["series_id"] + 1)
