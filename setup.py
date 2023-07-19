@@ -106,6 +106,7 @@ setup(
             "calibration/calibration_files/*/*/*/*"],
     },
     install_requires=[
+        "alembic==1.10.2",
         "numpy",
         "netCDF4",
         "xarray==2023.6.0",
