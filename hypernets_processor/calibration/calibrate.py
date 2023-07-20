@@ -91,7 +91,7 @@ class Calibrate:
                 np.count_nonzero(
                     dataset_l1a["u_rel_random_" + measurandstring].values > 100
                 )
-                > 0.05 * dataset_l1a["u_rel_random_" + measurandstring].values.size
+                > 0.5 * dataset_l1a["u_rel_random_" + measurandstring].values.size
             ):
                 self.context.anomaly_handler.add_anomaly("o", dataset_l1a)
 

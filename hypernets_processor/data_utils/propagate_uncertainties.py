@@ -81,17 +81,17 @@ class PropagateUnc:
         for var in variables:
             try:
                 inputs_indep.append((dataset["u_rel_systematic_" + var].values*dataset[var].values).astype("float32"))
-                corr_indep.append(dataset["corr_systematic_" + var].values)
+                corr_indep.append(dataset["err_corr_systematic_" + var].values)
             except:
                 try:
                     inputs_indep.append((calib_dataset["u_rel_systematic_indep_"+var].values*calib_dataset[var].values).astype("float32"))
-                    corr_indep.append(calib_dataset["corr_systematic_indep_"+var].values)
+                    corr_indep.append(calib_dataset["err_corr_systematic_indep_"+var].values)
                 except:
                     inputs_indep.append(None)
                     corr_indep.append(None)
                 try:
                     inputs_corr.append((calib_dataset["u_rel_systematic_corr_rad_irr_"+var].values*calib_dataset[var].values).astype("float32"))
-                    corr_corr.append(calib_dataset["corr_systematic_corr_rad_irr_"+var].values)
+                    corr_corr.append(calib_dataset["err_corr_systematic_corr_rad_irr_"+var].values)
                 except:
                     inputs_corr.append(None)
                     corr_corr.append(None)
@@ -149,7 +149,7 @@ class PropagateUnc:
         corr_indep = []
         for var in variables:
             try:
-                corr_indep.append(dataset["corr_systematic_indep_" + var].values)
+                corr_indep.append(dataset["err_corr_systematic_indep_" + var].values)
                 inputs.append((dataset["u_rel_systematic_indep_" + var].values*dataset[var].values).astype("float32"))
             except:
                 inputs.append(None)
@@ -202,9 +202,9 @@ class PropagateUnc:
             dataset["u_rel_random_" + measurandstring].values = u_random_measurand/measurand
             dataset["u_rel_systematic_indep_" + measurandstring].values = u_syst_measurand_indep/measurand
             dataset["u_rel_systematic_corr_rad_irr_" + measurandstring].values = u_syst_measurand_corr/measurand
-            dataset["corr_random_" + measurandstring].values = np.eye(len(u_random_measurand))
-            dataset["corr_systematic_indep_" + measurandstring].values = corr_syst_measurand_indep
-            dataset["corr_systematic_corr_rad_irr_" + measurandstring].values = corr_syst_measurand_corr
+            dataset["err_corr_random_" + measurandstring].values = np.eye(len(u_random_measurand))
+            dataset["err_corr_systematic_indep_" + measurandstring].values = corr_syst_measurand_indep
+            dataset["err_corr_systematic_corr_rad_irr_" + measurandstring].values = corr_syst_measurand_corr
 
         return dataset
 
@@ -240,11 +240,11 @@ class PropagateUnc:
             dataset["u_rel_systematic_indep_"+measurandstring].values = u_syst_measurand_indep/measurand
             dataset[
                 "u_rel_systematic_corr_rad_irr_"+measurandstring].values = u_syst_measurand_corr/measurand
-            dataset["corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
+            dataset["err_corr_random_"+measurandstring].values = np.eye(len(u_random_measurand))
             dataset[
-                "corr_systematic_indep_"+measurandstring].values = corr_syst_measurand_indep
+                "err_corr_systematic_indep_"+measurandstring].values = corr_syst_measurand_indep
             dataset[
-                "corr_systematic_corr_rad_irr_"+measurandstring].values = corr_syst_measurand_corr
+                "err_corr_systematic_corr_rad_irr_"+measurandstring].values = corr_syst_measurand_corr
 
         return dataset
 
@@ -286,9 +286,9 @@ class PropagateUnc:
         #                 dataset["u_rel_systematic_"+measurandstring].values =\
         #                 u_systematic_measurand[im]/measurand[im]
         #                 try:
-        #                     dataset["corr_random_"+measurandstring].values = np.eye(
+        #                     dataset["err_corr_random_"+measurandstring].values = np.eye(
         #                         len(u_random_measurand[im]))
-        #                     dataset["corr_systematic_"+measurandstring].values =\
+        #                     dataset["err_corr_systematic_"+measurandstring].values =\
         #                     corr_systematic_measurand[im]
         #                 except:
         #                     print("no correlation for ",measurandstring)
@@ -303,9 +303,9 @@ class PropagateUnc:
         #             dataset[measurandstring].values = measurand
         #             dataset["u_rel_random_"+measurandstring].values = u_random_measurand/measurand
         #             dataset["u_rel_systematic_"+measurandstring].values = u_systematic_measurand/measurand
-        #             dataset["corr_random_"+measurandstring].values = np.eye(
+        #             dataset["err_corr_random_"+measurandstring].values = np.eye(
         #                 len(u_random_measurand))
         #             dataset[
-        #                 "corr_systematic_"+measurandstring].values = corr_systematic_measurand
+        #                 "err_corr_systematic_"+measurandstring].values = corr_systematic_measurand
 
         return dataset

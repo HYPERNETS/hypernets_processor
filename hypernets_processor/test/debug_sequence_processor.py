@@ -49,11 +49,11 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"/home/cgoyens/waterhypernet/HYPSTAR/Raw/M1BE/test/"
+    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\M1BE\SEQ20230407T093202"
 
     job_config["Output"][
         "archive_directory"
-    ] = r"/home/cgoyens/waterhypernet/HYPSTAR/Processed/M1BE/"
+    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\archive_test"
 
     job_config["Processor"]["max_level"] = "L2A"
 
