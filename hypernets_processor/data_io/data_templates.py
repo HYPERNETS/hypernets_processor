@@ -66,8 +66,8 @@ class DataTemplates:
         dataset_l0 = self.hdsb.create_ds_template(
             dim_sizes_dict=dim_sizes_dict, ds_format=fileformat, swir=swir
         )
-        dataset_l0.assign_coords(wavelength=wvl)
-        dataset_l0.assign_coords(scan=np.linspace(1, scanDim, scanDim))
+        dataset_l0 = dataset_l0.assign_coords(wavelength=wvl)
+        dataset_l0 = dataset_l0.assign_coords(scan=np.linspace(1, scanDim, scanDim))
 
         return dataset_l0
 
