@@ -338,7 +338,7 @@ class HypernetsReader:
                         ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
                         self.context.logger.error(
                             "Accuracy of pan is above 3°. Check your system and/or data before processing.")
-                    print("Ange accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
+                    print("Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
                     print("If azimuth switch is on, please check the following: switch:{}, vaa_rel:{:.4f}, vaa_abs:{:.4f}, saa:{:.4f}".format(
                         azimuth_switch, vaa_rel, vaa_abs, ds["solar_azimuth_angle"][scan_number].values
                     ))
@@ -700,7 +700,7 @@ class HypernetsReader:
             else:
                 globalattr = []
 
-            print(globalattr)
+            # print(globalattr)
 
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
@@ -767,9 +767,9 @@ class HypernetsReader:
             else:
                 offset_tilt = self.context.get_config_value("offset_tilt")
 
-            print(offset_tilt)
-            print(offset_pan)
-            print(azimuth_switch)
+            # print(offset_tilt)
+            # print(offset_pan)
+            # print(azimuth_switch)
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------

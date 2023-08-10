@@ -108,8 +108,6 @@ class CalibrationConverter:
         # else:
         #     nlin_i=[x for x, date in enumerate(nonlin_times) if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
 
-        print(enumerate(nonlin_times))
-
         calib_i=[x for x, date in enumerate(calibration_data_times)
                    if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
         if len(nonlin_times) == 1:
