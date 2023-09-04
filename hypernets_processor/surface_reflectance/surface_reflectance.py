@@ -17,7 +17,6 @@ from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_utils.average import Average
 from hypernets_processor.data_utils.quality_checks import QualityChecks
-from hypernets_processor.data_utils.propagate_uncertainties import PropagateUnc
 
 import punpy
 import numpy as np
@@ -37,8 +36,6 @@ __status__ = "Development"
 class SurfaceReflectance:
     def __init__(self, context, parallel_cores=1):
         self._measurement_function_factory = ProtocolFactory
-        self._measurement_function_factoryPrev = ProtocolFactoryOld(context)
-        self.prop = PropagateUnc(context, parallel_cores=parallel_cores)
         self.qual = QualityChecks(context)
         self.templ = DataTemplates(context=context)
         self.writer = HypernetsWriter(context)
@@ -56,20 +53,32 @@ class SurfaceReflectance:
         dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
         dataset_l1c = self.rh.qc_bird(dataset_l1c)
 
-        measname=self.context.get_config_value("measurement_function_surface_reflectance")
-        print(measname)
-        l1ctol1b_function = self._measurement_function_factoryPrev.get_measurement_function(measname)
 
-        input_vars = l1ctol1b_function.get_argument_names()
-        input_qty = self.prop.find_input(input_vars, dataset_l1c)
-        u_random_input_qty = self.prop.find_u_random_input(input_vars, dataset_l1c)
-        u_systematic_input_qty, corr_systematic_input_qty = \
-            self.prop.find_u_systematic_input(input_vars, dataset_l1c)
+        prop = punpy.MCPropagation(
+            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
+        )
 
-        L1c = self.prop.process_measurement_function_l2(
-            ["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
-            dataset_l1c, l1ctol1b_function.meas_function, input_qty,
-            u_random_input_qty, u_systematic_input_qty, corr_systematic_input_qty,param_fixed=[False,False,False,False,True])
+        measurement_function_protocol = self.context.get_config_value(
+            "measurement_function_surface_reflectance"
+        )
+
+        water_protocol_function = self._measurement_function_factory(
+            prop=prop,
+            corr_dims=["wavelength","wavelength","wavelength",None],
+            separate_corr_dims=True,
+            yvariable=["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
+            use_err_corr_dict=True,
+        ).get_measurement_function(measurement_function_protocol)
+
+        water_protocol_function.setup(context=self.context)
+
+        L1c = water_protocol_function.propagate_ds_specific(
+            ["random", "systematic_indep"],
+            dataset_l1c,
+            comp_list_out=["random", "systematic"],
+            ds_out_pre=dataset_l1c,
+            store_unc_percent=True,
+        )
 
         failSimil=self.rh.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
@@ -114,7 +123,7 @@ class SurfaceReflectance:
                 try:
                     if self.context.get_config_value("plot_l2a"):
                         self.plot.plot_series_in_sequence(
-                            measurandstring, dataset_l2a, ylim=[0, 0.05]
+                            measurandstring, dataset_l2a, # ylim=[0, 0.05]
                         )
 
                     if self.context.get_config_value("plot_uncertainty"):

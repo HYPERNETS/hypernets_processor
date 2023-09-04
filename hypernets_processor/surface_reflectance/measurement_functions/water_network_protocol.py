@@ -8,8 +8,7 @@ from punpy import MeasurementFunction
 
 
 class WaterNetworkProtocol(MeasurementFunction):
-    #def setup(self, context):
-    def __init__(self, context, MCsteps=1000, parallel_cores=1):
+    def setup(self, context):
         self.context = context
         self.rh = RhymerHypstar(context)
         self.rhp = RhymerProcessing(context)

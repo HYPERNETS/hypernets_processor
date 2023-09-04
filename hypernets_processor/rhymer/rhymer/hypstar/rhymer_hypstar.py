@@ -48,6 +48,7 @@ class RhymerHypstar:
         residuals = y - func(wv, *popt)
         ss_res = np.sum(residuals ** 2)
         return (popt, pcov, ss_res)
+
     def qc_bird(self, l1c):
         ld = np.mean(l1c.downwelling_radiance.values, axis=1)
         ed = np.mean(l1c.irradiance.values, axis=1)
@@ -115,7 +116,7 @@ class RhymerHypstar:
 
                 ## continue if value exceeds the cv threshold
                 if v > self.context.get_config_value("diff_threshold"):
-                    print(self.context.get_config_value("diff_threshold"))
+                    # print(self.context.get_config_value("diff_threshold"))
                     # get flag value for the temporal variability
                     if measurandstring == 'irradiance':
                         flags[id] = 1
