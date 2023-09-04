@@ -13,7 +13,7 @@ Radiometer measurements are taken in a defined set of geometries called a sequen
 
 Once a sequence has been completed succesfully, the data is sent to the server with the following data format, name convention and data structure:
    * Sequence directory:
-      Data from a single sequence (see data structure) are contained in a SEQUENCE directory with the following name convention *SEQ[date of acquisition with format %Y%m%d]T[time of acquisition with format %H%M%S]*
+      Data from a single sequence (see data structure) are contained in a SEQUENCE directory with the following name convention *SEQ[date of acquisition with format %Y%m%d]T[time of acquisition in UTC with format %H%M%S]*
    * Data structure:
       * *metadata.txt*:
          1. This files contains a header with PyxisVersion, DateTime, PI, Site Name, Latitude, Longitude, and, SN of the sensor, followed by,
