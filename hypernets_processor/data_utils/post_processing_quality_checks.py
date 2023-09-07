@@ -25,9 +25,9 @@ __status__ = "Development"
 dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 # archive_path = r"\\eoserver\home\data\insitu\hypernets\archive_qc"
-archive_path = r"/home/data/insitu/hypernets/archive_qc"
-out_path = r"/home/data/insitu/hypernets/archive_qc/best_files2"
-plot_path = r"/home/data/insitu/hypernets/archive_qc/qc_plots3"
+archive_path = r"/home/data/insitu/hypernets/archive"
+out_path = r"/home/data/insitu/hypernets/archive_qc_Sept2023/best_files"
+plot_path = r"/home/data/insitu/hypernets/archive_qc_Sept2023/qc_plots"
 plotter = Plotting("",plot_path,".png")
 
 
@@ -257,9 +257,9 @@ if __name__ == "__main__":
     hour_bins=[0,2,4,6,8,10,12,14,16,18,20,22,24]
 
     sites=["GHNA", "WWUK", "ATGE", "BASP","PEAN1A","PEAN1B", "PEAN1C", "PEAN2","DEGE",  "IFAR"]
-    sites=["BASP"]
+    sites=["WWUK"]
     sites_thresh=[2,2,2,2,2,2,2,2,3,3]
-    sites_thresh=[3]
+    sites_thresh=[2]
     sites_points=[0]
 
     for isite,site in enumerate(sites):
