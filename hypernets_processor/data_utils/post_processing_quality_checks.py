@@ -262,7 +262,16 @@ if __name__ == "__main__":
     sites_thresh=[2]
     sites_points=[0]
 
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+
+    if not os.path.exists(plot_path):
+        os.makedirs(plot_path)
+
     for isite,site in enumerate(sites):
+        if not os.path.exists(os.path.join(out_path,site)):
+            os.makedirs(os.path.join(out_path,site))
+
         files,site_ds=find_files(site)
         files_nmaskedseries=np.zeros(len(files))
         for ifile in range(len(site_ds)):
