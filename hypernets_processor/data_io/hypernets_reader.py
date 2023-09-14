@@ -497,10 +497,6 @@ class HypernetsReader:
                     # spectrum.print_header()
                     vaa, vza = map(float, specattr['pt_ask'].split(";"))
 
-                    #here check if absolute mode is used
-                    if True:
-                        vaa=vaa-180
-
                     if vza == -1 and vaa == -1:
                         self.context.logger.warning(
                             "vza and vaa are both -1, using pt_abs instead")
@@ -524,12 +520,18 @@ class HypernetsReader:
                     vza_ref = normalizedeg(float(vza_ref), 0, 360)
                     vaa_ref = normalizedeg(float(vaa_ref), 0, 360)
 
+                    # here check if absolute mode is used
+                    if True:
+                        vaa = vaa - 180
+                        vaa_ref = vaa_ref - 180
+
                     angacc_vza = abs(vza-vza_ref)
                     angacc_vaa = abs(vaa-vaa_ref)
 
                     self.context.logger.debug(
-                        "Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc, normalizedeg(float(vaa_abs), 0, 360),
-                                                                      normalizedeg(float(vaa_ref), 0, 360)))
+                        "Angle accuracy vza {:.4f} ={:.4f}-{:.4f}".format(angacc_vza, vza, vza_ref))
+                    self.context.logger.debug(
+                        "Angle accuracy vaa {:.4f} ={:.4f}-{:.4f}".format(angacc_vaa, vaa, vaa_ref))
 
                     if len(spectrum.body) > 500:
                         scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
@@ -560,11 +562,11 @@ class HypernetsReader:
                         ds['temperature'][scan_number] = spectrum.header.temperature
 
                         if angacc_vaa > 3:
-                            ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
+                            ds["quality_flag"].values[scan_number] = du.set_flag(ds["quality_flag"][scan_number], "bad_pointing")
                             self.context.logger.error(
                                 "Error in Accuracy of pan is above 3°. Check your system and/or data before processing.")
                         if angacc_vza > 3:
-                            ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
+                            ds["quality_flag"].values[scan_number] = du.set_flag(ds["quality_flag"][scan_number], "bad_pointing")
                             self.context.logger.error(
                                 "Error in Accuracy of tilt is above 3°. Check your system and/or data before processing.")
 
@@ -601,16 +603,16 @@ class HypernetsReader:
                         ds_swir["series_id"][scan_number_swir] = series_id
 
                         if angacc_vaa > 3:
-                            ds_swir["quality_flag"] = du.set_flag(ds_swir["quality_flag"], "bad_pointing")
+                            ds_swir["quality_flag"].values[scan_number_swir] = du.set_flag(ds_swir["quality_flag"][scan_number_swir], "bad_pointing")
                             self.context.logger.error(
                                 "Error in Accuracy of pan is above 3°. Check your system and/or data before processing.")
                         if angacc_vza > 3:
-                            ds_swir["quality_flag"] = du.set_flag(ds_swir["quality_flag"], "bad_pointing")
+                            ds_swir["quality_flag"].values[scan_number_swir] = du.set_flag(ds_swir["quality_flag"][scan_number_swir], "bad_pointing")
                             self.context.logger.error(
                                 "Error in Accuracy of tilt is above 3°. Check your system and/or data before processing.")
 
-                        ds_swir["viewing_azimuth_angle"][scan_number] = vaa
-                        ds_swir["viewing_zenith_angle"][scan_number] = vza
+                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = vaa
+                        ds_swir["viewing_zenith_angle"][scan_number_swir] = vza
 
                         # estimate time based on timestamp
                         ds_swir["acquisition_time"][

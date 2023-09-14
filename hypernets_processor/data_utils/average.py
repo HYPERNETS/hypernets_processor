@@ -104,7 +104,7 @@ class Average:
 
     def average_l1a(self, measurandstring, dataset_l1a):
         dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(measurandstring, dataset_l1a)
-        flags = ["outliers","L0_thresholds", "L0_discontinuity"]
+        flags = ["outliers","L0_thresholds", "L0_discontinuity","bad_pointing"]
 
         for var in dataset_l1b.variables:
             if var==measurandstring:
