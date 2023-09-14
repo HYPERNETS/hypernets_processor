@@ -6,7 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import (
-    ProtocolFactory,ProtocolFactoryOld
+    ProtocolFactory
 )
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
@@ -48,14 +48,35 @@ class SurfaceReflectance:
         self.rhs = RhymerShared(context)
 
     def process_l1c(self, dataset, l1birr):
-        dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset)
-        dataset_l1c = self.rh.get_wind(dataset_l1c)
-        dataset_l1c = self.rh.get_fresnelrefl(dataset_l1c)
-        dataset_l1c = self.rh.qc_bird(dataset_l1c)
+        L1c = self.templ.l1c_from_l1b_dataset(dataset)
+        L1c = self.rh.get_wind(L1c)
+        L1c = self.rh.get_fresnelrefl(L1c)
+        L1c = self.rh.qc_bird(L1c)
 
 
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
+        )
+
+        measurement_function_protocol_lw = self.context.get_config_value(
+            "measurement_function_water_leaving_radiance"
+        )
+
+        water_protocol_function = self._measurement_function_factory(
+            prop=prop,
+            corr_dims=["wavelength"],
+            separate_corr_dims=True,
+            yvariable=["water_leaving_radiance"],
+            use_err_corr_dict=True,
+        ).get_measurement_function(measurement_function_protocol_lw)
+
+        water_protocol_function.setup(context=self.context)
+
+        L1c = water_protocol_function.propagate_ds_specific(
+            ["random", "systematic_indep", "systematic_corr_rad_irr"],
+            L1c,
+            ds_out_pre=L1c,
+            store_unc_percent=True,
         )
 
         measurement_function_protocol = self.context.get_config_value(
@@ -64,9 +85,9 @@ class SurfaceReflectance:
 
         water_protocol_function = self._measurement_function_factory(
             prop=prop,
-            corr_dims=["wavelength","wavelength","wavelength",None],
+            corr_dims=["wavelength","wavelength",None],
             separate_corr_dims=True,
-            yvariable=["water_leaving_radiance", "reflectance_nosc", "reflectance", "epsilon"],
+            yvariable=["reflectance_nosc", "reflectance", "epsilon"],
             use_err_corr_dict=True,
         ).get_measurement_function(measurement_function_protocol)
 
@@ -74,9 +95,9 @@ class SurfaceReflectance:
 
         L1c = water_protocol_function.propagate_ds_specific(
             ["random", "systematic_indep"],
-            dataset_l1c,
+            L1c,
             comp_list_out=["random", "systematic"],
-            ds_out_pre=dataset_l1c,
+            ds_out_pre=L1c,
             store_unc_percent=True,
         )
 
@@ -96,7 +117,10 @@ class SurfaceReflectance:
                     self.plot.plot_series_in_sequence(measurandstring, L1c)
 
                 if self.context.get_config_value("plot_uncertainty"):
-                    self.plot.plot_relative_uncertainty(measurandstring, L1c, L2=True)
+                    if measurandstring=="water_leaving_radiance":
+                        self.plot.plot_relative_uncertainty(measurandstring, L1c)
+                    else:
+                        self.plot.plot_relative_uncertainty(measurandstring, L1c, L2=True)
             except:
                 print("not plotting ",measurandstring)
         return L1c

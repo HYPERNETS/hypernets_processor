@@ -1737,7 +1737,8 @@ W_L1C_REFLECTANCE_VARIABLES = {
             "preferred_symbol": "lw",
             "unc_comps": [
                 "u_rel_random_water_leaving_radiance",
-                "u_rel_systematic_water_leaving_radiance",
+                "u_rel_systematic_indep_water_leaving_radiance",
+                "u_rel_systematic_corr_rad_irr_water_leaving_radiance",
             ],
         },
     },
@@ -1745,7 +1746,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [WL_DIM, Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "water_leaving_reflectance_nosc",
+            "standard_name": "reflectance_nosc",
             "long_name": "Reflectance of the water column at the "
             "surface without correction for the NIR "
             "similarity spectrum "
@@ -1773,19 +1774,19 @@ W_L1C_REFLECTANCE_VARIABLES = {
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
     },
-    "u_rel_systematic_water_leaving_radiance": {
+    "u_rel_systematic_indep_water_leaving_radiance": {
         "dim": [WL_DIM, Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "u_rel_systematic_normalized_water_leaving_radiance",
-            "long_name": "Systematic normalized water leaving radiance "
+            "standard_name": "u_rel_systematic_indep_water_leaving_radiance",
+            "long_name": "water leaving radiance Systematic uncertainty component that is independent with uncertainties on irradiance "
             "relative uncertainty",
             "units": "%",
             "err_corr": [
                 {
                     "dim": WL_DIM,
                     "form": "err_corr_matrix",
-                    "params": ["err_corr_systematic_water_leaving_radiance"],
+                    "params": ["err_corr_systematic_indep_water_leaving_radiance"],
                     "units": [],
                 },
                 {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
@@ -1793,13 +1794,44 @@ W_L1C_REFLECTANCE_VARIABLES = {
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
     },
-    "err_corr_systematic_water_leaving_radiance": {
+    "err_corr_systematic_indep_water_leaving_radiance": {
         "dim": [WL_DIM, WL_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "err_corr_systematic_normalized_water_leaving_radiance",
-            "long_name": "Correlation matrix of systematic normalized water "
+            "standard_name": "err_corr_systematic_indep_water_leaving_radiance",
+            "long_name": "Correlation matrix of water leaving radiance Systematic uncertainty component that is independent with uncertainties on irradiance"
             "leaving radiance uncertainty",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "u_rel_systematic_corr_rad_irr_water_leaving_radiance": {
+        "dim": [WL_DIM, Lu_SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "u_rel_systematic_corr_rad_irr_water_leaving_radiance",
+            "long_name": "water leaving radiance Systematic uncertainty component that is correlated with uncertainties on irradiance "
+                         "relative uncertainty",
+            "units": "%",
+            "err_corr": [
+                {
+                    "dim": WL_DIM,
+                    "form": "err_corr_matrix",
+                    "params": ["err_corr_systematic_indep_water_leaving_radiance"],
+                    "units": [],
+                },
+                {"dim": Lu_SCAN_DIM, "form": "systematic", "params": [], "units": []},
+            ],
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "err_corr_systematic_corr_rad_irr_water_leaving_radiance": {
+        "dim": [WL_DIM, WL_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "err_corr_systematic_corr_rad_irr_water_leaving_radiance",
+            "long_name": "Correlation matrix of water leaving radiance Systematic uncertainty component that is correlated with uncertainties on irradiance"
+                         "leaving radiance uncertainty",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1808,7 +1840,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [WL_DIM, Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "u_rel_random_water_leaving_reflectance",
+            "standard_name": "u_rel_random_reflectance",
             "long_name": "Random water leaving reflectance " "relative uncertainty",
             "units": "%",
             "err_corr": [
@@ -1822,7 +1854,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [WL_DIM, Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "u_rel_systematic_water_leaving_reflectance",
+            "standard_name": "u_rel_systematic_reflectance",
             "long_name": "Systematic water leaving reflectance relative uncertainty",
             "units": "%",
             "err_corr": [
@@ -1841,7 +1873,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [WL_DIM, WL_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "err_corr_systematic_water_leaving_reflectance",
+            "standard_name": "err_corr_systematic_reflectance",
             "long_name": "Correlation matrix of systematic water leaving "
             "reflectance uncertainty",
             "units": "-",
@@ -1852,7 +1884,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [WL_DIM, Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "u_rel_random_water_leaving_reflectance_nosc",
+            "standard_name": "u_rel_random_reflectance_nosc",
             "long_name": "Random water leaving reflectance not corrected "
             "for NIR similarity spectrum relative uncertainty",
             "units": "%",
@@ -1888,7 +1920,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [WL_DIM, WL_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "err_corr_systematic_water_leaving_reflectance_nosc",
+            "standard_name": "err_corr_systematic_reflectance_nosc",
             "long_name": "Correlation matrix of systematic water "
             "leaving reflectance not corrected for NIR "
             "similarity spectrum uncertainty",
@@ -1900,7 +1932,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "simil_epsilon",
+            "standard_name": "epsilon",
             "long_name": "Similarity spectrum ratio at two wavelengths see Ruddick et al. (2016)",
             "reference": "",
             "units": "-",

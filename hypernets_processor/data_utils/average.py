@@ -136,7 +136,25 @@ class Average:
                          "fresnel_default","temp_variability_ed","temp_variability_lu", "simil_fail"]
 
         dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags)
-        for measurandstring in ["water_leaving_radiance","reflectance_nosc",
+
+        measurand, measurand_std, n_valid = self.calc_mean_masked(
+            dataset, "water_leaving_radiance", flags, return_std=True)
+        dataset_l2a["water_leaving_radiance"].values = measurand
+        dataset_l2a["std_water_leaving_radiance"].values = measurand_std.astype(
+            dataset_l2a["std_water_leaving_radiance"].values.dtype)
+        dataset_l2a["n_valid_scans"].values = n_valid.astype(dataset_l2a["n_valid_scans"].values.dtype)
+        dataset_l2a["u_rel_random_water_leaving_radiance"].values = self.calc_mean_masked(
+            dataset, "u_rel_random_water_leaving_radiance", flags, rand_unc=True)
+        dataset_l2a["u_rel_systematic_indep_water_leaving_radiance"].values = self.calc_mean_masked(
+            dataset, "u_rel_systematic_indep_water_leaving_radiance", flags)
+        dataset_l2a["err_corr_systematic_indep_water_leaving_radiance"].values = \
+            dataset["err_corr_systematic_indep_water_leaving_radiance"].values
+        dataset_l2a["u_rel_systematic_corr_rad_irr_water_leaving_radiance"].values = self.calc_mean_masked(
+            dataset, "u_rel_systematic_corr_rad_irr_water_leaving_radiance", flags)
+        dataset_l2a["err_corr_systematic_corr_rad_irr_water_leaving_radiance"].values = \
+            dataset["err_corr_systematic_corr_rad_irr_water_leaving_radiance"].values
+
+        for measurandstring in ["reflectance_nosc",
                                 "reflectance","epsilon"]:
             measurand, measurand_std, n_valid=self.calc_mean_masked(
                 dataset,measurandstring,flags,return_std=True)
@@ -150,6 +168,7 @@ class Average:
             if not measurandstring=="epsilon":
                 dataset_l2a["err_corr_systematic_"+measurandstring].values = \
                     dataset["err_corr_systematic_"+measurandstring].values
+
 
         return dataset_l2a
 

@@ -15,28 +15,14 @@ class WaterNetworkProtocol(MeasurementFunction):
         self.rhs = RhymerShared(context)
 
     def meas_function(
-        self, upwelling_radiance, downwelling_radiance, irradiance, rhof, wavelength
+        self, water_leaving_radiance, irradiance, wavelength
     ):
         """
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         """
 
-        # default water network processing
-        water_leaving_radiance = np.array(
-            [
-                (upwelling_radiance[w] - (rhof * downwelling_radiance[w]))
-                for w in range(len(downwelling_radiance))
-            ]
-        )
-        reflectance_nosc = np.array(
-            [
-                np.pi
-                * (upwelling_radiance[w] - (rhof * downwelling_radiance[w]))
-                / irradiance[w]
-                for w in range(len(downwelling_radiance))
-            ]
-        )
+        reflectance_nosc = np.pi * water_leaving_radiance/ irradiance
 
         # NIR SIMIL CORRECTION
         # retrieve variables for NIR SIMIL correction
@@ -58,7 +44,7 @@ class WaterNetworkProtocol(MeasurementFunction):
             alpha - 1.0
         )
         reflectance = np.array([r - epsilon for r in reflectance_nosc])
-        return water_leaving_radiance, reflectance_nosc, reflectance, epsilon
+        return reflectance_nosc, reflectance, epsilon
 
     @staticmethod
     def get_name():
@@ -66,9 +52,7 @@ class WaterNetworkProtocol(MeasurementFunction):
 
     def get_argument_names(self):
         return [
-            "upwelling_radiance",
-            "downwelling_radiance",
+            "water_leaving_radiance",
             "irradiance",
-            "rhof",
             "wavelength",
         ]
