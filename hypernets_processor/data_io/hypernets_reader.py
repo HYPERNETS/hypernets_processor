@@ -396,7 +396,6 @@ class HypernetsReader:
                         model['azimuth_ref'] + '_' + model['vza']
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
-            vaa, vza = map(float, specattr['pt_abs'].split(";"))
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
@@ -496,6 +495,42 @@ class HypernetsReader:
                     chunk_body = f.read(chunk_size)
                     spectrum = Spectrum.parse_raw(chunk_body)
                     # spectrum.print_header()
+                    vaa, vza = map(float, specattr['pt_ask'].split(";"))
+
+                    #here check if absolute mode is used
+                    if True:
+                        vaa=vaa-180
+
+                    if vza == -1 and vaa == -1:
+                        self.context.logger.warning(
+                            "vza and vaa are both -1, using pt_abs instead")
+                        vaa, vza = map(float, specattr['pt_abs'].split(";"))
+
+                    if specattr.get('pt_ref'):
+                        vaa_ref, vza_ref = map(float, specattr['pt_ref'].split(";"))
+                    else:
+                        vaa_ref, vza_ref = -999999, -999999
+                    if vza > 180:
+                        self.context.logger.debug(
+                            "vza is larger than 90degrees, changing to equivalent geometry with vza<90.")
+                        vza = 360 - vza
+                        vaa = vaa + 180
+
+                        vza_ref = 360 - vza_ref
+                        vaa_ref = vaa_ref + 180
+
+                    vza = normalizedeg(float(vza), 0, 360)
+                    vaa = normalizedeg(float(vaa), 0, 360)
+                    vza_ref = normalizedeg(float(vza_ref), 0, 360)
+                    vaa_ref = normalizedeg(float(vaa_ref), 0, 360)
+
+                    angacc_vza = abs(vza-vza_ref)
+                    angacc_vaa = abs(vaa-vaa_ref)
+
+                    self.context.logger.debug(
+                        "Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc, normalizedeg(float(vaa_abs), 0, 360),
+                                                                      normalizedeg(float(vaa_ref), 0, 360)))
+
                     if len(spectrum.body) > 500:
                         scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
@@ -505,8 +540,6 @@ class HypernetsReader:
 
                         series_id = model['series_id']
                         ds["series_id"][scan_number] = series_id
-                        ds["viewing_azimuth_angle"][scan_number] = vaa
-                        ds["viewing_zenith_angle"][scan_number] = vza
 
                         # estimate time based on timestamp
                         ds["acquisition_time"][
@@ -518,25 +551,6 @@ class HypernetsReader:
                                 float(lat),float(lon),acquisitionTime)
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
-                            vaa,vza = map(float,specattr['pt_ask'].split(";"))
-                            if vza==-1 and vaa==-1:
-                                self.context.logger.warning(
-                                    "vza and vaa are both -1, using pt_abs instead")
-                                vaa,vza = map(float,specattr['pt_abs'].split(";"))
-                            if vza>180:
-                                self.context.logger.debug(
-                                    "vza is larger than 90degrees, changing to equivalent geometry with vza<90.")
-                                vza=360-vza
-                                vaa=vaa+180
-
-                            ds.attrs["site_latitude"] = lat
-                            ds.attrs["site_longitude"] = lon
-                            ds["solar_zenith_angle"][
-                                scan_number] = 90-get_altitude(float(lat),
-                                float(lon),acquisitionTime)
-                            ds["solar_azimuth_angle"][
-                                scan_number] = get_azimuth(float(lat),float(lon),
-                                acquisitionTime)
                         else:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
@@ -544,6 +558,15 @@ class HypernetsReader:
                         ds['integration_time'][
                             scan_number] = spectrum.header.exposure_time
                         ds['temperature'][scan_number] = spectrum.header.temperature
+
+                        if angacc_vaa > 3:
+                            ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
+                            self.context.logger.error(
+                                "Error in Accuracy of pan is above 3°. Check your system and/or data before processing.")
+                        if angacc_vza > 3:
+                            ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
+                            self.context.logger.error(
+                                "Error in Accuracy of tilt is above 3°. Check your system and/or data before processing.")
 
                         ds["viewing_azimuth_angle"][scan_number] = vaa
                         ds["viewing_zenith_angle"][scan_number] = vza
@@ -576,8 +599,18 @@ class HypernetsReader:
 
                         series_id = model['series_id']
                         ds_swir["series_id"][scan_number_swir] = series_id
-                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = vaa
-                        ds_swir["viewing_zenith_angle"][scan_number_swir] = vza
+
+                        if angacc_vaa > 3:
+                            ds_swir["quality_flag"] = du.set_flag(ds_swir["quality_flag"], "bad_pointing")
+                            self.context.logger.error(
+                                "Error in Accuracy of pan is above 3°. Check your system and/or data before processing.")
+                        if angacc_vza > 3:
+                            ds_swir["quality_flag"] = du.set_flag(ds_swir["quality_flag"], "bad_pointing")
+                            self.context.logger.error(
+                                "Error in Accuracy of tilt is above 3°. Check your system and/or data before processing.")
+
+                        ds_swir["viewing_azimuth_angle"][scan_number] = vaa
+                        ds_swir["viewing_zenith_angle"][scan_number] = vza
 
                         # estimate time based on timestamp
                         ds_swir["acquisition_time"][
@@ -608,10 +641,7 @@ class HypernetsReader:
                                 float(lat),float(lon),acquisitionTime)
                             ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
-                            vaa,vza = map(float,specattr['pt_ask'].split(";"))
-                            # vaa = ((ds_swir["solar_azimuth_angle"][
-                            #             scan_number_swir]+vaa_rel)/360-int(
-                            #     ds_swir["solar_azimuth_angle"][scan_number_swir]+vaa_rel))/360
+
                         else:
                             self.context.logger.error(
                                 "Latitude is not found, using default values instead for lat, lon, sza and saa.")
@@ -623,9 +653,6 @@ class HypernetsReader:
                             ds_swir['integration_time'][
                                 scan_number_swir] = ds['integration_time'][0]
                         ds_swir['temperature'][scan_number_swir] = spectrum.header.temperature
-
-                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = vaa
-                        ds_swir["viewing_zenith_angle"][scan_number_swir] = vza
 
                         # accelaration:
                         # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
