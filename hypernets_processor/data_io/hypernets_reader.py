@@ -228,7 +228,7 @@ class HypernetsReader:
         ds.attrs["source_file"] = str(os.path.basename(seq_dir))
 
         ds["wavelength"] = wvl
-        # ds["bandwidth"]=wvl
+        ds["bandwidth"].values = 3 * np.ones_like(wvl)
         ds["scan"] = np.linspace(1, scanDim, scanDim)
 
         # add auxiliary data to the L0 data
@@ -337,7 +337,7 @@ class HypernetsReader:
                     if angacc > 3:
                         ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
                         self.context.logger.error(
-                            "Accuracy of pan is above 3°. Check your system and/or data before processing.")
+                            "Accuracy of pan is above 3° (vaa_abs=%s; vaa_ref=%s). Check your system and/or data before processing."%(vaa_abs, vaa_ref))
                     print("Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
                     print("If azimuth switch is on, please check the following: switch:{}, vaa_rel:{:.4f}, vaa_abs:{:.4f}, saa:{:.4f}".format(
                         azimuth_switch, vaa_rel, vaa_abs, ds["solar_azimuth_angle"][scan_number].values
@@ -453,6 +453,7 @@ class HypernetsReader:
         ds.attrs["instrument_id"] = str(instrument_id)
         ds.attrs["site_id"] = str(site_id)
         ds.attrs["source_file"] = str(os.path.basename(seq_dir))
+        ds["bandwidth"].values = 3 * np.ones_like(wvl)
 
         scanDim = swir.shape[0]
         wvl_swir = self.read_wavelength(swir.shape[1], cal_data_swir)
@@ -461,7 +462,8 @@ class HypernetsReader:
         ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds_swir.attrs["instrument_id"] = str(instrument_id)
         ds_swir.attrs["site_id"] = str(site_id)
-        ds.attrs["source_file"] = str(os.path.basename(seq_dir))
+        ds_swir.attrs["source_file"] = str(os.path.basename(seq_dir))
+        ds_swir["bandwidth"].values = 10 * np.ones_like(wvl_swir)
 
         scan_number = 0
         scan_number_swir = 0
@@ -496,11 +498,12 @@ class HypernetsReader:
                     spectrum = Spectrum.parse_raw(chunk_body)
                     # spectrum.print_header()
                     vaa, vza = map(float, specattr['pt_ask'].split(";"))
+                    vaa_abs, vza_abs = map(float, specattr['pt_abs'].split(";"))
 
                     if vza == -1 and vaa == -1:
                         self.context.logger.warning(
                             "vza and vaa are both -1, using pt_abs instead")
-                        vaa, vza = map(float, specattr['pt_abs'].split(";"))
+                        vaa, vza = vaa_abs, vza_abs
 
                     if specattr.get('pt_ref'):
                         vaa_ref, vza_ref = map(float, specattr['pt_ref'].split(";"))
@@ -515,18 +518,24 @@ class HypernetsReader:
                         vza_ref = 360 - vza_ref
                         vaa_ref = vaa_ref + 180
 
+                        vza_abs = 360 - vza_abs
+                        vaa_abs = vaa_abs + 180
+
                     vza = normalizedeg(float(vza), 0, 360)
                     vaa = normalizedeg(float(vaa), 0, 360)
                     vza_ref = normalizedeg(float(vza_ref), 0, 360)
                     vaa_ref = normalizedeg(float(vaa_ref), 0, 360)
+                    vza_abs = normalizedeg(float(vza_abs), 0, 360)
+                    vaa_abs = normalizedeg(float(vaa_abs), 0, 360)
 
                     # here check if absolute mode is used
                     if True:
                         vaa = vaa - 180
                         vaa_ref = vaa_ref - 180
+                        vaa_abs = vaa_abs - 180
 
-                    angacc_vza = abs(vza-vza_ref)
-                    angacc_vaa = abs(vaa-vaa_ref)
+                    angacc_vza = abs(vza_abs-vza_ref)
+                    angacc_vaa = abs(vaa_abs-vaa_ref)
 
                     self.context.logger.debug(
                         "Angle accuracy vza {:.4f} ={:.4f}-{:.4f}".format(angacc_vza, vza, vza_ref))
@@ -553,7 +562,7 @@ class HypernetsReader:
                                 float(lat),float(lon),acquisitionTime)
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
-                        else:
+                        elif scan_number==0:
                             self.context.logger.error(
                                 "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
                         ds['quality_flag'][scan_number] = flag
@@ -564,11 +573,14 @@ class HypernetsReader:
                         if angacc_vaa > 3:
                             ds["quality_flag"].values[scan_number] = du.set_flag(ds["quality_flag"][scan_number], "bad_pointing")
                             self.context.logger.error(
-                                "Error in Accuracy of pan is above 3°. Check your system and/or data before processing.")
+                                "Error in Accuracy of pan is above 3° (vaa_abs=%s; vaa_ref=%s). Check your system and/or data before processing."% (
+                                vaa_abs, vaa_ref))
                         if angacc_vza > 3:
                             ds["quality_flag"].values[scan_number] = du.set_flag(ds["quality_flag"][scan_number], "bad_pointing")
                             self.context.logger.error(
-                                "Error in Accuracy of tilt is above 3°. Check your system and/or data before processing.")
+                                "Error in Accuracy of tilt is above 3° (vza_abs=%s; vza_ref=%s). Check your system and/or data before processing."% (
+                                vaa_abs, vaa_ref))
+
 
                         ds["viewing_azimuth_angle"][scan_number] = vaa
                         ds["viewing_zenith_angle"][scan_number] = vza
@@ -592,6 +604,7 @@ class HypernetsReader:
                         ds['acceleration_z_std'][scan_number] = spectrum.header.accel_stats.std_z * a / b
                         ds['digital_number'][:, scan_number] = scan
                         scan_number += 1
+
                     else:
                         scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
@@ -644,7 +657,7 @@ class HypernetsReader:
                             ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
                                 float(lat),float(lon),acquisitionTime)
 
-                        else:
+                        elif scan_number_swir==0:
                             self.context.logger.error(
                                 "Latitude is not found, using default values instead for lat, lon, sza and saa.")
                         ds_swir['quality_flag'][scan_number_swir] = flag

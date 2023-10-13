@@ -581,3 +581,52 @@ class Plotting:
         self.plot_irradiance(
             plotpath, dataset["wavelength"].values, ydata, labels=angle_labels
         )
+
+    def plot_polar_reflectance(self, dataset, wavelength):
+        plotpath = os.path.join(
+            self.path,
+            "plot_polar_reflectance_"
+            + dataset.attrs["product_name"]
+            + "."
+            + self.plot_format,
+        )
+
+        saa = np.mean(dataset.solar_azimuth_angle.values%360)
+        sza = np.mean(dataset.solar_zenith_angle.values)
+        vaa = dataset.viewing_azimuth_angle.values%360
+
+        vza = dataset.viewing_zenith_angle.values
+        refl = dataset.reflectance.values
+
+        vaa_grid = np.arange(8, 368, 15)
+        vza_grid = np.unique(vza)
+        raa_grid = (vaa_grid - saa)
+
+        id_wav = np.argmin(np.abs(wavelength - dataset.wavelength.values))
+
+        vaa_mesh, vza_mesh = np.meshgrid(np.radians(vaa_grid), vza_grid)
+
+        refl_2d = np.zeros((len(vaa_grid), len(vza_grid)))
+        for i in range(len(vaa_grid)):
+            for ii in range(len(vza_grid)):
+                id_series = np.where((vaa == vaa_grid[i]) & (vza == vza_grid[ii]))[0]
+                if len(id_series) > 0:
+                    refl_2d[i, ii] = refl[id_wav, id_series]
+
+        refl_2d[refl_2d == 0] = np.nan
+
+        fig = plt.figure()
+        ax = plt.subplot(1, 1, 1, projection='polar')
+        ax.set_theta_direction(-1)
+        ax.set_theta_offset(np.pi / 2.0)
+        plt.pcolormesh(vaa_mesh, vza_mesh, refl_2d.T, shading='auto', cmap=plt.get_cmap('jet'))
+
+        plt.plot(np.radians(saa), sza, color='k', ls='none', marker="o")
+
+        plt.thetagrids(
+            [theta * 15 for theta in range(360 // 15)])  # This adds more lines to graph
+        plt.grid()
+        plt.colorbar()
+
+        fig.savefig(plotpath)
+        plt.close(fig)

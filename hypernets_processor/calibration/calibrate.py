@@ -87,13 +87,13 @@ class Calibrate:
                 ds_out_pre=dataset_l1a,
                 store_unc_percent=True,
             )
-            if (
-                np.count_nonzero(
-                    dataset_l1a["u_rel_random_" + measurandstring].values > 100
-                )
-                > 0.5 * dataset_l1a["u_rel_random_" + measurandstring].values.size
-            ):
-                self.context.anomaly_handler.add_anomaly("o", dataset_l1a)
+            # if (
+            #     np.count_nonzero(
+            #         dataset_l1a["u_rel_random_" + measurandstring].values > 100
+            #     )
+            #     > 0.5 * dataset_l1a["u_rel_random_" + measurandstring].values.size
+            # ):
+                # self.context.anomaly_handler.add_anomaly("o", dataset_l1a)
 
             if self.context.get_config_value("bad_wavelenth_ranges"):
                 for maskrange in self.context.get_config_value(
@@ -212,13 +212,13 @@ class Calibrate:
             store_unc_percent=True,
         )
 
-        if (
-            np.count_nonzero(
-                dataset_l1b["u_rel_random_" + measurandstring].values > 100
-            )
-            > 0.5 * dataset_l1b["u_rel_random_" + measurandstring].values.size
-        ):
-            self.context.anomaly_handler.add_anomaly("o", dataset_l1b)
+        # if (
+        #     np.count_nonzero(
+        #         dataset_l1b["u_rel_random_" + measurandstring].values > 100
+        #     )
+        #     > 0.5 * dataset_l1b["u_rel_random_" + measurandstring].values.size
+        # ):
+        #     self.context.anomaly_handler.add_anomaly("o", dataset_l1b)
 
         if self.context.get_config_value("bad_wavelenth_ranges"):
             for maskrange in self.context.get_config_value(

@@ -148,7 +148,7 @@ COMMON_VARIABLES_SERIES = {
     },
     "series_id": {
         "dim": [SERIES_DIM],
-        "dtype": np.uint8,
+        "dtype": np.uint16,
         "attributes": {
             "standard_name": "series_id",
             "long_name": "Series id number",

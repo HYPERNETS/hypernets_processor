@@ -228,7 +228,7 @@ class HypernetsReader:
         ds.attrs["source_file"] = str(os.path.basename(seq_dir))
 
         ds["wavelength"] = wvl
-        # ds["bandwidth"]=wvl
+        ds["bandwidth"]=wvl
         ds["scan"] = np.linspace(1, scanDim, scanDim)
 
         # add auxiliary data to the L0 data
