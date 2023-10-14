@@ -622,7 +622,8 @@ class Plotting:
 
         ax.plot(np.radians(saa), sza, color='k', ls='none', marker="o")
 
-        fig.colorbar(im)
+        cbar = fig.colorbar(im)
+        cbar.set_label('reflectance at %s nm'%wavelength, rotation=270)
 
         fig.savefig(plotpath)
         plt.close(fig)
