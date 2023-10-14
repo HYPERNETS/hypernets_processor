@@ -20,7 +20,7 @@ from hypernets_processor.data_utils.quality_checks import QualityChecks
 
 import warnings
 import os
-import time
+from datetime import datetime
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -70,8 +70,8 @@ class SequenceProcessor:
             if not self.context.get_config_value("verbose"):
                 warnings.simplefilter("ignore")
 
-            tstart = time.time()
-
+            tstart = datetime.now()
+            self.context.set_config_value("start_time_processing_sequence",tstart)
             if self.context.get_config_value("network") == "w":
                 calibration_data_rad,calibration_data_irr = calcon.read_calib_files(sequence_path)
                 # Read L0
@@ -263,8 +263,8 @@ class SequenceProcessor:
                 raise NameError(
                     "Invalid network: " + self.context.get_config_value("network")
                 )
-        tend = time.time()
-        print("time for computation of one seq (min, sec):{}".format(divmod(tend - tstart, 60)))
+        tend = datetime.now()
+        print("time for computation of one seq (min, sec):{}".format(divmod((tend - tstart).total_seconds(), 60)))
         return None
 
 

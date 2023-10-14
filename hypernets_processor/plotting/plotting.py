@@ -611,22 +611,18 @@ class Plotting:
             for ii in range(len(vza_grid)):
                 id_series = np.where((vaa == vaa_grid[i]) & (vza == vza_grid[ii]))[0]
                 if len(id_series) > 0:
-                    refl_2d[i, ii] = refl[id_wav, id_series]
-
+                    refl_2d[i, ii] = np.abs(refl[id_wav, id_series])
         refl_2d[refl_2d == 0] = np.nan
 
         fig = plt.figure()
         ax = plt.subplot(1, 1, 1, projection='polar')
         ax.set_theta_direction(-1)
         ax.set_theta_offset(np.pi / 2.0)
-        plt.pcolormesh(vaa_mesh, vza_mesh, refl_2d.T, shading='auto', cmap=plt.get_cmap('jet'))
+        im = ax.pcolormesh(vaa_mesh, vza_mesh, refl_2d.T, shading='auto', cmap=plt.get_cmap('jet'))
 
-        plt.plot(np.radians(saa), sza, color='k', ls='none', marker="o")
+        ax.plot(np.radians(saa), sza, color='k', ls='none', marker="o")
 
-        plt.thetagrids(
-            [theta * 15 for theta in range(360 // 15)])  # This adds more lines to graph
-        plt.grid()
-        plt.colorbar()
+        fig.colorbar(im)
 
         fig.savefig(plotpath)
         plt.close(fig)

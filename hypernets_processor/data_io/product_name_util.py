@@ -58,6 +58,7 @@ class ProductNameUtil:
         network=None,
         site_id=None,
         time=None,
+        time_processing=None,
         version=None,
         swir=None,
         angles=None,
@@ -100,6 +101,9 @@ class ProductNameUtil:
         if (time is None) and (self.context is not None):
             time = self.context.get_config_value("time")
 
+        if (time_processing is None) and (self.context is not None):
+            time_processing = self.context.get_config_value("start_time_processing_sequence")
+
         if (version is None) and (self.context is not None):
             version = str(self.context.get_config_value("version"))
 
@@ -114,12 +118,17 @@ class ProductNameUtil:
         if type(time) is not datetime and time is not None:
             time = datetime.strptime(time, "%Y%m%dT%H%M%S")
 
+        if type(time_processing) is not datetime and time_processing is not None:
+            time_processing = datetime.strptime(time_processing, "%Y%m%dT%H%M%S")
+
         time_string = time.strftime(TIME_FMT_L12A) if time is not None else None
+        time_processing_string = time_processing.strftime(TIME_FMT_L12A) if time_processing is not None else None
         network = network.upper() if network is not None else None
         site_id = site_id.upper() if site_id is not None else None
         version = "v" + version if version is not None else None
 
-        today_time_string = datetime.now().strftime(TIME_FMT_L12A)
+        if time_processing_string is None:
+            time_processing_string = datetime.now().strftime(TIME_FMT_L12A)
 
         # Assemble parts
         product_name_parts = [
@@ -128,7 +137,7 @@ class ProductNameUtil:
             site_id,
             ptype,
             time_string,
-            today_time_string,
+            time_processing_string,
             angles,
             version,
             swir,

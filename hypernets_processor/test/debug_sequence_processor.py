@@ -30,8 +30,8 @@ def process_sequence():
     Command line interface to sequence_processor_main for ad-hoc job processing
     """
 
-    network = "water"
-    # network = "land"
+    # network = "water"
+    network = "land"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
     print(job_config_path)
@@ -50,7 +50,7 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\M1BE\SEQ20230407T093202"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20231008T150035"
 
     # job_config["Input"][
     #     "raw_data_directory"
@@ -58,7 +58,7 @@ def process_sequence():
 
     job_config["Output"][
         "archive_directory"
-    ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\archive_test"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\archive_test"
 
     job_config["Processor"]["max_level"] = "L2A"
 

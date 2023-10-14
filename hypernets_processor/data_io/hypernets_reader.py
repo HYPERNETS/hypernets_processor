@@ -421,7 +421,6 @@ class HypernetsReader:
                     f.seek(byte_pointer)
                     chunk_body = f.read(chunk_size)
                     spectrum = Spectrum.parse_raw(chunk_body)
-                    # spectrum.print_header()
                     if len(spectrum.body) > 500:
                         if len(vnir) == 0:
                             vnir = np.array(spectrum.body)
@@ -496,7 +495,7 @@ class HypernetsReader:
                     f.seek(byte_pointer)
                     chunk_body = f.read(chunk_size)
                     spectrum = Spectrum.parse_raw(chunk_body)
-                    # spectrum.print_header()
+
                     vaa, vza = map(float, specattr['pt_ask'].split(";"))
                     vaa_abs, vza_abs = map(float, specattr['pt_abs'].split(";"))
 
@@ -543,6 +542,8 @@ class HypernetsReader:
                         "Angle accuracy vaa {:.4f} ={:.4f}-{:.4f}".format(angacc_vaa, vaa, vaa_ref))
 
                     if len(spectrum.body) > 500:
+                        if scan_number == 0:
+                            print(spectrum.return_header())
                         scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
                         # HypernetsReader(self.context).plot_spectra(spectra, scan)
@@ -606,6 +607,9 @@ class HypernetsReader:
                         scan_number += 1
 
                     else:
+                        if scan_number_swir == 0:
+                            print(spectrum.return_header())
+
                         scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
                         # HypernetsReader(self.context).plot_spectra(spectra, scan)
@@ -747,35 +751,42 @@ class HypernetsReader:
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
             # look for latitude and longitude or lat and lon , more elegant way??
-            if 'latitude' in (globalattr.keys()):
-                lat = float(globalattr['latitude'])
-                if lat ==0.:
+
+            if self.context.get_config_value("use_config_latlon"):
+                lat = self.context.get_config_value("lat")
+
+            elif "latitude" in (globalattr.keys()):
+                lat = float(globalattr["latitude"])
+                if lat == 0.0:
                     print("Latitude is 0.0, use default or add it in metadata.txt")
                     lat = self.context.get_config_value("lat")
-                    flag = flag+2**FLAG_COMMON.index("lat_default")
-            elif 'lat' in (globalattr.keys()):
-                lat = float(globalattr['lat'])
-                if lat == 0.:
+                    flag = flag + 2 ** FLAG_COMMON.index("lat_default")
+            elif "lat" in (globalattr.keys()):
+                lat = float(globalattr["lat"])
+                if lat == 0.0:
                     print("Latitude is 0.0, use default or add it in metadata.txt")
                     lat = self.context.get_config_value("lat")
-                    flag = flag+2**FLAG_COMMON.index("lat_default")
+                    flag = flag + 2 ** FLAG_COMMON.index("lat_default")
             else:
                 print("Latitude is not given, use default or add it in metadata.txt")
-                lat = self.context.get_config_value("latitude")
+                lat = self.context.get_config_value("lat")
                 flag = flag + 2 ** FLAG_COMMON.index("lat_default")
 
-            if 'longitude' in (globalattr.keys()):
-                lon = float(globalattr['longitude'])
-                if lon == 0.:
+            if self.context.get_config_value("use_config_latlon"):
+                lon = self.context.get_config_value("lon")
+
+            elif "longitude" in (globalattr.keys()):
+                lon = float(globalattr["longitude"])
+                if lon == 0.0:
                     print("Latitude is 0.0, use default or add it in metadata.txt")
-                    lon = self.context.get_config_value("longitude")
-                    flag = flag+2**FLAG_COMMON.index("lon_default")
-            elif 'lon' in (globalattr.keys()):
-                lon = float(globalattr['lon'])
-                if lon == 0.:
+                    lon = self.context.get_config_value("lon")
+                    flag = flag + 2 ** FLAG_COMMON.index("lon_default")
+            elif "lon" in (globalattr.keys()):
+                lon = float(globalattr["lon"])
+                if lon == 0.0:
                     print("Longitude is 0.0, use default or add it in metadata.txt")
                     lon = self.context.get_config_value("lon")
-                    flag = flag+2**FLAG_COMMON.index("lon_default")
+                    flag = flag + 2 ** FLAG_COMMON.index("lon_default")
             else:
                 print("Longitude is not given, use default or add it in metadata.txt")
                 lon = self.context.get_config_value("lon")
