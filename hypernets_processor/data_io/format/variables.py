@@ -863,7 +863,7 @@ L1A_IRR_VARIABLES = {
         "attributes": {
             "standard_name": "irradiance",
             "long_name": "downwelling irradiance",
-            "units": "mW m^-2 nm^-1 sr^-1",
+            "units": "mW m^-2 nm^-1",
             "unc_comps": [
                 "u_rel_random_irradiance",
                 "u_rel_systematic_indep_irradiance",
@@ -1186,7 +1186,7 @@ L1B_IRR_VARIABLES = {
         "attributes": {
             "standard_name": "irradiance",
             "long_name": "downwelling irradiance",
-            "units": "mW m^-2 nm^-1 sr^-1",
+            "units": "mW m^-2 nm^-1",
             "unc_comps": [
                 "u_rel_random_irradiance",
                 "u_rel_systematic_indep_irradiance",
@@ -1200,7 +1200,7 @@ L1B_IRR_VARIABLES = {
         "attributes": {
             "standard_name": "standard deviation irradiance",
             "long_name": "standard deviation on downwelling irradiance",
-            "units": "mW m^-2 nm^-1 sr^-1",
+            "units": "mW m^-2 nm^-1",
         },
     },
     "acceleration_x_mean": {"dim": [SERIES_DIM],
@@ -1507,7 +1507,7 @@ W_L1C_VARIABLES = {
         "attributes": {
             "standard_name": "irradiance",
             "long_name": "downwelling irradiance",
-            "units": "mW m^-2 nm^-1 sr^-1",
+            "units": "mW m^-2 nm^-1",
             "unc_comps": [
                 "u_rel_random_irradiance",
                 "u_rel_systematic_indep_irradiance",
@@ -1521,7 +1521,7 @@ W_L1C_VARIABLES = {
         "attributes": {
             "standard_name": "std irradiance",
             "long_name": "standard deviation for downwelling irradiance",
-            "units": "mW m^-2 nm^-1 sr^-1",
+            "units": "mW m^-2 nm^-1",
             "unc_comps": [
                 "u_rel_random_irradiance",
                 "u_rel_systematic_indep_irradiance",
