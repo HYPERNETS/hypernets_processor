@@ -1,0 +1,11 @@
+[Metadata]
+principal_investigator = RBINS
+site_id = M1BE
+hypstar_sn = 121221
+latitude = 51.360548
+longitude = 3.118246
+offset_pan = 36
+offset_tilt =53
+reverse_tilt = no
+azimuth_switch = 0
+angle2use=pt_ref

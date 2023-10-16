@@ -4,6 +4,7 @@ Data template class
 
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
+from hypernets_processor.data_io.normalize_360 import normalizedeg
 
 import numpy as np
 from obsarray.templater.dataset_util import DatasetUtil
@@ -135,7 +136,8 @@ class DataTemplates:
         upscan = [
             i
             for i, e in enumerate(dataset_l1a["viewing_zenith_angle"].values)
-            if e <= 90
+
+            if (e <= 90)
         ]
         l1b_dim_sizes_dict = {
             "wavelength": len(dataset_l1a["wavelength"]),
@@ -143,7 +145,7 @@ class DataTemplates:
         }
 
         dataset_l1b = self.hdsb.create_ds_template(
-            l1b_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1a, ds=dataset_l1a
+            l1b_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1a, ds=dataset_l1a,
         )
 
         dataset_l1b = dataset_l1b.isel(scan=upscan)
@@ -321,7 +323,7 @@ class DataTemplates:
         dataset_l1b = dataset_l1b.assign_coords(wavelength=wavs)
         return dataset_l1b
 
-    def l1c_from_l1b_dataset(self, dataset_l1b):
+    def l1c_from_l1b_dataset(self, dataset_l1b, razangle=None):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
 
@@ -348,13 +350,13 @@ class DataTemplates:
             }
 
             dataset_l1c = self.hdsb.create_ds_template(
-                l1c_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1b, ds=dataset_l1b
+                l1c_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1b, ds=dataset_l1b, angles=razangle
             )
             dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
 
         return dataset_l1c
 
-    def l1ctemp_dataset(self, dataset_l1b, dataset_l1b_irr):
+    def l1ctemp_dataset(self, dataset_l1b, dataset_l1b_irr,azangle=None):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
 
@@ -381,37 +383,14 @@ class DataTemplates:
             }
 
             dataset_l1c = self.hdsb.create_ds_template(
-                l1c_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1b, ds=dataset_l1b
+                l1c_dim_sizes_dict, "W_L1C", propagate_ds=dataset_l1b, ds=dataset_l1b, angles=azangle
             )
             dataset_l1c = dataset_l1c.assign_coords(wavelength=dataset_l1b.wavelength)
 
         return dataset_l1c
 
-    def l1d_from_l1c_dataset(self, datasetl1c):
-        """
-        Makes a L2 template of the data, and propagates the appropriate keywords from L1.
 
-        :param datasetl0:
-        :type datasetl0:
-        :return:
-        :rtype:
-        """
-        if self.context.get_config_value("network").lower() == "l":
-            print("No L1D level for land")
-
-        elif self.context.get_config_value("network").lower() == "w":
-            l1d_dim_sizes_dict = {
-                "wavelength": len(datasetl1c["wavelength"]),
-                "scan": len(datasetl1c["scan"]),
-            }
-            dataset_l1d = self.hdsb.create_ds_template(
-                l1d_dim_sizes_dict, "W_L1D", propagate_ds=datasetl1c, ds=datasetl1c
-            )
-            dataset_l1d = dataset_l1d.assign_coords(wavelength=datasetl1c.wavelength)
-
-        return dataset_l1d
-
-    def l2_from_l1c_dataset(self, datasetl1c, flags):
+    def l2_from_l1c_dataset(self, datasetl1c, flags, razangle=None):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
         :param datasetl0:
@@ -425,7 +404,7 @@ class DataTemplates:
                 "series": len(np.unique(datasetl1c["series_id"])),
             }
             dataset_l2a = self.hdsb.create_ds_template(
-                l2a_dim_sizes_dict, "W_L2A", propagate_ds=datasetl1c, ds=datasetl1c
+                l2a_dim_sizes_dict, "W_L2A", propagate_ds=datasetl1c, ds=datasetl1c, angles=razangle
             )
             dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
 

@@ -1,6 +1,0 @@
-## Modified settings for rhymer
-## Disabled the scan variability and measurement tests
-version=20190710-NOQC
-scan_diff_test=False
-test_measurement=False
-verbosity=5

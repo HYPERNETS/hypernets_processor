@@ -1,0 +1,11 @@
+[Metadata]
+principal_investigator = CONICET
+site_id = LPAR
+latitude = -34.81800
+longitude = -57.89590
+offset_pan = 0
+offset_tilt = 52
+reverse_tilt = no
+pantilt_port = /dev/ttyS3
+azimuth_switch = 180
+angle2use=pt_ref

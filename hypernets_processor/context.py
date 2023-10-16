@@ -41,7 +41,6 @@ class Context:
 
         # Set defaults - to be overwritten
         self.set_defaults()
-
         # Unpack processor_config to set relevant attributes
         if processor_config is not None:
             self.unpack_config(processor_config)

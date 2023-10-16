@@ -47,8 +47,8 @@ class SurfaceReflectance:
         self.rhp = RhymerProcessing(context)
         self.rhs = RhymerShared(context)
 
-    def process_l1c(self, dataset, l1birr):
-        L1c = self.templ.l1c_from_l1b_dataset(dataset)
+    def reflectance_w(self, dataset, l1birr, razangle):
+        L1c = self.templ.l1c_from_l1b_dataset(dataset, razangle)
         L1c = self.rh.get_wind(L1c)
         L1c = self.rh.get_fresnelrefl(L1c)
         L1c = self.rh.qc_bird(L1c)
@@ -125,18 +125,18 @@ class SurfaceReflectance:
                 print("not plotting ",measurandstring)
         return L1c
 
-    def process_l2(self, dataset):
+    def process_l2(self, dataset, razangle=None):
         dataset = self.qual.perform_quality_check_L2a(dataset)
         if self.context.get_config_value("network").lower() == "w":
             dataset_l2a = self.avg.average_L2(
-                dataset
+                dataset, razangle
             )  # template and propagation is in average_L2
 
             # propagate flags
             for flag_i in ["single_irradiance_used"]:
                 if any(DatasetUtil.get_flags_mask_or(dataset["quality_flag"],[flag_i])):
-                    dataset_l2a["quality_flag"].values = DatasetUtil.set_flag(
-                        dataset_l2a["quality_flag"].values, flag_i
+                    dataset_l2a["quality_flag"] = DatasetUtil.set_flag(
+                        dataset_l2a["quality_flag"], flag_i
                     )
 
             for measurandstring in [

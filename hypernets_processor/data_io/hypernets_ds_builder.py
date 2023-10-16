@@ -53,6 +53,7 @@ class HypernetsDSBuilder:
         ds_format: object,
         propagate_ds: object = None,
         swir: object = False,
+        angles: object=False,
         ds=None,
     ) -> object:
 
@@ -109,7 +110,7 @@ class HypernetsDSBuilder:
 
         # Set product_name metadata
         pu = ProductNameUtil(context=self.context)
-        metadata["product_name"] = pu.create_product_name(ds_format, swir=swir)
+        metadata["product_name"] = pu.create_product_name(ds_format, swir=swir, angles=angles)
         metadata["product_level"] = str(ds_format)
         metadata["data_created"] = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
@@ -166,6 +167,17 @@ class HypernetsDSBuilder:
                 metadata["fresnel_option"] = self.context.get_config_value(
                     "fresnel_option"
                 )
+
+                wa = self.context.get_config_value("wind_ancillary")
+                if not wa:
+                    metadata["fresnel_wind_source"] = "Default - {}".format(self.context.get_config_value("wind_default"))
+                elif wa=="GDAS":
+                    metadata["fresnel_wind_source"] ="GDAS"
+                elif wa=="NCEP":
+                    metadata["fresnel_wind_source"] = ("The National Centers for Environmental Prediction) "
+                                                       "Reanalysis 2 (NCEPR2) dataset used for the SeaDAS Ocean Color Processing; "
+                                                       "https://oceandata.sci.gsfc.nasa.gov/directdataaccess/Ancillary/GLOBAL")
+
                 metadata["similarity_waveref"] = self.context.get_config_value(
                     "similarity_wr"
                 )
