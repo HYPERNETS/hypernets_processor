@@ -1,6 +1,6 @@
 FLAG_COMMON = [
-    "angles_missing",
-    "saturation",
+    "angles_missing", # doesn't exist anymore?
+    "saturation",  # doesn't exist anymore?
     "nonlinearity",
     "bad_pointing",
     "placeholder1",
@@ -12,7 +12,7 @@ FLAG_COMMON = [
     "dark_masked",
     "half_of_scans_masked",
     "vza_irradiance",
-    "clear_sky_irradiance",
+    "cloudy_irradiance",
     "variable_irradiance",
     "single_irradiance_used",
     "no_clear_sky",
@@ -30,7 +30,7 @@ FLAG_WATER = [
     "min_nbrlsky",
     "def_wind_flag",
     "simil_fail",
-    "ld_ed_clearsky_failing"
+    "ld_ed_clearsky_failing" # needs to be checked
 ]
 
 FLAG_LAND = []

@@ -891,7 +891,7 @@ class HypernetsReader:
         return data['temp'],data['RH'],data['pressure'],data['lux']
 
     def read_sequence(self, seq_dir, calibration_data_rad, calibration_data_irr,
-                      calibration_data_swir_rad=None, calibration_data_swir_irr=None):
+                      calibration_data_swir_rad=None, calibration_data_swir_irr=None,single_series=None):
 
         # define data to return none at end of method if does not exist
         l0_irr = None
@@ -905,6 +905,24 @@ class HypernetsReader:
             seriesIrr, seriesRad, seriesBlack, \
             seriesPict, flag, instrument_id, site_id, \
             azimuth_switch, offset_tilt, offset_pan = self.read_metadata(seq_dir)
+
+        if single_series is not None:
+            if single_series in seriesIrr:
+                seriesIrr = [single_series]
+            else:
+                seriesIrr = None
+            if single_series in seriesRad:
+                seriesRad=[single_series]
+            else:
+                seriesRad=None
+            if single_series in seriesBlack:
+                seriesBlack = [single_series]
+            else:
+                seriesBlack = None
+            if single_series in seriesPict:
+                seriesPict=[single_series]
+            else:
+                seriesPict=None
 
         if seriesIrr:
             if self.context.get_config_value("network") == "w":

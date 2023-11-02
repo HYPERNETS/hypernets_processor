@@ -72,7 +72,7 @@ ANOMALIES_DICT = {
     },
     "nu": {
         "description": "Non constant illumination",
-        "error": None,
-        "error_msg": None
+        "error": ValueError,
+        "error_msg": "Sequences with irradiance coefficient of variation above 10% are not processed"
     },
 }
