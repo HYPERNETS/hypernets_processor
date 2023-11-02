@@ -72,7 +72,12 @@ ANOMALIES_DICT = {
     },
     "nu": {
         "description": "Non constant illumination",
-        "error": None,
-        "error_msg": None
+        "error": ValueError,
+        "error_msg": "Coefficient of variation for Ed(550) is > 10%"
+    },
+    "nd": {
+        "description": "Non constant illumination",
+        "error": ValueError,
+        "error_msg": "Coefficient of variation for Ld(550) is > 10%"
     },
 }

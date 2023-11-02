@@ -5,6 +5,10 @@ Averaging class
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.plotting.plotting import Plotting
+from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
+from scipy.optimize import curve_fit
+
+
 
 import numpy as np
 import warnings
@@ -13,6 +17,8 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import pysolar
 import datetime
+import math
+
 
 import punpy
 from obsarray.templater.dataset_util import DatasetUtil
@@ -34,6 +40,7 @@ class QualityChecks:
     def __init__(self, context):
         self.context = context
         self.plot = Plotting(context)
+        self.rhymershared = RhymerShared(context)
 
     def perform_quality_check_L0(self, datasetl0, series_ids):
         mask = []
@@ -203,7 +210,7 @@ class QualityChecks:
 
         flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"])
         mask_notflagged = np.where(flagged == False)[0]
-        if self.qc_illumination(dataset_l1b_irr.isel(series=mask_notflagged))> 0.1:
+        if self.qc_illumination(dataset_l1b_irr.isel(series=mask_notflagged), 'irradiance')> 0.1:
             self.context.logger.info("Non constant illumination for sequence {}".format(dataset_l1b_irr.attrs['sequence_id']))
             self.context.anomaly_handler.add_anomaly("nu")
             for i in range(len(dataset_l1b_irr["quality_flag"].values)):
@@ -215,12 +222,20 @@ class QualityChecks:
 
         return dataset_l1b_irr
 
-    def qc_illumination(self, dataset):
-        wv=dataset['wavelength'].values
-        covvar=(np.std(dataset.irradiance.values[np.argmin(np.abs(wv-550)),:]/
-                      np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values))/
-               np.mean(dataset.irradiance.values[np.argmin(np.abs(wv-550)),:]/
-                      np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values)))
+    def qc_illumination(self, dataset, measurand):
+
+        if measurand=='irradiance':
+            wv=dataset['wavelength'].values
+            covvar=(np.std(dataset.irradiance.values[np.argmin(np.abs(wv-550)),:]/
+                          np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values))/
+                   np.mean(dataset.irradiance.values[np.argmin(np.abs(wv-550)),:]/
+                          np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values)))
+            print("Coefficient of variation: {}".format(covvar))
+        elif measurand=='radiance':
+            wv=dataset['wavelength'].values
+            covvar=(np.std(dataset.radiance.values[np.argmin(np.abs(wv-550)),:])/
+                   np.mean(dataset.radiance.values[np.argmin(np.abs(wv-550)),:]))
+
         print("Coefficient of variation: {}".format(covvar))
         return covvar
 
@@ -284,3 +299,131 @@ class QualityChecks:
 
         # Return results
         return sigma_new, average
+
+# Water based quality checks includes:
+# 1. qc_similarity
+# 2. qc_birds
+# 3. qc_scan: difference at 550 nm (wavelength ref) < 25% (diff_threshold) with neighbours -> if triggered 'temporal variability in Lu, Ed or Ld"
+    def qc_similarity(self, L1c):
+
+        wave = L1c["wavelength"]
+        wr = L1c.attrs["similarity_waveref"]
+        wp = L1c.attrs["similarity_wavethres"]
+
+        epsilon = L1c["epsilon"]
+        ## get pixel index for wavelength
+        irefr, wrefr = self.rhymershared.closest_idx(wave, wr)
+
+        failSimil = []
+        scans = L1c['scan']
+        for i in range(len(scans)):
+            data = L1c['reflectance_nosc'].sel(scan=i).values
+            if abs(epsilon[i]) > wp * data[irefr]:
+                failSimil.append(1)
+            else:
+                failSimil.append(0)
+        return failSimil
+
+    def fitcurve(self, wv, ld, ed):
+        def func(x, a, b):
+            return a + b * (x / 100) ** (-4)
+
+        if ld.ndim > 1:
+            y = np.mean(ld / ed, axis=1)
+        else:
+            y = ld / ed
+        popt, pcov = curve_fit(func, wv, y)
+        residuals = y - func(wv, *popt)
+        ss_res = np.sum(residuals ** 2)
+        return (popt, pcov, ss_res)
+
+    def qc_bird(self, l1c):
+        ld = np.mean(l1c.downwelling_radiance.values, axis=1)
+        ed = np.mean(l1c.irradiance.values, axis=1)
+        wv = l1c.wavelength.values
+        popt, pcov, ss_res = self.fitcurve(wv, ld, ed)
+        print("this is ss_res:{}".format(ss_res))
+        # popt[0]+popt[1]*(x/100)**(-4)
+        # plt.plot(wv, popt[0] + popt[1] * (wv / 100) ** (-4), label="Fitted Curve")
+
+        # sum of squares regression
+        # sum of the differences between the predicted value by the model and the mean of the dependent variable
+        l1c.attrs['ss_res'] = str(ss_res)
+        return l1c
+
+    def qc_scan(self, dataset, measurandstring, dataset_l1b):
+        ## no inclination
+        ## difference at 550 nm < 25% with neighbours
+        ##
+        ## QV July 2018
+        ## Last modifications: 2019-07-10 (QV) renamed from PANTR, integrated in rhymer
+        # Modified 10/09/2020 by CG for the PANTHYR
+        verbosity = self.context.get_config_value("verbosity")
+        series_id = np.unique(dataset['series_id'])
+        wave = dataset['wavelength'].values
+        flags = np.zeros(shape=len(dataset['scan']))
+        id = 0
+        for s in series_id:
+
+            scans = dataset['scan'][dataset['series_id'] == s]
+
+            ##
+            n = len(scans)
+            ## get pixel index for wavelength
+            iref, wref = self.rhymershared.closest_idx(wave, self.context.get_config_value("diff_wave"))
+
+            cos_sza = []
+            for i in dataset['solar_zenith_angle'].sel(scan=scans).values:
+                cos_sza.append(math.cos(math.radians(i)))
+
+            ## go through the current set of scans
+            for i in range(n):
+                ## test inclination
+                ## not done
+
+                if measurandstring == 'irradiance':
+                    data = dataset['irradiance'].sel(scan=scans).T.values
+                    ## test variability at 550 nm
+                    if i == 0:
+                        v = abs(1 - ((data[i][iref] / cos_sza[i]) / (data[i + 1][iref] / cos_sza[i + 1])))
+                    elif i < n - 1:
+                        v = max(abs(1 - ((data[i][iref] / cos_sza[i]) / (data[i + 1][iref] / cos_sza[i + 1]))),
+                                abs(1 - ((data[i][iref] / cos_sza[i]) / (data[i - 1][iref] / cos_sza[i - 1]))))
+                    else:
+                        v = abs(1 - ((data[i][iref] / cos_sza[i]) / (data[i - 1][iref] / cos_sza[i - 1])))
+                else:
+                    data = dataset['radiance'].sel(scan=scans).T.values
+                    ## test variability at 550 nm
+                    if i == 0:
+                        v = abs(1 - (data[i][iref] / data[i + 1][iref]))
+                    elif i < n - 1:
+                        v = max(abs(1 - (data[i][iref] / data[i + 1][iref])),
+                                abs(1 - (data[i][iref] / data[i - 1][iref])))
+                    else:
+                        v = abs(1 - (data[i][iref] / data[i - 1][iref]))
+
+                ## continue if value exceeds the cv threshold
+                if v > self.context.get_config_value("diff_threshold"):
+                    if measurandstring == 'irradiance':
+                        flags[id] = 1
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
+                            dataset_l1b["quality_flag"][np.where(dataset_l1b["scan"] == i)],
+                            "temp_variability_ed")
+
+                    else:
+                        flags[id] = 1
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = du.set_flag(
+                            dataset_l1b["quality_flag"][np.where(dataset_l1b["scan"] == i)],
+                            "temp_variability_lu")
+
+                    seq = dataset.attrs["sequence_id"]
+                    ts = datetime.datetime.utcfromtimestamp(dataset['acquisition_time'][i])
+
+                    if verbosity > 2: self.context.logger.info(
+                        'Temporal jump: in {}:  Aquisition time {}:, {}'.format(seq, ts, ', '.join(
+                            ['{}:{}:{}'.format(k, dataset[k][scans[i]].values, dataset[k][scans[i]].values,
+                                               dataset[k][scans[i]].values) for
+                             k in ['scan', 'series_id', 'viewing_zenith_angle', 'quality_flag']])))
+                id += 1
+
+            return dataset_l1b, flags

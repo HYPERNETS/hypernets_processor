@@ -135,8 +135,7 @@ class SequenceProcessor:
                             #                                                                          dataset_l1b)
 
                             L1c_int = rhymer.process_l1c_int(rad_, irr_)
-                            if rhymer.qc_bird(L1c_int) < 0.1:
-                                L1c_int["quality_flag"] = du.set_flag(L1c_int["quality_flag"],"ld_ed_clearsky_failing")
+
                             # add relative azimuth angle for the filename
                             L1c = surf.reflectance_w(L1c_int, L1b_irr, razangle=ra)
                             self.context.logger.info("Done")
