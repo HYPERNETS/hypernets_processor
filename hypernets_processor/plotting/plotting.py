@@ -10,7 +10,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-plt.style.use("seaborn-colorblind")
+plt.style.use('tableau-colorblind10')
 
 import numpy as np
 import os.path

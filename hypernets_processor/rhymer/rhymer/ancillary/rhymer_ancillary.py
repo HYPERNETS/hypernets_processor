@@ -39,29 +39,7 @@ class RhymerAncillary:
         else:
             intfunc = scipy.interpolate.interp1d(tstime, tseries)
             out = intfunc(output_time.timestamp())
-        print(out)
         return out
-
-    def get_wind(self, isodate, lon, lat, isotime=None, ftime=12):
-
-        if isotime is not None:
-            # h,m,s = (float(v) for v in isotime.split(':'))
-            # ftime = (h + m/60 + s/3600)/24
-            ts = (float(v) for v in isotime.split(':'))
-            ftime = 0
-            for i, t in enumerate(ts):
-                ftime += t / (60 ** i)
-        print('isodate:{}, lat:{}, lon:{}'.format(isodate, lat, lon))
-        anc = self.ancillary_get(isodate, lon, lat, ftime=ftime)
-
-        if ('z_wind' in anc) and ('m_wind' in anc):
-            u = anc['z_wind']['interp']
-            v = anc['m_wind']['interp']
-            wind = (u ** 2 + v ** 2) ** 0.5
-            return (wind)
-        else:
-            return (None)
-
 
     ## ancillary_get
     ## downloads and interpolates ancillary data from the ocean data server
@@ -266,3 +244,173 @@ class RhymerAncillary:
             anc_data[dataset] = {"interp": ti, "series": interp_data[dataset]}
 
         return (anc_data)
+
+
+    def gdas_extract(self, isodate, lon, lat, process = 'GDASFNL', method='linear'):
+        local_dir = self.context.get_config_value("met_dir")
+        thredds_url = self.context.get_config_value("thredds_url")
+        #thredds_url = "https://thredds.rda.ucar.edu/thredds"
+
+        import numpy as np
+        import datetime, dateutil.parser
+        import os, json, netCDF4, time
+
+        ## hours until archived nowcasts are available
+        time_archive = 30
+
+        ## date time
+        now = datetime.datetime.utcnow()
+        if type(isodate) is str:
+            dt = dateutil.parser.parse(isodate)
+        if type(isodate) is datetime.datetime:
+            dt = isodate
+
+        ## parse date alone
+        dt0 = datetime.datetime(year=dt.year, month=dt.month, day=dt.day)
+
+        ## hour mod 6 gives h0 for simulation start
+        timestep = 6
+        hm = (dt.hour % timestep)
+        h0 = (dt.hour - hm)
+
+        ## bounding nowcasts
+        dt0 += datetime.timedelta(seconds=h0 * 3600)
+        dt1 = dt0 + datetime.timedelta(seconds=timestep * 3600)
+
+        ## date weight
+        dtw = (dt1 - dt).seconds / (dt1 - dt0).seconds
+
+        ## get lat lon from remote
+        lats = None
+        lons = None
+
+        ## construct lats and lons here to save time and bandwidth
+        lats = np.linspace(90, -90, num=721)
+        lons = np.linspace(0, 360 - 0.25, num=1440)
+
+        override = False
+
+        ## use NRT
+        tdiff = now - dt1
+        if (tdiff.days * 24 + tdiff.seconds / 3600) < time_archive:
+            use_nrt = True
+
+        ## datasets to retrieve
+        datasets = {'lat': 'lat', 'lon': 'lon'}
+        ## nowcast archive
+        # e.g. https://rda.ucar.edu/thredds/catalog/files/g/ds083.3/2023/202302/catalog.html
+        forecast = 0
+
+        url_base = thredds_url + '/dodsC/files/g/ds083.3/{year}/{year}{month}/gdas1.fnl0p25.{year}{month}{day}{hour}.f{forecast}.grib2'
+
+        datasets['u'] = 'u-component_of_wind_height_above_ground'
+        datasets['v'] = 'v-component_of_wind_height_above_ground'
+
+        ## get data
+        data_list = []
+        for di, dtn in enumerate([dt0, dt1]):
+            if 'forecast' in url_base:
+                url = url_base.format(year=str(dtn.year), month=str(dtn.month).zfill(2),
+                                      day=str(dtn.day).zfill(2), hour=str(dtn.hour).zfill(2),
+                                      forecast=str(forecast).zfill(2))
+
+                print(url)
+                ds = None
+
+                ## read data
+                ## get lat and lons
+                if lats is None:
+                    if ds is None: ds = netCDF4.Dataset(url)
+                    lats = ds.variables[datasets['lat']][:].data
+                if lons is None:
+                    if ds is None: ds = netCDF4.Dataset(url)
+                    lons = ds.variables[datasets['lon']][:].data
+
+                ## indices
+                xx = np.arange(len(lons))
+                yy = np.arange(len(lats))
+
+                ## interpolate indices
+                loni = np.interp(lon, lons, xx)
+                if lats[0] > lats[-1]:
+                    lati = np.interp(lat * -1, lats * -1, yy)  ## invert lats
+                else:
+                    lati = np.interp(lat, lats, yy)
+
+                ## NN interpolation
+                latc = np.round(lati).astype(int)
+                lonc = np.round(loni).astype(int)
+
+                ## linear interpolation bounding indices and weigths
+                lat0 = np.floor(lati).astype(int)
+                latw = 1 - (lati - lat0)
+                lon0 = np.floor(loni).astype(int)
+                lonw = 1 - (loni - lon0)
+
+                ## run through lats and lons
+                for li, latv in enumerate([lat0, lat0 + 1]):
+                    clat = lats[latv]
+                    for lj, lonv in enumerate([lon0, lon0 + 1]):
+                        clon = lons[lonv]
+                        ofile = '{}/{}/{}/{}/{}_f{}.json'.format(local_dir, dtn.strftime('%Y/%m/%d/%H'), clat, clon,
+                                                                 process, str(forecast).zfill(2))
+                        if (not os.path.exists(ofile)) | (override):
+                            if os.path.exists(ofile): os.remove(ofile)
+                            if not os.path.exists(os.path.dirname(ofile)): os.makedirs(os.path.dirname(ofile))
+
+                            ## open dataset url
+                            if ds is None: ds = netCDF4.Dataset(url)
+
+                            # print(ofile)
+                            data = {}
+                            for par in ['u', 'v']:
+                                # print(latv, lonv, par)
+                                dsv = ds.variables[datasets[par]]
+                                if len(dsv.shape) not in [3, 4]:
+                                    print('Dataset dimensions not configured.')
+                                    continue
+
+                                if len(dsv.shape) == 3:
+                                    data[par] = float(dsv[0, latv, lonv].data)
+                                elif len(dsv.shape) == 4:
+                                    data[par] = float(dsv[0, 0, latv, lonv].data)
+
+                            data['w'] = (data['u'] ** 2 + data['v'] ** 2) ** 0.5
+                            with open(ofile, 'w') as f:
+                                f.write(json.dumps(data))
+                        else:
+                            continue
+                            # print(ofile)
+                            # print('Dataset exists.')
+                if ds is not None:
+                    ds.close()
+                    ds = None
+                    # print('Sleeping...')
+                    # time.sleep(3) ## test to see if this helps with I/O failures
+
+                ## run through lats and lons
+                data = {k: np.zeros((2, 2)) for k in ['u', 'v', 'w']}
+
+                for li, latv in enumerate([lat0, lat0 + 1]):
+                    clat = lats[latv]
+                    for lj, lonv in enumerate([lon0, lon0 + 1]):
+                        clon = lons[lonv]
+                        ofile = '{}/{}/{}/{}/{}_f{}.json'.format(local_dir, dtn.strftime('%Y/%m/%d/%H'), clat, clon,
+                                                                 process, str(forecast).zfill(2))
+                        with open(ofile, 'r') as f:
+                            tmp = json.load(f)
+                        for k in tmp: data[k][li, lj] = tmp[k]
+
+                ## interpolate
+                data_int = {}
+                for par in data:
+                    data_int[par] = data[par][0, 0] * (latw) * (lonw) + data[par][1, 0] * (1 - latw) * (lonw) + \
+                                    data[par][0, 1] * (latw) * (1 - lonw) + data[par][1, 1] * (1 - latw) * (1 - lonw)
+                data_list.append(data_int)
+
+        # print(data_list)
+        data_int_time = None
+        if len(data_list) > 0:
+            data_int_time = {k: (data_list[0][k] * dtw) + (data_list[1][k] * (1 - dtw)) for k in data_int}
+        print(data_int_time)
+        return (data_int_time)

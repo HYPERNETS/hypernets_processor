@@ -25,8 +25,6 @@ from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.normalize_360 import normalizedeg
 from obsarray.templater.dataset_util import DatasetUtil as du
 
-
-
 '''___Authorship___'''
 __author__ = "ClÃ©mence Goyens"
 __created__ = "12/2/2020"
@@ -158,7 +156,7 @@ class HypernetsReader:
 
         return wvl
 
-    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan):
+    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -296,25 +294,6 @@ class HypernetsReader:
 
                 # estimate time based on timestamp
                 ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
-                #            #print(datetime.fromtimestamp(acquisitionTime))
-
-                #             # didn't use acquisition time from instrument
-                #             # possibility that acquisition time is time since reboot, but how to now reboot time?
-                #             # if we use the metadata time header
-                #             timestamp=header['acquisition_time']
-                #             ts = int(timestamp)/1000
-
-                #             date_time_str = timereboot+'UTC'
-                #             print(date_time_str)
-                #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
-                #             print(date_time_obj)
-
-                #             timereboot = datetime.timestamp(date_time_obj)
-                #             print("timereboot =", timereboot)
-                #             print(datetime.fromtimestamp(timereboot))
-
-                #             print(datetime.fromtimestamp(int(ts+timereboot)))
-                #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
                 if lat is not None:
                     ds.attrs["site_latitude"] = lat
                     ds.attrs["site_longitude"] = lon
@@ -333,19 +312,40 @@ class HypernetsReader:
 
 
                     angacc=abs(normalizedeg(float(vaa_abs),0,360)-normalizedeg(float(vaa_ref),0,360))
+                    angacc_zen=abs(normalizedeg(float(vza_abs),0,360)-normalizedeg(float(vza_ref),0,360))
+
+                    if (offset_pan==None) & (angle2use=="pt_ask"):
+                        vaa = normalizedeg(float(vaa_rel)+ds["solar_azimuth_angle"][scan_number],0,360)
+                    elif (offset_pan == None) & (angle2use == "pt_ref"):
+                        vaa = normalizedeg(float(vaa_ref),0,360)
+                    else:
+                        vaa = normalizedeg(float(vaa_ref)+float(offset_pan),0,360)
+
+
 
                     if angacc > 3:
                         ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
                         self.context.logger.error(
                             "Accuracy of pan is above 3° (vaa_abs=%s; vaa_ref=%s). Check your system and/or data before processing."%(vaa_abs, vaa_ref))
                     print("Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
+
+                    if angacc_zen > 1:
+                        ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
+                        self.context.logger.error(
+                            "Accuracy of pan is above 3°. Check your system and/or data before processing.")
+                    print("Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc_zen,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
+
+
                     print("If azimuth switch is on, please check the following: switch:{}, vaa_rel:{:.4f}, vaa_abs:{:.4f}, saa:{:.4f}".format(
                         azimuth_switch, vaa_rel, vaa_abs, ds["solar_azimuth_angle"][scan_number].values
                     ))
 
-                    vaa = normalizedeg(float(vaa_abs)-float(offset_pan),0,360)
+                    print(
+                        "If pan-tilt offset, please check the following: pan offset:{}, tilt offset:{:.4f}, vaa:{:.4f}, vza:{:.4f}".format(
+                            offset_pan, offset_tilt, vaa, vza
+                        ))
 
-                    #raise SystemExit(0)
+
                 else:
                     self.context.logger.error(
                         "Latitude is not found, using default values instead for lat, lon, sza and saa.")
@@ -746,7 +746,27 @@ class HypernetsReader:
             else:
                 globalattr = []
 
-            # print(globalattr)
+            # first retrieve site name to get site specific attributes, if any
+
+            if 'site_name' in (globalattr.keys()):
+                site_id = str(globalattr['site_name']).strip()
+            elif 'site_id' in (globalattr.keys()):
+                site_id = str(globalattr['site_id']).strip()
+            else:
+                site_id = self.context.get_config_value("site_id")
+
+            # need to check which angle to use as a reference to calculate vaa (~azimuth swith, offset, ...)
+            angle2use=None
+
+            sitespec = ConfigParser()
+            path_ = os.path.abspath(os.path.join(__file__, "../../.."))
+            sitespec_=os.path.join(path_, "data","site_specific_parameters","{}.csv".format(site_id))
+
+            if os.path.exists(sitespec_):
+                sitespec.read(sitespec_)
+                if sitespec.has_section('Metadata'):
+                    sitespecattr = dict(sitespec['Metadata'])
+                    angle2use=str(sitespecattr['angle2use']).strip()
 
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
@@ -800,29 +820,27 @@ class HypernetsReader:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
                 self.context.logger.error("No SN for hypstar instrument!")
                 #self.context.anomaly_handler.add_anomaly("x")
-            if 'site_name' in (globalattr.keys()):
-                site_id = str(globalattr['site_name']).strip()
-            elif 'site_id' in (globalattr.keys()):
-                site_id = str(globalattr['site_id']).strip()
-            else:
-                site_id = self.context.get_config_value("site_id")
 
             if 'azimuth_switch' in (globalattr.keys()):
-                azimuth_switch = str(globalattr['azimuth_switch']).strip()
+                azimuth_switch = float(globalattr['azimuth_switch'])
+            elif 'azimuth_switch' in (sitespecattr.keys()):
+                azimuth_switch = float(sitespecattr['azimuth_switch'])
             else:
-                azimuth_switch = self.context.get_config_value("azimuth_switch")
-            if 'offset_pan' in (globalattr.keys()):
-                offset_pan = str(globalattr['offset_pan']).strip()
-            else:
-                offset_pan = self.context.get_config_value("offset_pan")
-            if 'offset_tilt' in (globalattr.keys()):
-                offset_tilt = str(globalattr['offset_tilt']).strip()
-            else:
-                offset_tilt = self.context.get_config_value("offset_tilt")
+                azimuth_switch =None
 
-            # print(offset_tilt)
-            # print(offset_pan)
-            # print(azimuth_switch)
+            if 'offset_pan' in (globalattr.keys()):
+                offset_pan = float(globalattr['offset_pan'])
+            elif 'offset_pan' in (sitespecattr.keys()):
+                offset_pan = float(sitespecattr['offset_pan'])
+            else:
+                offset_pan=None
+
+            if 'offset_tilt' in (globalattr.keys()):
+                offset_tilt = float(globalattr['offset_tilt'])
+            elif 'offset_tilt' in (sitespecattr.keys()):
+                offset_tilt = float(sitespecattr['offset_tilt'])
+            else:
+                offset_tilt= None
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
@@ -868,7 +886,7 @@ class HypernetsReader:
             self.context.logger.error("Metadata missing")
             self.context.anomaly_handler.add_anomaly("m")
 
-        return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan
+        return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use
 
     def read_aux(self, seq_dir):
         if os.path.exists(os.path.join(seq_dir, "meteo.csv")):
@@ -904,7 +922,7 @@ class HypernetsReader:
         lat, lon, cc, metadata, \
             seriesIrr, seriesRad, seriesBlack, \
             seriesPict, flag, instrument_id, site_id, \
-            azimuth_switch, offset_tilt, offset_pan = self.read_metadata(seq_dir)
+            azimuth_switch, offset_tilt, offset_pan, angle2use = self.read_metadata(seq_dir)
 
         if single_series is not None:
             if single_series in seriesIrr:
@@ -927,7 +945,7 @@ class HypernetsReader:
         if seriesIrr:
             if self.context.get_config_value("network") == "w":
                 l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
-                                          "L0_IRR", calibration_data_irr, instrument_id, site_id, azimuth_switch, offset_tilt, offset_pan)
+                                          "L0_IRR", calibration_data_irr, instrument_id, site_id, azimuth_switch, offset_tilt, offset_pan, angle2use)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_irr, overwrite=True)
             else:
@@ -945,7 +963,7 @@ class HypernetsReader:
         if seriesRad:
             if self.context.get_config_value("network") == "w":
                 l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
-                                          "L0_RAD", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan)
+                                          "L0_RAD", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_rad, overwrite=True)
             else:
@@ -964,7 +982,7 @@ class HypernetsReader:
         if seriesBlack:
             if self.context.get_config_value("network") == "w":
                 l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag,
-                                          "L0_BLA", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan)
+                                          "L0_BLA", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
                 if self.context.get_config_value("write_l0"):
                     self.writer.write(l0_bla, overwrite=True)
             else:

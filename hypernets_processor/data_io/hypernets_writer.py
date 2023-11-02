@@ -201,7 +201,7 @@ class HypernetsWriter:
         )
         return rel_directory
 
-    def return_plot_directory(self, directory=None):
+    def return_plot_directory(self, directory=""):
         """
         Return plots directory, with respect to context and specified value
 

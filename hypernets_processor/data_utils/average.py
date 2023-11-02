@@ -125,7 +125,7 @@ class Average:
 
         return dataset_l1b
 
-    def average_L2(self,dataset):
+    def average_L2(self,dataset, razangle=None):
         # flags = ["saturation","nonlinearity","bad_pointing","outliers",
         #                  "angles_missing","lu_eq_missing","fresnel_angle_missing",
         #                  "fresnel_default","temp_variability_ed","temp_variability_lu",
@@ -135,7 +135,7 @@ class Average:
                          "angles_missing","lu_eq_missing","fresnel_angle_missing",
                          "fresnel_default","temp_variability_ed","temp_variability_lu", "simil_fail"]
 
-        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags)
+        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags, razangle)
 
         measurand, measurand_std, n_valid = self.calc_mean_masked(
             dataset, "water_leaving_radiance", flags, return_std=True)

@@ -121,18 +121,17 @@ class ProductNameUtil:
 
         today_time_string = datetime.now().strftime(TIME_FMT_L12A)
 
-        # Assemble parts
         product_name_parts = [
-            "HYPERNETS",
-            network,
-            site_id,
-            ptype,
-            time_string,
-            today_time_string,
-            angles,
-            version,
-            swir,
-        ]
+                "HYPERNETS",
+                network,
+                site_id,
+                ptype,
+                angles,
+                time_string,
+                today_time_string,
+                version,
+                swir,
+            ]
         product_name_parts = filter(None, product_name_parts)
         return "_".join(product_name_parts)
 

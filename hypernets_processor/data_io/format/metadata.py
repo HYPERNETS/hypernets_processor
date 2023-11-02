@@ -131,6 +131,7 @@ W_L1C_WLR_METADATA = {"title": "HYPSTAR Water network dataset of downwelling irr
                       "instrument_calibration_file_rad": "NaN",
                       "instrument_calibration_file_irr": "NaN",
                       "fresnel_option": "NaN",
+                      "fresnel_wind_source":"NaN",
                       "similarity_waveref": "NaN",
                       "similarity_wavethres": "NaN",
                       "similarity_wavelen1": "NaN",

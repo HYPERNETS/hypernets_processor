@@ -114,37 +114,40 @@ class SequenceProcessor:
                             l0_irr_bla_masked,
                             calibration_data_irr,
                         )
-                        # print(L1b_irr)
-
-                        # if self.context.get_config_value("max_level") in ["L1B", "L1C", "L2A"]:
-                        #     self.context.logger.info("Processing to L1b radiance...")
-                        #
-                        #
-                        #     L1b_rad = avg.average_l1b("radiance", L1a_rad)
-                        #     if self.context.get_config_value("write_l1b"):
-                        #         writer.write(L1b_rad, overwrite=True,
-                        #                      remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
-                        #     self.context.logger.info("Done")
-                        # self.context.logger.info("Processing to L1b irradiance...")
-                        # L1b_irr = avg.average_l1b("irradiance", L1a_irr)
-                        # if self.context.get_config_value("write_l1b"):
-                        #     writer.write(L1b_irr, overwrite=True,
-                        #                  remove_vars_strings=self.context.get_config_value("remove_vars_strings"))
-                        # self.context.logger.info("Done")
 
                 if L1b_rad and L1b_irr:
                     if self.context.get_config_value("max_level") in ["L1C","L2A"]:
                         self.context.logger.info("Processing to L1c...")
-                        L1c_int = rhymer.process_l1c_int(L1a_rad, L1a_irr)
-                        if rhymer.qc_bird(L1c_int) < 0.1:
-                            L1c_int["quality_flag"] = du.set_flag(L1c_int["quality_flag"],"ld_ed_clearsky_failing")
-                        L1c = surf.process_l1c(L1c_int, L1b_irr)
+                        # check if different azimuth angles within single sequence
+                        azis=rhymer.checkazimuths(L1a_rad)
+
+                        for a in azis:
+                            print("Processing for azimuth:{}".format(a))
+                            rad_, irr_, ra = rhymer.selectazimuths(L1a_rad, L1a_irr, a)
+                            print("Processing for relative azimuth: {}".format(ra))
+
+                            # if self.context.get_config_value("protocol") == "water_std_use_all_irr":
+
+                            #     L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = rhymer.cycleparse(rad_, irr,
+                            #                                                                          dataset_l1b)
+                            # if self.context.get_config_value("protocol") == "water_std":
+                            #     L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = rhymer.cycleparse(rad_, irr_,
+                            #                                                                          dataset_l1b)
+
+                            L1c_int = rhymer.process_l1c_int(rad_, irr_)
+                            if rhymer.qc_bird(L1c_int) < 0.1:
+                                L1c_int["quality_flag"] = du.set_flag(L1c_int["quality_flag"],"ld_ed_clearsky_failing")
+                            # add relative azimuth angle for the filename
+                            L1c = surf.reflectance_w(L1c_int, L1b_irr, razangle=ra)
+                            self.context.logger.info("Done")
+
+                            if self.context.get_config_value("max_level")=="L2A":
+                                self.context.logger.info("Processing to L2a...")
+                                # add relative azimuth angle for the filename
+                                L2a = surf.process_l2(L1c, razangle=ra)
+                                self.context.logger.info("Done for azimuth {}".format(ra))
                         self.context.logger.info("Done")
 
-                    if self.context.get_config_value("max_level")=="L2A":
-                        self.context.logger.info("Processing to L2a...")
-                        L2a = surf.process_l2(L1c)
-                        self.context.logger.info("Done")
                 else:
                     self.context.logger.info("Not a standard sequence")
                     self.context.anomaly_handler.add_anomaly("s")

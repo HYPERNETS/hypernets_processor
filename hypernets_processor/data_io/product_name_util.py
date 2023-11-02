@@ -110,7 +110,10 @@ class ProductNameUtil:
         if swir:
             swir = "SWIR"
         if angles:
-            angles = angles
+            if isinstance(angles, str):
+                angles = angles
+            else:
+                angles = "{}".format(round(float(angles)))
 
         # Prepare product name parts
         ptype = DS_FORMAT_FNAMES[ds_format]

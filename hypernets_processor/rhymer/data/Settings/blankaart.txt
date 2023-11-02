@@ -1,9 +1,0 @@
-version=20190710-QC
-platform_id=BLANKAART_SOUTH
-platform_description=Blankaart SOUTH end of the railing
-output_plot=True
-output_nc=True
-output_csv=False
-scan_diff_test=True
-test_measurement=True
-verbosity=5
