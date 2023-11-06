@@ -323,10 +323,10 @@ class RhymerHypstar:
 
         # print(pd.DataFrame(du.unpack_flags(dataset_l1b['quality_flag']).to_dataframe()))
         # No temporal quality checks but check if downwelling radiance varies by less than 10%
-        #dataset_l1flags, flags_rad = self.qual.qc_scan(l1a_rad, "radiance", dataset_l1flags)
-        #dataset_l1flags, flags_irr = self.qual.qc_scan(l1a_irr, "irradiance", dataset_l1flags)
-        #l1a_rad = l1a_rad.sel(scan=np.where(np.array(flags_rad) != 1)[0])
-        #l1a_irr = l1a_irr.sel(scan=np.where(np.array(flags_irr) != 1)[0])
+        dataset_l1flags, flags_rad = self.qual.qc_scan(l1a_rad, "radiance", dataset_l1flags)
+        dataset_l1flags, flags_irr = self.qual.qc_scan(l1a_irr, "irradiance", dataset_l1flags)
+        l1a_rad = l1a_rad.sel(scan=np.where(np.array(flags_rad) != 1)[0])
+        l1a_irr = l1a_irr.sel(scan=np.where(np.array(flags_irr) != 1)[0])
 
         # check number of scans per cycle for up, down radiance and irradiance
         L1a_uprad, L1a_downrad, L1a_irr, dataset_l1flags = self.cycleparse(l1a_rad, l1a_irr, dataset_l1flags)
@@ -345,7 +345,7 @@ class RhymerHypstar:
         # irradiance wavelength to the radiance wavelength
         L1c_int = self.intp.interpolate_l1b_w(dataset_l1flags, L1a_uprad, L1b_downrad, L1b_irr)
 
-        flags = (["saturation", "nonlinearity", "bad_pointing", "outliers",
+        flags = ([ "nonlinearity", "bad_pointing", "outliers",
                  "angles_missing", "lu_eq_missing", "fresnel_angle_missing", "ld_ed_clearsky_failing",
                   "outliers",
                   "L0_thresholds",

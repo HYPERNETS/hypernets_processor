@@ -1,7 +1,8 @@
 Bit #,name,Description,Comment, Application*
 1,angles_missing,Missing angles,, W
-2,saturation,Pixel saturation,Too many pixels above an empirically defined threshold, L & W
-3,nonlinearity,Non-linearity,, L & W
+2,saturation - to replace by L0_thresholds,Pixel saturation,Too many pixels above an empirically defined threshold, L & W
+3,nonlinearity,Non-linearity,I think this one is not used?, L & W
+3, L0_discontinuity, shoudl be added, ,,
 4,bad_pointing,Bad pointing,Pan/tilt angle versus requested angle - Not yet implemented, L & W
 5,placeholder1,,Placeholder for other potential calibration related quality flags, L & W
 6,lon_default,Missing longitude,When raised use default, L & W
