@@ -131,7 +131,7 @@ class Average:
         #                  "fresnel_default","temp_variability_ed","temp_variability_lu",
         #                  "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
 
-        flags = ["saturation","nonlinearity","bad_pointing","outliers",
+        flags = ["nonlinearity","bad_pointing","outliers",
                          "angles_missing","lu_eq_missing","fresnel_angle_missing",
                          "fresnel_default","temp_variability_ed","temp_variability_lu", "simil_fail"]
 

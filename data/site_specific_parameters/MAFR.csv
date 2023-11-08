@@ -1,6 +1,11 @@
 [Metadata]
 principal_investigator = LOV
+hypstar_sn = 121231
 site_id = MAFR
-latitude =
-longitude =
+latitude = 45.543777
+longitude = -1.042159
 angle2use=pt_ask
+offset_pan = 0
+offset_tilt = 60
+reverse_tilt = no
+azimuth_switch = 0

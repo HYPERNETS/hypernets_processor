@@ -327,13 +327,17 @@ class HypernetsReader:
                         ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
                         self.context.logger.error(
                             "Accuracy of pan is above 3° (vaa_abs=%s; vaa_ref=%s). Check your system and/or data before processing."%(vaa_abs, vaa_ref))
-                    print("Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
+                        self.context.anomaly_handler.add_anomaly("a")
+
+                    print("Angle accuracy in azimuth {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
 
                     if angacc_zen > 1:
                         ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
                         self.context.logger.error(
-                            "Accuracy of pan is above 3°. Check your system and/or data before processing.")
-                    print("Angle accuracy {:.4f} ={:.4f}-{:.4f}".format(angacc_zen,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
+                            "Accuracy of zenith is above 1°. Check your system and/or data before processing.")
+                        self.context.anomaly_handler.add_anomaly("a")
+
+                    print("Angle accuracy in zenith {:.4f} ={:.4f}-{:.4f}".format(angacc_zen,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
 
 
                     print("If azimuth switch is on, please check the following: switch:{}, vaa_rel:{:.4f}, vaa_abs:{:.4f}, saa:{:.4f}".format(

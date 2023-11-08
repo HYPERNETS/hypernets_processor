@@ -200,6 +200,7 @@ class Interpolate:
         return dataset_l1c
 
     def interpolate_skyradiance(self, dataset_l1c, dataset_l1b_skyrad):
+        print(dataset_l1b_skyrad)
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), parallel_cores=1, dtype="float32"
         )
@@ -223,7 +224,7 @@ class Interpolate:
 
         if len(acqui_skyrad) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-                dataset_l1c["quality_flag"], "single_irradiance_used"
+                dataset_l1c["quality_flag"], "single_skyradiance_used"
             )
 
         return dataset_l1c

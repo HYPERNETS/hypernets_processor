@@ -51,7 +51,9 @@ class SurfaceReflectance:
         L1c = self.templ.l1c_from_l1b_dataset(dataset, razangle)
         L1c = self.rh.get_wind(L1c)
         L1c = self.rh.get_fresnelrefl(L1c)
-        L1c = self.rh.qc_bird(L1c)
+
+        #remove qc bird since we have a clearsky test already?
+        L1c = self.qual.qc_bird(L1c)
 
 
         prop = punpy.MCPropagation(
@@ -101,7 +103,7 @@ class SurfaceReflectance:
             store_unc_percent=True,
         )
 
-        failSimil=self.rh.qc_similarity(L1c)
+        failSimil=self.qual.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
             L1c["quality_flag"][np.where(failSimil == 1)], "simil_fail")  # for i in range(len(mask))]
 
