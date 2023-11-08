@@ -138,7 +138,8 @@ class RhymerHypstar:
             print(sena_lsky)
 
             for i in sena_lu:
-                if np.round(i)-1 not in np.round(sena_lsky) and np.round(i) + 1 not in np.round(sena_lsky) :
+                if (np.round(i)-1 not in np.round(sena_lsky) and np.round(i) not in np.round(sena_lsky) and
+                        np.round(i) + 1 not in np.round(sena_lsky)) :
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "lu_eq_missing")
                     if self.context.get_config_value("verbosity") > 2:
@@ -156,8 +157,10 @@ class RhymerHypstar:
             # check if we have the required fresnel angle for lsky
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
+
             for i in senz_lu:
-                if np.round(i) not in np.round(senz_lsky):
+                if (np.round(i)-1 not in np.round(senz_lsky) and np.round(i) not in np.round(senz_lsky) and
+                        np.round(i) + 1 not in np.round(senz_lsky)) :
                     dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i] = du.set_flag(
                         dataset_l1b["quality_flag"][dataset_l1b["viewing_azimuth_angle"] == i], "fresnel_angle_missing")
                     ts = [datetime.utcfromtimestamp(x) for x in
@@ -222,6 +225,7 @@ class RhymerHypstar:
                 if self.context.logger is not None:
                     self.context.logger.info(
                         "Not enough downwelling irradiance data for sequence {}".format(irr.attrs['sequence_id']))
+                self.context.anomaly_handler.add_anomaly("ned")
 
             return lu, lsky, irr, dataset_l1b
 
@@ -272,7 +276,7 @@ class RhymerHypstar:
                 if anc_wind is not None:
                     wind.append(anc_wind['w'])
                     now = datetime.now()
-                    l1b.attrs["fresnel_wind_source"] = ":{}".format(now.strftime("%d/%m/%Y"))
+                    l1b.attrs["fresnel_wind_source"] = "NCEP/GDAS FNL 0.25 ds083.3 | DOI: 10.5065/D65Q4T4Z"
 
         l1b['fresnel_wind'].values = wind
         return l1b
@@ -289,14 +293,14 @@ class RhymerHypstar:
         for i in range(len(l1b.scan)):
             fresnel_vza[i] = l1b['viewing_zenith_angle'][i].values
             fresnel_sza[i] = l1b['solar_zenith_angle'][i].values
-            ra = normalizedeg(abs(l1b['viewing_azimuth_angle'][i].values -
-                                  l1b['solar_azimuth_angle'][i].values), 0, 360)
+            ra = (l1b['viewing_azimuth_angle'][i].values -
+                                  l1b['solar_azimuth_angle'][i].values) % 360
 
-            fresnel_raa[i]=abs(180 - ra)
+            fresnel_raa[i]=((ra - 180) % 360) - 180
 
             ## get fresnel reflectance
             if self.context.get_config_value("fresnel_option") == 'Mobley1999':
-                if (fresnel_sza[i] is not None) & (fresnel_raa[i] is not None):
+                if (fresnel_sza[i] is not None) & (fresnel_raa[i] is not None) & (abs(fresnel_raa[i]) > 180):
                     sza = min(fresnel_sza[i], 79.999)
                     rhof = self.rhymerproc.mobley_lut_interp(sza, fresnel_vza[i], fresnel_raa[i],
                                                              wind=wind[i])

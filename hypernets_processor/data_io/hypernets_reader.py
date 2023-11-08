@@ -327,12 +327,16 @@ class HypernetsReader:
                         ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
                         self.context.logger.error(
                             "Accuracy of pan is above 3°. Check your system and/or data before processing.")
+                        self.context.anomaly_handler.add_anomaly("a")
+
                     print("Angle accuracy in azimuth {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
 
                     if angacc_zen > 1:
                         ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
                         self.context.logger.error(
-                            "Accuracy of pan is above 3°. Check your system and/or data before processing.")
+                            "Accuracy of zenith is above 1°. Check your system and/or data before processing.")
+                        self.context.anomaly_handler.add_anomaly("a")
+
                     print("Angle accuracy in zenith {:.4f} ={:.4f}-{:.4f}".format(angacc_zen,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
 
 

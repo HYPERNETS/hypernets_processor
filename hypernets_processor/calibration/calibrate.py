@@ -146,7 +146,7 @@ class Calibrate:
             measurandstring, dataset_l0
         )
 
-        flags = ["outliers", "L0_thresholds", "L0_discontinuity"]
+        flags = ["bad_pointing","outliers", "L0_thresholds", "L0_discontinuity"]
 
         dataset_l0b = self.avg.average_l0(dataset_l0, dataset_l0_bla)
 

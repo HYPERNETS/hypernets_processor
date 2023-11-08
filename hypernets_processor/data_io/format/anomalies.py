@@ -11,12 +11,12 @@ Anomaly definitions for Hypernets land and water network
 
 ANOMALIES_DICT = {
     "a": {
-        "description": "angle achieved by pan tilt >5 deg away from target angle during sequence",
+        "description": "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
         "error": None,
         "error_msg": None,
     },
     "s": {
-            "description": "sequence data incomplete",
+            "description": "meteo data missing",
             "error": None,
             "error_msg": None,
         },
@@ -35,18 +35,13 @@ ANOMALIES_DICT = {
         "error": IOError,
         "error_msg": "Metadata file missing",
     },
-    "e": {
-        "description": "Meteo file missing",
-        "error": None,
-        "error_msg": None,
-    },
     "o": {
         "description": "more than 50% of data has random error above 100% (probably corrupted data)",
         "error": ValueError,
         "error_msg": "more than 50% of data has random error above 100% (probably corrupted data)",
     },
     "q": {
-        "description": "None of the scans in a series passed the quality control",
+        "description": "None of the scans in one or more series of the sequences passed the quality control",
         "error": None,
         "error_msg": None,
     },
@@ -65,6 +60,11 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "Not enough Lsky scans",
     },
+    "ned": {
+        "description": "Not enough Lsky scans",
+        "error": ValueError,
+        "error_msg": "Not enough ed scans",
+    },
     "i": {
         "description": "No valid irradiance measurements",
         "error": None,
@@ -76,7 +76,7 @@ ANOMALIES_DICT = {
         "error_msg": "Coefficient of variation for Ed(550) is > 10%"
     },
     "nd": {
-        "description": "Non constant illumination",
+        "description": "Non constant illumination in downwelling radiance",
         "error": ValueError,
         "error_msg": "Coefficient of variation for Ld(550) is > 10%"
     },

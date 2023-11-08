@@ -224,7 +224,7 @@ class Interpolate:
 
         if len(acqui_skyrad) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-                dataset_l1c["quality_flag"], "single_irradiance_used"
+                dataset_l1c["quality_flag"], "single_skyradiance_used"
             )
 
         return dataset_l1c
