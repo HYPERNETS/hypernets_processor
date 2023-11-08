@@ -16,6 +16,7 @@ import numpy as np
 import os.path
 import warnings
 from obsarray.templater.dataset_util import DatasetUtil
+from datetime import datetime
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -33,6 +34,12 @@ class Plotting:
             self.path = HypernetsWriter(context).return_plot_directory()
         else:
             self.path = path
+        self.fontsize=context.get_config_value("plot_fontsize")
+        self.legendfontsize=context.get_config_value("plot_legendfontsize")
+        if self.fontsize is None:
+            self.fontsize=10
+        if self.legendfontsize is None:
+            self.legendfontsize=8
         if not os.path.exists(self.path):
             os.makedirs(self.path)
         if plot_format is None:
@@ -98,7 +105,7 @@ class Plotting:
         )
 
         if measurandstring == "irradiance":
-            angle_labels = dataset["acquisition_time"].values
+            angle_labels = [datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S") for timestamp in dataset["acquisition_time"].values]
         else:
             angle_labels = [
                 "vza= {:.2f}, vaa= {:.2f}".format(
@@ -143,7 +150,7 @@ class Plotting:
         )
 
         if measurandstring == "irradiance":
-            angle_labels = dataset["acquisition_time"].values
+            angle_labels = [datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S") for timestamp in dataset["acquisition_time"].values]
         else:
             angle_labels = np.array(
                 [
@@ -179,7 +186,7 @@ class Plotting:
         )
 
         if measurandstring == "irradiance":
-            angle_labels = dataset["acquisition_time"].values
+            angle_labels = [datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S") for timestamp in dataset["acquisition_time"].values]
         else:
             angle_labels = np.array(
                 [
@@ -313,9 +320,9 @@ class Plotting:
                 wavs = dataset["wavelength"].values
                 fig1, ax1 = plt.subplots(figsize=(5, 5))
                 im = ax1.pcolormesh(wavs, wavs, ycorr, vmin=0, vmax=1, cmap="gnuplot")
-                ax1.set_ylabel("wavelength (nm)")
-                ax1.set_xlabel("wavelength (nm)")
-                ax1.set_title("systematic correlation matrix")
+                ax1.set_ylabel("wavelength (nm)", fontsize=self.fontsize)
+                ax1.set_xlabel("wavelength (nm)", fontsize=self.fontsize)
+                ax1.set_title("systematic correlation matrix", fontsize=self.fontsize)
                 fig1.colorbar(im, ax=ax1)
                 fig1.savefig(plotpath, bbox_inches="tight")
                 plt.close(fig1)
@@ -330,15 +337,15 @@ class Plotting:
                 wavs = dataset["wavelength"].values
                 fig1, (ax1, ax2) = plt.subplots(ncols=2, nrows=1, figsize=(10, 5))
                 ax1.pcolormesh(wavs, wavs, ycorr_indep, vmin=0, vmax=1, cmap="gnuplot")
-                ax1.set_ylabel("wavelength (nm)")
-                ax1.set_xlabel("wavelength (nm)")
-                ax1.set_title("independent systematic correlation matrix")
+                ax1.set_ylabel("wavelength (nm)", fontsize=self.fontsize)
+                ax1.set_xlabel("wavelength (nm)", fontsize=self.fontsize)
+                ax1.set_title("independent systematic correlation matrix", fontsize=self.fontsize)
                 im = ax2.pcolormesh(
                     wavs, wavs, ycorr_corr, vmin=0, vmax=1, cmap="gnuplot"
                 )
-                ax2.set_ylabel("wavelength (nm)")
-                ax2.set_xlabel("wavelength (nm)")
-                ax2.set_title("correlated (rad-irr) systematic correlation matrix")
+                ax2.set_ylabel("wavelength (nm)", fontsize=self.fontsize)
+                ax2.set_xlabel("wavelength (nm)", fontsize=self.fontsize)
+                ax2.set_title("correlated (rad-irr) systematic correlation matrix", fontsize=self.fontsize)
                 fig1.colorbar(im, ax=ax2)
                 fig1.savefig(plotpath, bbox_inches="tight")
                 plt.close(fig1)
@@ -366,12 +373,12 @@ class Plotting:
                     )
             if len(labels) > 10:
                 ax1.legend(
-                    bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=8, ncol=2
+                    bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=self.legendfontsize, ncol=2
                 )
             else:
-                ax1.legend(fontsize=8, loc="upper right")
-        ax1.set_xlabel("Wavelength (nm)")
-        ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)")
+                ax1.legend(fontsize=self.legendfontsize, loc="upper right")
+        ax1.set_xlabel("Wavelength (nm)", fontsize=self.fontsize)
+        ax1.set_ylabel(r"Radiance ($mW\ nm^{-1}\ m^{-2}\ sr^{-1}$)", fontsize=self.fontsize)
         if ylim is not None:
             ax1.set_ylim(ylim)
         else:
@@ -397,9 +404,9 @@ class Plotting:
         else:
             for i in range(len(labels)):
                 ax1.plot(xdata, ydata[:, i], label=labels[i], alpha=0.3)
-            ax1.legend(fontsize=8)
-        ax1.set_xlabel("Wavelength (nm)")
-        ax1.set_ylabel(r"Irradiance ($mW\ nm^{-1}\ m^{-2}$)")
+            ax1.legend(fontsize=self.legendfontsize)
+        ax1.set_xlabel("Wavelength (nm)", fontsize=self.fontsize)
+        ax1.set_ylabel(r"Irradiance ($mW\ nm^{-1}\ m^{-2}$)", fontsize=self.fontsize)
         if ylim is not None:
             ax1.set_ylim(ylim)
         else:
@@ -430,9 +437,9 @@ class Plotting:
                     ax1.plot(
                         xdata, ydata[:, i], label=labels[i], ls=linestyles[i], alpha=0.3
                     )
-            ax1.legend(fontsize=8, ncol=2)
-        ax1.set_xlabel("Wavelength (nm)")
-        ax1.set_ylabel(r"digital_number")
+            ax1.legend(fontsize=self.legendfontsize, ncol=2)
+        ax1.set_xlabel("wavelength_pixel", fontsize=self.fontsize)
+        ax1.set_ylabel(r"digital_number", fontsize=self.fontsize)
         if ylim is not None:
             ax1.set_ylim(ylim)
         fig1.savefig(plotpath, bbox_inches="tight")
@@ -461,12 +468,12 @@ class Plotting:
                     )
             if len(labels) > 10:
                 ax1.legend(
-                    bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=8, ncol=2
+                    bbox_to_anchor=(1.04, 1), loc="upper left", fontsize=self.legendfontsize, ncol=2
                 )
             else:
-                ax1.legend(loc="lower right", fontsize=8)
-        ax1.set_xlabel("Wavelength (nm)")
-        ax1.set_ylabel(r"Reflectance")
+                ax1.legend(loc="lower right", fontsize=self.legendfontsize)
+        ax1.set_xlabel("Wavelength (nm)", fontsize=self.fontsize)
+        ax1.set_ylabel(r"Reflectance", fontsize=self.fontsize)
         if ylim is not None:
             ax1.set_ylim(ylim)
         else:
@@ -545,10 +552,10 @@ class Plotting:
                         handlesb.append(p)
                         p.set_c(colors[icol])
                         icol += 1
-                ax1.legend(handlesb, labelsb)  # correct legend
+                ax1.legend(handlesb, labelsb, fontsize=self.legendfontsize)  # correct legend
 
-            ax1.set_xlabel("Wavelength (nm)")
-            ax1.set_ylabel(measurandstring)
+            ax1.set_xlabel("Wavelength (nm)", fontsize=self.fontsize)
+            ax1.set_ylabel(measurandstring, fontsize=self.fontsize)
             if ylim is not None:
                 ax1.set_ylim(ylim)
             else:
@@ -569,8 +576,8 @@ class Plotting:
         )
 
         angle_labels = [
-            "time= {:.0f}, sza= {:.2f}, rescaled to sza= {:.0f}".format(
-                dataset["acquisition_time"].values[i],
+            "time= {}, sza= {:.2f}, rescaled to sza= {:.0f}".format(
+                datetime.utcfromtimestamp(dataset["acquisition_time"].values[i]).strftime("%Y-%m-%d %H:%M:%S"),
                 dataset["solar_zenith_angle"].values[i],
                 refsza,
             )

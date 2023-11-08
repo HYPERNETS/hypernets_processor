@@ -76,31 +76,29 @@ class SequenceProcessor:
                 calibration_data_rad,calibration_data_irr = calcon.read_calib_files(sequence_path)
                 # Read L0
                 self.context.logger.info("Reading raw data...")
-                l0_irr,l0_rad,l0_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)
+                l0a_irr,l0a_rad,l0a_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)
                 self.context.logger.info("Done")
 
                 # Calibrate to L1a
                 if self.context.get_config_value("max_level") in ["L1A","L1B","L1C","L2A"]:
                     self.context.logger.info("Processing to L1a...")
-                    if l0_rad:
-                        L1a_rad, l0_rad_masked, l0_rad_bla_masked = cal.calibrate_l1a(
-                            "radiance", l0_rad, l0_bla, calibration_data_rad
+                    if l0a_rad:
+                        L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = cal.calibrate_l1a(
+                            "radiance", l0a_rad, l0a_bla, calibration_data_rad
                         )
-                        print(L1a_rad)
-                    if l0_irr:
-                        L1a_irr, l0_irr_masked, l0_irr_bla_masked = cal.calibrate_l1a(
-                            "irradiance", l0_irr, l0_bla, calibration_data_irr
+                    if l0a_irr:
+                        L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = cal.calibrate_l1a(
+                            "irradiance", l0a_irr, l0a_bla, calibration_data_irr
                         )
-                        print(L1a_irr)
                     self.context.logger.info("Done")
 
-                if l0_rad and l0_irr:
+                if l0a_rad and l0a_irr:
                     if self.context.get_config_value("max_level") in ["L1B", "L1C", "L2A"]:
                         self.context.logger.info("Processing to L1b radiance...")
                         L1b_rad = cal.calibrate_l1b(
                             "radiance",
-                            l0_rad_masked,
-                            l0_rad_bla_masked,
+                            l0a_rad_masked,
+                            l0a_rad_bla_masked,
                             calibration_data_rad,
                         )
                         # print(L1b_rad)
@@ -110,8 +108,8 @@ class SequenceProcessor:
                         self.context.logger.info("Processing to L1b irradiance...")
                         L1b_irr = cal.calibrate_l1b(
                             "irradiance",
-                            l0_irr_masked,
-                            l0_irr_bla_masked,
+                            l0a_irr_masked,
+                            l0a_irr_bla_masked,
                             calibration_data_irr,
                         )
 
@@ -166,12 +164,12 @@ class SequenceProcessor:
                 ) = calcon.read_calib_files(sequence_path)
 
                 (
-                    l0_irr,
-                    l0_rad,
-                    l0_bla,
-                    l0_swir_irr,
-                    l0_swir_rad,
-                    l0_swir_bla,
+                    l0a_irr,
+                    l0a_rad,
+                    l0a_bla,
+                    l0a_swir_irr,
+                    l0a_swir_rad,
+                    l0a_swir_bla,
                 ) = reader.read_sequence(
                     sequence_path,
                     calibration_data_rad,
@@ -188,62 +186,62 @@ class SequenceProcessor:
                     "L2A",
                 ]:
                     self.context.logger.info("Processing to L1a...")
-                    if l0_rad:
-                        L1a_rad, l0_rad_masked, l0_rad_bla_masked = cal.calibrate_l1a(
-                            "radiance", l0_rad, l0_bla, calibration_data_rad
+                    if l0a_rad:
+                        L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = cal.calibrate_l1a(
+                            "radiance", l0a_rad, l0a_bla, calibration_data_rad
                         )
-                    if l0_irr:
-                        L1a_irr, l0_irr_masked, l0_irr_bla_masked = cal.calibrate_l1a(
-                            "irradiance", l0_irr, l0_bla, calibration_data_irr
+                    if l0a_irr:
+                        L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = cal.calibrate_l1a(
+                            "irradiance", l0a_irr, l0a_bla, calibration_data_irr
                         )
-                    if l0_swir_rad:
+                    if l0a_swir_rad:
                         (
                             L1a_swir_rad,
-                            l0_swir_rad_masked,
-                            l0_swir_rad_bla_masked,
+                            l0a_swir_rad_masked,
+                            l0a_swir_rad_bla_masked,
                         ) = cal.calibrate_l1a(
                             "radiance",
-                            l0_swir_rad,
-                            l0_swir_bla,
+                            l0a_swir_rad,
+                            l0a_swir_bla,
                             calibration_data_swir_rad,
                             swir=True,
                         )
-                    if l0_swir_irr:
+                    if l0a_swir_irr:
                         (
                             L1a_swir_irr,
-                            l0_swir_irr_masked,
-                            l0_swir_irr_bla_masked,
+                            l0a_swir_irr_masked,
+                            l0a_swir_irr_bla_masked,
                         ) = cal.calibrate_l1a(
                             "irradiance",
-                            l0_swir_irr,
-                            l0_swir_bla,
+                            l0a_swir_irr,
+                            l0a_swir_bla,
                             calibration_data_swir_irr,
                             swir=True,
                         )
                     self.context.logger.info("Done")
 
                 if self.context.get_config_value("max_level") in ["L1B", "L1C", "L2A"]:
-                    if l0_rad_masked and l0_swir_rad_masked:
+                    if l0a_rad_masked and l0a_swir_rad_masked:
                         self.context.logger.info("Processing to L1b radiance...")
                         L1b_rad = comb.combine(
                             "radiance",
-                            l0_rad_masked,
-                            l0_rad_bla_masked,
-                            l0_swir_rad_masked,
-                            l0_swir_rad_bla_masked,
+                            l0a_rad_masked,
+                            l0a_rad_bla_masked,
+                            l0a_swir_rad_masked,
+                            l0a_swir_rad_bla_masked,
                             calibration_data_rad,
                             calibration_data_swir_rad,
                         )
                         self.context.logger.info("Done")
 
-                    if l0_irr_masked and l0_swir_irr_masked:
+                    if l0a_irr_masked and l0a_swir_irr_masked:
                         self.context.logger.info("Processing to L1b irradiance...")
                         L1b_irr = comb.combine(
                             "irradiance",
-                            l0_irr_masked,
-                            l0_irr_bla_masked,
-                            l0_swir_irr_masked,
-                            l0_swir_irr_bla_masked,
+                            l0a_irr_masked,
+                            l0a_irr_bla_masked,
+                            l0a_swir_irr_masked,
+                            l0a_swir_irr_bla_masked,
                             calibration_data_irr,
                             calibration_data_swir_irr,
                         )

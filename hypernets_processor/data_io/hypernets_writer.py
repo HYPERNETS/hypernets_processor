@@ -201,7 +201,7 @@ class HypernetsWriter:
         )
         return rel_directory
 
-    def return_plot_directory(self, directory=""):
+    def return_plot_directory(self, directory=None):
         """
         Return plots directory, with respect to context and specified value
 
@@ -212,8 +212,8 @@ class HypernetsWriter:
         :return: directory
         :rtype: str
         """
-
-        return os.path.join(self.return_directory(directory), "plots")
+        dir=self.return_directory(directory)
+        return os.path.join(dir, "plots")
 
     def return_image_directory(self, directory=None):
         """
@@ -263,7 +263,8 @@ class HypernetsWriter:
                         )
                     }
                 )
-            ds[var_name].attrs.pop("_FillValue")
+            if "_FillValue" in ds[var_name].attrs.keys():
+                ds[var_name].attrs.pop("_FillValue")
             encoding.update({var_name: var_encoding})
         ds.to_netcdf(path, format="netCDF4", engine="netcdf4", encoding=encoding)
 

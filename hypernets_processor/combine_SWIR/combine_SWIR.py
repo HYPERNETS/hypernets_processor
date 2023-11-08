@@ -51,6 +51,7 @@ class CombineSWIR:
             dataset_l0masked_swir,
             dataset_bla_swir,
             calibration_data_swir,
+            swir=True
         )
 
         dataset_l1b, dataset_l1b_swir = self.qual.perform_quality_check_comb(

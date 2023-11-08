@@ -210,7 +210,7 @@ class HypernetsReader:
             # 2. Create template dataset
             # -----------------------------------
             # use template from variables and metadata in format
-            ds = self.templ.l0_template_dataset(wvl, scanDim, fileformat)
+            ds = self.templ.l0a_template_dataset(wvl, scanDim, fileformat)
         else:
             self.context.logger.error("The number of wavelength pixels does not match "
                                       "the expected values for VNIR.")
@@ -446,7 +446,7 @@ class HypernetsReader:
 
         scanDim = vnir.shape[0]
         wvl = self.read_wavelength(vnir.shape[1], cal_data)
-        ds = self.templ.l0_template_dataset(wvl, scanDim, fileformat)
+        ds = self.templ.l0a_template_dataset(wvl, scanDim, fileformat)
 
         ds.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds.attrs["instrument_id"] = str(instrument_id)
@@ -456,7 +456,7 @@ class HypernetsReader:
 
         scanDim = swir.shape[0]
         wvl_swir = self.read_wavelength(swir.shape[1], cal_data_swir)
-        ds_swir = self.templ.l0_template_dataset(wvl_swir, scanDim, fileformat, swir=True)
+        ds_swir = self.templ.l0a_template_dataset(wvl_swir, scanDim, fileformat, swir=True)
 
         ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds_swir.attrs["instrument_id"] = str(instrument_id)
@@ -761,12 +761,14 @@ class HypernetsReader:
             sitespec = ConfigParser()
             path_ = os.path.abspath(os.path.join(__file__, "../../.."))
             sitespec_=os.path.join(path_, "data","site_specific_parameters","{}.csv".format(site_id))
+            sitespecattr = None
 
             if os.path.exists(sitespec_):
                 sitespec.read(sitespec_)
                 if sitespec.has_section('Metadata'):
                     sitespecattr = dict(sitespec['Metadata'])
                     angle2use=str(sitespecattr['angle2use']).strip()
+
 
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
@@ -823,21 +825,21 @@ class HypernetsReader:
 
             if 'azimuth_switch' in (globalattr.keys()):
                 azimuth_switch = float(globalattr['azimuth_switch'])
-            elif 'azimuth_switch' in (sitespecattr.keys()):
+            elif sitespecattr and 'azimuth_switch' in (sitespecattr.keys()):
                 azimuth_switch = float(sitespecattr['azimuth_switch'])
             else:
                 azimuth_switch =None
 
             if 'offset_pan' in (globalattr.keys()):
                 offset_pan = float(globalattr['offset_pan'])
-            elif 'offset_pan' in (sitespecattr.keys()):
+            elif sitespecattr and 'offset_pan' in (sitespecattr.keys()):
                 offset_pan = float(sitespecattr['offset_pan'])
             else:
                 offset_pan=None
 
             if 'offset_tilt' in (globalattr.keys()):
                 offset_tilt = float(globalattr['offset_tilt'])
-            elif 'offset_tilt' in (sitespecattr.keys()):
+            elif sitespecattr and 'offset_tilt' in (sitespecattr.keys()):
                 offset_tilt = float(sitespecattr['offset_tilt'])
             else:
                 offset_tilt= None
@@ -912,12 +914,12 @@ class HypernetsReader:
                       calibration_data_swir_rad=None, calibration_data_swir_irr=None,single_series=None):
 
         # define data to return none at end of method if does not exist
-        l0_irr = None
-        l0_rad = None
-        l0_bla = None
-        l0_swir_irr = None
-        l0_swir_rad = None
-        l0_swir_bla = None
+        l0a_irr = None
+        l0a_rad = None
+        l0a_bla = None
+        l0a_swir_irr = None
+        l0a_swir_rad = None
+        l0a_swir_bla = None
 
         lat, lon, cc, metadata, \
             seriesIrr, seriesRad, seriesBlack, \
@@ -944,55 +946,55 @@ class HypernetsReader:
 
         if seriesIrr:
             if self.context.get_config_value("network") == "w":
-                l0_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
-                                          "L0_IRR", calibration_data_irr, instrument_id, site_id, azimuth_switch, offset_tilt, offset_pan, angle2use)
-                if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_irr, overwrite=True)
+                l0a_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
+                                          "L0A_IRR", calibration_data_irr, instrument_id, site_id, azimuth_switch, offset_tilt, offset_pan, angle2use)
+                if self.context.get_config_value("write_l0a"):
+                    self.writer.write(l0a_irr, overwrite=True)
             else:
-                l0_irr, l0_swir_irr = self.read_series_L(seq_dir, seriesIrr, lat, lon,
-                                                         metadata, flag, "L0_IRR",
+                l0a_irr, l0a_swir_irr = self.read_series_L(seq_dir, seriesIrr, lat, lon,
+                                                         metadata, flag, "L0A_IRR",
                                                          calibration_data_irr,
                                                          calibration_data_swir_irr, instrument_id, site_id)
-                if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_irr, overwrite=True)
-                    self.writer.write(l0_swir_irr, overwrite=True)
+                if self.context.get_config_value("write_l0a"):
+                    self.writer.write(l0a_irr, overwrite=True)
+                    self.writer.write(l0a_swir_irr, overwrite=True)
 
         else:
             self.context.logger.error("No irradiance data for this sequence")
 
         if seriesRad:
             if self.context.get_config_value("network") == "w":
-                l0_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
-                                          "L0_RAD", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
-                if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_rad, overwrite=True)
+                l0a_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
+                                          "L0A_RAD", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
+                if self.context.get_config_value("write_l0a"):
+                    self.writer.write(l0a_rad, overwrite=True)
             else:
-                l0_rad, l0_swir_rad = self.read_series_L(seq_dir, seriesRad, lat, lon,
-                                                         metadata, flag, "L0_RAD",
+                l0a_rad, l0a_swir_rad = self.read_series_L(seq_dir, seriesRad, lat, lon,
+                                                         metadata, flag, "L0A_RAD",
                                                          calibration_data_rad,
                                                          calibration_data_swir_rad, instrument_id, site_id)
 
-                if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_rad, overwrite=True)
-                    self.writer.write(l0_swir_rad, overwrite=True)
+                if self.context.get_config_value("write_l0a"):
+                    self.writer.write(l0a_rad, overwrite=True)
+                    self.writer.write(l0a_swir_rad, overwrite=True)
 
         else:
             self.context.logger.error("No radiance data for this sequence")
 
         if seriesBlack:
             if self.context.get_config_value("network") == "w":
-                l0_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag,
-                                          "L0_BLA", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
-                if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_bla, overwrite=True)
+                l0a_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag,
+                                          "L0A_BLA", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
+                if self.context.get_config_value("write_l0a"):
+                    self.writer.write(l0a_bla, overwrite=True)
             else:
-                l0_bla, l0_swir_bla = self.read_series_L(seq_dir, seriesBlack, lat, lon,
-                                                         metadata, flag, "L0_BLA",
+                l0a_bla, l0a_swir_bla = self.read_series_L(seq_dir, seriesBlack, lat, lon,
+                                                         metadata, flag, "L0A_BLA",
                                                          calibration_data_rad,
                                                          calibration_data_swir_rad, instrument_id, site_id)
-                if self.context.get_config_value("write_l0"):
-                    self.writer.write(l0_bla, overwrite=True)
-                    self.writer.write(l0_swir_bla, overwrite=True)
+                if self.context.get_config_value("write_l0a"):
+                    self.writer.write(l0a_bla, overwrite=True)
+                    self.writer.write(l0a_swir_bla, overwrite=True)
 
         else:
             self.context.logger.error("No black data for this sequence")
@@ -1025,9 +1027,9 @@ class HypernetsReader:
         else:
             self.context.logger.error("No pictures for this sequence")
         if self.context.get_config_value("network") == "w":
-            return l0_irr, l0_rad, l0_bla
+            return l0a_irr, l0a_rad, l0a_bla
         else:
-            return l0_irr, l0_rad, l0_bla, l0_swir_irr, l0_swir_rad, l0_swir_bla
+            return l0a_irr, l0a_rad, l0a_bla, l0a_swir_irr, l0a_swir_rad, l0a_swir_bla
 
 
 if __name__ == '__main__':

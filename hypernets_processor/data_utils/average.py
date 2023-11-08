@@ -29,7 +29,7 @@ class Average:
         self._measurement_function_factory = MeasurementFunctionFactory
 
 
-    def average_l0(self, dataset_l0, dataset_l0_bla):
+    def average_l0(self, measurandstring, dataset_l0, dataset_l0_bla, swir=False):
         """
 
         :param measurandstring:
@@ -43,7 +43,7 @@ class Average:
         :return:
         :rtype:
         """
-        dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(dataset_l0)
+        dataset_l0b = self.templ.l0b_template_from_l0_dataset_land(measurandstring,dataset_l0,swir=swir)
         flags = ["outliers","L0_thresholds", "L0_discontinuity"]
         for var in dataset_l0b.variables:
             if var=="digital_number":

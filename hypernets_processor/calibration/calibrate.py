@@ -140,7 +140,7 @@ class Calibrate:
         return dataset_l1a, dataset_l0_masked, dataset_l0_bla_masked
 
     def calibrate_l1b(
-        self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data
+        self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data, swir=False
     ):
         dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(
             measurandstring, dataset_l0
@@ -148,7 +148,16 @@ class Calibrate:
 
         flags = ["outliers", "L0_thresholds", "L0_discontinuity"]
 
-        dataset_l0b = self.avg.average_l0(dataset_l0, dataset_l0_bla)
+        dataset_l0b = self.avg.average_l0(measurandstring, dataset_l0, dataset_l0_bla, swir=swir)
+
+        if self.context.get_config_value("write_l0b"):
+            self.writer.write(
+                dataset_l0b,
+                overwrite=True,
+                remove_vars_strings=self.context.get_config_value(
+                    "remove_vars_strings"
+                ),
+            )
 
         series_id = np.unique(dataset_l0["series_id"])
         series_id_bla = np.unique(dataset_l0_bla["series_id"])

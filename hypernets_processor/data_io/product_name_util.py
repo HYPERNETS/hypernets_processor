@@ -19,11 +19,12 @@ TIME_FMT_L2B = "%Y%m%d"
 
 
 DS_FORMAT_FNAMES = {
-    "L0_RAD": "L0_RAD",
-    "L0_BLA": "L0_BLA",
-    "L0_IRR": "L0_IRR",
+    "L0A_RAD": "L0A_RAD",
+    "L0A_BLA": "L0A_BLA",
+    "L0A_IRR": "L0A_IRR",
     "CAL": "CAL",
-    "L_L0B": "L_L0B",
+    "L_L0B_RAD": "L0B_RAD",
+    "L_L0B_IRR": "L0B_IRR",
     "L_L1A_RAD": "L1A_RAD",
     "W_L1A_RAD": "L1A_RAD",
     "L_L1A_IRR": "L1A_IRR",
@@ -32,10 +33,8 @@ DS_FORMAT_FNAMES = {
     "L_L1B_IRR": "L1B_IRR",
     "W_L1B_RAD": "L1B_RAD",
     "W_L1B_IRR": "L1B_IRR",
-    "W_L1B": "L1B",
-    "L_L1C": "L1C",
+    "L_L1C": "L1C_ALL",
     "W_L1C": "L1C_ALL",
-    "W_L1D": "L1D",
     "L_L2A": "L2A_REF",
     "W_L2A": "L2A_REF",
     "L_L2B": "L2B_REF",

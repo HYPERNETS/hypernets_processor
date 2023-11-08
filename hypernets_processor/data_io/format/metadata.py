@@ -166,9 +166,9 @@ LAND_NETWORK_METADATA = {"topic_category": "land, environment, geoscientific inf
                                     "(http://aims.fao.org/aos/agrovoc/c_5371), vegetation "
                                     "(http://www.eionet.europa.eu/gemet/concept/8922)",
                          "locator": "https://github.com/HYPERNETS/hypernets_processor/",
-                         "responsible_party": "National Physical Laboratory, UK",
-                         "creator_name": "TBD",
-                         "creator_email": "TBD",
+                         "responsible_party": "National Physical Laboratory (NPL), UK",
+                         "creator_name": "Pieter De Vis",
+                         "creator_email": "pieter.de.vis@npl.cp.uk",
                          }
 
 WATER_NETWORK_METADATA = {"topic_category": "oceans, environment, inland waters, geoscientific information",
@@ -321,10 +321,11 @@ W_SYSTEM_METADATA = {**STANDARD_METADATA, **COMPONENTS_METADATA,
                      **SITE_METADATA, **WATER_NETWORK_METADATA, **NETWORK_METADATA}
 
 METADATA_DEFS = {
-    "L0_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA},
-    "L0_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA},
-    "L0_BLA": {**STANDARD_METADATA, **COMPONENTS_METADATA},
-    "L_L0B": {**STANDARD_METADATA, **COMPONENTS_METADATA},
+    "L0A_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA},
+    "L0A_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA},
+    "L0A_BLA": {**STANDARD_METADATA, **COMPONENTS_METADATA},
+    "L_L0B_RAD": {**STANDARD_METADATA, **COMPONENTS_METADATA},
+    "L_L0B_IRR": {**STANDARD_METADATA, **COMPONENTS_METADATA},
     "CAL": {
         **CAL_METADATA,
         **SYSTEM_METADATA,

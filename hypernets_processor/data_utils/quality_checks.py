@@ -211,8 +211,6 @@ class QualityChecks:
                     dataset_l1b_irr["quality_flag"][i], "variable_irradiance"
                 )
 
-
-
         return dataset_l1b_irr
 
     def qc_illumination(self, dataset):
