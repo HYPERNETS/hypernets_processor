@@ -300,7 +300,7 @@ class RhymerHypstar:
 
             ## get fresnel reflectance
             if self.context.get_config_value("fresnel_option") == 'Mobley1999':
-                if (fresnel_sza[i] is not None) & (fresnel_raa[i] is not None) & (abs(fresnel_raa[i]) > 180):
+                if (fresnel_sza[i] is not None) & (fresnel_raa[i] is not None) & (abs(fresnel_raa[i]) < 180):
                     sza = min(fresnel_sza[i], 79.999)
                     rhof = self.rhymerproc.mobley_lut_interp(sza, fresnel_vza[i], fresnel_raa[i],
                                                              wind=wind[i])
