@@ -23,9 +23,9 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.product_name_util import ProductNameUtil
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.data_io.normalize_360 import normalizedeg
-from obsarray.templater.dataset_util import DatasetUtil as du
+from hypernets_processor.data_utils.quality_checks import QualityChecks
 
-'''___Authorship___'''
+"""___Authorship___"""
 __author__ = "ClÃ©mence Goyens"
 __created__ = "12/2/2020"
 __version__ = __version__
@@ -34,14 +34,21 @@ __status__ = "Development"
 
 
 class HypernetsReader:
-
     def __init__(self, context):
         self.context = context
-        self.model = self.context.get_config_value("model").split(',')
+        self.model = self.context.get_config_value("model").split(",")
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context=context)
         self.produt = ProductNameUtil(context=context)
-        cckeys = ['mapping_vis_a', 'mapping_vis_b', 'mapping_vis_c', 'mapping_vis_d', 'mapping_vis_e', 'mapping_vis_f']
+        self.qual = QualityChecks(context)
+        cckeys = [
+            "mapping_vis_a",
+            "mapping_vis_b",
+            "mapping_vis_c",
+            "mapping_vis_d",
+            "mapping_vis_e",
+            "mapping_vis_f",
+        ]
         ccvalues = []
         for i in range(len(cckeys)):
             ccvalues.append(self.context.get_config_value(cckeys[i]))
@@ -96,11 +103,12 @@ class HypernetsReader:
             #     print("%02X " * headLen % (tuple([b for b in data])))
             # else:
             #     print("%02X " * headLen % (tuple([ord(b) for b in data])))
-            var, = unpack(headFormat, data)
-            if headName == "Pixel Count": pixel_count = var
+            (var,) = unpack(headFormat, data)
+            if headName == "Pixel Count":
+                pixel_count = var
             if headName == "Spectrum Type Information":
-                specInfo = format(ord(data), '#010b')
-                specInfo = ['1' == a for a in reversed(specInfo[2:])]
+                specInfo = format(ord(data), "#010b")
+                specInfo = ["1" == a for a in reversed(specInfo[2:])]
 
                 # bit 7 for VIS radiometer,
                 # bit 6 for SWIR,
@@ -109,13 +117,19 @@ class HypernetsReader:
                 # bits 4 and 3 for dark;
                 strInfo = ""
 
-                if specInfo[7]: strInfo += "VIS "  # noqa
-                if specInfo[6]: strInfo += "SWIR "  # noqa
+                if specInfo[7]:
+                    strInfo += "VIS "  # noqa
+                if specInfo[6]:
+                    strInfo += "SWIR "  # noqa
 
-                if not specInfo[3] and not specInfo[4]: strInfo += "Dark"  # noqa
-                if specInfo[3] and not specInfo[4]: strInfo += "Irr"  # noqa
-                if specInfo[4] and not specInfo[3]: strInfo += "Rad"  # noqa
-                if specInfo[3] and specInfo[4]: strInfo += "Error"  # noqa
+                if not specInfo[3] and not specInfo[4]:
+                    strInfo += "Dark"  # noqa
+                if specInfo[3] and not specInfo[4]:
+                    strInfo += "Irr"  # noqa
+                if specInfo[4] and not specInfo[3]:
+                    strInfo += "Rad"  # noqa
+                if specInfo[3] and specInfo[4]:
+                    strInfo += "Error"  # noqa
 
                 self.context.logger.debug("Spectrum Type Info : %s " % strInfo)
 
@@ -134,7 +148,7 @@ class HypernetsReader:
                 continue
 
             # Read data as unsigned short
-            unpackData, = unpack('<H', data)
+            (unpackData,) = unpack("<H", data)
             dataSpectra.append(unpackData)
             prev = unpackData
         return dataSpectra
@@ -143,7 +157,7 @@ class HypernetsReader:
         # print(f)
         self.context.logger.debug("Reading CRC32 ...")
         data = f.read(datalength)
-        unpackData, = unpack('<I', data)
+        (unpackData,) = unpack("<I", data)
 
     def read_wavelength(self, pixcount, cal_data):
 
@@ -156,7 +170,95 @@ class HypernetsReader:
 
         return wvl
 
-    def read_series(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use):
+    def read_angles(
+        self, ds, scan_number, specattr, offset_pan, offset_tilt, angle2use, land=False
+    ):
+
+        paa_ask, vza_ask = map(float, specattr["pt_ask"].split(";"))
+        paa_abs, vza_abs = map(float, specattr["pt_abs"].split(";"))
+        if specattr.get("pt_ref"):
+            paa_ref, vza_ref = map(float, specattr["pt_ref"].split(";"))
+        else:
+            paa_ref, vza_ref = -999999, -999999
+
+        vza_ask = normalizedeg(float(vza_ask), 0, 360)
+        vza_abs = normalizedeg(float(vza_abs), 0, 360)
+        vza_ref = normalizedeg(float(vza_ref), 0, 360)
+
+        # perform quality checks
+        self.qual.perform_quality_check_angles(
+            ds, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
+        )
+
+        if (
+            ((offset_pan is None) or (offset_tilt is None))
+            & (angle2use == "pt_ask")
+            & (not land)
+        ):
+            paa = normalizedeg(
+                float(paa_ask) + ds["solar_azimuth_angle"][scan_number], 0, 360
+            )
+            vza = vza_ask
+        elif (
+            ((offset_pan is None) or (offset_tilt is None))
+            & (angle2use == "pt_ask")
+            & (land)
+        ):
+            paa = normalizedeg(float(paa_ask), 0, 360)
+            vza = vza_ask
+        elif ((offset_pan is None) or (offset_tilt is None)) & (angle2use == "pt_ref"):
+            paa = normalizedeg(float(paa_ref), 0, 360)
+            vza = vza_ref
+        else:
+            paa = normalizedeg(float(paa_ref) + float(offset_pan), 0, 360)
+            vza = normalizedeg(float(vza_ref) + float(offset_tilt), 0, 360)
+
+        if vza > 180:
+            self.context.logger.debug(
+                "tilt is larger than 180 degrees, changing to equivalent geometry with tilt<180."
+            )
+            vza = 360 - vza
+            paa = paa + 180
+
+            vza_ref = 360 - vza_ref
+            paa_ref = paa_ref + 180
+
+            vza_abs = 360 - vza_abs
+            paa_abs = paa_abs + 180
+
+            vza_ask = 360 - vza_ask
+            paa_ask = paa_ask + 180
+
+        ds["paa_ref"][scan_number] = normalizedeg(float(paa_ref), 0, 360)
+        ds["paa_ask"][scan_number] = normalizedeg(float(paa_ask), 0, 360)
+        ds["paa_abs"][scan_number] = normalizedeg(float(paa_abs), 0, 360)
+
+        # convert from pointing azimuth angle to viewing azimuth angle
+        vaa = normalizedeg(paa - 180, 0, 360)
+
+        ds["pointing_azimuth_angle"][scan_number] = paa
+        ds["viewing_azimuth_angle"][scan_number] = vaa
+        ds["viewing_zenith_angle"][scan_number] = vza
+
+        return ds
+
+    def read_series(
+        self,
+        seq_dir,
+        series,
+        lat,
+        lon,
+        metadata,
+        flag,
+        fileformat,
+        cal_data,
+        instrument_id,
+        site_id,
+        azimuth_switch,
+        offset_tilt,
+        offset_pan,
+        angle2use,
+    ):
         model_name = self.model
 
         # 1. Read header to create template dataset (including wvl and scan dimensions + end of file!!)
@@ -167,7 +269,7 @@ class HypernetsReader:
         # series id
         # ------------------------------------------
         # added to consider concanated files
-        scanDim = sum([int(re.split('_|\.', i)[index_scan_total]) for i in series])
+        scanDim = sum([int(re.split("_|\.", i)[index_scan_total]) for i in series])
 
         # ------------------------------------------
         # added to consider non concanated files
@@ -200,7 +302,7 @@ class HypernetsReader:
         # Header definition with length, description and decoding format
         header = self.read_header(f, HEADER_DEF)
         self.context.logger.debug(header)
-        pixCount = header['Pixel Count']
+        pixCount = header["Pixel Count"]
         # if bool(header) == False:
         #     print("Data corrupt go to next line")
         #     header = self.read_header(f, HEADER_DEF)
@@ -212,8 +314,10 @@ class HypernetsReader:
             # use template from variables and metadata in format
             ds = self.templ.l0a_template_dataset(wvl, scanDim, fileformat)
         else:
-            self.context.logger.error("The number of wavelength pixels does not match "
-                                      "the expected values for VNIR.")
+            self.context.logger.error(
+                "The number of wavelength pixels does not match "
+                "the expected values for VNIR."
+            )
 
         # look for the maximum number of lines to read-- maybe not an elegant way to do?
         f.seek(0, 2)  # go to end of file
@@ -230,7 +334,7 @@ class HypernetsReader:
         ds["scan"] = np.linspace(1, scanDim, scanDim)
 
         # add auxiliary data to the L0 data
-        temp, RH , pressure, lux=self.read_aux(seq_dir)
+        temp, RH, pressure, lux = self.read_aux(seq_dir)
         ds.attrs["system_temperature"] = temp.values
         ds.attrs["system_relative_humidity"] = RH.values
         ds.attrs["system_pressure"] = pressure.values
@@ -242,15 +346,26 @@ class HypernetsReader:
         # read all spectra (== spe files with concanated files) in a series
         for spectra in series:
 
-            model = dict(zip(model_name, spectra.split('_')[:-1]))
-            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + model[
-                'azimuth_ref'] + '_' + model['vza']
+            model = dict(zip(model_name, spectra.split("_")[:-1]))
+            specBlock = (
+                model["series_rep"]
+                + "_"
+                + model["series_id"]
+                + "_"
+                + model["vaa"]
+                + "_"
+                + model["azimuth_ref"]
+                + "_"
+                + model["vza"]
+            )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
-            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+            acquisitionTime = datetime.datetime.strptime(
+                acquisitionTime + "UTC", "%Y%m%dT%H%M%S%Z"
+            )
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
 
@@ -279,7 +394,7 @@ class HypernetsReader:
                     break
                     continue
                 # -------------------------------------------------------
-                pixCount = header['Pixel Count']
+                pixCount = header["Pixel Count"]
                 scan = self.read_data(f, pixCount)
                 # should include this back again when crc32 is in the headers!
                 crc32 = self.read_footer(f, 4)
@@ -288,78 +403,42 @@ class HypernetsReader:
 
                 # fill in dataset
                 # maybe xarray has a better way to do - check merge, concat, ...
-                series_id = model['series_id']
+                series_id = model["series_id"]
                 ds["series_id"][scan_number] = series_id
 
-
                 # estimate time based on timestamp
-                ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(acquisitionTime)
+                ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(
+                    acquisitionTime
+                )
                 if lat is not None:
                     ds.attrs["site_latitude"] = lat
                     ds.attrs["site_longitude"] = lon
-                    ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(float(lat), float(lon), acquisitionTime)
-                    ds["solar_azimuth_angle"][scan_number] = get_azimuth(float(lat), float(lon), acquisitionTime)
-                    vaa_rel, vza = map(float, specattr['pt_ask'].split(";"))
-                    vaa_abs, vza_abs = map(float, specattr['pt_abs'].split(";"))
-                    if specattr.get('pt_ref'):
-                        vaa_ref, vza_ref = map(float, specattr['pt_ref'].split(";"))
-                    else:
-                        vaa_ref=-999999
+                    ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
+                        float(lat), float(lon), acquisitionTime
+                    )
+                    ds["solar_azimuth_angle"][scan_number] = get_azimuth(
+                        float(lat), float(lon), acquisitionTime
+                    )
 
-                    ds["vaa_ref"][scan_number] = normalizedeg(float(vaa_ref),0,360)
-                    ds["vaa_ask"][scan_number] = normalizedeg(float(vaa_rel),0,360)
-                    ds["vaa_abs"][scan_number] = normalizedeg(float(vaa_abs),0,360)
-
-
-                    angacc=abs(normalizedeg(float(vaa_abs),0,360)-normalizedeg(float(vaa_ref),0,360))
-                    angacc_zen=abs(normalizedeg(float(vza_abs),0,360)-normalizedeg(float(vza_ref),0,360))
-
-                    if (offset_pan==None) & (angle2use=="pt_ask"):
-                        vaa = normalizedeg(float(vaa_rel)+ds["solar_azimuth_angle"][scan_number],0,360)
-                    elif (offset_pan == None) & (angle2use == "pt_ref"):
-                        vaa = normalizedeg(float(vaa_ref),0,360)
-                    else:
-                        vaa = normalizedeg(float(vaa_ref)+float(offset_pan),0,360)
-
-
-
-                    if angacc > 3:
-                        ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
-                        self.context.logger.error(
-                            "Accuracy of pan is above 3° (vaa_abs=%s; vaa_ref=%s). Check your system and/or data before processing."%(vaa_abs, vaa_ref))
-                        self.context.anomaly_handler.add_anomaly("a")
-
-                    print("Angle accuracy in azimuth {:.4f} ={:.4f}-{:.4f}".format(angacc,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
-
-                    if angacc_zen > 1:
-                        ds["quality_flag"] = du.set_flag(ds["quality_flag"], "bad_pointing")
-                        self.context.logger.error(
-                            "Accuracy of zenith is above 1°. Check your system and/or data before processing.")
-                        self.context.anomaly_handler.add_anomaly("a")
-
-                    print("Angle accuracy in zenith {:.4f} ={:.4f}-{:.4f}".format(angacc_zen,normalizedeg(float(vaa_abs),0,360),normalizedeg(float(vaa_ref),0,360)))
-
-
-                    print("If azimuth switch is on, please check the following: switch:{}, vaa_rel:{:.4f}, vaa_abs:{:.4f}, saa:{:.4f}".format(
-                        azimuth_switch, vaa_rel, vaa_abs, ds["solar_azimuth_angle"][scan_number].values
-                    ))
-
-                    print(
-                        "If pan-tilt offset, please check the following: pan offset:{}, tilt offset:{:.4f}, vaa:{:.4f}, vza:{:.4f}".format(
-                            offset_pan, offset_tilt, vaa, vza
-                        ))
-
+                    ds = self.read_angles(
+                        ds,
+                        scan_number,
+                        specattr,
+                        offset_pan,
+                        offset_tilt,
+                        angle2use,
+                        land=False,
+                    )
 
                 else:
                     self.context.logger.error(
-                        "Latitude is not found, using default values instead for lat, lon, sza and saa.")
+                        "Latitude is not found, using default values instead for lat, lon, sza and saa."
+                    )
 
-                ds['quality_flag'][scan_number] = flag
-                ds['integration_time'][scan_number] = header['integration_time']
-                ds['temperature'][scan_number] = header['temperature']
+                ds["quality_flag"][scan_number] = flag
+                ds["integration_time"][scan_number] = header["integration_time"]
+                ds["temperature"][scan_number] = header["temperature"]
 
-                ds["viewing_azimuth_angle"][scan_number] = vaa
-                ds["viewing_zenith_angle"][scan_number] = vza
                 # accelaration:
                 # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
                 # acceleration measurements respectively. These are factory-calibrated steady-state
@@ -370,14 +449,26 @@ class HypernetsReader:
                 # Acceleration for each axis can be calculated per Eq. (4).
 
                 a = 19.6
-                b = 2 ** 15
-                ds['acceleration_x_mean'][scan_number] = header['acceleration_x_mean'] * a / b
-                ds['acceleration_x_std'][scan_number] = header['acceleration_x_std'] * a / b
-                ds['acceleration_y_mean'][scan_number] = header['acceleration_y_mean'] * a / b
-                ds['acceleration_y_std'][scan_number] = header['acceleration_y_std'] * a / b
-                ds['acceleration_z_mean'][scan_number] = header['acceleration_z_mean'] * a / b
-                ds['acceleration_z_std'][scan_number] = header['acceleration_z_std'] * a / b
-                ds['digital_number'][0:pixCount, scan_number] = scan
+                b = 2**15
+                ds["acceleration_x_mean"][scan_number] = (
+                    header["acceleration_x_mean"] * a / b
+                )
+                ds["acceleration_x_std"][scan_number] = (
+                    header["acceleration_x_std"] * a / b
+                )
+                ds["acceleration_y_mean"][scan_number] = (
+                    header["acceleration_y_mean"] * a / b
+                )
+                ds["acceleration_y_std"][scan_number] = (
+                    header["acceleration_y_std"] * a / b
+                )
+                ds["acceleration_z_mean"][scan_number] = (
+                    header["acceleration_z_mean"] * a / b
+                )
+                ds["acceleration_z_std"][scan_number] = (
+                    header["acceleration_z_std"] * a / b
+                )
+                ds["digital_number"][0:pixCount, scan_number] = scan
 
                 scan_number += 1
                 if f.tell() == eof:
@@ -385,8 +476,23 @@ class HypernetsReader:
 
         return ds
 
-    def read_series_L(self, seq_dir, series, lat, lon, metadata, flag, fileformat, cal_data, cal_data_swir,
-                      instrument_id, site_id):
+    def read_series_L(
+        self,
+        seq_dir,
+        series,
+        lat,
+        lon,
+        metadata,
+        flag,
+        fileformat,
+        cal_data,
+        cal_data_swir,
+        instrument_id,
+        site_id,
+        offset_tilt,
+        offset_pan,
+        angle2use,
+    ):
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         model_name = self.model
 
@@ -395,16 +501,26 @@ class HypernetsReader:
         swir = []
         for spectra in series:
             self.context.logger.debug("processing " + spectra)
-            model = dict(zip(model_name, spectra.split('_')[:-1]))
-            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model['vaa'] + '_' + \
-                        model['azimuth_ref'] + '_' + model['vza']
+            model = dict(zip(model_name, spectra.split("_")[:-1]))
+            specBlock = (
+                model["series_rep"]
+                + "_"
+                + model["series_id"]
+                + "_"
+                + model["vaa"]
+                + "_"
+                + model["azimuth_ref"]
+                + "_"
+                + model["vza"]
+            )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
-            acquisitionTime = datetime.datetime.strptime(acquisitionTime + "UTC",
-                                                         '%Y%m%dT%H%M%S%Z')
+            acquisitionTime = datetime.datetime.strptime(
+                acquisitionTime + "UTC", "%Y%m%dT%H%M%S%Z"
+            )
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             # -----------------------
             # read the file
@@ -417,9 +533,12 @@ class HypernetsReader:
                 chunk_size = 1
                 chunk_counter = 1
                 while file_size - byte_pointer:
-                    self.context.logger.debug('Parsing chunk No {}, size {} bytes, bytes left: {}'.format(
-                        chunk_counter, chunk_size, file_size - byte_pointer))
-                    chunk_size = unpack('<H', f.read(2))[0]
+                    self.context.logger.debug(
+                        "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
+                            chunk_counter, chunk_size, file_size - byte_pointer
+                        )
+                    )
+                    chunk_size = unpack("<H", f.read(2))[0]
                     if chunk_size == 4119:
                         chunk_size = 4131
                     f.seek(byte_pointer)
@@ -444,9 +563,10 @@ class HypernetsReader:
         if len(swir.shape) == 1:
             swir = swir[None, :]
 
-        self.context.logger.debug("vnir data shape in combined raw files: %s \n "
-                                  "swir data shape in combined raw files: %s"
-                                  % (vnir.shape, swir.shape))
+        self.context.logger.debug(
+            "vnir data shape in combined raw files: %s \n "
+            "swir data shape in combined raw files: %s" % (vnir.shape, swir.shape)
+        )
 
         scanDim = vnir.shape[0]
         wvl = self.read_wavelength(vnir.shape[1], cal_data)
@@ -460,7 +580,9 @@ class HypernetsReader:
 
         scanDim = swir.shape[0]
         wvl_swir = self.read_wavelength(swir.shape[1], cal_data_swir)
-        ds_swir = self.templ.l0a_template_dataset(wvl_swir, scanDim, fileformat, swir=True)
+        ds_swir = self.templ.l0a_template_dataset(
+            wvl_swir, scanDim, fileformat, swir=True
+        )
 
         ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
         ds_swir.attrs["instrument_id"] = str(instrument_id)
@@ -471,16 +593,26 @@ class HypernetsReader:
         scan_number = 0
         scan_number_swir = 0
         for spectra in series:
-            model = dict(zip(model_name, spectra.split('_')[:-1]))
-            specBlock = model['series_rep'] + '_' + model['series_id'] + '_' + model[
-                'vaa'] + '_' + model['azimuth_ref'] + '_' + model['vza']
+            model = dict(zip(model_name, spectra.split("_")[:-1]))
+            specBlock = (
+                model["series_rep"]
+                + "_"
+                + model["series_id"]
+                + "_"
+                + model["vaa"]
+                + "_"
+                + model["azimuth_ref"]
+                + "_"
+                + model["vza"]
+            )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
 
             # name of spectra file
             acquisitionTime = specattr[spectra]
             acquisitionTime = datetime.datetime.strptime(
-                acquisitionTime + "UTC", '%Y%m%dT%H%M%S%Z')
+                acquisitionTime + "UTC", "%Y%m%dT%H%M%S%Z"
+            )
             acquisitionTime = acquisitionTime.replace(tzinfo=timezone.utc)
             # -----------------------
             # read the file
@@ -493,102 +625,55 @@ class HypernetsReader:
                 chunk_size = 1
                 chunk_counter = 1
                 while file_size - byte_pointer:
-                    chunk_size = unpack('<H', f.read(2))[0]
+                    chunk_size = unpack("<H", f.read(2))[0]
                     if chunk_size == 4119:
                         chunk_size = 4131
                     f.seek(byte_pointer)
                     chunk_body = f.read(chunk_size)
                     spectrum = Spectrum.parse_raw(chunk_body)
 
-                    vaa, vza = map(float, specattr['pt_ask'].split(";"))
-                    vaa_abs, vza_abs = map(float, specattr['pt_abs'].split(";"))
-
-                    if vza == -1 and vaa == -1:
-                        self.context.logger.warning(
-                            "vza and vaa are both -1, using pt_abs instead")
-                        vaa, vza = vaa_abs, vza_abs
-
-                    if specattr.get('pt_ref'):
-                        vaa_ref, vza_ref = map(float, specattr['pt_ref'].split(";"))
-                    else:
-                        vaa_ref, vza_ref = -999999, -999999
-                    if vza > 180:
-                        self.context.logger.debug(
-                            "vza is larger than 90degrees, changing to equivalent geometry with vza<90.")
-                        vza = 360 - vza
-                        vaa = vaa + 180
-
-                        vza_ref = 360 - vza_ref
-                        vaa_ref = vaa_ref + 180
-
-                        vza_abs = 360 - vza_abs
-                        vaa_abs = vaa_abs + 180
-
-                    vza = normalizedeg(float(vza), 0, 360)
-                    vaa = normalizedeg(float(vaa), 0, 360)
-                    vza_ref = normalizedeg(float(vza_ref), 0, 360)
-                    vaa_ref = normalizedeg(float(vaa_ref), 0, 360)
-                    vza_abs = normalizedeg(float(vza_abs), 0, 360)
-                    vaa_abs = normalizedeg(float(vaa_abs), 0, 360)
-
-                    # here check if absolute mode is used
-                    if True:
-                        vaa = vaa - 180
-                        vaa_ref = vaa_ref - 180
-                        vaa_abs = vaa_abs - 180
-
-                    angacc_vza = abs(vza_abs-vza_ref)
-                    angacc_vaa = abs(vaa_abs-vaa_ref)
-
-                    self.context.logger.debug(
-                        "Angle accuracy vza {:.4f} ={:.4f}-{:.4f}".format(angacc_vza, vza, vza_ref))
-                    self.context.logger.debug(
-                        "Angle accuracy vaa {:.4f} ={:.4f}-{:.4f}".format(angacc_vaa, vaa, vaa_ref))
-
                     if len(spectrum.body) > 500:
                         if scan_number == 0:
                             print(spectrum.return_header())
-                        scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
+                        scan = (
+                            spectrum.body
+                        )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                        # HypernetsReader(self.context).plot_spectra(spectra, scan)
-
-                        # fill in dataset  # maybe xarray has a better way to do - check merge, concat, ...
-
-                        series_id = model['series_id']
+                        series_id = model["series_id"]
                         ds["series_id"][scan_number] = series_id
 
                         # estimate time based on timestamp
                         ds["acquisition_time"][
-                            scan_number] = datetime.datetime.timestamp(acquisitionTime)
+                            scan_number
+                        ] = datetime.datetime.timestamp(acquisitionTime)
                         if lat is not None:
                             ds.attrs["site_latitude"] = lat
                             ds.attrs["site_longitude"] = lon
-                            ds["solar_zenith_angle"][scan_number] = 90-get_altitude(
-                                float(lat),float(lon),acquisitionTime)
+                            ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
+                                float(lat), float(lon), acquisitionTime
+                            )
                             ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                                float(lat),float(lon),acquisitionTime)
-                        elif scan_number==0:
+                                float(lat), float(lon), acquisitionTime
+                            )
+                        elif scan_number == 0:
                             self.context.logger.error(
-                                "Lattitude is not found, using default values instead for lat, lon, sza and saa.")
-                        ds['quality_flag'][scan_number] = flag
-                        ds['integration_time'][
-                            scan_number] = spectrum.header.exposure_time
-                        ds['temperature'][scan_number] = spectrum.header.temperature
+                                "Lattitude is not found, using default values instead for lat, lon, sza and saa."
+                            )
+                        ds["quality_flag"][scan_number] = flag
+                        ds["integration_time"][
+                            scan_number
+                        ] = spectrum.header.exposure_time
+                        ds["temperature"][scan_number] = spectrum.header.temperature
 
-                        if angacc_vaa > 3:
-                            ds["quality_flag"].values[scan_number] = du.set_flag(ds["quality_flag"][scan_number], "bad_pointing")
-                            self.context.logger.error(
-                                "Error in Accuracy of pan is above 3° (vaa_abs=%s; vaa_ref=%s). Check your system and/or data before processing."% (
-                                vaa_abs, vaa_ref))
-                        if angacc_vza > 3:
-                            ds["quality_flag"].values[scan_number] = du.set_flag(ds["quality_flag"][scan_number], "bad_pointing")
-                            self.context.logger.error(
-                                "Error in Accuracy of tilt is above 3° (vza_abs=%s; vza_ref=%s). Check your system and/or data before processing."% (
-                                vaa_abs, vaa_ref))
-
-
-                        ds["viewing_azimuth_angle"][scan_number] = vaa
-                        ds["viewing_zenith_angle"][scan_number] = vza
+                        ds = self.read_angles(
+                            ds,
+                            scan_number,
+                            specattr,
+                            offset_pan,
+                            offset_tilt,
+                            angle2use,
+                            land=True,
+                        )
 
                         # accelaration:
                         # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
@@ -600,44 +685,43 @@ class HypernetsReader:
                         # Acceleration for each axis can be calculated per Eq. (4).
 
                         a = 19.6
-                        b = 2 ** 15
-                        ds['acceleration_x_mean'][scan_number] = spectrum.header.accel_stats.mean_x * a / b
-                        ds['acceleration_x_std'][scan_number] = spectrum.header.accel_stats.std_x * a / b
-                        ds['acceleration_y_mean'][scan_number] = spectrum.header.accel_stats.mean_y * a / b
-                        ds['acceleration_y_std'][scan_number] = spectrum.header.accel_stats.std_y * a / b
-                        ds['acceleration_z_mean'][scan_number] = spectrum.header.accel_stats.mean_z * a / b
-                        ds['acceleration_z_std'][scan_number] = spectrum.header.accel_stats.std_z * a / b
-                        ds['digital_number'][:, scan_number] = scan
+                        b = 2**15
+                        ds["acceleration_x_mean"][scan_number] = (
+                            spectrum.header.accel_stats.mean_x * a / b
+                        )
+                        ds["acceleration_x_std"][scan_number] = (
+                            spectrum.header.accel_stats.std_x * a / b
+                        )
+                        ds["acceleration_y_mean"][scan_number] = (
+                            spectrum.header.accel_stats.mean_y * a / b
+                        )
+                        ds["acceleration_y_std"][scan_number] = (
+                            spectrum.header.accel_stats.std_y * a / b
+                        )
+                        ds["acceleration_z_mean"][scan_number] = (
+                            spectrum.header.accel_stats.mean_z * a / b
+                        )
+                        ds["acceleration_z_std"][scan_number] = (
+                            spectrum.header.accel_stats.std_z * a / b
+                        )
+                        ds["digital_number"][:, scan_number] = scan
                         scan_number += 1
 
                     else:
                         if scan_number_swir == 0:
                             print(spectrum.return_header())
 
-                        scan = spectrum.body  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
+                        scan = (
+                            spectrum.body
+                        )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                        # HypernetsReader(self.context).plot_spectra(spectra, scan)
-
-                        # fill in dataset  # maybe xarray has a better way to do - check merge, concat, ...
-
-                        series_id = model['series_id']
+                        series_id = model["series_id"]
                         ds_swir["series_id"][scan_number_swir] = series_id
-
-                        if angacc_vaa > 3:
-                            ds_swir["quality_flag"].values[scan_number_swir] = du.set_flag(ds_swir["quality_flag"][scan_number_swir], "bad_pointing")
-                            self.context.logger.error(
-                                "Error in Accuracy of pan is above 3°. Check your system and/or data before processing.")
-                        if angacc_vza > 3:
-                            ds_swir["quality_flag"].values[scan_number_swir] = du.set_flag(ds_swir["quality_flag"][scan_number_swir], "bad_pointing")
-                            self.context.logger.error(
-                                "Error in Accuracy of tilt is above 3°. Check your system and/or data before processing.")
-
-                        ds_swir["viewing_azimuth_angle"][scan_number_swir] = vaa
-                        ds_swir["viewing_zenith_angle"][scan_number_swir] = vza
 
                         # estimate time based on timestamp
                         ds_swir["acquisition_time"][
-                            scan_number_swir] = datetime.datetime.timestamp(acquisitionTime)
+                            scan_number_swir
+                        ] = datetime.datetime.timestamp(acquisitionTime)
                         #            #print(datetime.fromtimestamp(acquisitionTime))
 
                         #             # didn't use acquisition time from instrument
@@ -660,22 +744,41 @@ class HypernetsReader:
                         if lat is not None:
                             ds_swir.attrs["site_latitude"] = lat
                             ds_swir.attrs["site_longitude"] = lon
-                            ds_swir["solar_zenith_angle"][scan_number_swir] = 90-get_altitude(
-                                float(lat),float(lon),acquisitionTime)
-                            ds_swir["solar_azimuth_angle"][scan_number_swir] = get_azimuth(
-                                float(lat),float(lon),acquisitionTime)
+                            ds_swir["solar_zenith_angle"][
+                                scan_number_swir
+                            ] = 90 - get_altitude(
+                                float(lat), float(lon), acquisitionTime
+                            )
+                            ds_swir["solar_azimuth_angle"][
+                                scan_number_swir
+                            ] = get_azimuth(float(lat), float(lon), acquisitionTime)
 
-                        elif scan_number_swir==0:
+                        elif scan_number_swir == 0:
                             self.context.logger.error(
-                                "Latitude is not found, using default values instead for lat, lon, sza and saa.")
-                        ds_swir['quality_flag'][scan_number_swir] = flag
-                        if spectrum.header.exposure_time>0:
-                            ds_swir['integration_time'][
-                            scan_number_swir] = spectrum.header.exposure_time
+                                "Latitude is not found, using default values instead for lat, lon, sza and saa."
+                            )
+                        ds_swir["quality_flag"][scan_number_swir] = flag
+                        if spectrum.header.exposure_time > 0:
+                            ds_swir["integration_time"][
+                                scan_number_swir
+                            ] = spectrum.header.exposure_time
                         else:
-                            ds_swir['integration_time'][
-                                scan_number_swir] = ds['integration_time'][0]
-                        ds_swir['temperature'][scan_number_swir] = spectrum.header.temperature
+                            ds_swir["integration_time"][scan_number_swir] = ds[
+                                "integration_time"
+                            ][0]
+                        ds_swir["temperature"][
+                            scan_number_swir
+                        ] = spectrum.header.temperature
+
+                        ds_swir = self.read_angles(
+                            ds_swir,
+                            scan_number_swir,
+                            specattr,
+                            offset_pan,
+                            offset_tilt,
+                            angle2use,
+                            land=True,
+                        )
 
                         # accelaration:
                         # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
@@ -687,19 +790,30 @@ class HypernetsReader:
                         # Acceleration for each axis can be calculated per Eq. (4).
 
                         a = 19.6
-                        b = 2 ** 15
-                        ds_swir['acceleration_x_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_x * a / b
-                        ds_swir['acceleration_x_std'][scan_number_swir] = spectrum.header.accel_stats.std_x * a / b
-                        ds_swir['acceleration_y_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_y * a / b
-                        ds_swir['acceleration_y_std'][scan_number_swir] = spectrum.header.accel_stats.std_y * a / b
-                        ds_swir['acceleration_z_mean'][scan_number_swir] = spectrum.header.accel_stats.mean_z * a / b
-                        ds_swir['acceleration_z_std'][scan_number_swir] = spectrum.header.accel_stats.std_z * a / b
-                        ds_swir['digital_number'][:, scan_number_swir] = scan
+                        b = 2**15
+                        ds_swir["acceleration_x_mean"][scan_number_swir] = (
+                            spectrum.header.accel_stats.mean_x * a / b
+                        )
+                        ds_swir["acceleration_x_std"][scan_number_swir] = (
+                            spectrum.header.accel_stats.std_x * a / b
+                        )
+                        ds_swir["acceleration_y_mean"][scan_number_swir] = (
+                            spectrum.header.accel_stats.mean_y * a / b
+                        )
+                        ds_swir["acceleration_y_std"][scan_number_swir] = (
+                            spectrum.header.accel_stats.std_y * a / b
+                        )
+                        ds_swir["acceleration_z_mean"][scan_number_swir] = (
+                            spectrum.header.accel_stats.mean_z * a / b
+                        )
+                        ds_swir["acceleration_z_std"][scan_number_swir] = (
+                            spectrum.header.accel_stats.std_z * a / b
+                        )
+                        ds_swir["digital_number"][:, scan_number_swir] = scan
                         scan_number_swir += 1
 
                     byte_pointer = f.tell()
                     chunk_counter += 1
-
         return ds, ds_swir
 
     def read_metadata(self, seq_dir):
@@ -745,34 +859,35 @@ class HypernetsReader:
             # ------------------------------
             # global attributes + wavelengths -> need to check for swir
             # ----------------------------------
-            if metadata.has_section('Metadata'):
-                globalattr = dict(metadata['Metadata'])
+            if metadata.has_section("Metadata"):
+                globalattr = dict(metadata["Metadata"])
             else:
                 globalattr = []
 
             # first retrieve site name to get site specific attributes, if any
 
-            if 'site_name' in (globalattr.keys()):
-                site_id = str(globalattr['site_name']).strip()
-            elif 'site_id' in (globalattr.keys()):
-                site_id = str(globalattr['site_id']).strip()
+            if "site_name" in (globalattr.keys()):
+                site_id = str(globalattr["site_name"]).strip()
+            elif "site_id" in (globalattr.keys()):
+                site_id = str(globalattr["site_id"]).strip()
             else:
                 site_id = self.context.get_config_value("site_id")
 
             # need to check which angle to use as a reference to calculate vaa (~azimuth swith, offset, ...)
-            angle2use=None
+            angle2use = "pt_ref"
 
             sitespec = ConfigParser()
             path_ = os.path.abspath(os.path.join(__file__, "../../.."))
-            sitespec_=os.path.join(path_, "data","site_specific_parameters","{}.csv".format(site_id))
+            sitespec_ = os.path.join(
+                path_, "data", "site_specific_parameters", "{}.csv".format(site_id)
+            )
             sitespecattr = None
 
             if os.path.exists(sitespec_):
                 sitespec.read(sitespec_)
-                if sitespec.has_section('Metadata'):
-                    sitespecattr = dict(sitespec['Metadata'])
-                    angle2use=str(sitespecattr['angle2use']).strip()
-
+                if sitespec.has_section("Metadata"):
+                    sitespecattr = dict(sitespec["Metadata"])
+                    angle2use = str(sitespecattr["angle2use"]).strip()
 
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
@@ -818,57 +933,60 @@ class HypernetsReader:
                 lon = self.context.get_config_value("lon")
                 flag = flag + 2 ** FLAG_COMMON.index("lon_default")
 
-            if 'hypstar_sn' in (globalattr.keys()):
-                instrument_id = int(globalattr['hypstar_sn'])
-            elif 'sn_hypstar' in (globalattr.keys()):
-                instrument_id = int(globalattr['sn_hypstar'])
+            if "hypstar_sn" in (globalattr.keys()):
+                instrument_id = int(globalattr["hypstar_sn"])
+            elif "sn_hypstar" in (globalattr.keys()):
+                instrument_id = int(globalattr["sn_hypstar"])
             else:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
                 self.context.logger.error("No SN for hypstar instrument!")
-                #self.context.anomaly_handler.add_anomaly("x")
+                # self.context.anomaly_handler.add_anomaly("x")
 
-            if 'azimuth_switch' in (globalattr.keys()):
-                azimuth_switch = float(globalattr['azimuth_switch'])
-            elif sitespecattr and 'azimuth_switch' in (sitespecattr.keys()):
-                azimuth_switch = float(sitespecattr['azimuth_switch'])
+            if "azimuth_switch" in (globalattr.keys()):
+                azimuth_switch = float(globalattr["azimuth_switch"])
+            elif sitespecattr and "azimuth_switch" in (sitespecattr.keys()):
+                azimuth_switch = float(sitespecattr["azimuth_switch"])
             else:
-                azimuth_switch =None
+                azimuth_switch = None
 
-            if 'offset_pan' in (globalattr.keys()):
-                offset_pan = float(globalattr['offset_pan'])
-            elif sitespecattr and 'offset_pan' in (sitespecattr.keys()):
-                offset_pan = float(sitespecattr['offset_pan'])
+            if "offset_pan" in (globalattr.keys()):
+                offset_pan = float(globalattr["offset_pan"])
+            elif sitespecattr and "offset_pan" in (sitespecattr.keys()):
+                offset_pan = float(sitespecattr["offset_pan"])
             else:
-                offset_pan=None
+                offset_pan = None
 
-            if 'offset_tilt' in (globalattr.keys()):
-                offset_tilt = float(globalattr['offset_tilt'])
-            elif sitespecattr and 'offset_tilt' in (sitespecattr.keys()):
-                offset_tilt = float(sitespecattr['offset_tilt'])
+            if "offset_tilt" in (globalattr.keys()):
+                offset_tilt = float(globalattr["offset_tilt"])
+            elif sitespecattr and "offset_tilt" in (sitespecattr.keys()):
+                offset_tilt = float(sitespecattr["offset_tilt"])
             else:
-                offset_tilt= None
+                offset_tilt = None
 
             # 2. Estimate wavelengths - NEED TO CHANGE HERE!!!!!!
             # ----------------------
             # from 1 to 14 cause only able to read the visible wavelengths.... how to read the swir once?
             # to change!!!!
 
-            if 'cc' not in globalattr:
+            if "cc" not in globalattr:
                 cc = self.cc_vis
             else:
-                cc = list(str.split(globalattr['cc'], "\n"))
-                cc = {k.strip(): float(v.strip()) for k, v in (i.split(":") for i in cc[1:14])}
+                cc = list(str.split(globalattr["cc"], "\n"))
+                cc = {
+                    k.strip(): float(v.strip())
+                    for k, v in (i.split(":") for i in cc[1:14])
+                }
 
             # 3. Read series
             # ---------------------------
             # check for radiance and irradiance series within the metadata
-            series_all = metadata.sections()[1:len(metadata)]
+            series_all = metadata.sections()[1 : len(metadata)]
             seriesName = []
             seriesPict = []
             for i in series_all:
                 seriesattr = dict(metadata[i])
-                seriesName.extend(list(name for name in seriesattr if '.spe' in name))
-                seriesPict.extend(list(name for name in seriesattr if '.jpg' in name))
+                seriesName.extend(list(name for name in seriesattr if ".spe" in name))
+                seriesPict.extend(list(name for name in seriesattr if ".jpg" in name))
 
             # ----------------
             # Make list per action
@@ -880,7 +998,7 @@ class HypernetsReader:
             #     ACTION_PIC   : 0x02   (02) - NOT IN THE FILENAME!
             #     ACTION_NONE  : 0x03   (03)
             index_action = model_name.index("action")
-            action = [re.split('_|\.', i)[index_action] for i in seriesName]
+            action = [re.split("_|\.", i)[index_action] for i in seriesName]
             # self.context.logger.info(action)
 
             # this is slow????
@@ -892,7 +1010,23 @@ class HypernetsReader:
             self.context.logger.error("Metadata missing")
             self.context.anomaly_handler.add_anomaly("m")
 
-        return lat, lon, cc, metadata, seriesIrr, seriesRad, seriesBlack, seriesPict, flag, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use
+        return (
+            lat,
+            lon,
+            cc,
+            metadata,
+            seriesIrr,
+            seriesRad,
+            seriesBlack,
+            seriesPict,
+            flag,
+            instrument_id,
+            site_id,
+            azimuth_switch,
+            offset_tilt,
+            offset_pan,
+            angle2use,
+        )
 
     def read_aux(self, seq_dir):
         if os.path.exists(os.path.join(seq_dir, "meteo.csv")):
@@ -900,22 +1034,38 @@ class HypernetsReader:
             for line in met.readlines():
                 aux = pd.DataFrame(line.replace("&#039;C", "Â°C").split(";"))
                 data = pd.concat(
-                    [pd.DataFrame(aux.iloc[i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
-                    axis=1, ignore_index=True)
+                    [
+                        pd.DataFrame(
+                            aux.iloc[i].str.extract(r"(\d+.\d+)").astype("float")
+                        )
+                        for i in range(aux.size)
+                    ],
+                    axis=1,
+                    ignore_index=True,
+                )
 
             # aux = pd.read_csv(os.path.join(seq_dir, "meteo.csv"), sep=";", header=None)
             # data = pd.concat(
             #     [pd.DataFrame(aux.iloc[:, i].str.extract(r'(\d+.\d+)').astype('float')) for i in range(aux.size)],
             #     axis=1, ignore_index=True)
-            data.columns = ['temp', 'RH', 'pressure', 'lux']
+            data.columns = ["temp", "RH", "pressure", "lux"]
         else:
-            self.context.logger.error("Missing meteo file in sequence directory. No meteo data added to your output file.")
+            self.context.logger.error(
+                "Missing meteo file in sequence directory. No meteo data added to your output file."
+            )
             self.context.anomaly_handler.add_anomaly("s")
 
-        return data['temp'],data['RH'],data['pressure'],data['lux']
+        return data["temp"], data["RH"], data["pressure"], data["lux"]
 
-    def read_sequence(self, seq_dir, calibration_data_rad, calibration_data_irr,
-                      calibration_data_swir_rad=None, calibration_data_swir_irr=None,single_series=None):
+    def read_sequence(
+        self,
+        seq_dir,
+        calibration_data_rad,
+        calibration_data_irr,
+        calibration_data_swir_rad=None,
+        calibration_data_swir_irr=None,
+        single_series=None,
+    ):
 
         # define data to return none at end of method if does not exist
         l0a_irr = None
@@ -925,10 +1075,23 @@ class HypernetsReader:
         l0a_swir_rad = None
         l0a_swir_bla = None
 
-        lat, lon, cc, metadata, \
-            seriesIrr, seriesRad, seriesBlack, \
-            seriesPict, flag, instrument_id, site_id, \
-            azimuth_switch, offset_tilt, offset_pan, angle2use = self.read_metadata(seq_dir)
+        (
+            lat,
+            lon,
+            cc,
+            metadata,
+            seriesIrr,
+            seriesRad,
+            seriesBlack,
+            seriesPict,
+            flag,
+            instrument_id,
+            site_id,
+            azimuth_switch,
+            offset_tilt,
+            offset_pan,
+            angle2use,
+        ) = self.read_metadata(seq_dir)
 
         if single_series is not None:
             if single_series in seriesIrr:
@@ -936,29 +1099,55 @@ class HypernetsReader:
             else:
                 seriesIrr = None
             if single_series in seriesRad:
-                seriesRad=[single_series]
+                seriesRad = [single_series]
             else:
-                seriesRad=None
+                seriesRad = None
             if single_series in seriesBlack:
                 seriesBlack = [single_series]
             else:
                 seriesBlack = None
             if single_series in seriesPict:
-                seriesPict=[single_series]
+                seriesPict = [single_series]
             else:
-                seriesPict=None
+                seriesPict = None
 
         if seriesIrr:
             if self.context.get_config_value("network") == "w":
-                l0a_irr = self.read_series(seq_dir, seriesIrr, lat, lon, metadata, flag,
-                                          "L0A_IRR", calibration_data_irr, instrument_id, site_id, azimuth_switch, offset_tilt, offset_pan, angle2use)
+                l0a_irr = self.read_series(
+                    seq_dir,
+                    seriesIrr,
+                    lat,
+                    lon,
+                    metadata,
+                    flag,
+                    "L0A_IRR",
+                    calibration_data_irr,
+                    instrument_id,
+                    site_id,
+                    azimuth_switch,
+                    offset_tilt,
+                    offset_pan,
+                    angle2use,
+                )
                 if self.context.get_config_value("write_l0a"):
                     self.writer.write(l0a_irr, overwrite=True)
             else:
-                l0a_irr, l0a_swir_irr = self.read_series_L(seq_dir, seriesIrr, lat, lon,
-                                                         metadata, flag, "L0A_IRR",
-                                                         calibration_data_irr,
-                                                         calibration_data_swir_irr, instrument_id, site_id)
+                l0a_irr, l0a_swir_irr = self.read_series_L(
+                    seq_dir,
+                    seriesIrr,
+                    lat,
+                    lon,
+                    metadata,
+                    flag,
+                    "L0A_IRR",
+                    calibration_data_irr,
+                    calibration_data_swir_irr,
+                    instrument_id,
+                    site_id,
+                    offset_tilt,
+                    offset_pan,
+                    angle2use,
+                )
                 if self.context.get_config_value("write_l0a"):
                     self.writer.write(l0a_irr, overwrite=True)
                     self.writer.write(l0a_swir_irr, overwrite=True)
@@ -968,15 +1157,41 @@ class HypernetsReader:
 
         if seriesRad:
             if self.context.get_config_value("network") == "w":
-                l0a_rad = self.read_series(seq_dir, seriesRad, lat, lon, metadata, flag,
-                                          "L0A_RAD", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
+                l0a_rad = self.read_series(
+                    seq_dir,
+                    seriesRad,
+                    lat,
+                    lon,
+                    metadata,
+                    flag,
+                    "L0A_RAD",
+                    calibration_data_rad,
+                    instrument_id,
+                    site_id,
+                    azimuth_switch,
+                    offset_tilt,
+                    offset_pan,
+                    angle2use,
+                )
                 if self.context.get_config_value("write_l0a"):
                     self.writer.write(l0a_rad, overwrite=True)
             else:
-                l0a_rad, l0a_swir_rad = self.read_series_L(seq_dir, seriesRad, lat, lon,
-                                                         metadata, flag, "L0A_RAD",
-                                                         calibration_data_rad,
-                                                         calibration_data_swir_rad, instrument_id, site_id)
+                l0a_rad, l0a_swir_rad = self.read_series_L(
+                    seq_dir,
+                    seriesRad,
+                    lat,
+                    lon,
+                    metadata,
+                    flag,
+                    "L0A_RAD",
+                    calibration_data_rad,
+                    calibration_data_swir_rad,
+                    instrument_id,
+                    site_id,
+                    offset_tilt,
+                    offset_pan,
+                    angle2use,
+                )
 
                 if self.context.get_config_value("write_l0a"):
                     self.writer.write(l0a_rad, overwrite=True)
@@ -987,15 +1202,41 @@ class HypernetsReader:
 
         if seriesBlack:
             if self.context.get_config_value("network") == "w":
-                l0a_bla = self.read_series(seq_dir, seriesBlack, lat, lon, metadata, flag,
-                                          "L0A_BLA", calibration_data_rad, instrument_id, site_id,azimuth_switch, offset_tilt, offset_pan, angle2use)
+                l0a_bla = self.read_series(
+                    seq_dir,
+                    seriesBlack,
+                    lat,
+                    lon,
+                    metadata,
+                    flag,
+                    "L0A_BLA",
+                    calibration_data_rad,
+                    instrument_id,
+                    site_id,
+                    azimuth_switch,
+                    offset_tilt,
+                    offset_pan,
+                    angle2use,
+                )
                 if self.context.get_config_value("write_l0a"):
                     self.writer.write(l0a_bla, overwrite=True)
             else:
-                l0a_bla, l0a_swir_bla = self.read_series_L(seq_dir, seriesBlack, lat, lon,
-                                                         metadata, flag, "L0A_BLA",
-                                                         calibration_data_rad,
-                                                         calibration_data_swir_rad, instrument_id, site_id)
+                l0a_bla, l0a_swir_bla = self.read_series_L(
+                    seq_dir,
+                    seriesBlack,
+                    lat,
+                    lon,
+                    metadata,
+                    flag,
+                    "L0A_BLA",
+                    calibration_data_rad,
+                    calibration_data_swir_rad,
+                    instrument_id,
+                    site_id,
+                    offset_tilt,
+                    offset_pan,
+                    angle2use,
+                )
                 if self.context.get_config_value("write_l0a"):
                     self.writer.write(l0a_bla, overwrite=True)
                     self.writer.write(l0a_swir_bla, overwrite=True)
@@ -1008,19 +1249,29 @@ class HypernetsReader:
                 seriesid = (i.replace(".jpg", "")).split("_", 5)[1]
                 va = (i.replace(".jpg", "")).split("_", 5)[2]
                 aa = (i.replace(".jpg", "")).split("_", 5)[4]
-                date_time_obj = datetime.datetime.strptime(os.path.basename(seq_dir).replace('SEQ', ''),
-                                                           '%Y%m%dT%H%M%S')
+                date_time_obj = datetime.datetime.strptime(
+                    os.path.basename(seq_dir).replace("SEQ", ""), "%Y%m%dT%H%M%S"
+                )
                 date_time_obj = date_time_obj.replace(tzinfo=timezone.utc)
 
                 if aa == "-001":
-                    aa = get_azimuth(float(lat), float(lon), date_time_obj, )
+                    aa = get_azimuth(
+                        float(lat),
+                        float(lon),
+                        date_time_obj,
+                    )
                 if va == "-001":
                     va = 90 - get_altitude(float(lat), float(lon), date_time_obj)
-                angles = '{}_{}_{}'.format(seriesid, round(float(aa)), round(float(va)))
-                imagename = self.produt.create_product_name("IMG", network=self.context.get_config_value("network"),
-                                                            site_id=site_id,
-                                                            time=os.path.basename(seq_dir).replace('SEQ', ''),
-                                                            version=None, swir=None, angles=angles)
+                angles = "{}_{}_{}".format(seriesid, round(float(aa)), round(float(va)))
+                imagename = self.produt.create_product_name(
+                    "IMG",
+                    network=self.context.get_config_value("network"),
+                    site_id=site_id,
+                    time=os.path.basename(seq_dir).replace("SEQ", ""),
+                    version=None,
+                    swir=None,
+                    angles=angles,
+                )
                 directory = self.writer.return_image_directory()
                 if not os.path.exists(directory):
                     os.makedirs(directory)
@@ -1036,5 +1287,5 @@ class HypernetsReader:
             return l0a_irr, l0a_rad, l0a_bla, l0a_swir_irr, l0a_swir_rad, l0a_swir_bla
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass

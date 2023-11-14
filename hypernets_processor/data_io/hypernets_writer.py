@@ -212,7 +212,7 @@ class HypernetsWriter:
         :return: directory
         :rtype: str
         """
-        dir=self.return_directory(directory)
+        dir = self.return_directory(directory)
         return os.path.join(dir, "plots")
 
     def return_image_directory(self, directory=None):

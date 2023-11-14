@@ -13,7 +13,7 @@ class StandardMeasurementFunction(MeasurementFunction):
 
         corrected_DN = self.correct_nonlin(DN, non_linear)
 
-        gains=np.squeeze(gains)
+        gains = np.squeeze(gains)
         if gains.ndim == 1:
             return gains[:, None] * corrected_DN / int_time * 1000
         else:

@@ -14,21 +14,19 @@ class WaterNetworkProtocol(MeasurementFunction):
         self.rhp = RhymerProcessing(context)
         self.rhs = RhymerShared(context)
 
-    def meas_function(
-        self, water_leaving_radiance, irradiance, wavelength
-    ):
+    def meas_function(self, water_leaving_radiance, irradiance, wavelength):
         """
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         """
 
-        reflectance_nosc = np.pi * water_leaving_radiance/ irradiance
+        reflectance_nosc = np.pi * water_leaving_radiance / irradiance
 
         # NIR SIMIL CORRECTION
         # retrieve variables for NIR SIMIL correction
-        w1 = 720#self.context.get_config_value("similarity_w1")
-        w2 = 780#self.context.get_config_value("similarity_w2")
-        alpha = 2.35#self.context.get_config_value("similarity_alpha")
+        w1 = 720  # self.context.get_config_value("similarity_w1")
+        w2 = 780  # self.context.get_config_value("similarity_w2")
+        alpha = 2.35  # self.context.get_config_value("similarity_alpha")
 
         iref1, wref1 = self.rhs.closest_idx(wavelength, w1)
         iref2, wref2 = self.rhs.closest_idx(wavelength, w2)

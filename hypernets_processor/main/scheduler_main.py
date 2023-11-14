@@ -114,7 +114,7 @@ def main(scheduler_config, processor_config):
 
     inputs = np.empty(len(jobs_list), dtype=object)
 
-    for ij,job_config_path in enumerate(jobs_list):
+    for ij, job_config_path in enumerate(jobs_list):
 
         # define scheduler job config
         scheduler_job_config = dict()
@@ -174,7 +174,9 @@ def main(scheduler_config, processor_config):
             logger.info(log_msg)
     else:
         # run scheduled jobs
-        processor_sch.run(start_time=scheduler_config["Processor Schedule"]["start_time"])
+        processor_sch.run(
+            start_time=scheduler_config["Processor Schedule"]["start_time"]
+        )
 
     return None
 

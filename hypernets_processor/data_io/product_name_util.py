@@ -23,8 +23,8 @@ DS_FORMAT_FNAMES = {
     "L0A_BLA": "L0A_BLA",
     "L0A_IRR": "L0A_IRR",
     "CAL": "CAL",
-    "L_L0B_RAD": "L0B_RAD",
-    "L_L0B_IRR": "L0B_IRR",
+    "L0B_RAD": "L0B_RAD",
+    "L0B_IRR": "L0B_IRR",
     "L_L1A_RAD": "L1A_RAD",
     "W_L1A_RAD": "L1A_RAD",
     "L_L1A_IRR": "L1A_IRR",
@@ -101,7 +101,9 @@ class ProductNameUtil:
             time = self.context.get_config_value("time")
 
         if (time_processing is None) and (self.context is not None):
-            time_processing = self.context.get_config_value("start_time_processing_sequence")
+            time_processing = self.context.get_config_value(
+                "start_time_processing_sequence"
+            )
 
         if (version is None) and (self.context is not None):
             version = str(self.context.get_config_value("version"))
@@ -124,7 +126,11 @@ class ProductNameUtil:
             time_processing = datetime.strptime(time_processing, "%Y%m%dT%H%M%S")
 
         time_string = time.strftime(TIME_FMT_L12A) if time is not None else None
-        time_processing_string = time_processing.strftime(TIME_FMT_L12A) if time_processing is not None else None
+        time_processing_string = (
+            time_processing.strftime(TIME_FMT_L12A)
+            if time_processing is not None
+            else None
+        )
         network = network.upper() if network is not None else None
         site_id = site_id.upper() if site_id is not None else None
         version = "v" + version if version is not None else None

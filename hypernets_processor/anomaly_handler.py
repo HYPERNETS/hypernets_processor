@@ -56,7 +56,7 @@ class AnomalyHandler:
 
         # Check anomaly defined
         if anomaly_id not in self.get_anomaly_ids():
-            self.context.logger.debug(
+            self.context.logger.info(
                 "Unknown anomaly_id (" + anomaly_id + ") - not add to anomaly database"
             )
             return
@@ -71,10 +71,14 @@ class AnomalyHandler:
         # Exit if anomaly requires error
         error = self.get_anomaly_error(anomaly_id)
         error_msg = self.get_anomaly_error_msg(anomaly_id)
+        error_description = self.get_anomaly_description(anomaly_id)
         if error is not None:
             self.context.logger.error(error_msg)
             print(error_msg)
             raise error(error_msg)
+
+        else:
+            self.context.logger.info("anomaly added: " + error_description)
 
     def add_x_anomaly(self):
         """
@@ -113,6 +117,16 @@ class AnomalyHandler:
         """
 
         return self.anomalies_dict[anomaly_id]["error_msg"]
+
+    def get_anomaly_description(self, anomaly_id):
+        """
+        Returns error msg for anomaly id
+
+        :rtype: list
+        :return: anomaly error msg
+        """
+
+        return self.anomalies_dict[anomaly_id]["description"]
 
     def get_crashing_anomaly_ids(self):
         """

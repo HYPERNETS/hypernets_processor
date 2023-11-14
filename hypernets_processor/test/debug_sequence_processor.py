@@ -30,8 +30,8 @@ def process_sequence():
     Command line interface to sequence_processor_main for ad-hoc job processing
     """
 
-    # network = "water"
-    network = "land"
+    network = "water"
+    #network = "land"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
     print(job_config_path)
@@ -50,7 +50,7 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20221006T090127"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20230801T150236"
 
     # job_config["Input"][
     #     "raw_data_directory"

@@ -65,7 +65,7 @@ class Calibrate:
             dataset_l0_masked = dataset_l0
             dataset_l0_bla_masked = dataset_l0_bla
 
-        dataset_l1a = self.templ.l1a_template_from_l0_dataset(
+        dataset_l1a = self.templ.l1a_template_from_l0a_dataset(
             measurandstring, dataset_l0_masked, swir
         )
 
@@ -87,13 +87,6 @@ class Calibrate:
                 ds_out_pre=dataset_l1a,
                 store_unc_percent=True,
             )
-            # if (
-            #     np.count_nonzero(
-            #         dataset_l1a["u_rel_random_" + measurandstring].values > 100
-            #     )
-            #     > 0.5 * dataset_l1a["u_rel_random_" + measurandstring].values.size
-            # ):
-                # self.context.anomaly_handler.add_anomaly("o", dataset_l1a)
 
             if self.context.get_config_value("bad_wavelenth_ranges"):
                 for maskrange in self.context.get_config_value(
@@ -142,13 +135,14 @@ class Calibrate:
     def calibrate_l1b(
         self, measurandstring, dataset_l0, dataset_l0_bla, calibration_data, swir=False
     ):
-        dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(
-            measurandstring, dataset_l0
+
+        dataset_l0b = self.avg.average_l0(
+            measurandstring, dataset_l0, dataset_l0_bla, swir=swir
         )
 
-        flags = ["bad_pointing","outliers", "L0_thresholds", "L0_discontinuity"]
-
-        dataset_l0b = self.avg.average_l0(measurandstring, dataset_l0, dataset_l0_bla, swir=swir)
+        dataset_l1b = self.templ.l1b_template_from_l0b_dataset(
+            measurandstring, dataset_l0b
+        )
 
         if self.context.get_config_value("write_l0b"):
             self.writer.write(
@@ -158,51 +152,6 @@ class Calibrate:
                     "remove_vars_strings"
                 ),
             )
-
-        series_id = np.unique(dataset_l0["series_id"])
-        series_id_bla = np.unique(dataset_l0_bla["series_id"])
-        flag_halfmasked = [False] * len(series_id)
-        flag_allmasked = [False] * len(series_id)
-        flag_darkmasked = [False] * len(series_id)
-        for i in range(len(series_id)):
-            flagged_bla = DatasetUtil.get_flags_mask_or(
-                dataset_l0_bla["quality_flag"], ["dark_masked"]
-            )
-            flagged_bla = flagged_bla[
-                np.where(dataset_l0_bla["series_id"] == series_id_bla[i])
-            ]
-            flagged = DatasetUtil.get_flags_mask_or(dataset_l0["quality_flag"], flags)
-            flagged = flagged[np.where(dataset_l0["series_id"] == series_id[i])]
-            if np.count_nonzero(flagged) > 0.5 * len(flagged):
-                flag_halfmasked[i] = True
-                self.context.logger.info(
-                    "less than half of the scans for series %s passed quality checks"
-                    % (series_id[i])
-                )
-            if np.count_nonzero(flagged) == len(flagged):
-                flag_allmasked[i] = True
-                self.context.logger.info(
-                    "None of the scans for series %s passed quality checks"
-                    % (series_id[i])
-                )
-            if np.count_nonzero(flagged_bla == False) < 3:
-                flag_darkmasked[i] = True
-                self.context.logger.info(
-                    "less than 3 dark scans for series %s passed quality checks"
-                    % (series_id[i])
-                )
-
-        dataset_l1b["quality_flag"][np.where(flag_halfmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_halfmasked)],
-            "half_of_scans_masked",
-        )
-        dataset_l1b["quality_flag"][np.where(flag_allmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_allmasked)], "angles_missing"
-        )
-        dataset_l1b["quality_flag"][np.where(flag_darkmasked)] = DatasetUtil.set_flag(
-            dataset_l1b["quality_flag"][np.where(flag_darkmasked)],
-            "less_than_three_darks",
-        )
 
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), dtype="float32", MCdimlast=True
@@ -221,13 +170,7 @@ class Calibrate:
             store_unc_percent=True,
         )
 
-        # if (
-        #     np.count_nonzero(
-        #         dataset_l1b["u_rel_random_" + measurandstring].values > 100
-        #     )
-        #     > 0.5 * dataset_l1b["u_rel_random_" + measurandstring].values.size
-        # ):
-        #     self.context.anomaly_handler.add_anomaly("o", dataset_l1b)
+        self.qual.perform_quality_check_rand_unc(dataset_l1b, measurandstring)
 
         if self.context.get_config_value("bad_wavelenth_ranges"):
             for maskrange in self.context.get_config_value(
@@ -249,12 +192,12 @@ class Calibrate:
             / dataset_l0b["digital_number"].values
         )
 
-        dataset_l1b["n_valid_scans"].values = dataset_l0b["n_valid_scans"].values
-
         if self.context.get_config_value("network") == "w":
             dataset_l1b = dataset_l1b.drop("n_valid_scans_SWIR")
             if measurandstring == "irradiance":
                 dataset_l1b = self.qual.perform_quality_irradiance(dataset_l1b)
+
+            self.qual.check_standard_sequence_L1B(dataset_l1b, measurandstring, "water")
 
             if self.context.get_config_value("write_l1b"):
                 self.writer.write(
@@ -316,9 +259,9 @@ class Calibrate:
         datasetl0masked_bla = datasetl0_bla.isel(
             wavelength=slice(int(wavpix[0]), int(wavpix[-1]) + 1)
         )
-#       Wavelength already exist as coordinate...?
-#        datasetl0masked = datasetl0masked.assign_coords(wavelength=wavs)
-#        datasetl0masked_bla = datasetl0masked_bla.assign_coords(wavelength=wavs)
+        #       Wavelength already exist as coordinate...?
+        #        datasetl0masked = datasetl0masked.assign_coords(wavelength=wavs)
+        #        datasetl0masked_bla = datasetl0masked_bla.assign_coords(wavelength=wavs)
 
         series_ids = np.unique(datasetl0masked["series_id"])
         series_ids_bla = np.unique(datasetl0masked["series_id"] + 1)
@@ -415,11 +358,11 @@ class Calibrate:
                     dark_outliers_radscans[id],
                 ) = (
                     dark_signal_rad,
-                    std_dark_signal_rad / dark_signal_rad * 100,
+                    np.abs(std_dark_signal_rad / dark_signal_rad * 100),
                     dark_outlier_rad,
                 )
 
-        datasetl0masked, mask = self.qual.perform_quality_check_L0(
+        datasetl0masked, mask = self.qual.perform_quality_check_L0A(
             datasetl0masked, series_ids
         )
         datasetl0masked["quality_flag"][
@@ -454,7 +397,7 @@ class Calibrate:
                     dtype=np.float32,
                 )
                 for ii, id in enumerate(ids):
-                    rand[:, id] = std / avg * 100
+                    rand[:, id] = np.abs(std / avg * 100)
             else:
                 for ii, id in enumerate(ids):
                     rand[:, id] = np.nan
@@ -501,7 +444,7 @@ class Calibrate:
                     axis=1,
                 )
                 for ii, id in enumerate(ids):
-                    rand[:, id] = std / avg * 100
+                    rand[:, id] = np.abs(std / avg * 100)
             else:
                 for ii, id in enumerate(ids):
                     rand[:, id] = np.nan

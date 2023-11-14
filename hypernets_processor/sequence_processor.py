@@ -62,25 +62,36 @@ class SequenceProcessor:
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
         qc = QualityChecks(self.context)
-        avg = Average(self.context,)
-        rhymer=RhymerHypstar(self.context)
-        writer=HypernetsWriter(self.context)
+        avg = Average(
+            self.context,
+        )
+        rhymer = RhymerHypstar(self.context)
+        writer = HypernetsWriter(self.context)
 
         with warnings.catch_warnings():
             if not self.context.get_config_value("verbose"):
                 warnings.simplefilter("ignore")
 
             tstart = datetime.now()
-            self.context.set_config_value("start_time_processing_sequence",tstart)
+            self.context.set_config_value("start_time_processing_sequence", tstart)
             if self.context.get_config_value("network") == "w":
-                calibration_data_rad,calibration_data_irr = calcon.read_calib_files(sequence_path)
+                calibration_data_rad, calibration_data_irr = calcon.read_calib_files(
+                    sequence_path
+                )
                 # Read L0
                 self.context.logger.info("Reading raw data...")
-                l0a_irr,l0a_rad,l0a_bla = reader.read_sequence(sequence_path,calibration_data_rad,calibration_data_irr)
+                l0a_irr, l0a_rad, l0a_bla = reader.read_sequence(
+                    sequence_path, calibration_data_rad, calibration_data_irr
+                )
                 self.context.logger.info("Done")
 
                 # Calibrate to L1a
-                if self.context.get_config_value("max_level") in ["L1A","L1B","L1C","L2A"]:
+                if self.context.get_config_value("max_level") in [
+                    "L1A",
+                    "L1B",
+                    "L1C",
+                    "L2A",
+                ]:
                     self.context.logger.info("Processing to L1a...")
                     if l0a_rad:
                         L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = cal.calibrate_l1a(
@@ -93,7 +104,11 @@ class SequenceProcessor:
                     self.context.logger.info("Done")
 
                 if l0a_rad and l0a_irr:
-                    if self.context.get_config_value("max_level") in ["L1B", "L1C", "L2A"]:
+                    if self.context.get_config_value("max_level") in [
+                        "L1B",
+                        "L1C",
+                        "L2A",
+                    ]:
                         self.context.logger.info("Processing to L1b radiance...")
                         L1b_rad = cal.calibrate_l1b(
                             "radiance",
@@ -114,10 +129,10 @@ class SequenceProcessor:
                         )
 
                 if L1b_rad and L1b_irr:
-                    if self.context.get_config_value("max_level") in ["L1C","L2A"]:
+                    if self.context.get_config_value("max_level") in ["L1C", "L2A"]:
                         self.context.logger.info("Processing to L1c...")
                         # check if different azimuth angles within single sequence
-                        azis=rhymer.checkazimuths(L1a_rad)
+                        azis = rhymer.checkazimuths(L1a_rad)
 
                         for a in azis:
                             print("Processing for azimuth:{}".format(a))
@@ -132,17 +147,19 @@ class SequenceProcessor:
                             #     L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = rhymer.cycleparse(rad_, irr_,
                             #                                                                          dataset_l1b)
 
-                            L1c_int = rhymer.process_l1c_int(rad_, irr_)
+                            L1c_int = rhymer.process_l1c_int(rad_, irr_, L1b_irr)
 
                             # add relative azimuth angle for the filename
                             L1c = surf.reflectance_w(L1c_int, L1b_irr, razangle=ra)
                             self.context.logger.info("Done")
 
-                            if self.context.get_config_value("max_level")=="L2A":
+                            if self.context.get_config_value("max_level") == "L2A":
                                 self.context.logger.info("Processing to L2a...")
                                 # add relative azimuth angle for the filename
                                 L2a = surf.process_l2(L1c, razangle=ra)
-                                self.context.logger.info("Done for azimuth {}".format(ra))
+                                self.context.logger.info(
+                                    "Done for azimuth {}".format(ra)
+                                )
                         self.context.logger.info("Done")
 
                 else:
@@ -264,7 +281,11 @@ class SequenceProcessor:
                     "Invalid network: " + self.context.get_config_value("network")
                 )
         tend = datetime.now()
-        print("time for computation of one seq (min, sec):{}".format(divmod((tend - tstart).total_seconds(), 60)))
+        print(
+            "time for computation of one seq (min, sec):{}".format(
+                divmod((tend - tstart).total_seconds(), 60)
+            )
+        )
         return None
 
 

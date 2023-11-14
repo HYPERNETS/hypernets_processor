@@ -6,7 +6,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.surface_reflectance.measurement_functions.protocol_factory import (
-    ProtocolFactory
+    ProtocolFactory,
 )
 from hypernets_processor.calibration.calibrate import Calibrate
 from hypernets_processor.rhymer.rhymer.hypstar.rhymer_hypstar import RhymerHypstar
@@ -52,9 +52,8 @@ class SurfaceReflectance:
         L1c = self.rh.get_wind(L1c)
         L1c = self.rh.get_fresnelrefl(L1c)
 
-        #remove qc bird since we have a clearsky test already?
+        # remove qc bird since we have a clearsky test already?
         L1c = self.qual.qc_bird(L1c)
-
 
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
@@ -87,7 +86,7 @@ class SurfaceReflectance:
 
         water_protocol_function = self._measurement_function_factory(
             prop=prop,
-            corr_dims=["wavelength","wavelength",None],
+            corr_dims=["wavelength", "wavelength", None],
             separate_corr_dims=True,
             yvariable=["reflectance_nosc", "reflectance", "epsilon"],
             use_err_corr_dict=True,
@@ -103,28 +102,46 @@ class SurfaceReflectance:
             store_unc_percent=True,
         )
 
-        failSimil=self.qual.qc_similarity(L1c)
+        failSimil = self.qual.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
-            L1c["quality_flag"][np.where(failSimil == 1)], "simil_fail")  # for i in range(len(mask))]
+            L1c["quality_flag"][np.where(failSimil == 1)], "simil_fail"
+        )  # for i in range(len(mask))]
 
-        L1c.attrs["IRR_acceleration_x_mean"] = str(np.mean(l1birr['acceleration_x_mean'].values))
-        L1c.attrs["IRR_acceleration_x_std"] = str(np.mean(l1birr['acceleration_x_std'].values))
+        L1c.attrs["IRR_acceleration_x_mean"] = str(
+            np.mean(l1birr["acceleration_x_mean"].values)
+        )
+        L1c.attrs["IRR_acceleration_x_std"] = str(
+            np.mean(l1birr["acceleration_x_std"].values)
+        )
         print("IRR_acceleration_x_mean:{}".format(L1c.attrs["IRR_acceleration_x_mean"]))
 
         if self.context.get_config_value("write_l1c"):
-            self.writer.write(L1c, overwrite=True, remove_vars_strings=self.context.get_config_value("remove_vars_strings_L2"))
-        for measurandstring in ["water_leaving_radiance","reflectance_nosc","reflectance","epsilon"]:
+            self.writer.write(
+                L1c,
+                overwrite=True,
+                remove_vars_strings=self.context.get_config_value(
+                    "remove_vars_strings_L2"
+                ),
+            )
+        for measurandstring in [
+            "water_leaving_radiance",
+            "reflectance_nosc",
+            "reflectance",
+            "epsilon",
+        ]:
             try:
                 if self.context.get_config_value("plot_l1c"):
                     self.plot.plot_series_in_sequence(measurandstring, L1c)
 
                 if self.context.get_config_value("plot_uncertainty"):
-                    if measurandstring=="water_leaving_radiance":
+                    if measurandstring == "water_leaving_radiance":
                         self.plot.plot_relative_uncertainty(measurandstring, L1c)
                     else:
-                        self.plot.plot_relative_uncertainty(measurandstring, L1c, L2=True)
+                        self.plot.plot_relative_uncertainty(
+                            measurandstring, L1c, L2=True
+                        )
             except:
-                print("not plotting ",measurandstring)
+                print("not plotting ", measurandstring)
         return L1c
 
     def process_l2(self, dataset, razangle=None):
@@ -135,8 +152,19 @@ class SurfaceReflectance:
             )  # template and propagation is in average_L2
 
             # propagate flags
-            for flag_i in ["single_irradiance_used"]:
-                if any(DatasetUtil.get_flags_mask_or(dataset["quality_flag"],[flag_i])):
+            flags_propagate = [
+                "single_irradiance_used",
+                "series_missing",
+                "fresnel_default",
+                "simil_fail",
+                "no_clear_sky_sequence",
+                "def_wind_flag",
+            ]
+
+            for flag_i in flags_propagate:
+                if any(
+                    DatasetUtil.get_flags_mask_or(dataset["quality_flag"], [flag_i])
+                ):
                     dataset_l2a["quality_flag"] = DatasetUtil.set_flag(
                         dataset_l2a["quality_flag"], flag_i
                     )
@@ -149,7 +177,8 @@ class SurfaceReflectance:
                 try:
                     if self.context.get_config_value("plot_l2a"):
                         self.plot.plot_series_in_sequence(
-                            measurandstring, dataset_l2a, # ylim=[0, 0.05]
+                            measurandstring,
+                            dataset_l2a,  # ylim=[0, 0.05]
                         )
 
                     if self.context.get_config_value("plot_uncertainty"):
@@ -171,7 +200,9 @@ class SurfaceReflectance:
             l1tol2_function = self._measurement_function_factory(
                 prop=prop, repeat_dims="series", yvariable="reflectance"
             ).get_measurement_function(
-                self.context.get_config_value("measurement_function_surface_reflectance")
+                self.context.get_config_value(
+                    "measurement_function_surface_reflectance"
+                )
             )
 
             dataset_l2a = self.templ.l2_from_l1c_dataset(
@@ -197,7 +228,9 @@ class SurfaceReflectance:
                 self.plot.plot_series_in_sequence_vaa("reflectance", dataset_l2a, 98)
                 self.plot.plot_series_in_sequence_vza("reflectance", dataset_l2a, 30)
                 if self.context.get_config_value("plot_polar_wav") is not None:
-                    self.plot.plot_polar_reflectance(dataset_l2a, self.context.get_config_value("plot_polar_wav"))
+                    self.plot.plot_polar_reflectance(
+                        dataset_l2a, self.context.get_config_value("plot_polar_wav")
+                    )
             if self.context.get_config_value("plot_uncertainty"):
                 self.plot.plot_relative_uncertainty("reflectance", dataset_l2a, L2=True)
 

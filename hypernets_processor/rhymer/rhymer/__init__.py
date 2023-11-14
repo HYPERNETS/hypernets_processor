@@ -1,9 +1,9 @@
 import os
 import configparser
 
-#from rhymer import ancillary
-#from rhymer import processing
-#from rhymer import Format
+# from rhymer import ancillary
+# from rhymer import processing
+# from rhymer import Format
 # from .shared.rhymer_shared import RhymerShared
 #
 # rs=RhymerShared()
@@ -18,4 +18,3 @@ import configparser
 #     if os.path.exists(config[t]): continue
 #     tmp = path + os.path.sep + config[t]
 #     config[t] = os.path.abspath(tmp)
-

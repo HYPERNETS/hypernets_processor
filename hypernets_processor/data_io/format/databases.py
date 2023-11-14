@@ -67,7 +67,7 @@ ANOMALY_DB = {
             "viewing_zenith_angle_min": {"type": str},
             "viewing_zenith_angle_max": {"type": str},
             "viewing_azimuth_angle_min": {"type": str},
-            "viewing_azimuth_angle_max": {"type": str}
+            "viewing_azimuth_angle_max": {"type": str},
         }
     }
 }
@@ -104,6 +104,4 @@ ARCHIVE_DB = {
 # Database format defs
 # --------------------
 
-DB_DICT_DEFS = {"metadata": METADATA_DB,
-                "anomaly": ANOMALY_DB,
-                "archive": ARCHIVE_DB}
+DB_DICT_DEFS = {"metadata": METADATA_DB, "anomaly": ANOMALY_DB, "archive": ARCHIVE_DB}

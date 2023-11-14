@@ -91,7 +91,7 @@ class CalibrationConverter:
                 os.path.join(hypstar_path, name) + " calibration file does not exist"
             )
 
-        sequence_datetime=parse_sequence_path(sequence_path)["datetime"]
+        sequence_datetime = parse_sequence_path(sequence_path)["datetime"]
 
         calibration_data_times = calibration_data_rad["calibrationdates"].values
         nonlin_times = calibration_data_rad["nonlineardates"].values
@@ -108,29 +108,43 @@ class CalibrationConverter:
         # else:
         #     nlin_i=[x for x, date in enumerate(nonlin_times) if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
 
-        calib_i=[x for x, date in enumerate(calibration_data_times)
-                   if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
+        calib_i = [
+            x
+            for x, date in enumerate(calibration_data_times)
+            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
+        ][-1]
         if len(nonlin_times) == 1:
             nlin_i = 0
         else:
-            nlin_i=[x for x, date in enumerate(nonlin_times)
-                   if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
+            nlin_i = [
+                x
+                for x, date in enumerate(nonlin_times)
+                if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
+            ][-1]
 
-        wav_i=[x for x, date in enumerate(wav_times)
-                   if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
+        wav_i = [
+            x
+            for x, date in enumerate(wav_times)
+            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
+        ][-1]
 
         calibration_data_rad = calibration_data_rad.sel(
             calibrationdates=calibration_data_times[calib_i]
         )
-        calibration_data_rad = calibration_data_rad.sel(nonlineardates=nonlin_times[nlin_i])
+        calibration_data_rad = calibration_data_rad.sel(
+            nonlineardates=nonlin_times[nlin_i]
+        )
         calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[wav_i])
 
         calibration_data_times_irr = calibration_data_irr["calibrationdates"].values
         nonlin_times_irr = calibration_data_irr["nonlineardates"].values
         wav_times_irr = calibration_data_irr["wavdates"].values
 
-        calib_i_irr = [x for x, date in enumerate(calibration_data_times_irr)
-                   if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
+        calib_i_irr = [
+            x
+            for x, date in enumerate(calibration_data_times_irr)
+            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
+        ][-1]
 
         # if len(nonlin_times)==1:
         #     nlin_i_irr=0
@@ -140,18 +154,27 @@ class CalibrationConverter:
         if len(nonlin_times) == 1:
             nlin_i_irr = 0
         else:
-            nlin_i_irr = [x for x, date in enumerate(nonlin_times_irr)
-                  if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
+            nlin_i_irr = [
+                x
+                for x, date in enumerate(nonlin_times_irr)
+                if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
+            ][-1]
 
-        wav_i_irr = [x for x, date in enumerate(wav_times_irr)
-                 if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime][-1]
-
+        wav_i_irr = [
+            x
+            for x, date in enumerate(wav_times_irr)
+            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
+        ][-1]
 
         calibration_data_irr = calibration_data_irr.sel(
             calibrationdates=calibration_data_times_irr[calib_i_irr]
         )
-        calibration_data_irr = calibration_data_irr.sel(nonlineardates=nonlin_times_irr[nlin_i_irr])
-        calibration_data_irr = calibration_data_irr.sel(wavdates=wav_times_irr[wav_i_irr])
+        calibration_data_irr = calibration_data_irr.sel(
+            nonlineardates=nonlin_times_irr[nlin_i_irr]
+        )
+        calibration_data_irr = calibration_data_irr.sel(
+            wavdates=wav_times_irr[wav_i_irr]
+        )
 
         if self.context.get_config_value("network") == "l":
             name = (
@@ -285,21 +308,21 @@ class CalibrationConverter:
             if ".pdf" not in path
         ]
         caldates = []
-        gains=np.zeros(9999)
-        minwav=350
+        gains = np.zeros(9999)
+        minwav = 350
         for caldatepath in caldatepaths:
             if measurandstring == "radiance":
                 calpath = glob.glob(
                     os.path.join(
                         caldatepath,
-                        "hypstar_"
-                        + str(hypstar) +
-                        "_radcal_L_*_%s.dat" % (sensortag),
+                        "hypstar_" + str(hypstar) + "_radcal_L_*_%s.dat" % (sensortag),
                     )
                 )[0]
                 caldate = calpath[-15:-9]
                 print(os.path.basename(caldatepath))
-                if ("b" in os.path.basename(caldatepath)) or ("10C" in os.path.basename(caldatepath)):
+                if ("b" in os.path.basename(caldatepath)) or (
+                    "10C" in os.path.basename(caldatepath)
+                ):
                     caldate += "T235959"
                 elif "a" in os.path.basename(caldatepath):
                     caldate += "T000000"
@@ -310,13 +333,13 @@ class CalibrationConverter:
                 calpath = glob.glob(
                     os.path.join(
                         caldatepath,
-                        "hypstar_"
-                        + str(hypstar) +
-                        "_radcal_E_*_%s.dat" % (sensortag)
+                        "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
                     )
                 )[0]
                 caldate = calpath[-15:-9]
-                if ("b" in os.path.basename(caldatepath)) or ("10C" in os.path.basename(caldatepath)):
+                if ("b" in os.path.basename(caldatepath)) or (
+                    "10C" in os.path.basename(caldatepath)
+                ):
                     caldate += "T235959"
                 elif "a" in os.path.basename(caldatepath):
                     caldate += "T000000"
@@ -328,44 +351,48 @@ class CalibrationConverter:
                 gains_temp = np.genfromtxt(calpath)
                 wavs_temp = gains_temp[:, 1]
                 gains_temp = gains_temp[np.where(wavs_temp > minwav)[0]]
-                if len(gains_temp)<len(gains):
-                    gains=gains_temp
+                if len(gains_temp) < len(gains):
+                    gains = gains_temp
                     wavs = gains[:, 1]
 
         lincaldatepaths = [
             path
             for path in glob.glob(
-                os.path.join(directory, "hypstar_" + str(hypstar),"linearity","*")
+                os.path.join(directory, "hypstar_" + str(hypstar), "linearity", "*")
             )
         ]
 
-        if len(lincaldatepaths)==0:
+        if len(lincaldatepaths) == 0:
             lincaldatepaths = [
                 path
                 for path in glob.glob(
-                    os.path.join(directory, "hypstar_" + str(hypstar), "radiometric", "*")
-                ) if len(glob.glob(
                     os.path.join(
-                        path,
-                        "hypstar_"
-                        + str(hypstar)
-                        + "_nonlin_corr_coefs_*.dat",
+                        directory, "hypstar_" + str(hypstar), "radiometric", "*"
                     )
-                ))>0
+                )
+                if len(
+                    glob.glob(
+                        os.path.join(
+                            path,
+                            "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
+                        )
+                    )
+                )
+                > 0
             ]
 
         nonlindates = []
         for lincaldatepath in lincaldatepaths:
             nonlinpath = glob.glob(
-                    os.path.join(
-                        lincaldatepath,
-                        "hypstar_"
-                        + str(hypstar)
-                        + "_nonlin_corr_coefs_*.dat",
-                    )
-                )[0]
-            lincaldate=nonlinpath[-10:-4]
-            if ("b" in os.path.basename(lincaldatepath)) or ("10C" in os.path.basename(lincaldatepath)):
+                os.path.join(
+                    lincaldatepath,
+                    "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
+                )
+            )[0]
+            lincaldate = nonlinpath[-10:-4]
+            if ("b" in os.path.basename(lincaldatepath)) or (
+                "10C" in os.path.basename(lincaldatepath)
+            ):
                 lincaldate += "T235959"
             elif "a" in os.path.basename(lincaldatepath):
                 lincaldate += "T000000"
@@ -392,12 +419,13 @@ class CalibrationConverter:
             wavcalpath = glob.glob(
                 os.path.join(
                     wavcaldatepath,
-                    "hypstar_"+ str(hypstar)
-                    + "_wl_coefs_*.dat",
+                    "hypstar_" + str(hypstar) + "_wl_coefs_*.dat",
                 )
             )[0]
             wavcaldate = wavcalpath[-10:-4]
-            if ("b" in os.path.basename(wavcaldatepath)) or ("10C" in os.path.basename(wavcaldatepath)):
+            if ("b" in os.path.basename(wavcaldatepath)) or (
+                "10C" in os.path.basename(wavcaldatepath)
+            ):
                 wavcaldate += "T235959"
             elif "a" in os.path.basename(wavcaldatepath):
                 wavcaldate += "T000000"
@@ -417,9 +445,7 @@ class CalibrationConverter:
             nonlinpath = glob.glob(
                 os.path.join(
                     lincaldatepath,
-                    "hypstar_"
-                    + str(hypstar)
-                    + "_nonlin_corr_coefs_*.dat",
+                    "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
                 )
             )[0]
             if os.path.exists(nonlinpath):
@@ -440,10 +466,14 @@ class CalibrationConverter:
                                     float(line.strip()[8::]) / 2
                                 )  # reading in from comments in non_lin files, and convert to k=1
 
-
                 calibration_data["non_linearity_coefficients"].values[
                     i_nonlin
-                ] = np.pad(non_linear_cals,(0,13-len(non_linear_cals)),'constant', constant_values=(0,0))
+                ] = np.pad(
+                    non_linear_cals,
+                    (0, 13 - len(non_linear_cals)),
+                    "constant",
+                    constant_values=(0, 0),
+                )
                 i_nonlin += 1
 
         i_wavcoef = 0
@@ -452,9 +482,7 @@ class CalibrationConverter:
             wavcalpath = glob.glob(
                 os.path.join(
                     wavcaldatepath,
-                    "hypstar_"
-                    + str(hypstar)
-                    + "_wl_coefs_*.dat",
+                    "hypstar_" + str(hypstar) + "_wl_coefs_*.dat",
                 )
             )[0]
             if os.path.exists(wavcalpath):
@@ -477,18 +505,14 @@ class CalibrationConverter:
                 calpath = glob.glob(
                     os.path.join(
                         caldatepath,
-                        "hypstar_"
-                        + str(hypstar)
-                        + "_radcal_L_*_%s.dat" % (sensortag),
+                        "hypstar_" + str(hypstar) + "_radcal_L_*_%s.dat" % (sensortag),
                     )
                 )[0]
             else:
                 calpath = glob.glob(
                     os.path.join(
                         caldatepath,
-                        "hypstar_"
-                        + str(hypstar)
-                        + "_radcal_E_*_%s.dat" % (sensortag),
+                        "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
                     )
                 )[0]
 
@@ -499,30 +523,37 @@ class CalibrationConverter:
                 gains = gains[np.where(wavs > 350)[0]]
                 wavs = wavs[np.where(wavs > 350)[0]]
                 placeholder_unc = 2
-                gainlen=len(calibration_data["wavpix"].values[i_cal,:])
+                gainlen = len(calibration_data["wavpix"].values[i_cal, :])
                 if True:
                     # calibration_data["wavelength"].values = gains[:, 1]
-                    calibration_data["wavpix"].values[i_cal,:] = gains[:gainlen, 0]
-                    calibration_data["gains"].values[i_cal,:] = gains[:gainlen, 2]
+                    calibration_data["wavpix"].values[i_cal, :] = gains[:gainlen, 0]
+                    calibration_data["gains"].values[i_cal, :] = gains[:gainlen, 2]
                     # calibration_data["u_rel_random_gains"].values = None
 
-                    calibration_data["u_rel_systematic_indep_gains"].values[i_cal,:] = ((
-                        gains[:, 6] ** 2
-                        + gains[:, 7] ** 2
-                        + gains[:, 8] ** 2
-                        + gains[:, 9] ** 2
-                        + gains[:, 10] ** 2
-                        + gains[:, 11] ** 2
-                        + gains[:, 12] ** 2
-                        + gains[:, 13] ** 2
-                        + gains[:, 14] ** 2
-                        + gains[:, 15] ** 2
-                        + gains[:, 16] ** 2
-                        + gains[:, 17] ** 2
-                        + gains[:, 19] ** 2
-                        + nonlin_unc**2
-                        + placeholder_unc**2
-                    ) ** 0.5)[:gainlen]
+                    calibration_data["u_rel_systematic_indep_gains"].values[
+                        i_cal, :
+                    ] = (
+                        (
+                            gains[:, 6] ** 2
+                            + gains[:, 7] ** 2
+                            + gains[:, 8] ** 2
+                            + gains[:, 9] ** 2
+                            + gains[:, 10] ** 2
+                            + gains[:, 11] ** 2
+                            + gains[:, 12] ** 2
+                            + gains[:, 13] ** 2
+                            + gains[:, 14] ** 2
+                            + gains[:, 15] ** 2
+                            + gains[:, 16] ** 2
+                            + gains[:, 17] ** 2
+                            + gains[:, 19] ** 2
+                            + nonlin_unc**2
+                            + placeholder_unc**2
+                        )
+                        ** 0.5
+                    )[
+                        :gainlen
+                    ]
 
                     cov_diag = cm.convert_corr_to_cov(
                         np.eye(len(gains[:, 2])), gains[:, 2] * (gains[:, 19])
@@ -563,14 +594,20 @@ class CalibrationConverter:
                     )
 
                     calibration_data["err_corr_systematic_indep_gains"].values[
-                        i_cal,:,:
+                        i_cal, :, :
                     ] = cm.correlation_from_covariance(
                         cov_diag + cov_other + cov_full + cov_filament
-                    )[:gainlen,:gainlen]
+                    )[
+                        :gainlen, :gainlen
+                    ]
 
                     calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[
-                        i_cal,:
-                    ] = ((gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5)[:gainlen]
+                        i_cal, :
+                    ] = (
+                        (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5
+                    )[
+                        :gainlen
+                    ]
 
                     cov_other = cm.convert_corr_to_cov(
                         np.eye(len(gains[:, 2])),
@@ -583,8 +620,10 @@ class CalibrationConverter:
                     )
 
                     calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
-                        i_cal,:,:
-                    ] = cm.correlation_from_covariance(cov_other + cov_filament)[:gainlen,:gainlen]
+                        i_cal, :, :
+                    ] = cm.correlation_from_covariance(cov_other + cov_filament)[
+                        :gainlen, :gainlen
+                    ]
                 # except:
                 #     print(caldatepath, " failed")
             i_cal += 1

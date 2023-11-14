@@ -65,19 +65,30 @@ COMMON_VARIABLES_SERIES = {
         "dim": [SERIES_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "sensor_azimuth_angle",
-            "long_name": "sensor_azimuth_angle is the "
+            "standard_name": "viewing_azimuth_angle",
+            "long_name": "viewing_azimuth_angle is the "
             "horizontal angle between the line of "
             "sight from the observation point to "
-            "the sensor and a reference direction "
-            "at the observation point, which is "
-            "often due north. The angle is "
+            "the sensor and True North. The angle is "
             "measured clockwise positive, starting"
-            " from the reference direction. A "
-            "comment attribute should be added to "
-            "a data variable with this standard "
-            "name to specify the reference "
-            "direction.",
+            " from the North direction.",
+            "units": "degrees",
+            "reference": "True North",
+            "preferred_symbol": "vaa",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "pointing_azimuth_angle": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pointing_azimuth_angle",
+            "long_name": "pointing_azimuth_angle is the "
+            "horizontal angle between the direction the sensor "
+            "is pointing to, and True North. The angle is "
+            "measured clockwise positive, starting "
+            "from True North direction. This angle "
+            "is 180 degrees different from the viewing_azimuth_angle.",
             "units": "degrees",
             "reference": "True North",
             "preferred_symbol": "vaa",
@@ -88,16 +99,18 @@ COMMON_VARIABLES_SERIES = {
         "dim": [SERIES_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "sensor_zenith_angle",
-            "long_name": "sensor_zenith_angle is the angle "
-            "between the line of sight to the "
-            "sensor and the local zenith at the "
-            "observation target. This angle is "
+            "standard_name": "viewing_zenith_angle",
+            "long_name": "viewing_zenith_angle is the angle "
+            "between the local zenith and the direction "
+            "from the location being measured"
+            "to the sensor. This angle is "
             "measured starting from directly "
             "overhead and its range is from zero "
             "(directly overhead the observation "
-            "target) to 180 degrees (directly below"
-            " the observation target). Local zenith"
+            "target, i.e. sensor looking down) "
+            "to 180 degrees (directly below"
+            " the observation target, i.e. sensor"
+            "pointing at local zenith). Local zenith"
             " is a line perpendicular to the "
             "Earth's surface at a given location. "
             "'Observation target' means a location"
@@ -154,8 +167,8 @@ COMMON_VARIABLES_SERIES = {
             "long_name": "Series id number",
             "units": "-",
         },
-    }
-    }
+    },
+}
 
 COMMON_VARIABLES_SEQ = deepcopy(COMMON_VARIABLES_SERIES)
 COMMON_VARIABLES_SCAN = deepcopy(COMMON_VARIABLES_SERIES)
@@ -202,7 +215,7 @@ L0A_RAD_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "acceleration_x_mean",
-            "long_name": "Time during measurement",
+            "long_name": "",
             "units": "-",
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
@@ -266,33 +279,42 @@ L0A_RAD_VARIABLES = {
             "units": "-",
         },
     },
-    "vaa_ref": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_abs": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_ask": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
+    "paa_ref": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ref in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ref",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_abs": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_abs as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_abs",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_ask": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ask as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ask",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
 }
 
 L0B_RAD_VARIABLES = {
@@ -319,7 +341,7 @@ L0B_RAD_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "acceleration_x_mean",
-            "long_name": "Time during measurement",
+            "long_name": "",
             "units": "-",
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
@@ -453,33 +475,51 @@ L0B_RAD_VARIABLES = {
             "units": "-",
         },
     },
-    "vaa_ref": {"dim": [SERIES_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_abs": {"dim": [SERIES_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_ask": {"dim": [SERIES_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}}
+    "n_total_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of total scans acquired",
+            "long_name": "",
+            "units": "-",
+        },
+    },
+    "paa_ref": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ref in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ref",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_abs": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_abs as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_abs",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_ask": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ask as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ask",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
 }
 
 L0A_IRR_VARIABLES = L0A_RAD_VARIABLES
@@ -719,69 +759,102 @@ L1A_RAD_VARIABLES = {
             ],
         },
     },
-    "acceleration_x_mean": {"dim": [SCAN_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_x_mean",
-                                           "long_name": "Time during measurement",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_x_std": {"dim": [SCAN_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_x_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_mean": {"dim": [SCAN_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_y_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_std": {"dim": [SCAN_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_y_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_mean": {"dim": [SCAN_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_z_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_std": {"dim": [SCAN_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_z_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "vaa_ref": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_abs": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_ask": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}}
+    "acceleration_x_mean": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_x_std": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_mean": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_std": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_mean": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_std": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "paa_ref": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ref in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ref",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_abs": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_abs as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_abs",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_ask": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ask as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ask",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
 }
 
 L1A_IRR_VARIABLES = {
@@ -871,69 +944,102 @@ L1A_IRR_VARIABLES = {
             ],
         },
     },
-    "acceleration_x_mean": {"dim": [SCAN_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_x_mean",
-                                           "long_name": "Time during measurement",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_x_std": {"dim": [SCAN_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_x_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_mean": {"dim": [SCAN_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_y_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_std": {"dim": [SCAN_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_y_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_mean": {"dim": [SCAN_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_z_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_std": {"dim": [SCAN_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_z_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "vaa_ref": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_abs": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}},
-    "vaa_ask": {"dim": [SCAN_DIM],
-                "dtype": np.float32,
-                "attributes": {"standard_name": "vaa_ref as in metadata",
-                               "long_name": "",
-                               "units": "degrees",
-                               "reference": "no idea",
-                               "preferred_symbol": "vaa_ref"},
-                "encoding": {'dtype': np.uint16, "scale_factor": 0.0055,
-                             "offset": 0.0}}
+    "acceleration_x_mean": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_x_std": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_mean": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_std": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_mean": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_std": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "paa_ref": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ref in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ref",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_abs": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_abs as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_abs",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
+    "paa_ask": {
+        "dim": [SCAN_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "pan (pointing azimuth angle) from pt_ask as in metadata",
+            "long_name": "",
+            "units": "degrees",
+            "reference": "no idea",
+            "preferred_symbol": "paa_ask",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
+    },
 }
 
 L1B_RAD_VARIABLES = {
@@ -1018,11 +1124,29 @@ L1B_RAD_VARIABLES = {
             "units": "-",
         },
     },
+    "n_total_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of total scans acquired for VNIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
     "n_valid_scans_SWIR": {
         "dim": [SERIES_DIM],
         "dtype": np.uint8,
         "attributes": {
             "standard_name": "number of valid scans used in average of SWIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
+    "n_total_scans_SWIR": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of total scans acquired for SWIR",
             "long_name": "",
             "units": "-",
         },
@@ -1050,42 +1174,66 @@ L1B_RAD_VARIABLES = {
             "units": "mW m^-2 nm^-1 sr^-1",
         },
     },
-    "acceleration_x_mean": {"dim": [SERIES_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_x_mean",
-                                           "long_name": "Time during measurement",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_x_std": {"dim": [SERIES_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_x_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_mean": {"dim": [SERIES_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_y_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_std": {"dim": [SERIES_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_y_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_mean": {"dim": [SERIES_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_z_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_std": {"dim": [SERIES_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_z_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
+    "acceleration_x_mean": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_x_std": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_mean": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_std": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_mean": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_std": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
 }
 
 
@@ -1171,11 +1319,29 @@ L1B_IRR_VARIABLES = {
             "units": "-",
         },
     },
+    "n_total_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of total scans acquired for VNIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
     "n_valid_scans_SWIR": {
         "dim": [SERIES_DIM],
         "dtype": np.uint8,
         "attributes": {
             "standard_name": "number of valid scans used in average of SWIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
+    "n_total_scans_SWIR": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of total scans acquired for SWIR",
             "long_name": "",
             "units": "-",
         },
@@ -1203,42 +1369,66 @@ L1B_IRR_VARIABLES = {
             "units": "mW m^-2 nm^-1",
         },
     },
-    "acceleration_x_mean": {"dim": [SERIES_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_x_mean",
-                                           "long_name": "Time during measurement",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_x_std": {"dim": [SERIES_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_x_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_mean": {"dim": [SERIES_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_y_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_y_std": {"dim": [SERIES_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_y_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_mean": {"dim": [SERIES_DIM],
-                            "dtype": np.float32,
-                            "attributes": {"standard_name": "acceleration_z_mean",
-                                           "long_name": "",
-                                           "units": "-"},
-                            "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
-    "acceleration_z_std": {"dim": [SERIES_DIM],
-                           "dtype": np.float32,
-                           "attributes": {"standard_name": "acceleration_z_std",
-                                          "long_name": "",
-                                          "units": "-"},
-                           "encoding": {'dtype': np.uint16, "scale_factor": 0.01, "offset": 0.0}},
+    "acceleration_x_mean": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_x_std": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_x_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_mean": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_y_std": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_y_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_mean": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_mean",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
+    "acceleration_z_std": {
+        "dim": [SERIES_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "acceleration_z_std",
+            "long_name": "",
+            "units": "-",
+        },
+        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
+    },
 }
 
 
@@ -1330,19 +1520,19 @@ W_L1C_VARIABLES = {
         },
     },
     "std_downwelling_radiance": {
-            "dim": [WL_DIM],
-            "dtype": np.float32,
-            "attributes": {
-                "standard_name": "std radiance",
-                "long_name": "standard deviation for downwelling radiance",
-                "units": "mW m^-2 nm^-1 sr^-1",
-                "unc_comps": [
-                    "u_rel_random_downwelling_radiance",
-                    "u_rel_systematic_indep_downwelling_radiance",
-                    "u_rel_systematic_corr_rad_irr_downwelling_radiance",
-                ],
-            },
+        "dim": [WL_DIM],
+        "dtype": np.float32,
+        "attributes": {
+            "standard_name": "std radiance",
+            "long_name": "standard deviation for downwelling radiance",
+            "units": "mW m^-2 nm^-1 sr^-1",
+            "unc_comps": [
+                "u_rel_random_downwelling_radiance",
+                "u_rel_systematic_indep_downwelling_radiance",
+                "u_rel_systematic_corr_rad_irr_downwelling_radiance",
+            ],
         },
+    },
     "u_rel_random_upwelling_radiance": {
         "dim": [WL_DIM, Lu_SCAN_DIM],
         "dtype": np.float32,
@@ -1651,11 +1841,29 @@ L_L2A_REFLECTANCE_VARIABLES = {
             "units": "-",
         },
     },
+    "n_total_scans": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of total radiance scans acquired for VNIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
     "n_valid_scans_SWIR": {
         "dim": [SERIES_DIM],
         "dtype": np.uint8,
         "attributes": {
             "standard_name": "number of valid scans used in average of SWIR",
+            "long_name": "",
+            "units": "-",
+        },
+    },
+    "n_total_scans_SWIR": {
+        "dim": [SERIES_DIM],
+        "dtype": np.uint8,
+        "attributes": {
+            "standard_name": "number of total radiance scans acquired for SWIR",
             "long_name": "",
             "units": "-",
         },
@@ -1811,7 +2019,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "attributes": {
             "standard_name": "u_rel_systematic_corr_rad_irr_water_leaving_radiance",
             "long_name": "water leaving radiance Systematic uncertainty component that is correlated with uncertainties on irradiance "
-                         "relative uncertainty",
+            "relative uncertainty",
             "units": "%",
             "err_corr": [
                 {
@@ -1831,7 +2039,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "attributes": {
             "standard_name": "err_corr_systematic_corr_rad_irr_water_leaving_radiance",
             "long_name": "Correlation matrix of water leaving radiance Systematic uncertainty component that is correlated with uncertainties on irradiance"
-                         "leaving radiance uncertainty",
+            "leaving radiance uncertainty",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1981,6 +2189,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         },
     },
 }
+
 W_L2A_REFLECTANCE_VARIABLES = deepcopy(W_L1C_REFLECTANCE_VARIABLES)
 
 for variable in W_L2A_REFLECTANCE_VARIABLES.keys():
@@ -1992,11 +2201,22 @@ W_L2A_REFLECTANCE_VARIABLES["n_valid_scans"] = {
     "dim": [SERIES_DIM],
     "dtype": np.uint8,
     "attributes": {
-        "standard_name": "number of valid scans used in average of VNIR",
+        "standard_name": "number of valid radiance scans used in average of VNIR",
         "long_name": "",
         "units": "-",
     },
 }
+
+W_L2A_REFLECTANCE_VARIABLES["n_total_scans"] = {
+    "dim": [SERIES_DIM],
+    "dtype": np.uint8,
+    "attributes": {
+        "standard_name": "number of total radiance scans acquired",
+        "long_name": "",
+        "units": "-",
+    },
+}
+
 W_L2A_REFLECTANCE_VARIABLES["std_reflectance"] = {
     "dim": [WL_DIM, SERIES_DIM],
     "dtype": np.float32,
@@ -2040,83 +2260,30 @@ W_L2A_REFLECTANCE_VARIABLES["std_epsilon"] = {
 }
 
 
-# L_L2B_REFLECTANCE_VARIABLES - Reflectance variables required for L2B land data product
-L_L2B_REFLECTANCE_VARIABLES = {
-    "u_rel_random_reflectance": {
-        "dim": [WL_DIM, SERIES_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "u_rel_random_reflectance",
-            "long_name": "Random reflectance relative uncertainty",
-            "units": "%",
-            "err_corr": [
-                {"dim": WL_DIM, "form": "random", "params": [], "units": []},
-                {"dim": SERIES_DIM, "form": "random", "params": [], "units": []},
-            ],
-        },
-        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
-    },
-    "u_rel_systematic_reflectance": {
-        "dim": [WL_DIM, SERIES_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "u_rel_systematic_reflectance",
-            "long_name": "Systematic reflectance " "relative uncertainty",
-            "units": "%",
-            "err_corr": [
-                {
-                    "dim": WL_DIM,
-                    "form": "err_corr_matrix",
-                    "params": ["err_corr_systematic_reflectance"],
-                    "units": [],
-                },
-                {"dim": SERIES_DIM, "form": "systematic", "params": [], "units": []},
-            ],
-        },
-        "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
-    },
-    "err_corr_systematic_reflectance": {
-        "dim": [WL_DIM, WL_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "err_corr_systematic_reflectance",
-            "long_name": "Correlation matrix of systematic "
-            "reflectance "
-            "uncertainty",
-            "units": "-",
-        },
-        "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
-    },
-    "reflectance": {
-        "dim": [WL_DIM, SERIES_DIM],
-        "dtype": np.float32,
-        "attributes": {
-            "standard_name": "reflectance",
-            "long_name": "The surface called surface means the lower "
-            "boundary of the atmosphere. "
-            "Bidirectional_reflectance depends on"
-            "the angles of incident and measured"
-            "radiation.Reflectance is the ratio of the "
-            "energy of the reflected to the incident "
-            "radiation. A coordinate variable of "
-            "radiation_wavelength or radiation_frequency "
-            "can be used to specify the wavelength or "
-            "frequency, respectively, of the radiation.",
-            "units": "-",
-            "unc_comps": [
-                "u_rel_random_reflectance",
-                "u_rel_systematic_reflectance",
-            ],
-        },
-    },
-}
-
-# W_L2B_REFLECTANCE_VARIABLES - Reflectance variables required for L2A land data product
-W_L2B_REFLECTANCE_VARIABLES = {}
+L_L2B_REFLECTANCE_VARIABLES = deepcopy(L_L2A_REFLECTANCE_VARIABLES)
+W_L2B_REFLECTANCE_VARIABLES = deepcopy(W_L2A_REFLECTANCE_VARIABLES)
 
 C_QUALITY_SCAN = {
     "quality_flag": {
         "dim": [SCAN_DIM],
+        "dtype": "flag",
+        "attributes": {
+            "standard_name": "quality_flag",
+            "long_name": "A variable with the standard name of quality_"
+            "flag contains an indication of assessed "
+            "quality information of another data variable."
+            " The linkage between the data variable and the"
+            " variable or variables with the standard_name"
+            " of quality_flag is achieved using the "
+            "ancillary_variables attribute.",
+            "flag_meanings": FLAG_COMMON,
+        },
+    }
+}
+
+C_QUALITY_SERIES = {
+    "quality_flag": {
+        "dim": [SERIES_DIM],
         "dtype": "flag",
         "attributes": {
             "standard_name": "quality_flag",
@@ -2180,17 +2347,17 @@ VARIABLES_DICT_DEFS: Any = {
     "L0A_RAD": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0A_RAD_VARIABLES},
     "L0A_IRR": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0A_IRR_VARIABLES},
     "L0A_BLA": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L0A_BLA_VARIABLES},
-    "L_L0B_RAD": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L0B_RAD_VARIABLES},
-    "L_L0B_IRR": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L0B_RAD_VARIABLES},
+    "L0B_RAD": {**COMMON_VARIABLES_SERIES, **C_QUALITY_SERIES, **L0B_RAD_VARIABLES},
+    "L0B_IRR": {**COMMON_VARIABLES_SERIES, **C_QUALITY_SERIES, **L0B_RAD_VARIABLES},
     "CAL": {**CAL_VARIABLES},
     "L_L1A_RAD": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_RAD_VARIABLES},
-    "W_L1A_RAD": {**COMMON_VARIABLES_SCAN, **W_QUALITY_SCAN, **L1A_RAD_VARIABLES},
     "L_L1A_IRR": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_IRR_VARIABLES},
-    "W_L1A_IRR": {**COMMON_VARIABLES_SCAN, **W_QUALITY_SCAN, **L1A_IRR_VARIABLES},
+    "W_L1A_RAD": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_RAD_VARIABLES},
+    "W_L1A_IRR": {**COMMON_VARIABLES_SCAN, **C_QUALITY_SCAN, **L1A_IRR_VARIABLES},
     "L_L1B_RAD": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_RAD_VARIABLES},
     "L_L1B_IRR": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_IRR_VARIABLES},
-    "W_L1B_RAD": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_RAD_VARIABLES},
-    "W_L1B_IRR": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L1B_IRR_VARIABLES},
+    "W_L1B_RAD": {**COMMON_VARIABLES_SERIES, **W_QUALITY_SERIES, **L1B_RAD_VARIABLES},
+    "W_L1B_IRR": {**COMMON_VARIABLES_SERIES, **W_QUALITY_SERIES, **L1B_IRR_VARIABLES},
     "L_L1C": {
         **COMMON_VARIABLES_SERIES,
         **L_QUALITY,
@@ -2210,4 +2377,5 @@ VARIABLES_DICT_DEFS: Any = {
         **W_L2A_REFLECTANCE_VARIABLES,
     },
     "L_L2B": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **L_L2B_REFLECTANCE_VARIABLES},
+    "W_L2B": {**COMMON_VARIABLES_SERIES, **L_QUALITY, **W_L2B_REFLECTANCE_VARIABLES},
 }

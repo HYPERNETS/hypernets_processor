@@ -12,6 +12,7 @@ from hypernets_processor.surface_reflectance.measurement_functions.water_network
 from hypernets_processor.surface_reflectance.measurement_functions.water_network_protocol_water_leaving_radiance import (
     WaterNetworkProtocolWaterLeavingRadiance,
 )
+
 """___Authorship___"""
 __author__ = "Pieter De Vis"
 __created__ = "30/04/2020"
@@ -30,9 +31,10 @@ class ProtocolFactory:
                     WaterNetworkProtocol.get_name(),
                     WaterNetworkProtocol(*args, **kwargs),
                 ),
-                (WaterNetworkProtocolWaterLeavingRadiance.get_name(),
-                 WaterNetworkProtocolWaterLeavingRadiance(*args, **kwargs),
-                                     )
+                (
+                    WaterNetworkProtocolWaterLeavingRadiance.get_name(),
+                    WaterNetworkProtocolWaterLeavingRadiance(*args, **kwargs),
+                ),
             ]
         )
 
@@ -41,4 +43,3 @@ class ProtocolFactory:
 
     def get_measurement_function(self, name):
         return self.measurement_functions[name]
-

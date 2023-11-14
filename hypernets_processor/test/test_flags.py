@@ -15,7 +15,6 @@ print([DatasetUtil.get_set_flags(flag) for flag in data["quality_flag"]])
 print(DatasetUtil.get_flags_mask_or(data["quality_flag"], ["outliers", "saturation"]))
 
 
-
 # print(dat2["quality_flag"].values.dtype,dat2["quality_flag"].encoding)
 # print(dat2["reflectance"].values.dtype,dat2["reflectance"].encoding)
 # print(dat2["u_rel_random_reflectance"].values.dtype,dat2["u_rel_random_reflectance"].encoding)

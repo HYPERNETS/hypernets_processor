@@ -3,8 +3,7 @@ import numpy as np
 
 
 class WaterNetworkProtocolWaterLeavingRadiance(MeasurementFunction):
-    def meas_function(self, upwelling_radiance, downwelling_radiance, rhof
-    ):
+    def meas_function(self, upwelling_radiance, downwelling_radiance, rhof):
         """
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).

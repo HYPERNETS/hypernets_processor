@@ -36,6 +36,7 @@ def normalizedeg(num, lower=0.0, upper=360.0, b=False):
     Range must be symmetric about 0 or lower == 0.
     """
     from math import floor, ceil
+
     # abs(num + upper) and abs(num - lower) are needed, instead of
     # abs(num), since the lower and upper limits need not be 0. We need
     # to add half size of the range, so that the final result is lower +
@@ -43,8 +44,9 @@ def normalizedeg(num, lower=0.0, upper=360.0, b=False):
     res = num
     if not b:
         if lower >= upper:
-            raise ValueError("Invalid lower and upper limits: (%s, %s)" %
-                             (lower, upper))
+            raise ValueError(
+                "Invalid lower and upper limits: (%s, %s)" % (lower, upper)
+            )
 
         res = num
         if num > upper or num == lower:

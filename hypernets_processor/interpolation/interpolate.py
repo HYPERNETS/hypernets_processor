@@ -33,7 +33,12 @@ class Interpolate:
         self.context = context
 
     def interpolate_l1b_w(
-        self, dataset_l1c_int, dataset_l1a_uprad, dataset_l1b_downrad, dataset_l1b_irr, azangle=None
+        self,
+        dataset_l1c_int,
+        dataset_l1a_uprad,
+        dataset_l1b_downrad,
+        dataset_l1b_irr,
+        azangle=None,
     ):
 
         # chek for upwelling radiance
@@ -81,10 +86,17 @@ class Interpolate:
             self.context.logger.info("interpolate irradiance")
         else:
             print("interpolate irradiance")
-        dataset_l1c_int = self.interpolate_irradiance(dataset_l1c_int, dataset_l1b_irr, azangle)
+        dataset_l1c_int = self.interpolate_irradiance(
+            dataset_l1c_int, dataset_l1b_irr, azangle
+        )
         return dataset_l1c_int
 
-    def interpolate_l1c(self, dataset_l1b_rad, dataset_l1b_irr): #used for land processing
+    def interpolate_l1c(
+        self, dataset_l1b_rad, dataset_l1b_irr
+    ):  # used for land processing
+
+        self.qual.check_valid_radiance(dataset_l1b_rad)
+        self.qual.check_valid_irradiance(dataset_l1b_irr)
 
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
         dataset_l1c["acquisition_time"].values = dataset_l1b_rad[
@@ -142,7 +154,9 @@ class Interpolate:
             dataset_l1b_irr["wavelength"].values,
         )
 
-        dataset_l1c_temp = self.templ.l1ctemp_dataset(dataset_l1c, dataset_l1b_irr, razangle)
+        dataset_l1c_temp = self.templ.l1ctemp_dataset(
+            dataset_l1c, dataset_l1b_irr, razangle
+        )
         dataset_l1c_temp = interpolation_function_wav.propagate_ds_specific(
             ["random", "systematic_indep", "systematic_corr_rad_irr"],
             dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
@@ -168,13 +182,14 @@ class Interpolate:
         # Interpolate in time to radiance times
         acqui_rad = dataset_l1c["acquisition_time"].values
 
-        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"])
+        flags = ["no_clear_sky_irradiance", "vza_irradiance"]
+        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
         if len(mask_notflagged) == 0:
             self.context.anomaly_handler.add_anomaly("i", dataset_l1b_irr)
             acqui_irr = dataset_l1b_irr["acquisition_time"].values
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-                dataset_l1c["quality_flag"], "no_clear_sky"
+                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
             )
         else:
             if self.context.get_config_value("network") == "w":
@@ -200,7 +215,7 @@ class Interpolate:
         return dataset_l1c
 
     def interpolate_skyradiance(self, dataset_l1c, dataset_l1b_skyrad):
-        print(dataset_l1b_skyrad)
+        # print(dataset_l1b_skyrad)
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), parallel_cores=1, dtype="float32"
         )

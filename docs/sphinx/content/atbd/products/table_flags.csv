@@ -13,10 +13,10 @@ Bit #,name,Description,Comment, Application*
 11, dark_masked, Outliers and NaN , Same as for outliers (see 7), L & W
 12, half_of_scans_masked,, ,L & W
 13, vza_irradiance,, ,L & W
-14, clear_sky_irradiance,, ,L & W
+14, no_clear_sky_irradiance,, ,L & W
 15, variable_irradiance ,, ,L & W
 16, single_irradiance_used ,, ,L & W
-17, no_clear_sky ,, ,L & W
+17, no_clear_sky_sequence ,, ,L & W
 18, less_than_three_darks,, ,L & W
 12,lu_eq_missing,missing azimuthal equivalent for upwelling radiance ,, W
 13,fresnel_angle_missing,no appropriate fresnel angle for downwelling radiance,, W

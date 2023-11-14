@@ -51,7 +51,7 @@ class CombineSWIR:
             dataset_l0masked_swir,
             dataset_bla_swir,
             calibration_data_swir,
-            swir=True
+            swir=True,
         )
 
         dataset_l1b, dataset_l1b_swir = self.qual.perform_quality_check_comb(
@@ -107,9 +107,15 @@ class CombineSWIR:
         dataset_l1b_comb["n_valid_scans_SWIR"].values = dataset_l1b_swir[
             "n_valid_scans"
         ].values
+        dataset_l1b_comb["n_total_scans"].values = dataset_l1b["n_total_scans"].values
+        dataset_l1b_comb["n_total_scans_SWIR"].values = dataset_l1b_swir[
+            "n_total_scans"
+        ].values
 
         if measurandstring == "irradiance":
             dataset_l1b_comb = self.qual.perform_quality_irradiance(dataset_l1b_comb)
+
+        self.qual.check_standard_sequence_L1B(dataset_l1b_comb, measurandstring, "land")
 
         if self.context.get_config_value("write_l1b"):
             self.writer.write(
