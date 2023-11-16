@@ -186,7 +186,7 @@ class Interpolate:
         flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
         if len(mask_notflagged) == 0:
-            self.context.anomaly_handler.add_anomaly("i", dataset_l1b_irr)
+            self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
             acqui_irr = dataset_l1b_irr["acquisition_time"].values
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
                 dataset_l1c["quality_flag"], "no_clear_sky_sequence"

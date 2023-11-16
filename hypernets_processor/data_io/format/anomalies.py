@@ -72,12 +72,7 @@ ANOMALIES_DICT = {
     },
     "nld": {
         "description": "Not enough dark scans",
-        "error": None,
-        "error_msg": None,
-    },
-    "i": {
-        "description": "No valid irradiance measurements",
-        "error": None,
+        "error": ValueError,
         "error_msg": None,
     },
     "nu": {
