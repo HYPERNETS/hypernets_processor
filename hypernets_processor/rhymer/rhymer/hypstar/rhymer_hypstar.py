@@ -175,7 +175,7 @@ class RhymerHypstar:
                     self.context.anomaly_handler.add_anomaly("l")
 
             # check if correct number of radiance and irradiance data
-            flags = ["nonlinearity", "bad_pointing", "outliers"]
+            flags = ["nonlinearity", "bad_pointing", "outliers", "L0_threshold"]
             # flags = ["nonlinearity", "bad_pointing", "outliers",
             #          "angles_missing", "lu_eq_missing", "fresnel_angle_missing", "ld_ed_clearsky_failing",
             #          "fresnel_default", "temp_variability_ed", "temp_variability_lu", "simil_fail"]
@@ -339,10 +339,10 @@ class RhymerHypstar:
         L1a_uprad, L1a_downrad, L1a_irr, dataset_l1flags = self.cycleparse(l1a_rad, l1a_irr, dataset_l1flags)
 
 
-        if self.qual.qc_illumination(L1a_downrad, 'radiance') > 0.1:
-            self.context.logger.info(
-                "Non constant illumination for sequence {}".format(L1a_downrad.attrs['sequence_id']))
-            self.context.anomaly_handler.add_anomaly("nd")
+        # if self.qual.qc_illumination(L1a_downrad, 'radiance') > 0.25:
+        #     self.context.logger.info(
+        #         "Non constant illumination for sequence {}".format(L1a_downrad.attrs['sequence_id']))
+        #     self.context.anomaly_handler.add_anomaly("nd")
 
         L1b_downrad = self.avg.average_l1a("radiance", L1a_downrad)
         L1b_irr = self.avg.average_l1a("irradiance", L1a_irr)

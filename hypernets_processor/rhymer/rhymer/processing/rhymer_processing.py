@@ -19,7 +19,7 @@ class RhymerProcessing:
         self.dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         #self.path_ascii = os.path.join(dir_path, 'data', 'calibration_files_ascii', 'HYPSTAR_cal')
 
-    def mobley_lut_interp(self, ths, thv, phi, wind=2.):
+    def mobley_lut_interp(self, ths, thv, phiview, wind=2.):
         rholut = self.mobley_lut_read()
         dval = rholut['header']
 
@@ -27,10 +27,13 @@ class RhymerProcessing:
         wind_id, wind_br = self.rhymershared.lutpos(dval['Wind'], wind)
         wind_w = wind_id - wind_br[0]
 
+        #phi is phi-view
+        phi=180-abs(phiview)
+
         # find geometry
         ths_id, ths_br = self.rhymershared.lutpos(dval['Theta-sun'], ths)
         thv_id, thv_br = self.rhymershared.lutpos(dval['Theta'], thv)
-        phi_id, phi_br = self.rhymershared.lutpos(dval['Phi'], abs(phi))
+        phi_id, phi_br = self.rhymershared.lutpos(dval['Phi'], phi)
 
         ## interpolate for both bracketing wind speeds
         it1 = self.rhymershared.interp3d(rholut['data'][wind_br[0], :, :, :], ths_id, thv_id, phi_id)

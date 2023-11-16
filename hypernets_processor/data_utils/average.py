@@ -133,7 +133,7 @@ class Average:
 
         flags = ["nonlinearity","bad_pointing","outliers",
                          "angles_missing","lu_eq_missing","fresnel_angle_missing",
-                         "fresnel_default","temp_variability_ed","temp_variability_lu", "simil_fail"]
+                         "fresnel_default","temp_variability_ed","temp_variability_lu"] #, "simil_fail"]
 
         dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags, razangle)
 
