@@ -396,10 +396,10 @@ class RhymerHypstar:
                         l1b["quality_flag"][l1b["scan"] == i], "fresnel_default"
                     )
                     rhof = self.context.get_config_value("rhof_default")
-            if self.context.get_config_value("fresnel_option") == "Ruddick2006":
-                rhof = self.context.get_config_value("rhof_default")
-                if wind[i] is not None:
-                    rhof = rhof + 0.00039 * wind[i] + 0.000034 * wind[i] ** 2
+            # if self.context.get_config_value("fresnel_option") == "Ruddick2006":
+            #     rhof = self.context.get_config_value("rhof_default")
+            #     if wind[i] is not None:
+            #         rhof = rhof + 0.00039 * wind[i] + 0.000034 * wind[i] ** 2
 
             fresnel_coeff[i] = rhof
         l1b["rhof"].values = fresnel_coeff

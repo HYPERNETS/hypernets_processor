@@ -114,7 +114,7 @@ class ProductNameUtil:
             if isinstance(angles, str):
                 angles = angles
             else:
-                angles = "{}".format(round(float(angles)))
+                angles = "{:03d}".format(round(float(angles)))
 
         # Prepare product name parts
         ptype = DS_FORMAT_FNAMES[ds_format]
