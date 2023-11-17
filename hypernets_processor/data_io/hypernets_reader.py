@@ -185,6 +185,10 @@ class HypernetsReader:
         vza_abs = normalizedeg(float(vza_abs), 0, 360)
         vza_ref = normalizedeg(float(vza_ref), 0, 360)
 
+        paa_ask = normalizedeg(float(vza_ask), 0, 360)
+        paa_abs = normalizedeg(float(vza_abs), 0, 360)
+        paa_ref = normalizedeg(float(vza_ref), 0, 360)
+
         # perform quality checks
         self.qual.perform_quality_check_angles(
             ds, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
