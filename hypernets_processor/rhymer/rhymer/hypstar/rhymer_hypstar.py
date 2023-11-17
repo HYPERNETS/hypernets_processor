@@ -199,11 +199,11 @@ class RhymerHypstar:
                                 )
                             )
                             self.context.logger.error(
-                                "Ld missing for fresnel correction"
+                                "Ld missing for air water interface radiance reflectance correction"
                             )
                         self.context.anomaly_handler.add_anomaly("l")
 
-            # check if we have the required fresnel angle for lsky
+            # check if we have the required air_water_int angle for lsky
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
 
@@ -219,7 +219,7 @@ class RhymerHypstar:
                         dataset_l1b["quality_flag"][
                             dataset_l1b["pointing_azimuth_angle"] == i
                         ],
-                        "fresnel_angle_missing",
+                        "rhof_angle_missing",
                     )
                     ts = [
                         datetime.utcfromtimestamp(x)
@@ -229,7 +229,7 @@ class RhymerHypstar:
                     ]
                     if self.context.logger is not None:
                         self.context.logger.info(
-                            "No downwelling radiance measurement at appropriate fresnel angle: Aquisition time {}, {}".format(
+                            "No downwelling radiance measurement at appropriate angle for the approximation of rhof: Aquisition time {}, {}".format(
                                 ts,
                                 ", ".join(
                                     [
@@ -244,7 +244,7 @@ class RhymerHypstar:
                                 ),
                             )
                         )
-                        self.context.logger.error("Ld missing for fresnel correction")
+                        self.context.logger.error("Ld missing for rhof approximation of the air water interface radiance reflectance correction")
                     self.context.anomaly_handler.add_anomaly("l")
 
             # check if correct number of radiance and irradiance data
@@ -300,12 +300,7 @@ class RhymerHypstar:
         wind = []
 
         ## inform
-        if self.context.get_config_value("fresnel_option") == "Ruddick2006":
-            if self.context.logger is not None:
-                self.context.logger.info("Apply Ruddick et al., 2006")
-            else:
-                print("Apply Ruddick et al., 2006")
-        if self.context.get_config_value("fresnel_option") == "Mobley1999":
+        if self.context.get_config_value("rhof_option") == "Mobley1999":
             if self.context.logger is not None:
                 self.context.logger.info("Apply Mobley 1999")
             else:
@@ -333,7 +328,7 @@ class RhymerHypstar:
                     l1b["quality_flag"][l1b["scan"] == i], "def_wind_flag"
                 )
                 wind.append(self.context.get_config_value("wind_default"))
-                l1b.attrs["fresnel_wind_source"] = "Default - {}".format(
+                l1b.attrs["rhof_wind_source"] = "Default - {}".format(
                     self.context.get_config_value("wind_default")
                 )
 
@@ -344,7 +339,7 @@ class RhymerHypstar:
                 anc_wind = self.rhymeranc.ts_wind(isotime, l1b.attrs["site_id"])
                 if anc_wind is not None:
                     wind.append(anc_wind)
-                l1b.attrs["fresnel_wind_source"] = "NCEP"
+                l1b.attrs["rhof_wind_source"] = "NCEP"
 
             elif self.context.get_config_value("wind_ancillary") == "GDAS":
                 isotime = datetime.utcfromtimestamp(
@@ -355,57 +350,57 @@ class RhymerHypstar:
                     wind.append(anc_wind["w"])
                     now = datetime.now()
                     l1b.attrs[
-                        "fresnel_wind_source"
+                        "rhof_wind_source"
                     ] = "NCEP/GDAS FNL 0.25 ds083.3 | DOI: 10.5065/D65Q4T4Z"
 
-        l1b["fresnel_wind"].values = wind
+        l1b["rhof_wind"].values = wind
         return l1b
 
-    def get_fresnelrefl(self, l1b):
+    def get_rhof(self, l1b):
 
         ## read mobley rho lut
-        fresnel_coeff = np.zeros(len(l1b.scan))
-        fresnel_vza = np.zeros(len(l1b.scan))
-        fresnel_raa = np.zeros(len(l1b.scan))
-        fresnel_sza = np.zeros(len(l1b.scan))
+        rhof_coeff = np.zeros(len(l1b.scan))
+        rhof_vza = np.zeros(len(l1b.scan))
+        rhof_raa = np.zeros(len(l1b.scan))
+        rhof_sza = np.zeros(len(l1b.scan))
 
-        wind = l1b["fresnel_wind"].values
+        wind = l1b["rhof_wind"].values
         for i in range(len(l1b.scan)):
-            fresnel_vza[i] = l1b["viewing_zenith_angle"][i].values
-            fresnel_sza[i] = l1b["solar_zenith_angle"][i].values
+            rhof_vza[i] = l1b["viewing_zenith_angle"][i].values
+            rhof_sza[i] = l1b["solar_zenith_angle"][i].values
             ra = (
                 l1b["pointing_azimuth_angle"][i].values
                 - l1b["solar_azimuth_angle"][i].values
             ) % 360
 
-            fresnel_raa[i] = ((ra - 180) % 360) - 180
+            rhof_raa[i] = ((ra - 180) % 360) - 180
 
-            ## get fresnel reflectance
-            if self.context.get_config_value("fresnel_option") == "Mobley1999":
+            ## get air_water_int reflectance
+            if self.context.get_config_value("rhof_option") == "Mobley1999":
                 if (
-                    (fresnel_sza[i] is not None)
-                    & (fresnel_raa[i] is not None)
-                    & (abs(fresnel_raa[i]) > 180)
+                    (rhof_sza[i] is not None)
+                    & (rhof_raa[i] is not None)
+                    & (abs(rhof_raa[i]) > 180)
                 ):
-                    sza = min(fresnel_sza[i], 79.999)
+                    sza = min(rhof_sza[i], 79.999)
                     rhof = self.rhymerproc.mobley_lut_interp(
-                        sza, fresnel_vza[i], fresnel_raa[i], wind=wind[i]
+                        sza, rhof_vza[i], rhof_raa[i], wind=wind[i]
                     )
                 else:
                     l1b["quality_flag"][l1b["scan"] == i] = du.set_flag(
-                        l1b["quality_flag"][l1b["scan"] == i], "fresnel_default"
+                        l1b["quality_flag"][l1b["scan"] == i], "rhof_default"
                     )
                     rhof = self.context.get_config_value("rhof_default")
-            # if self.context.get_config_value("fresnel_option") == "Ruddick2006":
+            # if self.context.get_config_value("rhof_option") == "Ruddick2006":
             #     rhof = self.context.get_config_value("rhof_default")
             #     if wind[i] is not None:
             #         rhof = rhof + 0.00039 * wind[i] + 0.000034 * wind[i] ** 2
 
-            fresnel_coeff[i] = rhof
-        l1b["rhof"].values = fresnel_coeff
-        l1b["fresnel_vza"].values = fresnel_vza
-        l1b["fresnel_raa"].values = fresnel_raa
-        l1b["fresnel_sza"].values = fresnel_sza
+            rhof[i] = rhof
+        l1b["rhof"].values = rhof
+        l1b["rhof_vza"].values = rhof_vza
+        l1b["rhof_raa"].values = rhof_raa
+        l1b["rhof_sza"].values = rhof_sza
 
         return l1b
 
@@ -454,7 +449,7 @@ class RhymerHypstar:
 
         flags = ["outliers","L0_thresholds", "L0_discontinuity","bad_pointing"]
         # "temp_variability_ed", "temp_variability_lu"])
-        #                 "fresnel_default",  "simil_fail"]
+        #                 "air_water_int_default",  "simil_fail"]
 
         for measurandstring in ["irradiance", "downwelling_radiance"]:
             L1c_int["std_{}".format(measurandstring)].values = self.avg.calc_std_masked(

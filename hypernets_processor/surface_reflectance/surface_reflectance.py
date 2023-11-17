@@ -50,7 +50,7 @@ class SurfaceReflectance:
     def reflectance_w(self, dataset, l1birr, razangle):
         L1c = self.templ.l1c_from_l1b_dataset(dataset, razangle)
         L1c = self.rh.get_wind(L1c)
-        L1c = self.rh.get_fresnelrefl(L1c)
+        L1c = self.rh.get_rhof(L1c)
 
         # remove qc bird since we have a clearsky test already?
         L1c = self.qual.qc_bird(L1c)
@@ -155,7 +155,7 @@ class SurfaceReflectance:
             flags_propagate = [
                 "single_irradiance_used",
                 "series_missing",
-                "fresnel_default",
+                "rhof_default",
                 "simil_fail",
                 "no_clear_sky_sequence",
                 "def_wind_flag",

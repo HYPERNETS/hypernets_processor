@@ -166,19 +166,19 @@ class HypernetsDSBuilder:
                 metadata["instrument_calibration_file_irr"] = (
                     "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
                 )
-                metadata["fresnel_option"] = self.context.get_config_value(
-                    "fresnel_option"
+                metadata["rhof_option"] = self.context.get_config_value(
+                    "rhof_option"
                 )
 
                 wa = self.context.get_config_value("wind_ancillary")
                 if not wa:
-                    metadata["fresnel_wind_source"] = "Default - {}".format(
+                    metadata["rhof_wind_source"] = "Default - {}".format(
                         self.context.get_config_value("wind_default")
                     )
                 elif wa == "GDAS":
-                    metadata["fresnel_wind_source"] = "GDAS"
+                    metadata["rhof_wind_source"] = "GDAS"
                 elif wa == "NCEP":
-                    metadata["fresnel_wind_source"] = (
+                    metadata["rhof_wind_source"] = (
                         "The National Centers for Environmental Prediction) "
                         "Reanalysis 2 (NCEPR2) dataset used for the SeaDAS Ocean Color Processing; "
                         "https://oceandata.sci.gsfc.nasa.gov/directdataaccess/Ancillary/GLOBAL"
