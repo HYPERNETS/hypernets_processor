@@ -60,7 +60,7 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
-    "nls": {
+    "nld": {
         "description": "Not enough Lsky scans",
         "error": None,
         "error_msg": None,
@@ -70,7 +70,7 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
-    "nld": {
+    "ndark": {
         "description": "Not enough dark scans",
         "error": ValueError,
         "error_msg": None,

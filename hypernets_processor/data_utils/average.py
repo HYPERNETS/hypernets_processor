@@ -74,7 +74,7 @@ class Average:
                         if self.context.logger is not None:
                             self.context.logger.error(
                                 "Not enough dark scans for sequence {}".format(dataset_l0b.attrs['sequence_id']))
-                        self.context.anomaly_handler.add_anomaly("nld")
+                        self.context.anomaly_handler.add_anomaly("ndark")
             elif var=="u_rel_random_dark_signal":
                 dataset_l0b["u_rel_random_dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)
             elif "series" in dataset_l0b[var].dims:

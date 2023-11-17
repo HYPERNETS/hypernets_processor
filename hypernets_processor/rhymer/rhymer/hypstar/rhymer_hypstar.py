@@ -289,7 +289,7 @@ class RhymerHypstar:
                             lsky.attrs["sequence_id"]
                         )
                     )
-                self.context.anomaly_handler.add_anomaly("nls")
+                self.context.anomaly_handler.add_anomaly("nld")
 
             return lu, lsky, dataset_l1b
 
