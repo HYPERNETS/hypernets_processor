@@ -5,6 +5,7 @@ Averaging class
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
+from hypernets_processor.data_utils.quality_checks import QualityChecks
 from hypernets_processor.calibration.measurement_functions.measurement_function_factory import\
     MeasurementFunctionFactory
 
@@ -25,6 +26,7 @@ class Average:
     def __init__(self,context):
         self.templ = DataTemplates(context=context)
         self.context = context
+        self.qual = QualityChecks(context)
         self.writer=HypernetsWriter(context)
         self._measurement_function_factory = MeasurementFunctionFactory
 
@@ -59,22 +61,15 @@ class Average:
                         dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
                             dataset_l0b["quality_flag"][i], "half_of_scans_masked"
                         )
+                dataset_l0b = self.qual.check_valid_scans(dataset_l0b, n_valid, n_total, measurandstring)
 
             elif var=="dark_signal":
                 measurand, measurand_std, n_valid, n_total = self.calc_mean_masked(
                     dataset_l0_bla, "digital_number", flags, return_std=True, return_total=True)
                 dataset_l0b["dark_signal"].values=measurand
                 dataset_l0b["std_dark_signal"].values=measurand_std.astype(dataset_l0b["std_dark_signal"].values.dtype)
-                for i in range(len(n_valid)):
-                    # if n_valid[i] < 0.5*n_total[i]:
-                    #     dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
-                    #         dataset_l0b["quality_flag"][i], "half_of_scans_masked"
-                    #     )
-                    if n_valid[i] < self.context.get_config_value("n_valid_dark"):
-                        if self.context.logger is not None:
-                            self.context.logger.error(
-                                "Not enough dark scans for sequence {}".format(dataset_l0b.attrs['sequence_id']))
-                        self.context.anomaly_handler.add_anomaly("nld")
+                dataset_l0b = self.qual.check_valid_darks(dataset_l0b, n_valid, n_total)
+
             elif var=="u_rel_random_dark_signal":
                 dataset_l0b["u_rel_random_dark_signal"].values=self.calc_mean_masked(dataset_l0_bla, "u_rel_random_digital_number",flags,rand_unc=True)
             elif "series" in dataset_l0b[var].dims:
@@ -102,7 +97,6 @@ class Average:
                 dataset_l1b["n_total_scans"].values=n_total.astype(dataset_l1b["n_total_scans"].values.dtype)
 
             elif measurandstring in var:
-
                 if "u_rel_random" in var:
                     dataset_l1b[var].values=self.calc_mean_masked(dataset_l1a,var,flags,rand_unc=True)
                 elif "err_corr_" in var:
@@ -119,7 +113,7 @@ class Average:
         #                  "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
 
         flags = ["bad_pointing","outliers","L0_thresholds","L0_discontinuity",
-                "fresnel_angle_missing","temp_variability_ed","temp_variability_lu"]
+                "fresnel_angle_missing","temp_variability_ed","temp_variability_lu","fresnel_default"]
 
         dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags, razangle)
 
@@ -131,7 +125,7 @@ class Average:
         dataset_l2a["n_valid_scans"].values = n_valid.astype(dataset_l2a["n_valid_scans"].values.dtype)
         dataset_l2a["n_total_scans"].values = n_total.astype(dataset_l2a["n_total_scans"].values.dtype)
         dataset_l2a["u_rel_random_water_leaving_radiance"].values = self.calc_mean_masked(
-            dataset, "u_rel_random_water_leaving_radiance", flags, rand_unc=True)
+            dataset,"u_rel_random_water_leaving_radiance", flags, rand_unc=True)
         dataset_l2a["u_rel_systematic_indep_water_leaving_radiance"].values = self.calc_mean_masked(
             dataset, "u_rel_systematic_indep_water_leaving_radiance", flags)
         dataset_l2a["err_corr_systematic_indep_water_leaving_radiance"].values = \

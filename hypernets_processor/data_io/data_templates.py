@@ -220,8 +220,11 @@ class DataTemplates:
         dataset_l1b["series_id"].values = series_id
 
         for variablestring in dataset_l1a.keys():
-            if (dataset_l1a[variablestring].dims == ("scan",)) and (
-                variablestring in dataset_l1b.keys()
+            if (
+                (dataset_l1a[variablestring].dims == ("scan",))
+                and (variablestring in dataset_l1b.keys())
+                and (variablestring not in ["quality_flag"])
+                and (measurandstring not in variablestring)
             ):
                 temp_arr = np.empty(len(series_id))
                 for i in range(len(series_id)):
@@ -325,6 +328,14 @@ class DataTemplates:
                 np.where(wavs_swir > self.context.get_config_value("combine_lim_wav"))
             ],
         )
+        bandwidth = np.append(
+            dataset["bandwidth"].values[
+                np.where(wavs_vis <= self.context.get_config_value("combine_lim_wav"))
+            ],
+            dataset_SWIR["bandwidth"].values[
+                np.where(wavs_swir > self.context.get_config_value("combine_lim_wav"))
+            ],
+        )
         l1b_dim_sizes_dict = {"wavelength": len(wavs), "series": len(dataset["series"])}
         if measurementstring == "radiance":
             dataset_l1b = self.hdsb.create_ds_template(
@@ -335,6 +346,8 @@ class DataTemplates:
                 l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset, ds=dataset
             )
         dataset_l1b = dataset_l1b.assign_coords(wavelength=wavs)
+        dataset_l1b["bandwidth"].values=bandwidth
+        dataset_l1b["quality_flag"].values=dataset["quality_flag"].values+dataset_SWIR["quality_flag"].values
         return dataset_l1b
 
     def l1c_from_l1b_dataset(self, dataset_l1b, razangle=None):
@@ -436,8 +449,10 @@ class DataTemplates:
             series_id = np.unique(datasetl1c["series_id"])
             dataset_l2a["series_id"].values = series_id
             for variablestring in datasetl1c.keys():
-                if (datasetl1c[variablestring].dims == ("scan",)) and (
-                    variablestring in dataset_l2a.keys()
+                if (
+                    (datasetl1c[variablestring].dims == ("scan",))
+                    and (variablestring in dataset_l2a.keys())
+                    and (variablestring not in ["quality_flag"])
                 ):
                     temp_arr = np.empty(len(series_id))
                     for i in range(len(series_id)):

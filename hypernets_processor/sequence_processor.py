@@ -147,7 +147,7 @@ class SequenceProcessor:
                             #     L1a_uprad, L1a_downrad, L1a_irr, dataset_l1b = rhymer.cycleparse(rad_, irr_,
                             #                                                                          dataset_l1b)
 
-                            L1c_int = rhymer.process_l1c_int(rad_, irr_, L1b_irr)
+                            L1c_int = rhymer.process_l1c_int(rad_, L1b_irr)
 
                             # add relative azimuth angle for the filename
                             L1c = surf.reflectance_w(L1c_int, L1b_irr, razangle=ra)

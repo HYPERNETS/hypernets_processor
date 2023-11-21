@@ -100,6 +100,7 @@ class SurfaceReflectance:
             comp_list_out=["random", "systematic"],
             ds_out_pre=L1c,
             store_unc_percent=True,
+            simple_systematic=False
         )
 
         failSimil = self.qual.qc_similarity(L1c)
@@ -138,7 +139,7 @@ class SurfaceReflectance:
                         self.plot.plot_relative_uncertainty(measurandstring, L1c)
                     else:
                         self.plot.plot_relative_uncertainty(
-                            measurandstring, L1c, L2=True
+                            measurandstring, L1c, refl=True
                         )
             except:
                 print("not plotting ", measurandstring)
@@ -165,8 +166,8 @@ class SurfaceReflectance:
                 if any(
                     DatasetUtil.get_flags_mask_or(dataset["quality_flag"], [flag_i])
                 ):
-                    dataset_l2a["quality_flag"] = DatasetUtil.set_flag(
-                        dataset_l2a["quality_flag"], flag_i
+                    dataset_l2a["quality_flag"][:] = DatasetUtil.set_flag(
+                        dataset_l2a["quality_flag"][:], flag_i
                     )
 
             for measurandstring in [
@@ -174,24 +175,29 @@ class SurfaceReflectance:
                 "reflectance_nosc",
                 "reflectance",
             ]:
-                try:
+                if True:
                     if self.context.get_config_value("plot_l2a"):
                         self.plot.plot_series_in_sequence(
                             measurandstring,
                             dataset_l2a,  # ylim=[0, 0.05]
                         )
 
+                    if measurandstring == "water_leaving_radiance":
+                        refl = False
+                    else:
+                        refl = True
+
                     if self.context.get_config_value("plot_uncertainty"):
                         self.plot.plot_relative_uncertainty(
-                            measurandstring, dataset_l2a, L2=True
+                            measurandstring, dataset_l2a, refl=refl
                         )
 
                     if self.context.get_config_value("plot_correlation"):
                         self.plot.plot_correlation(
-                            measurandstring, dataset_l2a, L2=True
+                            measurandstring, dataset_l2a, refl=refl
                         )
-                except:
-                    print("not plotting ", measurandstring)
+                # except:
+                #     print("not plotting ", measurandstring)
 
         elif self.context.get_config_value("network").lower() == "l":
             prop = punpy.MCPropagation(
@@ -232,10 +238,10 @@ class SurfaceReflectance:
                         dataset_l2a, self.context.get_config_value("plot_polar_wav")
                     )
             if self.context.get_config_value("plot_uncertainty"):
-                self.plot.plot_relative_uncertainty("reflectance", dataset_l2a, L2=True)
+                self.plot.plot_relative_uncertainty("reflectance", dataset_l2a, refl=True)
 
             if self.context.get_config_value("plot_correlation"):
-                self.plot.plot_correlation("reflectance", dataset_l2a, L2=True)
+                self.plot.plot_correlation("reflectance", dataset_l2a, refl=True)
         else:
             self.context.logger.error("network is not correctly defined")
 

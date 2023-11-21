@@ -203,7 +203,6 @@ class HypernetsDSBuilder:
         if (metadata_db is not None) and (metadata_db_query is not None):
             metadata = self.find_metadata(metadata, metadata_db, metadata_db_query)
 
-
         return obsarray.create_ds(
             variables_dict, dim_sizes_dict, metadata=metadata, propagate_ds=propagate_ds
         )

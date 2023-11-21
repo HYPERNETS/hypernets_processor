@@ -31,7 +31,7 @@ def process_sequence():
     """
 
     network = "water"
-    #network = "land"
+    network = "land"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
     print(job_config_path)
@@ -48,13 +48,13 @@ def process_sequence():
     # Read config file
     job_config = read_config_file([job_config_path, processor_defaults])
 
-    job_config["Input"][
-        "raw_data_directory"
-    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20230801T150236"
-
     # job_config["Input"][
     #     "raw_data_directory"
-    # ] = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Desktop\GONA_data\raw_data\GONA\SEQ20220829T153127"
+    # ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20230407T093202"
+
+    job_config["Input"][
+        "raw_data_directory"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\SEQ20220626T114042"
 
     job_config["Output"][
         "archive_directory"

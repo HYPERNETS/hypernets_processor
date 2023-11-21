@@ -56,6 +56,12 @@ class QualityChecks:
         angacc_vza = abs(vza_abs - vza_ref)
         angacc_vaa = abs(paa_abs - paa_ref)
 
+        if angacc_vza > 180:
+            angacc_vza = 360 - angacc_vza
+
+        if angacc_vaa > 180:
+            angacc_vaa=360-angacc_vaa
+
         self.context.logger.debug(
             "Angle accuracy vza {:.4f} ={:.4f}-{:.4f}".format(
                 angacc_vza, vza_abs, vza_ref
@@ -203,15 +209,9 @@ class QualityChecks:
         szas = dataset_l1b_irr["solar_zenith_angle"].values
 
         for i, vza in enumerate(vzas):
-            if np.abs(vza - 180) > 2:
-                # dataset_l1b_irr["irradiance"].values[:, i] = np.mean(
-                #     dataset_l1b_irr["irradiance"].values[
-                #     :, np.where(np.abs(vzas - 180) < 2.0)[0]
-                #     ],
-                #     axis=1,
-                # )
+            if np.abs(vza - 180) > self.context.get_config_value("irradiance_zenith_treshold"):
                 self.context.logger.warning(
-                    "One of the irradiance measurements did not have vza=180, so has been masked"
+                    "One of the irradiance measurements did not have vza=180 (tolerance of %s), so has been masked"%self.context.get_config_value("irradiance_zenith_treshold")
                 )
                 dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
                     dataset_l1b_irr["quality_flag"][i], "vza_irradiance"
@@ -280,7 +280,7 @@ class QualityChecks:
             self.qc_illumination(
                 dataset_l1b_irr.isel(series=mask_notflagged), "irradiance"
             )
-            > self.context.get_config_value("irr_variability_percent") / 100 / 2**0.5
+            > self.context.get_config_value("irr_variability_percent") / 100 / 2
         ):  # /2 is to account for difference between calculating relative std and %  (for 2 values)
             for i in range(len(dataset_l1b_irr["quality_flag"].values)):
                 dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
@@ -291,27 +291,6 @@ class QualityChecks:
 
     def check_valid_irradiance(self, ds):
         for i in range(len(ds["n_valid_scans"])):
-            if ds["n_valid_scans"][i] < self.context.get_config_value("n_valid_irr"):
-                if self.context.logger is not None:
-                    self.context.logger.error(
-                        "Not enough downwelling irradiance data for sequence {}".format(
-                            ds.attrs["sequence_id"]
-                        )
-                    )
-                self.context.anomaly_handler.add_anomaly("ned")
-
-            if "n_valid_scans_SWIR" in ds.keys():
-                if ds["n_valid_scans_SWIR"][i] < self.context.get_config_value(
-                    "n_valid_irr"
-                ):
-                    if self.context.logger is not None:
-                        self.context.logger.error(
-                            "Not enough SWIR downwelling irradiance data for sequence {}".format(
-                                ds.attrs["sequence_id"]
-                            )
-                        )
-                    self.context.anomaly_handler.add_anomaly("ned")
-
             if DatasetUtil.get_flags_mask_or(
                 ds["quality_flag"][i], ["variable_irradiance"]
             ):
@@ -322,20 +301,49 @@ class QualityChecks:
                 )
                 self.context.anomaly_handler.add_anomaly("nu")
 
-    def check_valid_radiance(self, ds):
-        for i in range(len(ds["n_valid_scans"])):
-            if ds["n_valid_scans"][i] < self.context.get_config_value("n_valid_rad"):
+    def check_valid_darks(self, dataset_l0b, n_valid, n_total):
+        for i in range(len(n_valid)):
+            if n_valid[i] < self.context.get_config_value("n_valid_dark"):
+                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
+                    dataset_l0b["quality_flag"][i], "not_enough_dark_scans"
+                )
                 if self.context.logger is not None:
                     self.context.logger.error(
-                        "Not enough upwelling radiance data for sequence {}".format(
-                            ds.attrs["sequence_id"]
-                        )
-                    )
+                        "Not enough dark scans for sequence {}".format(dataset_l0b.attrs['sequence_id']))
+                self.context.anomaly_handler.add_anomaly("nld")
+            # if n_valid[i] < 0.5*n_total[i]:
+            #     dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
+            #         dataset_l0b["quality_flag"][i], "half_of_scans_masked"
+            #     )
+        return dataset_l0b
+
+    def check_valid_scans(self, dataset_l0b, n_valid, n_total, measurandstring):
+        for i in range(len(n_valid)):
+            if (measurandstring == "radiance") and (n_valid[i] < self.context.get_config_value("n_valid_rad")):
+                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
+                    dataset_l0b["quality_flag"][i], "not_enough_rad_scans"
+                )
                 self.context.anomaly_handler.add_anomaly("nlu")
 
+            if (measurandstring=="irradiance") and (n_valid[i] < self.context.get_config_value("n_valid_irr")):
+                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
+                    dataset_l0b["quality_flag"][i], "not_enough_irr_scans"
+                )
+                self.context.anomaly_handler.add_anomaly("ned")
+
+            if n_valid[i] < 0.5*n_total[i]:
+                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
+                    dataset_l0b["quality_flag"][i], "half_of_scans_masked"
+                )
+        return dataset_l0b
+
     def check_standard_sequence_L1B(self, ds, measurand, network):
+        flags=["not_enough_dark_scans","not_enough_rad_scans","not_enough_irr_scans"]
+        flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], flags)
+        mask_notflagged = np.where(flagged == False)[0]
+
         if measurand == "irradiance":
-            if len(ds["series_id"]) < 2:
+            if len(ds["series_id"][mask_notflagged]) < 2:
                 ds["quality_flag"] = DatasetUtil.set_flag(
                     ds["quality_flag"], "series_missing"
                 )
@@ -345,7 +353,7 @@ class QualityChecks:
                     ds["viewing_zenith_angle"].values[i],
                     ds["viewing_azimuth_angle"].values[i],
                 )
-                for i in range(len(ds["viewing_zenith_angle"].values))
+                for i in range(len(ds["viewing_zenith_angle"].values)) if i in mask_notflagged
             ]
             if np.all(
                 ds["viewing_zenith_angle"].values > 1
@@ -386,7 +394,7 @@ class QualityChecks:
                     )
 
         elif network == "water" and measurand == "downwelling_radiance":
-            if len(ds["series_id"]) < 2:
+            if len(ds["series_id"][mask_notflagged]) < 2:
                 ds["quality_flag"] = DatasetUtil.set_flag(
                     ds["quality_flag"], "series_missing"
                 )

@@ -75,11 +75,6 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
-    "i": {
-        "description": "No valid irradiance measurements",
-        "error": None,
-        "error_msg": None,
-    },
     "nu": {
         "description": "Non constant illumination",
         "error": ValueError,

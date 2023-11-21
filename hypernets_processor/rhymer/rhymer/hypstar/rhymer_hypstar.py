@@ -409,7 +409,7 @@ class RhymerHypstar:
 
         return l1b
 
-    def process_l1c_int(self, l1a_rad, l1a_irr, L1b_irr):
+    def process_l1c_int(self, l1a_rad, L1b_irr):
 
         # because we average to Lu scan we propagate values from radiance!
         dataset_l1flags = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
@@ -419,11 +419,8 @@ class RhymerHypstar:
         dataset_l1flags, flags_rad = self.qual.qc_scan(
             l1a_rad, "radiance", dataset_l1flags
         )
-        dataset_l1flags, flags_irr = self.qual.qc_scan(
-            l1a_irr, "irradiance", dataset_l1flags
-        )
+
         l1a_rad = l1a_rad.sel(scan=np.where(np.array(flags_rad) != 1)[0])
-        l1a_irr = l1a_irr.sel(scan=np.where(np.array(flags_irr) != 1)[0])
 
         # check number of scans per cycle for up, down radiance and irradiance
         L1a_uprad, L1a_downrad, dataset_l1flags = self.cycleparse(
@@ -452,7 +449,7 @@ class RhymerHypstar:
             dataset_l1flags, L1a_uprad, L1b_downrad, L1b_irr
         )
 
-        flags = ["outliers","L0_thresholds", "L0_discontinuity","bad_pointing"]
+        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
         # "temp_variability_ed", "temp_variability_lu"])
         #                 "fresnel_default",  "simil_fail"]
 
@@ -468,6 +465,6 @@ class RhymerHypstar:
 
         L1c_int.attrs["nld"] = dataset_l1flags.attrs["nld"]
         L1c_int.attrs["nlu"] = dataset_l1flags.attrs["nlu"]
-        #L1c_int.attrs["ned"] = dataset_l1flags.attrs["ned"]
+        # L1c_int.attrs["ned"] = dataset_l1flags.attrs["ned"]
 
         return L1c_int

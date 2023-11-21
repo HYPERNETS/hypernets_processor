@@ -185,6 +185,10 @@ class HypernetsReader:
         vza_abs = normalizedeg(float(vza_abs), 0, 360)
         vza_ref = normalizedeg(float(vza_ref), 0, 360)
 
+        paa_ask = normalizedeg(float(paa_ask), 0, 360)
+        paa_abs = normalizedeg(float(paa_abs), 0, 360)
+        paa_ref = normalizedeg(float(paa_ref), 0, 360)
+
         # perform quality checks
         self.qual.perform_quality_check_angles(
             ds, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
@@ -866,12 +870,16 @@ class HypernetsReader:
 
             # first retrieve site name to get site specific attributes, if any
 
-            if "site_name" in (globalattr.keys()):
-                site_id = str(globalattr["site_name"]).strip()
+            if self.context.get_config_value("site_id") != "TEST":
+                site_id = self.context.get_config_value("site_id")
             elif "site_id" in (globalattr.keys()):
                 site_id = str(globalattr["site_id"]).strip()
+                self.context.set_config_value("site_id", site_id)
+            elif "site_name" in (globalattr.keys()):
+                site_id = str(globalattr["site_name"]).strip()
+                self.context.set_config_value("site_id", site_id)
             else:
-                site_id = self.context.get_config_value("site_id")
+                self.context.error("site_id not found. Using default TEST instead.")
 
             # need to check which angle to use as a reference to calculate vaa (~azimuth swith, offset, ...)
             angle2use = "pt_ref"

@@ -95,7 +95,6 @@ class Interpolate:
         self, dataset_l1b_rad, dataset_l1b_irr
     ):  # used for land processing
 
-        self.qual.check_valid_radiance(dataset_l1b_rad)
         self.qual.check_valid_irradiance(dataset_l1b_irr)
 
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
@@ -182,11 +181,11 @@ class Interpolate:
         # Interpolate in time to radiance times
         acqui_rad = dataset_l1c["acquisition_time"].values
 
-        flags = ["no_clear_sky_irradiance", "vza_irradiance"]
+        flags = ["no_clear_sky_irradiance", "vza_irradiance", "not_enough_dark_scans", "not_enough_irr_scans"]
         flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
         if len(mask_notflagged) == 0:
-            self.context.anomaly_handler.add_anomaly("i", dataset_l1b_irr)
+            self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
             acqui_irr = dataset_l1b_irr["acquisition_time"].values
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
                 dataset_l1c["quality_flag"], "no_clear_sky_sequence"

@@ -178,13 +178,23 @@ class Calibrate:
             ).split(","):
                 start_mask = float(maskrange.split("-")[0])
                 end_mask = float(maskrange.split("-")[1])
-                dataset_l1b["u_rel_systematic_indep_" + measurandstring].values[
-                    np.where(
-                        (dataset_l1b.wavelength > start_mask)
-                        & (dataset_l1b.wavelength < end_mask)
-                    )[0],
+                for i in np.where(
+                    (dataset_l1b.wavelength > start_mask)
+                    & (dataset_l1b.wavelength < end_mask)
+                )[0]:
+                    dataset_l1b["u_rel_systematic_indep_" + measurandstring].values[
+                    i,
                     :,
-                ] += 50
+                    ] += 50
+                    dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
+                    i,:
+                    ] = (3 / 50) ** 2
+                    dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
+                    :,i
+                    ] = (3 / 50) ** 2
+                    dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
+                    i, i
+                    ] = 1
 
         dataset_l1b["std_" + measurandstring].values = (
             dataset_l1b[measurandstring].values
