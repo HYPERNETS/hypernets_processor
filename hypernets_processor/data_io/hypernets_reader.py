@@ -897,6 +897,8 @@ class HypernetsReader:
                     sitespecattr = dict(sitespec["Metadata"])
                     angle2use = str(sitespecattr["angle2use"]).strip()
 
+            print("angle used to evaluated azimuth:{}".format(angle2use))
+
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']
             # look for latitude and longitude or lat and lon , more elegant way??

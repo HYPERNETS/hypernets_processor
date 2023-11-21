@@ -51,16 +51,16 @@ ANOMALIES_DICT = {
         "error_msg": None,
     },
     "l": {
-        "description": "Ld missing for fresnel correction",
+        "description": "Ld missing for sky reflectance correction",
         "error": ValueError,
-        "error_msg": "Ld missing for fresnel correction",
+        "error_msg": "Ld missing for sky reflectance correction",
     },
     "nlu": {
         "description": "Not enough Lu scans",
         "error": None,
         "error_msg": None,
     },
-    "nls": {
+    "nld": {
         "description": "Not enough Lsky scans",
         "error": None,
         "error_msg": None,
@@ -70,7 +70,7 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
-    "nld": {
+    "ndark": {
         "description": "Not enough dark scans",
         "error": None,
         "error_msg": None,

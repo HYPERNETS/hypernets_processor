@@ -1723,7 +1723,7 @@ W_L1C_VARIABLES = {
         "dim": [Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "fresnel_reflectance",
+            "standard_name": "air_water_int_radiance_ratio",
             "long_name": "Fraction of downwelling sky radiance reflected at the "
             "air-water interface",
             "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",
@@ -1731,11 +1731,11 @@ W_L1C_VARIABLES = {
             "preferred_symbol": "rhof",
         },
     },
-    "fresnel_wind": {
+    "rhof_wind": {
         "dim": [Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "fresnel_wind",
+            "standard_name": "rhof_wind",
             "long_name": "Surface wind speed used for the retrieval of the "
             "fraction of downwelling sky radiance reflected at "
             "the air-water interface",
@@ -1743,11 +1743,11 @@ W_L1C_VARIABLES = {
             "units": "ms^-1",
         },
     },
-    "fresnel_sza": {
+    "rhof_sza": {
         "dim": [Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "fresnel_solar_zenith_angle",
+            "standard_name": "rhof_solar_zenith_angle",
             "long_name": "Solar zenith angle used for the retrieval of the "
             "fraction of downwelling sky radiance reflected at "
             "the air-water interface",
@@ -1755,11 +1755,11 @@ W_L1C_VARIABLES = {
             "units": "degrees",
         },
     },
-    "fresnel_raa": {
+    "rhof_raa": {
         "dim": [Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "fresnel_relative_azimuth_angle",
+            "standard_name": "rhof_relative_azimuth_angle",
             "long_name": "Relative azimuth angle from sun to sensor (0° when "
             "sun and sensor are aligned 180° when the sensor is "
             "looking into the sunglint) used for the retrieval "
@@ -1770,11 +1770,11 @@ W_L1C_VARIABLES = {
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
     },
-    "fresnel_vza": {
+    "rhof_vza": {
         "dim": [Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "fresnel_sensor_zenith_angle",
+            "standard_name": "rhof_sensor_zenith_angle",
             "long_name": "Sensor zenith angle used for the retrieval of the "
             "fraction of downwelling sky radiance reflected at "
             "the air-water interface",
@@ -2180,7 +2180,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dim": [Lu_SCAN_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "fresnel_reflectance",
+            "standard_name": "air_water_int_radiance_ratio",
             "long_name": "Fraction of downwelling sky radiance reflected at the "
             "air-water interface",
             "reference": "SYSTEM_HEIGHT_DEPLOYEMENT",

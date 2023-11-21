@@ -22,8 +22,8 @@ FLAG_COMMON = [
 
 FLAG_WATER = [
     "lu_eq_missing",
-    "fresnel_angle_missing",
-    "fresnel_default",
+    "rhof_angle_missing",
+    "rhof_default",
     "temp_variability_ed",
     "temp_variability_lu",
     "min_nbred",
