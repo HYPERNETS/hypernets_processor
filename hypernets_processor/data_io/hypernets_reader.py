@@ -185,9 +185,9 @@ class HypernetsReader:
         vza_abs = normalizedeg(float(vza_abs), 0, 360)
         vza_ref = normalizedeg(float(vza_ref), 0, 360)
 
-        paa_ask = normalizedeg(float(vza_ask), 0, 360)
-        paa_abs = normalizedeg(float(vza_abs), 0, 360)
-        paa_ref = normalizedeg(float(vza_ref), 0, 360)
+        paa_ask = normalizedeg(float(paa_ask), 0, 360)
+        paa_abs = normalizedeg(float(paa_abs), 0, 360)
+        paa_ref = normalizedeg(float(paa_ref), 0, 360)
 
         # perform quality checks
         self.qual.perform_quality_check_angles(
@@ -892,6 +892,8 @@ class HypernetsReader:
                 if sitespec.has_section("Metadata"):
                     sitespecattr = dict(sitespec["Metadata"])
                     angle2use = str(sitespecattr["angle2use"]).strip()
+
+            print("angle used to evaluated azimuth:{}".format(angle2use))
 
             # reboot time if we want to use acquisition time
             # timereboot=globalattr['datetime']

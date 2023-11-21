@@ -375,12 +375,14 @@ class RhymerHypstar:
 
             rhof_raa[i] = ((ra - 180) % 360) - 180
 
+            print(rhof_raa)
+
             ## get air_water_int reflectance
             if self.context.get_config_value("rhof_option") == "Mobley1999":
                 if (
                     (rhof_sza[i] is not None)
                     & (rhof_raa[i] is not None)
-                    & (abs(rhof_raa[i]) > 180)
+                    & (abs(rhof_raa[i]) < 180)
                 ):
                     sza = min(rhof_sza[i], 79.999)
                     rhof = self.rhymerproc.mobley_lut_interp(
@@ -396,8 +398,9 @@ class RhymerHypstar:
             #     if wind[i] is not None:
             #         rhof = rhof + 0.00039 * wind[i] + 0.000034 * wind[i] ** 2
 
-            rhof[i] = rhof
-        l1b["rhof"].values = rhof
+            rhof_coeff[i] = rhof
+        print(rhof_coeff)
+        l1b["rhof"].values = rhof_coeff
         l1b["rhof_vza"].values = rhof_vza
         l1b["rhof_raa"].values = rhof_raa
         l1b["rhof_sza"].values = rhof_sza

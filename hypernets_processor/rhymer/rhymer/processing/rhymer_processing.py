@@ -20,13 +20,16 @@ class RhymerProcessing:
         )
         # self.path_ascii = os.path.join(dir_path, 'data', 'calibration_files_ascii', 'HYPSTAR_cal')
 
-    def mobley_lut_interp(self, ths, thv, phi, wind=2.0):
+    def mobley_lut_interp(self, ths, thv, paa, wind=2.0):
         rholut = self.mobley_lut_read()
         dval = rholut["header"]
 
         # find wind speeds
         wind_id, wind_br = self.rhymershared.lutpos(dval["Wind"], wind)
         wind_w = wind_id - wind_br[0]
+
+        #phi is phi-view/pointing azimuth angle
+        phi=180-abs(paa)
 
         # find geometry
         ths_id, ths_br = self.rhymershared.lutpos(dval["Theta-sun"], ths)
