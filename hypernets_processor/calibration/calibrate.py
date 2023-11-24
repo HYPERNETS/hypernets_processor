@@ -183,17 +183,17 @@ class Calibrate:
                     & (dataset_l1b.wavelength < end_mask)
                 )[0]:
                     dataset_l1b["u_rel_systematic_indep_" + measurandstring].values[
-                    i,
-                    :,
+                        i,
+                        :,
                     ] += 50
                     dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
-                    i,:
+                        i, :
                     ] = (3 / 50) ** 2
                     dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
-                    :,i
+                        :, i
                     ] = (3 / 50) ** 2
                     dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
-                    i, i
+                        i, i
                     ] = 1
 
         dataset_l1b["std_" + measurandstring].values = (

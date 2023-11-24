@@ -28,8 +28,8 @@ class RhymerProcessing:
         wind_id, wind_br = self.rhymershared.lutpos(dval["Wind"], wind)
         wind_w = wind_id - wind_br[0]
 
-        #phi is phi-view/pointing azimuth angle
-        phi=180-abs(paa)
+        # phi is phi-view/pointing azimuth angle
+        phi = 180 - abs(paa)
 
         # find geometry
         ths_id, ths_br = self.rhymershared.lutpos(dval["Theta-sun"], ths)

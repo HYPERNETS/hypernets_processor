@@ -354,9 +354,7 @@ class Plotting:
                 ax1.pcolormesh(wavs, wavs, ycorr_indep, vmin=0, vmax=1, cmap="gnuplot")
                 ax1.set_ylabel("wavelength (nm)", fontsize=self.fontsize)
                 ax1.set_xlabel("wavelength (nm)", fontsize=self.fontsize)
-                ax1.set_title(
-                    "independent systematic correlation matrix", fontsize=10
-                )
+                ax1.set_title("independent systematic correlation matrix", fontsize=10)
                 im = ax2.pcolormesh(
                     wavs, wavs, ycorr_corr, vmin=0, vmax=1, cmap="gnuplot"
                 )
@@ -638,7 +636,7 @@ class Plotting:
         refl = dataset.reflectance.values
 
         vaa_grid = np.arange(8, 368, 15)
-        vza_grid = np.array([0,5,10,20,30,40,50,60])
+        vza_grid = np.array([0, 5, 10, 20, 30, 40, 50, 60])
         raa_grid = vaa_grid - saa
 
         id_wav = np.argmin(np.abs(wavelength - dataset.wavelength.values))
@@ -648,7 +646,18 @@ class Plotting:
         refl_2d = np.zeros((len(vaa_grid), len(vza_grid)))
         for i in range(len(vaa_grid)):
             for ii in range(len(vza_grid)):
-                id_series = np.where((np.abs(vaa-vaa_grid[i])<self.context.get_config_value("bad_pointing_threshold_azimuth")) & (np.abs(vza-vza_grid[ii])<self.context.get_config_value("bad_pointing_threshold_zenith")))[0]
+                id_series = np.where(
+                    (
+                        np.abs(vaa - vaa_grid[i])
+                        < self.context.get_config_value(
+                            "bad_pointing_threshold_azimuth"
+                        )
+                    )
+                    & (
+                        np.abs(vza - vza_grid[ii])
+                        < self.context.get_config_value("bad_pointing_threshold_zenith")
+                    )
+                )[0]
                 if len(id_series) > 0:
                     refl_2d[i, ii] = np.abs(refl[id_wav, id_series])
         refl_2d[refl_2d == 0] = np.nan

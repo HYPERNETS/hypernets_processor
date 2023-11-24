@@ -346,8 +346,10 @@ class DataTemplates:
                 l1b_dim_sizes_dict, "L_L1B_IRR", propagate_ds=dataset, ds=dataset
             )
         dataset_l1b = dataset_l1b.assign_coords(wavelength=wavs)
-        dataset_l1b["bandwidth"].values=bandwidth
-        dataset_l1b["quality_flag"].values=dataset["quality_flag"].values+dataset_SWIR["quality_flag"].values
+        dataset_l1b["bandwidth"].values = bandwidth
+        dataset_l1b["quality_flag"].values = (
+            dataset["quality_flag"].values + dataset_SWIR["quality_flag"].values
+        )
         return dataset_l1b
 
     def l1c_from_l1b_dataset(self, dataset_l1b, razangle=None):

@@ -100,7 +100,9 @@ class HypernetsDSBuilder:
         metadata_db_query = None
 
         if self.context is not None:
-            metadata["responsible_party"] = self.context.get_config_value("responsible_party")
+            metadata["responsible_party"] = self.context.get_config_value(
+                "responsible_party"
+            )
             metadata["creator_name"] = self.context.get_config_value("creator_name")
             metadata["creator_email"] = self.context.get_config_value("creator_email")
 
@@ -169,9 +171,7 @@ class HypernetsDSBuilder:
                 metadata["instrument_calibration_file_irr"] = (
                     "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
                 )
-                metadata["rhof_option"] = self.context.get_config_value(
-                    "rhof_option"
-                )
+                metadata["rhof_option"] = self.context.get_config_value("rhof_option")
 
                 wa = self.context.get_config_value("wind_ancillary")
                 if not wa:

@@ -100,7 +100,7 @@ class SurfaceReflectance:
             comp_list_out=["random", "systematic"],
             ds_out_pre=L1c,
             store_unc_percent=True,
-            simple_systematic=False
+            simple_systematic=False,
         )
 
         failSimil = self.qual.qc_similarity(L1c)
@@ -238,7 +238,9 @@ class SurfaceReflectance:
                         dataset_l2a, self.context.get_config_value("plot_polar_wav")
                     )
             if self.context.get_config_value("plot_uncertainty"):
-                self.plot.plot_relative_uncertainty("reflectance", dataset_l2a, refl=True)
+                self.plot.plot_relative_uncertainty(
+                    "reflectance", dataset_l2a, refl=True
+                )
 
             if self.context.get_config_value("plot_correlation"):
                 self.plot.plot_correlation("reflectance", dataset_l2a, refl=True)

@@ -181,7 +181,12 @@ class Interpolate:
         # Interpolate in time to radiance times
         acqui_rad = dataset_l1c["acquisition_time"].values
 
-        flags = ["no_clear_sky_irradiance", "vza_irradiance", "not_enough_dark_scans", "not_enough_irr_scans"]
+        flags = [
+            "no_clear_sky_irradiance",
+            "vza_irradiance",
+            "not_enough_dark_scans",
+            "not_enough_irr_scans",
+        ]
         flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
         if len(mask_notflagged) == 0:

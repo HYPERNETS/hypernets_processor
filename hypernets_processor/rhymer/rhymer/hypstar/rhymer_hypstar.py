@@ -244,7 +244,9 @@ class RhymerHypstar:
                                 ),
                             )
                         )
-                        self.context.logger.error("Ld missing for rhof approximation of the air water interface radiance reflectance correction")
+                        self.context.logger.error(
+                            "Ld missing for rhof approximation of the air water interface radiance reflectance correction"
+                        )
                     self.context.anomaly_handler.add_anomaly("l")
 
             # check if correct number of radiance and irradiance data
