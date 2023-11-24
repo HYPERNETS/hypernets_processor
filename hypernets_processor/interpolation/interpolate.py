@@ -95,7 +95,7 @@ class Interpolate:
         self, dataset_l1b_rad, dataset_l1b_irr
     ):  # used for land processing
 
-        self.qual.check_valid_irradiance(dataset_l1b_irr)
+        self.qual.check_valid_sequence_land(dataset_l1b_rad, dataset_l1b_irr)
 
         dataset_l1c = self.templ.l1c_from_l1b_dataset(dataset_l1b_rad)
         dataset_l1c["acquisition_time"].values = dataset_l1b_rad[

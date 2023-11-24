@@ -55,7 +55,7 @@ class CombineSWIR:
         )
 
         dataset_l1b, dataset_l1b_swir = self.qual.perform_quality_check_comb(
-            dataset_l1b, dataset_l1b_swir
+            dataset_l1b, dataset_l1b_swir, measurandstring
         )
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), dtype="float32", MCdimlast=True

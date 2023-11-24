@@ -199,8 +199,25 @@ class QualityChecks:
             )
             self.context.anomaly_handler.add_anomaly("o", dataset)
 
-    def perform_quality_check_comb(self, dataset_l1b, dataset_l1b_swir):
-        # todo add these checks
+    def perform_quality_check_comb(self, dataset_l1b, dataset_l1b_swir, measurandstring):
+        wav_range=20
+        for i in range(len(dataset_l1b["series_id"])):
+            if dataset_l1b["series_id"][i]!=dataset_l1b_swir["series_id"][i]:
+                raise ValueError("Series ID of VNIR and SWIR should be the same!")
+
+            idwav = np.where(
+                (dataset_l1b["wavelength"].values < 1000) & (dataset_l1b["wavelength"].values > (1000 - wav_range)))[0]
+            refl_VNIR_edge = np.mean(dataset_l1b[measurandstring][idwav, i])
+            idwav_swir = np.where(
+                (dataset_l1b_swir["wavelength"].values > 1000) & (dataset_l1b_swir["wavelength"].values < (1000 + wav_range)))[0]
+            refl_SRIW_edge = np.mean(dataset_l1b_swir[measurandstring][idwav_swir, i])
+            if 2*np.abs(refl_VNIR_edge-refl_SRIW_edge)/(refl_VNIR_edge+refl_SRIW_edge) > self.context.get_config_value("vnir_swir_discontinuity_percent")/100:
+                dataset_l1b["quality_flag"][i] = DatasetUtil.set_flag(
+                    dataset_l1b["quality_flag"][i], "discontinuity_VNIR_SWIR"
+                )
+                dataset_l1b_swir["quality_flag"][i] = DatasetUtil.set_flag(
+                    dataset_l1b_swir["quality_flag"][i], "discontinuity_VNIR_SWIR"
+                )
         return dataset_l1b, dataset_l1b_swir
 
     def perform_quality_irradiance(self, dataset_l1b_irr):
@@ -289,18 +306,6 @@ class QualityChecks:
 
         return dataset_l1b_irr
 
-    def check_valid_irradiance(self, ds):
-        for i in range(len(ds["n_valid_scans"])):
-            if DatasetUtil.get_flags_mask_or(
-                ds["quality_flag"][i], ["variable_irradiance"]
-            ):
-                self.context.logger.info(
-                    "Non constant irradiance for sequence {}".format(
-                        ds.attrs["sequence_id"]
-                    )
-                )
-                self.context.anomaly_handler.add_anomaly("nu")
-
     def check_valid_darks(self, dataset_l0b, n_valid, n_total):
         for i in range(len(n_valid)):
             if n_valid[i] < self.context.get_config_value("n_valid_dark"):
@@ -336,6 +341,39 @@ class QualityChecks:
                     dataset_l0b["quality_flag"][i], "half_of_scans_masked"
                 )
         return dataset_l0b
+
+    def check_valid_irradiance(self, ds_irr):
+        if any(DatasetUtil.get_flags_mask_or(
+                ds_irr["quality_flag"], ["variable_irradiance"]
+        )):
+            self.context.logger.info(
+                "Non constant irradiance for sequence {}".format(
+                    ds_irr.attrs["sequence_id"]
+                )
+            )
+            self.context.anomaly_handler.add_anomaly("nu")
+
+        flags = ["not_enough_dark_scans", "not_enough_irr_scans", "vza_irradiance"]
+
+        flagged_irr = DatasetUtil.get_flags_mask_or(ds_irr["quality_flag"], flags)
+        mask_notflagged_irr = np.where(flagged_irr == False)[0]
+        if len(ds_irr.series[mask_notflagged_irr]) == 0:
+            self.context.anomaly_handler.add_anomaly("in")
+
+    def check_valid_sequence_land(self, ds_rad, ds_irr):
+        self.check_valid_irradiance(ds_irr)
+
+        flags = ["not_enough_dark_scans", "not_enough_rad_scans"]
+
+        flagged_rad = DatasetUtil.get_flags_mask_or(ds_rad["quality_flag"], flags)
+        mask_notflagged_rad = np.where(flagged_rad == False)[0]
+        if len(ds_rad.series[mask_notflagged_rad]) == 0:
+            self.context.anomaly_handler.add_anomaly("in")
+
+    def check_valid_sequence_water(self, ds_rad, ds_irr):
+        flags = ["not_enough_dark_scans", "not_enough_rad_scans", "not_enough_irr_scans"]
+        flagged = DatasetUtil.get_flags_mask_or(ds_rad["quality_flag"], flags)
+        mask_notflagged = np.where(flagged == False)[0]
 
     def check_standard_sequence_L1B(self, ds, measurand, network):
         flags=["not_enough_dark_scans","not_enough_rad_scans","not_enough_irr_scans"]

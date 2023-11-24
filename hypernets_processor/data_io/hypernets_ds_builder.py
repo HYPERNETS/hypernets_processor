@@ -100,6 +100,9 @@ class HypernetsDSBuilder:
         metadata_db_query = None
 
         if self.context is not None:
+            metadata["responsible_party"] = self.context.get_config_value("responsible_party")
+            metadata["creator_name"] = self.context.get_config_value("creator_name")
+            metadata["creator_email"] = self.context.get_config_value("creator_email")
 
             metadata_db = self.context.metadata_db
 

@@ -25,11 +25,6 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
-    "b": {
-        "description": "Not a standard sequence (too much missing data to keep processing)",
-        "error": IOError,
-        "error_msg": "Not a standard sequence (too much missing data to keep processing)",
-    },
     "x": {
         "description": "unexpected error during processing",
         "error": None,
@@ -87,6 +82,16 @@ ANOMALIES_DICT = {
     },
     "cl": {
         "description": "No clear sky irradiance in sequence (i.e. overcast conditions)",
+        "error": None,
+        "error_msg": None,
+    },
+    "in": {
+        "description": "Invalid sequence (due to not enough valid radiance or irradiance series)",
+        "error": ValueError,
+        "error_msg": "Invalid sequence (due to not enough valid radiance or irradiance series)",
+    },
+    "d": {
+        "description": "Discontinuity between VNIR and SWIR",
         "error": None,
         "error_msg": None,
     },
