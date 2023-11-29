@@ -90,6 +90,13 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "Invalid sequence (due to not enough valid radiance or irradiance series)",
     },
+    "ms": {
+        "description": "There are series missing from the standard sequence (either because not present, "
+        "or flagged by `not_enough_dark_scans', `not_enough_irr_scans', `not_enough_rad_scans' "
+        "or `vza_irradiance').",
+        "error": None,
+        "error_msg": None,
+    },
     "d": {
         "description": "Discontinuity between VNIR and SWIR",
         "error": None,

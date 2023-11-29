@@ -407,6 +407,7 @@ class QualityChecks:
             "not_enough_dark_scans",
             "not_enough_rad_scans",
             "not_enough_irr_scans",
+            "vza_irradiance",
         ]
         flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
@@ -416,6 +417,8 @@ class QualityChecks:
                 ds["quality_flag"] = DatasetUtil.set_flag(
                     ds["quality_flag"], "series_missing"
                 )
+                self.context.anomaly_handler.add_anomaly("ms")
+
         elif network == "land" and measurand == "radiance":
             geometries = [
                 (
@@ -426,11 +429,14 @@ class QualityChecks:
                 if i in mask_notflagged
             ]
             if np.all(
-                ds["viewing_zenith_angle"].values > 1
+                ds["viewing_zenith_angle"].values
+                > self.context.get_config_value("bad_pointing_threshold_zenith")
             ):  # check if there are any nadir measurements
                 ds["quality_flag"][:] = DatasetUtil.set_flag(
                     ds["quality_flag"][:], "series_missing"
                 )
+                self.context.anomaly_handler.add_anomaly("ms")
+
             vza_standard = [5, 10, 20, 30]
             vaa_standard = [83, 98, 113, 263, 278, 293]
             geometries_standard = np.meshgrid(vza_standard, vaa_standard)
@@ -462,12 +468,14 @@ class QualityChecks:
                         "There is a missing geometry (vza=%s,vaa=%s,paa=%s) for the land standard sequence."
                         % (geom[0], geom[1], (geom[1] - 180) % 360)
                     )
+                    self.context.anomaly_handler.add_anomaly("ms")
 
         elif network == "water" and measurand == "downwelling_radiance":
             if len(ds["series_id"][mask_notflagged]) < 2:
                 ds["quality_flag"] = DatasetUtil.set_flag(
                     ds["quality_flag"], "series_missing"
                 )
+                self.context.anomaly_handler.add_anomaly("ms")
 
     def qc_illumination(self, dataset, measurand):
         wv = dataset["wavelength"].values
