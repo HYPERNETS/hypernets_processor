@@ -52,8 +52,8 @@ class Average:
             np.unique(dataset_l0["series_id"])
         ) or not all(
             [
-                np.unique(dataset_l0["series_id"][i]) + 1
-                == np.unique(dataset_l0_bla["series_id"][i])
+                np.unique(dataset_l0["series_id"])[i] + 1
+                == np.unique(dataset_l0_bla["series_id"])[i]
                 for i in range(len(np.unique(dataset_l0["series_id"])))
             ]
         ):
