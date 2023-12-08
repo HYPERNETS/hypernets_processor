@@ -6,8 +6,14 @@ from hypernets_processor.version import __version__
 from hypernets_processor.interpolation.measurement_functions.interpolate_time_linear import (
     InterpolationTimeLinear,
 )
+from hypernets_processor.interpolation.measurement_functions.interpolate_time_linear_coscorrected import (
+    InterpolationTimeLinearCoscorrected,
+)
 from hypernets_processor.interpolation.measurement_functions.interpolate_time_linear import (
     WaterNetworkInterpolationSkyRadianceLinear,
+)
+from hypernets_processor.interpolation.measurement_functions.interpolate_time_linear_coscorrected import (
+    WaterNetworkInterpolationSkyRadianceLinearCoscorrected,
 )
 from hypernets_processor.interpolation.measurement_functions.interpolate_wav_linear import (
     InterpolationWavLinear,
@@ -28,6 +34,8 @@ __status__ = "Development"
 interpolators = [
     InterpolationTimeLinear,
     WaterNetworkInterpolationSkyRadianceLinear,
+    InterpolationTimeLinearCoscorrected,
+    WaterNetworkInterpolationSkyRadianceLinearCoscorrected,
     InterpolationWavLinear,
     InterpolationWavClearSky,
 ]

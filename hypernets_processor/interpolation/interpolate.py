@@ -180,6 +180,8 @@ class Interpolate:
 
         # Interpolate in time to radiance times
         acqui_rad = dataset_l1c["acquisition_time"].values
+        output_sza = dataset_l1c["solar_zenith_angle"].values
+        input_sza = dataset_l1b_irr["solar_zenith_angle"].values
 
         flags = [
             "no_clear_sky_irradiance",
@@ -206,7 +208,12 @@ class Interpolate:
         dataset_l1c = interpolation_function_time.propagate_ds_specific(
             ["random", "systematic_indep", "systematic_corr_rad_irr"],
             dataset_l1c_temp,
-            {"input_time": acqui_irr, "output_time": acqui_rad},
+            {
+                "input_time": acqui_irr,
+                "output_time": acqui_rad,
+                "input_sza": input_sza,
+                "output_sza": output_sza,
+            },
             ds_out_pre=dataset_l1c,
             store_unc_percent=True,
         )
@@ -223,20 +230,30 @@ class Interpolate:
         prop = punpy.MCPropagation(
             self.context.get_config_value("mcsteps"), parallel_cores=1, dtype="float32"
         )
+        measurement_function_interpolate_time = self.context.get_config_value(
+            "measurement_function_interpolate_time_skyradiance"
+        )
         interpolation_function_time = self._measurement_function_factory(
             prop=prop,
             corr_dims="wavelength",
             yvariable="downwelling_radiance",
             use_err_corr_dict=True,
-        ).get_measurement_function("WaterNetworkInterpolationSkyRadianceLinear")
+        ).get_measurement_function(measurement_function_interpolate_time)
 
         acqui_skyrad = dataset_l1b_skyrad["acquisition_time"].values
         acqui_rad = dataset_l1c["acquisition_time"].values
+        output_sza = dataset_l1c["solar_zenith_angle"].values
+        input_sza = dataset_l1b_skyrad["solar_zenith_angle"].values
 
         dataset_l1c = interpolation_function_time.propagate_ds_specific(
             ["random", "systematic_indep", "systematic_corr_rad_irr"],
             dataset_l1b_skyrad,
-            {"input_time": acqui_skyrad, "output_time": acqui_rad},
+            {
+                "input_time": acqui_skyrad,
+                "output_time": acqui_rad,
+                "input_sza": input_sza,
+                "output_sza": output_sza,
+            },
             ds_out_pre=dataset_l1c,
             store_unc_percent=True,
         )
