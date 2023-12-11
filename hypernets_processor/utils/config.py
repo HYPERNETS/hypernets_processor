@@ -20,11 +20,17 @@ __status__ = "Development"
 this_directory = os.path.dirname(__file__)
 etc_directory = os.path.join(os.path.dirname(this_directory), "etc")
 WORKING_DIRECTORY_FILE_PATH = os.path.join(etc_directory, "working_directory.txt")
-working_directory = os.path.abspath(
-    str(np.genfromtxt(WORKING_DIRECTORY_FILE_PATH, dtype=str))
-)
+if os.path.exists(WORKING_DIRECTORY_FILE_PATH):
+    working_directory = os.path.abspath(
+        str(np.genfromtxt(WORKING_DIRECTORY_FILE_PATH, dtype=str))
+    )
 
-PROCESSOR_CONFIG_PATH = os.path.join(working_directory, "processor.config")
+    PROCESSOR_CONFIG_PATH = os.path.join(working_directory, "processor.config")
+    SCHEDULER_CONFIG_PATH = os.path.join(working_directory, "scheduler.config")
+    JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
+else:
+    print("working_directory.txt does not exist so some of the paths for automated processing could not be correctly set up.")
+
 PROCESSOR_DEFAULT_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
 PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(
     etc_directory, "processor_land_defaults.config"
@@ -32,10 +38,8 @@ PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(
 PROCESSOR_WATER_DEFAULTS_CONFIG_PATH = os.path.join(
     etc_directory, "processor_water_defaults.config"
 )
-SCHEDULER_CONFIG_PATH = os.path.join(working_directory, "scheduler.config")
 SCHEDULER_DEFAULT_CONFIG_PATH = os.path.join(etc_directory, "scheduler_default.config")
 JOB_CONFIG_TEMPLATE_PATH = os.path.join(etc_directory, "job_template.config")
-JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
 
 
 def read_config_file(fname):
