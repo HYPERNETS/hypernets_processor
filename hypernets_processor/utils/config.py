@@ -30,6 +30,9 @@ if os.path.exists(WORKING_DIRECTORY_FILE_PATH):
     JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
 else:
     print("working_directory.txt does not exist so some of the paths for automated processing could not be correctly set up.")
+    PROCESSOR_CONFIG_PATH = None
+    SCHEDULER_CONFIG_PATH = None
+    JOBS_FILE_PATH = None
 
 PROCESSOR_DEFAULT_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
 PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(
