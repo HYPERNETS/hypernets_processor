@@ -725,7 +725,7 @@ class QualityChecks:
                             dataset_l1b["quality_flag"][
                                 np.where(dataset_l1b["scan"] == i)
                             ],
-                            "temp_variability_ed",
+                            "temp_variability_irr",
                         )
 
                     else:
@@ -736,7 +736,7 @@ class QualityChecks:
                             dataset_l1b["quality_flag"][
                                 np.where(dataset_l1b["scan"] == i)
                             ],
-                            "temp_variability_lu",
+                            "temp_variability_rad",
                         )
 
                     seq = dataset.attrs["sequence_id"]

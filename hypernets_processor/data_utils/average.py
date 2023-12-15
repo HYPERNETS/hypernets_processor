@@ -228,7 +228,7 @@ class Average:
     def average_L2(self, dataset, razangle=None):
         # flags = ["saturation","nonlinearity","bad_pointing","outliers",
         #                  "angles_missing","lu_eq_missing","rhof_angle_missing",
-        #                  "rhof_default","temp_variability_ed","temp_variability_lu",
+        #                  "rhof_default","temp_variability_irr","temp_variability_rad",
         #                  "min_nbred","min_nbrlu","min_nbrlsky", "simil_fail"]
 
         flags = [
@@ -237,8 +237,8 @@ class Average:
             "L0_thresholds",
             "L0_discontinuity",
             "rhof_angle_missing",
-            "temp_variability_ed",
-            "temp_variability_lu",
+            "temp_variability_irr",
+            "temp_variability_rad",
         ]
 
         dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, razangle)

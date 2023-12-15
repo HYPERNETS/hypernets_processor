@@ -16,7 +16,7 @@ To process the water network data, the hypernets processor includes RHYMER ("Rel
 
 Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and not the L1B. Indeed it checks for additional (water-application specific) quality flags. The L1C processor will then average the series (often at the start and end of the sequence) of downwelling radiance and irradiance scans and interpolate these averages to the upwelling radiance scans (standard configuration file requires 6 scans for upwelling radiance). Hence, the final dimensions for the upwelling radiance, downwelling irradiance and radiance and reflectance outputs for the L1C data level is wavelength and upwelling radiance scans (default 6).
 
-1. **Quality check of the scans** (flags: temp_variability_ed, temp_variability_lu):
+1. **Quality check of the scans** (flags: temp_variability_irr, temp_variability_rad):
 
    The first function in the *rhymer_hypstar.process_l1c* module checks for the variability within a series, i.e., it assigns flags to each scan showing a temporal jump, with the previous and following scan, of more than a given threshold (25% is the default) at 550 nm. 
 

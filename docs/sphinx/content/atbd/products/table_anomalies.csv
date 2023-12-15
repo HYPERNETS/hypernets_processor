@@ -12,3 +12,136 @@ o, more than 50% of data has random error above 100% (probably corrupted data), 
 q, None of the scans in a series passed the quality control, None, L & W
 s, sequence data incomplete (e.g. failed series present in data), None, L & W
 x, unexpected error during processing, catches all errors, L & W
+
+ metadata_miss , L & W , L0A , metadata file is missing, or one of the raw files listed in the Metadata file is missing , ,  `m' , \checkmark
+    meteo_miss , L & W , L0A , File with meteorological information is missing , ,  `s' ,
+1, lon_default, L & W , L0A , Default longitude as given in the configuration file is used (missing Lon in metadata) , \checkmark , ,
+2, lat_default, L & W , L0A , same as `lon_default' but for latitude  , \checkmark , ,
+3, pt_ref_invalid , L & W , L0A , No effective pan/tilt is returned and the requested pan/tilt was used instead , \checkmark , ,
+4, bad_pointing , L & W , L0A , Difference between requested and effective pan/tilt angle is $>=$ 3°  , \checkmark , `a' ,
+5, outliers, L & W , L1A , If the spectrally integrated signal of the scan is more than 3 sigma, or more than 25\% (whichever is largest) removed from the mean, it is masked and will not be used when averaging the series. This process is repeated until convergence and applied to the measured (ir)radiances and to the darks. , \checkmark , ,
+6, L0_threshold, L & W , L1A , Check if any of the spectral pixels are saturated, i.e. digital number $DN>=64000$ , \checkmark , ,
+7, L0_discontinuity, L & W , L1A , Check if there are missing values in the spectrum, or significant discontinuities ($\Delta DN>10^4$)  , \checkmark , ,
+8, dark_masked, L & W , L1A , If any of the darks have been masked by `outliers', `L0_thresholds', and/or, `L0_discontinuity' , \checkmark , ,
+9, half_of_scans_masked, L & W , L0B , Less than half of the scans for a series passed quality checks `bad_pointing', `outliers', `L0_thresholds', and, `L0_discontinuity' , \checkmark , ,
+10, not_enough_dark_ scans, L & W , L0B ,  Not enough valid dark scans for this series ($\#$ valid dark scans $<$ n_valid_dark from the config file)  ,  \checkmark  , `nld' ,
+11, not_enough_rad_ scans, L & W , L0B , Not enough valid radiance scans for this series ($\#$ valid radiance scans $<$ n_valid_rad from the config file) , \checkmark , `nlu' ,
+12, not_enough_irr_scans, L & W , L0B , Not enough valid irradiance scans for this series ($\#$ valid irradiance scans $<$ n_valid_irr from the config file) , \checkmark , `ned' ,
+13, series_missing , L & W , L1B , Check if there are any missing series (either not present or flagged by `not_enough_dark_scans', `not_enough_irr_scans', `not_enough_rad_scans' or `vza_irradiance') , \checkmark , `ms',
+14, vza_irradiance , L & W , L1B , One of the irradiance measurements did not have $\theta_v$=180° (within 2° tolerance) , so has been masked  , \checkmark , ,
+15, no_clear_sky_ irradiance, L & W , L1B , More than 10$\%$ of the wavelength bands have a difference of more than 50$\%$ with the clear sky model  , \checkmark , ,
+16, variable_irradiance, L & W , L1B , More than 10\% difference between start and end $E_d$ at 550~nm , \checkmark , ,
+negative_unc , L & W , L1B , There are negative uncertainties , , `u' , \checkmark
+17, half_of_unc_too_big , L & W , L1B , More than 50\% of data has random error above 100\% (likely corrupted or dark data) , \checkmark , `o' ,
+check_valid_irradiance , L & W , L1C , Halt processing if `variable_irradiance' flag was triggered at previous level ,  , `nu', \checkmark
+check_valid_ sequence , L & W , L1C , Halt processing if there are no valid series (flagged by `not_enough_dark_scans', `not_enough_irr_scans', `not_enough_rad_scans' or `vza_irradiance'). ,  , `in', \checkmark
+18, single_irradiance_used, L & W , L1C , If only one series of irradiance is used for the computation of the reflectance  , \checkmark , ,
+19, no_clear_sky_sequence , L & W , L1C , If all irradiance series are flagged with the `no_clear_sky_irradiance' flag  , \checkmark , `cl',
+
+20, discontinuity_VNIR_SWIR , L , L1B , Checks if the VNIR and SWIR are different by more than 25\%  , \checkmark , `d' ,
+
+ variable_radiance, W , L1C , More than 10\% difference between start and end $L_d$ at 550~nm ,  , `nd' , \checkmark
+20, single_skyradiance_ used, W , L1C , If only one series of downwelling radiance is used for the computation of the reflectance  , \checkmark , ,
+21, lu_eq_missing, W , L1C , If there is no upwelling and downwelling radiance pair with similar pointing azimuth angles (within 1° tolerance)  , \checkmark , `l' , \checkmark
+22, rhof_angle_missing, W , L1C , If there is no downwelling radiance scans at the appropriate viewing zenith angle (i.e., 180°-$\theta_v$) (within 1° tolerance)  , \checkmark , `l' , \checkmark
+23, rhof_default, W , L1C , If the viewing geometry of the upwelling and downwelling radiance measurements are outside the viewing geometry range of the selected LUT for the `rhof_option' (e.g., $\Delta\phi$ $>$ 180° when using the LUT from \cite{Mobley1999}), a default $\rho_F$ is used for the air-water interface correction factor (default: $\rho_F$=0.0256)   , \checkmark , ,
+24, temp_variability_irr, W , L1C ,  If the difference in $E_d(\lambda)$ scans does not exceed a given threshold between two neighbouring scans (default: threshold = 25$\%$ and $\lambda$=550, see also \cite{Ruddick2006})  , \checkmark , ,
+25, temp_variability_rad, W , L1C ,  If the difference in $L_d(\lambda)$ or $L_u(\lambda)$ scans does not exceed a given threshold between two neighbouring scans (default: threshold = 25$\%$ and $\lambda$=550, see also \cite{Ruddick2006})  , \checkmark , ,
+26, min_nbred/lu/lsky, W , L1C , If the total number of scans not flagged by either `nonlinearity', `bad_pointing' or `outliers', is less than a given threshold (default: 3)  , \checkmark , `ned' `nlu' `nld' , \checkmark
+27, min_nbred/lu/lsky, W , L1C , If the total number of scans not flagged by either `nonlinearity', `bad_pointing' or `outliers', is less than a given threshold (default: 3)  , \checkmark , `ned' `nlu' `nld' , \checkmark
+28, min_nbred/lu/lsky, W , L1C , If the total number of scans not flagged by either `nonlinearity', `bad_pointing' or `outliers', is less than a given threshold (default: 3)  , \checkmark , `ned' `nlu' `nld' , \checkmark
+29, def_wind_flag, W , L1C , If a default wind speed is used (by default: wind speed = 2ms$^{-1}$) , \checkmark , ,
+30, simil_fail, W , L1C , If the quality check applied on the NIR similarity spectrum is not verified as suggested by \cite{ruddick2005} (see Section 3.2 and Fig. 4 in \cite{ruddick2005}) with default values for the computation of the NIR Similarity being 780 and 870~nm, the reference wavelength 670~nm and the threshold 5$\%$ , \checkmark , ,
+
+  "a": {
+        "description": "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
+        "error": None,
+        "error_msg": None,
+    },
+    "m": {
+        "description": "Metadata file missing",
+        "error": IOError,
+        "error_msg": "Metadata file missing",
+    },
+    "s": {
+        "description": "meteo data missing",
+        "error": None,
+        "error_msg": None,
+    },
+    "x": {
+        "description": "unexpected error during processing",
+        "error": None,
+        "error_msg": None,
+    },
+    "o": {
+        "description": "more than 50% of data has random error above 100% (probably corrupted data)",
+        "error": None,
+        "error_msg": None,
+    },
+    "u": {
+        "description": "some of the uncertainties have negative values",
+        "error": ValueError,
+        "error_msg": "some of the uncertainties have negative values",
+    },
+    "q": {
+        "description": "None of the scans in one or more series of the sequences passed the quality control",
+        "error": None,
+        "error_msg": None,
+    },
+    "l": {
+        "description": "Ld missing for sky reflectance correction",
+        "error": ValueError,
+        "error_msg": "Ld missing for sky reflectance correction",
+    },
+    "nlu": {
+        "description": "Not enough Lu scans",
+        "error": None,
+        "error_msg": None,
+    },
+    "nld": {
+        "description": "Not enough Lsky scans",
+        "error": None,
+        "error_msg": None,
+    },
+    "ned": {
+        "description": "Not enough Ed scans",
+        "error": None,
+        "error_msg": None,
+    },
+    "ndark": {
+        "description": "Not enough dark scans",
+        "error": None,
+        "error_msg": None,
+    },
+    "nu": {
+        "description": "Non constant illumination",
+        "error": ValueError,
+        "error_msg": "Coefficient of variation for Ed(550) is > 10%",
+    },
+    "nd": {
+        "description": "Non constant illumination in downwelling radiance",
+        "error": ValueError,
+        "error_msg": "Coefficient of variation for Ld(550) is > 10%",
+    },
+    "cl": {
+        "description": "No clear sky irradiance in sequence (i.e. overcast conditions)",
+        "error": None,
+        "error_msg": None,
+    },
+    "in": {
+        "description": "Invalid sequence (due to not enough valid radiance or irradiance series)",
+        "error": ValueError,
+        "error_msg": "Invalid sequence (due to not enough valid radiance or irradiance series)",
+    },
+    "ms": {
+        "description": "There are series missing from the standard sequence (either because not present, "
+        "or flagged by `not_enough_dark_scans', `not_enough_irr_scans', `not_enough_rad_scans' "
+        "or `vza_irradiance').",
+        "error": None,
+        "error_msg": None,
+    },
+    "d": {
+        "description": "Discontinuity between VNIR and SWIR",
+        "error": None,
+        "error_msg": None,
+    },

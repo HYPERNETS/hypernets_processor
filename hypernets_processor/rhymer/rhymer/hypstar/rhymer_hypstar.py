@@ -450,7 +450,7 @@ class RhymerHypstar:
         )
 
         flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
-        # "temp_variability_ed", "temp_variability_lu"])
+        # "temp_variability_irr", "temp_variability_rad"])
         #                 "air_water_int_default",  "simil_fail"]
 
         for measurandstring in ["irradiance", "downwelling_radiance"]:

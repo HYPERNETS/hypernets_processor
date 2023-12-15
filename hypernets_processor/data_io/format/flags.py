@@ -21,17 +21,17 @@ FLAG_COMMON = [
 ]
 
 FLAG_WATER = [
+    "single_skyradiance_used",
     "lu_eq_missing",
     "rhof_angle_missing",
     "rhof_default",
-    "temp_variability_ed",
-    "temp_variability_lu",
+    "temp_variability_irr",
+    "temp_variability_rad",
     "min_nbred",
     "min_nbrlu",
     "min_nbrlsky",
     "def_wind_flag",
     "simil_fail",
-    "single_skyradiance_used",
 ]
 
 FLAG_LAND = [

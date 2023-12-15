@@ -1,0 +1,2 @@
+Bit #,name,network,level,Description,anomaly raised
+20, discontinuity_VNIR_SWIR , L , L1B , Checks if the VNIR and SWIR are different by more than 25\%  ,`d'
