@@ -73,7 +73,7 @@ class DataTemplates:
         return dataset_l0a
 
     def l0b_template_from_l0a_dataset(
-        self, measurandstring, dataset_l0, flags, swir=False
+        self, measurandstring, dataset_l0, swir=False
     ):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
@@ -112,23 +112,6 @@ class DataTemplates:
 
         series_id = np.unique(dataset_l0["series_id"])
         dataset_l0b["series_id"].values = series_id
-
-        for variablestring in dataset_l0.keys():
-            if (dataset_l0[variablestring].dims == ("scan",)) and (
-                variablestring in dataset_l0b.keys()
-            ):
-                temp_arr = np.empty(len(series_id))
-                for i in range(len(series_id)):
-                    flagged = DatasetUtil.get_flags_mask_or(
-                        dataset_l0["quality_flag"], flags
-                    )
-
-                    ids = np.where(
-                        (dataset_l0["series_id"] == series_id[i]) & (flagged == False)
-                    )
-
-                    temp_arr[i] = np.mean(dataset_l0[variablestring].values[ids])
-                dataset_l0b[variablestring].values = temp_arr
 
         return dataset_l0b
 
@@ -185,7 +168,7 @@ class DataTemplates:
 
         return dataset_l1a
 
-    def l1b_template_from_l1a_dataset_water(self, measurandstring, dataset_l1a, flags):
+    def l1b_template_from_l1a_dataset_water(self, measurandstring, dataset_l1a):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 
@@ -218,26 +201,6 @@ class DataTemplates:
 
         series_id = np.unique(dataset_l1a["series_id"])
         dataset_l1b["series_id"].values = series_id
-
-        for variablestring in dataset_l1a.keys():
-            if (
-                (dataset_l1a[variablestring].dims == ("scan",))
-                and (variablestring in dataset_l1b.keys())
-                and (variablestring not in ["quality_flag"])
-                and (measurandstring not in variablestring)
-            ):
-                temp_arr = np.empty(len(series_id))
-                for i in range(len(series_id)):
-                    flagged = DatasetUtil.get_flags_mask_or(
-                        dataset_l1a["quality_flag"], flags
-                    )
-
-                    ids = np.where(
-                        (dataset_l1a["series_id"] == series_id[i]) & (flagged == False)
-                    )
-
-                    temp_arr[i] = np.mean(dataset_l1a[variablestring].values[ids])
-                dataset_l1b[variablestring].values = temp_arr
 
         return dataset_l1b
 
@@ -426,7 +389,7 @@ class DataTemplates:
 
         return dataset_l1c
 
-    def l2_from_l1c_dataset(self, datasetl1c, flags, razangle=None):
+    def l2_from_l1c_dataset(self, datasetl1c, razangle=None):
         """
         Makes a L2 template of the data, and propagates the appropriate keywords from L1.
         :param datasetl0:
@@ -434,11 +397,13 @@ class DataTemplates:
         :return:
         :rtype:
         """
+
+        l2a_dim_sizes_dict = {
+            "wavelength": len(datasetl1c["wavelength"]),
+            "series": len(np.unique(datasetl1c["series_id"])),
+        }
+
         if self.context.get_config_value("network").lower() == "w":
-            l2a_dim_sizes_dict = {
-                "wavelength": len(datasetl1c["wavelength"]),
-                "series": len(np.unique(datasetl1c["series_id"])),
-            }
             dataset_l2a = self.hdsb.create_ds_template(
                 l2a_dim_sizes_dict,
                 "W_L2A",
@@ -446,40 +411,15 @@ class DataTemplates:
                 ds=datasetl1c,
                 angles=razangle,
             )
-            dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
-
-            series_id = np.unique(datasetl1c["series_id"])
-            dataset_l2a["series_id"].values = series_id
-            for variablestring in datasetl1c.keys():
-                if (
-                    (datasetl1c[variablestring].dims == ("scan",))
-                    and (variablestring in dataset_l2a.keys())
-                    and (variablestring not in ["quality_flag"])
-                ):
-                    temp_arr = np.empty(len(series_id))
-                    for i in range(len(series_id)):
-                        flagged = DatasetUtil.get_flags_mask_or(
-                            datasetl1c["quality_flag"], flags
-                        )
-
-                        ids = np.where(
-                            (datasetl1c["series_id"] == series_id[i])
-                            & (flagged == False)
-                        )
-                        # ids = np.where((datasetl1c['series_id'] == series_id[i]) & (
-                        #         datasetl1c['quality_flag'] == 0))
-                        temp_arr[i] = np.mean(datasetl1c[variablestring].values[ids])
-                    dataset_l2a[variablestring].values = temp_arr
 
         if self.context.get_config_value("network").lower() == "l":
-            l2a_dim_sizes_dict = {
-                "wavelength": len(datasetl1c["wavelength"]),
-                "series": len(datasetl1c["series_id"]),
-            }
             dataset_l2a = self.hdsb.create_ds_template(
                 l2a_dim_sizes_dict, "L_L2A", propagate_ds=datasetl1c, ds=datasetl1c
             )
-            dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
+
+        dataset_l2a = dataset_l2a.assign_coords(wavelength=datasetl1c.wavelength)
+        series_id = np.unique(datasetl1c["series_id"])
+        dataset_l2a["series_id"].values = series_id
 
         return dataset_l2a
 

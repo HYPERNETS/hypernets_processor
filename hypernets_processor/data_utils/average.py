@@ -13,7 +13,7 @@ from hypernets_processor.calibration.measurement_functions.measurement_function_
 import time
 import numpy as np
 from obsarray.templater.dataset_util import DatasetUtil
-import punpy
+import datetime
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -46,8 +46,8 @@ class Average:
         :return:
         :rtype:
         """
-        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
 
+        #first check if the blacks and radiance/irradiance have matching series_id
         if len(np.unique(dataset_l0_bla["series_id"])) != len(
             np.unique(dataset_l0["series_id"])
         ) or not all(
@@ -64,12 +64,46 @@ class Average:
                 dataset_l0, dataset_l0_bla
             )
 
+        #create template dataset
         dataset_l0b = self.templ.l0b_template_from_l0a_dataset(
-            measurandstring, dataset_l0, flags, swir=swir
+            measurandstring, dataset_l0, swir=swir
         )
 
-        for var in dataset_l0b.variables:
-            if var == "digital_number":
+        #first do fast averaging of 1d variables
+        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
+
+        flagged = DatasetUtil.get_flags_mask_or(
+            dataset_l0["quality_flag"], flags
+        )
+
+        flags_ds = DatasetUtil.unpack_flags(dataset_l0["quality_flag"])
+        mask_flags = np.array([flags_ds[flag].values for flag in flags_ds.data_vars])
+
+        series_id = np.unique(dataset_l0["series_id"])
+
+        for i in range(len(series_id)):
+            ids = np.where(
+                dataset_l0["series_id"] == series_id[i]
+            )
+
+            ids_flagged = np.where(
+                (dataset_l0["series_id"] == series_id[i]) & (flagged == False)
+            )
+
+            for variablestring in dataset_l0.keys():
+                if variablestring=="quality_flag":
+                    #set quality flag of series if any of quality flag of scan has been raised
+                    dataset_l0b[variablestring].values[i] = sum([2**i for i,n in enumerate(
+                        np.logical_or.reduce(mask_flags[:,ids].T)[0]) if n])
+
+                elif (dataset_l0[variablestring].dims == ("scan",)) and (
+                        variablestring in dataset_l0b.keys()
+                ):
+                    dataset_l0b[variablestring].values[i] = np.mean(dataset_l0[variablestring].values[ids_flagged])
+
+        #next 2d variables are averaged
+        for variablestring in dataset_l0b.variables:
+            if variablestring == "digital_number":
                 measurand, measurand_std, n_valid, n_total = self.calc_mean_masked(
                     dataset_l0,
                     "digital_number",
@@ -96,7 +130,7 @@ class Average:
                     dataset_l0b, n_valid, n_total, measurandstring
                 )
 
-            elif var == "dark_signal":
+            elif variablestring == "dark_signal":
                 measurand, measurand_std, n_valid, n_total = self.calc_mean_masked(
                     dataset_l0_bla,
                     "digital_number",
@@ -110,35 +144,53 @@ class Average:
                 )
                 dataset_l0b = self.qual.check_valid_darks(dataset_l0b, n_valid, n_total)
 
-            elif var == "u_rel_random_dark_signal":
+            elif variablestring == "u_rel_random_dark_signal":
                 dataset_l0b["u_rel_random_dark_signal"].values = self.calc_mean_masked(
                     dataset_l0_bla, "u_rel_random_digital_number", flags, rand_unc=True
                 )
-            elif "series" in dataset_l0b[var].dims:
-                if "u_rel_random" in var:
-                    dataset_l0b[var].values = self.calc_mean_masked(
-                        dataset_l0, var, flags, rand_unc=True
-                    )
-                elif "err_corr_" in var:
-                    dataset_l0b[var].values = dataset_l0[var].values
-                elif (
-                    (not "std" in var)
-                    and (not "n_valid" in var)
-                    and (not "n_total" in var)
-                ):
-                    dataset_l0b[var].values = self.calc_mean_masked(
-                        dataset_l0, var, flags
-                    )
+            elif "u_rel_random" in variablestring:
+                dataset_l0b[variablestring].values = self.calc_mean_masked(
+                    dataset_l0, variablestring, flags, rand_unc=True
+                )
+            elif "err_corr_" in variablestring:
+                dataset_l0b[variablestring].values = dataset_l0[variablestring].values
 
         return dataset_l0b
 
     def average_l1a(self, measurandstring, dataset_l1a):
-        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
-
         dataset_l1b = self.templ.l1b_template_from_l1a_dataset_water(
-            measurandstring, dataset_l1a, flags
+            measurandstring, dataset_l1a
         )
 
+        # first do fast averaging of 1d variables
+        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
+
+        flagged = DatasetUtil.get_flags_mask_or(
+            dataset_l1a["quality_flag"], flags
+        )
+
+        flags_ds = DatasetUtil.unpack_flags(dataset_l1a["quality_flag"])
+        mask_flags = np.array([flags_ds[flag].values for flag in flags_ds.data_vars])
+
+        series_id = np.unique(dataset_l1a["series_id"])
+
+        for i in range(len(series_id)):
+            ids = np.where(
+                (dataset_l1a["series_id"] == series_id[i]) & (flagged == False)
+            )
+
+            for variablestring in dataset_l1a.keys():
+                if variablestring == "quality_flag":
+                    # set quality flag of series if any of quality flag of scan has been raised
+                    dataset_l1b[variablestring].values[i] = sum(
+                        [2 ** i for i, n in enumerate(np.logical_or.reduce(mask_flags[:, ids].T)[0]) if n])
+
+                elif (dataset_l1a[variablestring].dims == ("scan",)) and (
+                        variablestring in dataset_l1b.keys()
+                ):
+                    dataset_l1b[variablestring].values[i] = np.mean(dataset_l1a[variablestring].values[ids])
+
+        #next 2d variables are averaged
         for var in dataset_l1b.variables:
             if var == measurandstring:
                 measurand, measurand_std, n_valid, n_total = self.calc_mean_masked(
@@ -189,8 +241,36 @@ class Average:
             "temp_variability_lu",
         ]
 
-        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, flags, razangle)
+        dataset_l2a = self.templ.l2_from_l1c_dataset(dataset, razangle)
 
+        # first do fast averaging of 1d variables
+
+        flagged = DatasetUtil.get_flags_mask_or(
+            dataset["quality_flag"], flags
+        )
+
+        flags_ds = DatasetUtil.unpack_flags(dataset["quality_flag"])
+        mask_flags = np.array([flags_ds[flag].values for flag in flags_ds.data_vars])
+
+        series_id = np.unique(dataset["series_id"])
+
+        for i in range(len(series_id)):
+            ids = np.where(
+                (dataset["series_id"] == series_id[i]) & (flagged == False)
+            )
+
+            for variablestring in dataset.keys():
+                if variablestring == "quality_flag":
+                    # set quality flag of series if any of quality flag of scan has been raised
+                    dataset_l2a[variablestring].values[i] = sum(
+                        [2 ** i for i, n in enumerate(np.logical_or.reduce(mask_flags[:, ids].T)[0]) if n])
+
+                elif (dataset[variablestring].dims == ("scan",)) and (
+                        variablestring in dataset_l2a.keys()
+                ):
+                    dataset_l2a[variablestring].values[i] = np.mean(dataset[variablestring].values[ids])
+
+        # next 2d variables are averaged
         measurand, measurand_std, n_valid, n_total = self.calc_mean_masked(
             dataset, "water_leaving_radiance", flags, return_std=True, return_total=True
         )
@@ -311,6 +391,8 @@ class Average:
         """
         series_id = np.unique(dataset["series_id"])
         vals = dataset[var].values
+        flagged = DatasetUtil.get_flags_mask_or(dataset["quality_flag"], flags)
+
         if corr:
             out = np.empty(
                 (
@@ -321,7 +403,6 @@ class Average:
                 dtype=dataset[var].values.dtype,
             )
             for i in range(len(series_id)):
-                flagged = DatasetUtil.get_flags_mask_or(dataset["quality_flag"], flags)
                 ids = np.where(
                     (dataset["series_id"] == series_id[i]) & (flagged == False)
                 )
@@ -337,7 +418,6 @@ class Average:
                 n_total = np.empty((len(series_id),), dtype=np.uint8)
 
             for i in range(len(series_id)):
-                flagged = DatasetUtil.get_flags_mask_or(dataset["quality_flag"], flags)
                 ids = np.where(
                     (dataset["series_id"] == series_id[i]) & (flagged == False)
                 )
@@ -364,7 +444,6 @@ class Average:
                 n_total = np.empty((len(series_id),), dtype=np.uint8)
 
             for i in range(len(series_id)):
-                flagged = DatasetUtil.get_flags_mask_or(dataset["quality_flag"], flags)
                 ids = np.where(
                     (dataset["series_id"] == series_id[i]) & (flagged == False)
                 )
