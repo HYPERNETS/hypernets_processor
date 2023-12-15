@@ -667,7 +667,7 @@ class Plotting:
         ax.set_theta_direction(-1)
         ax.set_theta_offset(np.pi / 2.0)
         im = ax.pcolormesh(
-            vaa_mesh, vza_mesh, refl_2d.T, shading="auto", cmap=plt.get_cmap("jet")
+            vaa_mesh, vza_mesh, refl_2d.T, shading="auto", cmap=plt.get_cmap("jet"), vmin=self.context.get_config_value("plot_polar_min"), vmax=self.context.get_config_value("plot_polar_max"),
         )
 
         ax.plot(np.radians(saa), sza, color="k", ls="none", marker="o")
