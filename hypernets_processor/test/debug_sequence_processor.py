@@ -54,7 +54,7 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20220616T093043"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\SEQ20230812T110042"
 
     job_config["Output"][
         "archive_directory"

@@ -91,7 +91,10 @@ class Average:
             )
 
             for variablestring in dataset_l0.keys():
-                if variablestring=="quality_flag":
+                if variablestring=="series_id":
+                    dataset_l0b[variablestring].values[i] = series_id[i]
+
+                elif variablestring=="quality_flag":
                     #set quality flag of series if any of quality flag of scan has been raised
                     dataset_l0b[variablestring].values[i] = sum([2**i for i,n in enumerate(
                         np.logical_or.reduce(mask_flags[:,ids].T)[0]) if n])
@@ -176,11 +179,18 @@ class Average:
 
         for i in range(len(series_id)):
             ids = np.where(
+                dataset_l1a["series_id"] == series_id[i]
+            )
+
+            ids_flagged = np.where(
                 (dataset_l1a["series_id"] == series_id[i]) & (flagged == False)
             )
 
             for variablestring in dataset_l1a.keys():
-                if variablestring == "quality_flag":
+                if variablestring == "series_id":
+                    dataset_l1b[variablestring].values[i] = series_id[i]
+
+                elif variablestring == "quality_flag":
                     # set quality flag of series if any of quality flag of scan has been raised
                     dataset_l1b[variablestring].values[i] = sum(
                         [2 ** i for i, n in enumerate(np.logical_or.reduce(mask_flags[:, ids].T)[0]) if n])
@@ -188,7 +198,7 @@ class Average:
                 elif (dataset_l1a[variablestring].dims == ("scan",)) and (
                         variablestring in dataset_l1b.keys()
                 ):
-                    dataset_l1b[variablestring].values[i] = np.mean(dataset_l1a[variablestring].values[ids])
+                    dataset_l1b[variablestring].values[i] = np.mean(dataset_l1a[variablestring].values[ids_flagged])
 
         #next 2d variables are averaged
         for var in dataset_l1b.variables:
@@ -256,11 +266,18 @@ class Average:
 
         for i in range(len(series_id)):
             ids = np.where(
+                dataset["series_id"] == series_id[i]
+            )
+
+            ids_flagged = np.where(
                 (dataset["series_id"] == series_id[i]) & (flagged == False)
             )
 
             for variablestring in dataset.keys():
-                if variablestring == "quality_flag":
+                if variablestring == "series_id":
+                    dataset_l2a[variablestring].values[i] = series_id[i]
+
+                elif variablestring == "quality_flag":
                     # set quality flag of series if any of quality flag of scan has been raised
                     dataset_l2a[variablestring].values[i] = sum(
                         [2 ** i for i, n in enumerate(np.logical_or.reduce(mask_flags[:, ids].T)[0]) if n])
@@ -268,7 +285,7 @@ class Average:
                 elif (dataset[variablestring].dims == ("scan",)) and (
                         variablestring in dataset_l2a.keys()
                 ):
-                    dataset_l2a[variablestring].values[i] = np.mean(dataset[variablestring].values[ids])
+                    dataset_l2a[variablestring].values[i] = np.mean(dataset[variablestring].values[ids_flagged])
 
         # next 2d variables are averaged
         measurand, measurand_std, n_valid, n_total = self.calc_mean_masked(
