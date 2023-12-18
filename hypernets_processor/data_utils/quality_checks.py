@@ -143,8 +143,7 @@ class QualityChecks:
             datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
             "L0_discontinuity",
         )  # for i in range(len(mask))]
-        if raise_mask_anomaly:
-            self.context.anomaly_handler.add_anomaly("q", datasetl0)
+
         return datasetl0, mask
 
     def perform_quality_check_black(self, datasetl0, series_ids):
@@ -181,8 +180,7 @@ class QualityChecks:
         # datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
         #     datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_thresholds"
         # )  # for i in range(len(mask))]
-        if raise_mask_anomaly:
-            self.context.anomaly_handler.add_anomaly("q", datasetl0)
+
         return datasetl0, mask
 
     def perform_quality_check_rand_unc(self, dataset, measurandstring):

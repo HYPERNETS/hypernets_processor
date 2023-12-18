@@ -40,33 +40,23 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "some of the uncertainties have negative values",
     },
-    "q": {
-        "description": "None of the scans in one or more series of the sequences passed the quality control",
-        "error": None,
-        "error_msg": None,
-    },
     "l": {
         "description": "Ld missing for sky reflectance correction",
         "error": ValueError,
         "error_msg": "Ld missing for sky reflectance correction",
     },
     "nlu": {
-        "description": "Not enough Lu scans",
+        "description": "Not enough Lu scans for series",
         "error": None,
         "error_msg": None,
     },
     "nld": {
-        "description": "Not enough Lsky scans",
+        "description": "Not enough Lsky scans for series",
         "error": None,
         "error_msg": None,
     },
     "ned": {
-        "description": "Not enough Ed scans",
-        "error": None,
-        "error_msg": None,
-    },
-    "ndark": {
-        "description": "Not enough dark scans",
+        "description": "Not enough Ed scans for series",
         "error": None,
         "error_msg": None,
     },

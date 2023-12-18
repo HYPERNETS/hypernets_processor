@@ -1,5 +1,5 @@
 Bit #,name,network,level,Description,anomaly raised
-20, single_skyradiance_ used, W , L1C , If only one series of downwelling radiance is used for the computation of the reflectance  ,
+20, single_skyradiance_used, W , L1C , If only one series of downwelling radiance is used for the computation of the reflectance  ,
 21, lu_eq_missing, W , L1C , If there is no upwelling and downwelling radiance pair with similar pointing azimuth angles (within 1° tolerance)  , `l'
 22, rhof_angle_missing, W , L1C , If there is no downwelling radiance scans at the appropriate viewing zenith angle (i.e. 180°-$\theta_v$; within 1° tolerance), `l'
 23, rhof_default, W , L1C , If the viewing geometry of the upwelling and downwelling radiance measurements are outside the viewing geometry range of the selected LUT for the `rhof_option' (e.g. $\Delta\phi$ $>$ 180° when using the LUT from \cite{Mobley1999}) a default $\rho_F$ is used for the air-water interface correction factor (default: $\rho_F$=0.0256)   ,
