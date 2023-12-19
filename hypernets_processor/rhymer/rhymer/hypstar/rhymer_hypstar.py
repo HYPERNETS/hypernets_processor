@@ -164,90 +164,30 @@ class RhymerHypstar:
             sena_lu = np.unique(lu["pointing_azimuth_angle"].values)
             sena_lsky = np.unique(lsky["pointing_azimuth_angle"].values)
             sena_lu = sena_lu % 360
-            print(sena_lu)
+            print("this is sena_lu:{}".format(sena_lu))
             sena_lsky = sena_lsky % 360
-            print(sena_lsky)
+            print("this is sena_lsky:{}".format(sena_lsky))
 
+            equival_az= 0
             for i in sena_lu:
-                if (
-                    np.round(i) - 1 not in np.round(sena_lsky)
-                    and np.round(i) not in np.round(sena_lsky)
-                    and np.round(i) + 1 not in np.round(sena_lsky)
-                ):
-                    if self.context.get_config_value("verbosity") > 2:
-                        ts = [
-                            datetime.utcfromtimestamp(x)
-                            for x in lu["acquisition_time"][
-                                lu["pointing_azimuth_angle"] == i
-                            ].values
-                        ]
-                        if self.context.logger is not None:
-                            self.context.logger.info(
-                                "No azimuthal equivalent downwelling radiance measurement: Aquisition time {}, {}".format(
-                                    ts,
-                                    ", ".join(
-                                        [
-                                            "{}:{}".format(
-                                                k,
-                                                lu[k][
-                                                    lu["pointing_azimuth_angle"] == i
-                                                ].values,
-                                            )
-                                            for k in ["scan", "quality_flag"]
-                                        ]
-                                    ),
-                                )
-                            )
-                            self.context.logger.error(
-                                "Ld missing for air water interface radiance reflectance correction"
-                            )
-                        self.context.anomaly_handler.add_anomaly("l")
+                if np.in1d(np.round([i-1, i, i+1]), np.round(sena_lsky)).sum() >= 1:
+                    equival_az = equival_az + 1
+            if equival_az < 1: # set to 1 not to nbrlu cause it is per series
+                if self.context.get_config_value("verbosity") > 2:
+                    self.context.anomaly_handler.add_anomaly("l")
+            del equival_az
 
             # check if we have the required air_water_int angle for lsky
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
 
+            equival_zen = 0
             for i in senz_lu:
-                if (
-                    np.round(i) - 1 not in np.round(senz_lsky)
-                    and np.round(i) not in np.round(senz_lsky)
-                    and np.round(i) + 1 not in np.round(senz_lsky)
-                ):
-                    dataset_l1b["quality_flag"][
-                        dataset_l1b["pointing_azimuth_angle"] == i
-                    ] = du.set_flag(
-                        dataset_l1b["quality_flag"][
-                            dataset_l1b["pointing_azimuth_angle"] == i
-                        ],
-                        "rhof_angle_missing",
-                    )
-                    ts = [
-                        datetime.utcfromtimestamp(x)
-                        for x in lu["acquisition_time"][
-                            lu["viewing_zenith_angle"] == i
-                        ].values
-                    ]
-                    if self.context.logger is not None:
-                        self.context.logger.info(
-                            "No downwelling radiance measurement at appropriate angle for the approximation of rhof: Aquisition time {}, {}".format(
-                                ts,
-                                ", ".join(
-                                    [
-                                        "{}:{}".format(
-                                            k,
-                                            lu[k][
-                                                lu["pointing_azimuth_angle"] == i
-                                            ].values,
-                                        )
-                                        for k in ["scan", "quality_flag"]
-                                    ]
-                                ),
-                            )
-                        )
-                        self.context.logger.error(
-                            "Ld missing for rhof approximation of the air water interface radiance reflectance correction"
-                        )
-                    self.context.anomaly_handler.add_anomaly("l")
+                if np.in1d(np.linspace(np.round(i)-2, np.round(i)+2, 5), np.round(senz_lsky)).sum() >= 1:
+                    equival_zen = equival_zen + 1
+            if equival_zen < 1: # set to 1 not to nbrlu cause it is per series
+                self.context.anomaly_handler.add_anomaly("l")
+            del equival_zen
 
             # check if correct number of radiance and irradiance data
             flags = ["bad_pointing", "outliers", "L0_thresholds", "L0_discontinuity"]
