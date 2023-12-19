@@ -1,0 +1,11 @@
+[Metadata]
+principal_investigator = TARTU
+site_id = LVES
+hypstar_sn = 122241
+latitude = 58.211082
+longitude = 26.107643
+offset_pan = 0
+offset_tilt = 57
+azimuth_switch = 165
+angle2use=pt_ref
+
