@@ -70,12 +70,12 @@ class InterpolationTimeLinearCoscorrected(MeasurementFunction):
 
 
 class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(MeasurementFunction):
-    def meas_function(self, output_time, input_time, radiance, output_sza, sza_out):
+    def meas_function(self, output_time, input_time, radiance, output_sza, input_sza):
         """
         This function implements the measurement function.
         Each of the arguments can be either a scalar or a vector (1D-array).
         """
-        radiance = radiance / np.cos(np.pi / 180.0 * output_sza)
+        radiance = radiance / np.cos(np.pi / 180.0 * input_sza)
 
         skyradiance_intfunc = scipy.interpolate.interp1d(input_time, radiance)
 
@@ -86,4 +86,4 @@ class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(MeasurementFunction
         return "WaterNetworkInterpolationSkyRadianceLinearCoscorrected"
 
     def get_argument_names(self):
-        return ["output_time", "input_time", "radiance", "output_sza", "input_sza"]
+        return ["output_time", "input_time", "radiance"]
