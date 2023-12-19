@@ -181,6 +181,10 @@ class RhymerHypstar:
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
 
+            print(lsky["viewing_zenith_angle"].values)
+            print("this is senz_lu:{}".format(senz_lu))
+            print("this is senz_lsky:{}".format(senz_lsky))
+
             equival_zen = 0
             for i in senz_lu:
                 if np.in1d(np.linspace(np.round(i)-2, np.round(i)+2, 5), np.round(senz_lsky)).sum() >= 1:
