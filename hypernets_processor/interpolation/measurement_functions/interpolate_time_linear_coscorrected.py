@@ -86,4 +86,4 @@ class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(MeasurementFunction
         return "WaterNetworkInterpolationSkyRadianceLinearCoscorrected"
 
     def get_argument_names(self):
-        return ["output_time", "input_time", "radiance"]
+        return ["output_time", "input_time", "radiance",  "output_sza", "input_sza"]
