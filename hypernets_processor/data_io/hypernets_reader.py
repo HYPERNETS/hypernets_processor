@@ -191,7 +191,7 @@ class HypernetsReader:
         paa_abs = normalizedeg(float(paa_abs), 0, 360)
 
         if paa_ref > -999:
-            paa_ref = normalizedeg(float(vza_ref), 0, 360)
+            paa_ref = normalizedeg(float(paa_ref), 0, 360)
 
         # perform quality checks
         self.qual.perform_quality_check_angles(
