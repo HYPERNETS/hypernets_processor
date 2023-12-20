@@ -31,7 +31,7 @@ def process_sequence():
     """
 
     network = "water"
-    network = "land"
+    #network = "land"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
     print(job_config_path)
@@ -54,7 +54,7 @@ def process_sequence():
 
     job_config["Input"][
         "raw_data_directory"
-    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\SEQ20230812T110042"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20230913T104541"
 
     job_config["Output"][
         "archive_directory"
