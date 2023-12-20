@@ -245,12 +245,6 @@ class Interpolate:
         output_sza = dataset_l1c["solar_zenith_angle"].values
         input_sza = dataset_l1b_skyrad["solar_zenith_angle"].values
 
-        print(input_sza)
-        print(output_sza)
-        print(acqui_rad)
-        print(acqui_skyrad)
-
-
         dataset_l1c = interpolation_function_time.propagate_ds_specific(
             ["random", "systematic_indep", "systematic_corr_rad_irr"],
             dataset_l1b_skyrad,
