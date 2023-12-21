@@ -280,42 +280,43 @@ class Plotting:
             + self.plot_format,
         )
 
-        yrand = dataset["u_rel_random_" + measurandstring].values
-        if refl:
-            ysyst = dataset["u_rel_systematic_" + measurandstring].values
-            yerr = np.concatenate((yrand, ysyst), axis=1)
-            ylabel = np.concatenate(
-                (
-                    np.repeat(["random uncertainty"], len(yrand[0])),
-                    np.repeat(["systematic uncertainty"], len(ysyst[0])),
+        if self.context.get_config_value("mcsteps")>0:
+            yrand = dataset["u_rel_random_" + measurandstring].values
+            if refl:
+                ysyst = dataset["u_rel_systematic_" + measurandstring].values
+                yerr = np.concatenate((yrand, ysyst), axis=1)
+                ylabel = np.concatenate(
+                    (
+                        np.repeat(["random uncertainty"], len(yrand[0])),
+                        np.repeat(["systematic uncertainty"], len(ysyst[0])),
+                    )
                 )
-            )
-        else:
-            ysyst_corr = dataset[
-                "u_rel_systematic_corr_rad_irr_" + measurandstring
-            ].values
-            ysyst_indep = dataset["u_rel_systematic_indep_" + measurandstring].values
-            yerr = np.concatenate((yrand, ysyst_indep, ysyst_corr), axis=1)
-            ylabel = np.concatenate(
-                (
-                    np.repeat(["random uncertainty"], len(yrand[0])),
-                    np.repeat(
-                        ["independent systematic uncertainty"], len(ysyst_indep[0])
-                    ),
-                    np.repeat(
-                        ["correlated (rad-irr) systematic uncertainty"],
-                        len(ysyst_corr[0]),
-                    ),
+            else:
+                ysyst_corr = dataset[
+                    "u_rel_systematic_corr_rad_irr_" + measurandstring
+                ].values
+                ysyst_indep = dataset["u_rel_systematic_indep_" + measurandstring].values
+                yerr = np.concatenate((yrand, ysyst_indep, ysyst_corr), axis=1)
+                ylabel = np.concatenate(
+                    (
+                        np.repeat(["random uncertainty"], len(yrand[0])),
+                        np.repeat(
+                            ["independent systematic uncertainty"], len(ysyst_indep[0])
+                        ),
+                        np.repeat(
+                            ["correlated (rad-irr) systematic uncertainty"],
+                            len(ysyst_corr[0]),
+                        ),
+                    )
                 )
+            self.plot_variable(
+                "relative uncertainty " + measurandstring + " (%)",
+                plotpath,
+                dataset["wavelength"].values,
+                yerr,
+                labels=ylabel,
+                ylim=[0, 20],
             )
-        self.plot_variable(
-            "relative uncertainty " + measurandstring + " (%)",
-            plotpath,
-            dataset["wavelength"].values,
-            yerr,
-            labels=ylabel,
-            ylim=[0, 20],
-        )
 
     def plot_correlation(self, measurandstring, dataset, refl=False):
         with warnings.catch_warnings():

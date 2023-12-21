@@ -223,11 +223,18 @@ class Average:
 
             elif measurandstring in var:
                 if "u_rel_random" in var:
-                    dataset_l1b[var].values = self.calc_mean_masked(
-                        dataset_l1a, var, flags, rand_unc=True
-                    )
+                    if self.context.get_config_value("mcsteps")>0:
+                        dataset_l1b[var].values = self.calc_mean_masked(
+                            dataset_l1a, var, flags, rand_unc=True
+                        )
+                elif "u_rel_" in var:
+                    if self.context.get_config_value("mcsteps")>0:
+                        dataset_l1b[var].values = self.calc_mean_masked(
+                            dataset_l1a, var, flags
+                        )
                 elif "err_corr_" in var:
-                    dataset_l1b[var].values = dataset_l1a[var].values
+                    if self.context.get_config_value("mcsteps")>0:
+                        dataset_l1b[var].values = dataset_l1a[var].values
                 elif (not "std" in var) and (not "n_valid" in var):
                     dataset_l1b[var].values = self.calc_mean_masked(
                         dataset_l1a, var, flags
@@ -301,29 +308,30 @@ class Average:
         dataset_l2a["n_total_scans"].values = n_total.astype(
             dataset_l2a["n_total_scans"].values.dtype
         )
-        dataset_l2a[
-            "u_rel_random_water_leaving_radiance"
-        ].values = self.calc_mean_masked(
-            dataset, "u_rel_random_water_leaving_radiance", flags, rand_unc=True
-        )
-        dataset_l2a[
-            "u_rel_systematic_indep_water_leaving_radiance"
-        ].values = self.calc_mean_masked(
-            dataset, "u_rel_systematic_indep_water_leaving_radiance", flags
-        )
-        dataset_l2a[
-            "err_corr_systematic_indep_water_leaving_radiance"
-        ].values = dataset["err_corr_systematic_indep_water_leaving_radiance"].values
-        dataset_l2a[
-            "u_rel_systematic_corr_rad_irr_water_leaving_radiance"
-        ].values = self.calc_mean_masked(
-            dataset, "u_rel_systematic_corr_rad_irr_water_leaving_radiance", flags
-        )
-        dataset_l2a[
-            "err_corr_systematic_corr_rad_irr_water_leaving_radiance"
-        ].values = dataset[
-            "err_corr_systematic_corr_rad_irr_water_leaving_radiance"
-        ].values
+        if self.context.get_config_value("mcsteps") > 0:
+            dataset_l2a[
+                "u_rel_random_water_leaving_radiance"
+            ].values = self.calc_mean_masked(
+                dataset, "u_rel_random_water_leaving_radiance", flags, rand_unc=True
+            )
+            dataset_l2a[
+                "u_rel_systematic_indep_water_leaving_radiance"
+            ].values = self.calc_mean_masked(
+                dataset, "u_rel_systematic_indep_water_leaving_radiance", flags
+            )
+            dataset_l2a[
+                "err_corr_systematic_indep_water_leaving_radiance"
+            ].values = dataset["err_corr_systematic_indep_water_leaving_radiance"].values
+            dataset_l2a[
+                "u_rel_systematic_corr_rad_irr_water_leaving_radiance"
+            ].values = self.calc_mean_masked(
+                dataset, "u_rel_systematic_corr_rad_irr_water_leaving_radiance", flags
+            )
+            dataset_l2a[
+                "err_corr_systematic_corr_rad_irr_water_leaving_radiance"
+            ].values = dataset[
+                "err_corr_systematic_corr_rad_irr_water_leaving_radiance"
+            ].values
 
         for measurandstring in ["reflectance_nosc", "reflectance", "epsilon"]:
             measurand, measurand_std, n_valid, n_total = self.calc_mean_masked(
@@ -339,20 +347,21 @@ class Average:
             dataset_l2a["n_total_scans"].values = n_total.astype(
                 dataset_l2a["n_total_scans"].values.dtype
             )
-            dataset_l2a[
-                "u_rel_random_" + measurandstring
-            ].values = self.calc_mean_masked(
-                dataset, "u_rel_random_" + measurandstring, flags, rand_unc=True
-            )
-            dataset_l2a[
-                "u_rel_systematic_" + measurandstring
-            ].values = self.calc_mean_masked(
-                dataset, "u_rel_systematic_" + measurandstring, flags
-            )
-            if not measurandstring == "epsilon":
-                dataset_l2a["err_corr_systematic_" + measurandstring].values = dataset[
-                    "err_corr_systematic_" + measurandstring
-                ].values
+            if self.context.get_config_value("mcsteps") > 0:
+                dataset_l2a[
+                    "u_rel_random_" + measurandstring
+                ].values = self.calc_mean_masked(
+                    dataset, "u_rel_random_" + measurandstring, flags, rand_unc=True
+                )
+                dataset_l2a[
+                    "u_rel_systematic_" + measurandstring
+                ].values = self.calc_mean_masked(
+                    dataset, "u_rel_systematic_" + measurandstring, flags
+                )
+                if not measurandstring == "epsilon":
+                    dataset_l2a["err_corr_systematic_" + measurandstring].values = dataset[
+                        "err_corr_systematic_" + measurandstring
+                    ].values
 
         return dataset_l2a
 

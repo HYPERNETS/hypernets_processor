@@ -80,7 +80,7 @@ class Calibrate:
             self.context.get_config_value("measurement_function_calibrate")
         )
 
-        if self.context.get_config_value("uncertainty_l1a"):
+        if self.context.get_config_value("uncertainty_l1a") and self.context.get_config_value("mcsteps")>0:
             dataset_l1a = calibrate_function.propagate_ds_specific(
                 ["random", "systematic_indep", "systematic_corr_rad_irr"],
                 dataset_l0_masked,
@@ -171,31 +171,32 @@ class Calibrate:
             store_unc_percent=True,
         )
 
-        self.qual.perform_quality_check_rand_unc(dataset_l1b, measurandstring)
+        if self.context.get_config_value("mcsteps")>0:
+            self.qual.perform_quality_check_rand_unc(dataset_l1b, measurandstring)
 
-        if self.context.get_config_value("bad_wavelenth_ranges"):
-            for maskrange in self.context.get_config_value(
-                "bad_wavelenth_ranges"
-            ).split(","):
-                start_mask = float(maskrange.split("-")[0])
-                end_mask = float(maskrange.split("-")[1])
-                for i in np.where(
-                    (dataset_l1b.wavelength > start_mask)
-                    & (dataset_l1b.wavelength < end_mask)
-                )[0]:
-                    dataset_l1b["u_rel_systematic_indep_" + measurandstring].values[
-                        i,
-                        :,
-                    ] += 50
-                    dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
-                        i, :
-                    ] = (3 / 50) ** 2
-                    dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
-                        :, i
-                    ] = (3 / 50) ** 2
-                    dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
-                        i, i
-                    ] = 1
+            if self.context.get_config_value("bad_wavelenth_ranges"):
+                for maskrange in self.context.get_config_value(
+                    "bad_wavelenth_ranges"
+                ).split(","):
+                    start_mask = float(maskrange.split("-")[0])
+                    end_mask = float(maskrange.split("-")[1])
+                    for i in np.where(
+                        (dataset_l1b.wavelength > start_mask)
+                        & (dataset_l1b.wavelength < end_mask)
+                    )[0]:
+                        dataset_l1b["u_rel_systematic_indep_" + measurandstring].values[
+                            i,
+                            :,
+                        ] += 50
+                        dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
+                            i, :
+                        ] = (3 / 50) ** 2
+                        dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
+                            :, i
+                        ] = (3 / 50) ** 2
+                        dataset_l1b["err_corr_systematic_indep_" + measurandstring].values[
+                            i, i
+                        ] = 1
 
         dataset_l1b["std_" + measurandstring].values = (
             dataset_l1b[measurandstring].values

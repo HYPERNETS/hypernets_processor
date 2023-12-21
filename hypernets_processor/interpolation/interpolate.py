@@ -55,30 +55,31 @@ class Interpolate:
         dataset_l1c_int["acquisition_time"].values = (
             dataset_l1a_uprad["acquisition_time"].sel(scan=upscan).values
         )
-        # is this correct????
-        dataset_l1c_int["u_rel_random_upwelling_radiance"].values = (
-            dataset_l1a_uprad["u_rel_random_radiance"].sel(scan=upscan).values
-        )
-        dataset_l1c_int["u_rel_systematic_indep_upwelling_radiance"].values = (
-            dataset_l1a_uprad["u_rel_systematic_indep_radiance"].sel(scan=upscan).values
-        )
-        dataset_l1c_int["u_rel_systematic_corr_rad_irr_upwelling_radiance"].values = (
-            dataset_l1a_uprad["u_rel_systematic_corr_rad_irr_radiance"]
-            .sel(scan=upscan)
-            .values
-        )
-        dataset_l1c_int[
-            "err_corr_systematic_indep_upwelling_radiance"
-        ].values = dataset_l1a_uprad["err_corr_systematic_indep_radiance"].values
-        dataset_l1c_int[
-            "err_corr_systematic_corr_rad_irr_upwelling_radiance"
-        ].values = dataset_l1a_uprad["err_corr_systematic_corr_rad_irr_radiance"].values
+        if self.context.get_config_value("mcsteps") > 0:
+            dataset_l1c_int["u_rel_random_upwelling_radiance"].values = (
+                dataset_l1a_uprad["u_rel_random_radiance"].sel(scan=upscan).values
+            )
+            dataset_l1c_int["u_rel_systematic_indep_upwelling_radiance"].values = (
+                dataset_l1a_uprad["u_rel_systematic_indep_radiance"].sel(scan=upscan).values
+            )
+            dataset_l1c_int["u_rel_systematic_corr_rad_irr_upwelling_radiance"].values = (
+                dataset_l1a_uprad["u_rel_systematic_corr_rad_irr_radiance"]
+                .sel(scan=upscan)
+                .values
+            )
+            dataset_l1c_int[
+                "err_corr_systematic_indep_upwelling_radiance"
+            ].values = dataset_l1a_uprad["err_corr_systematic_indep_radiance"].values
+            dataset_l1c_int[
+                "err_corr_systematic_corr_rad_irr_upwelling_radiance"
+            ].values = dataset_l1a_uprad["err_corr_systematic_corr_rad_irr_radiance"].values
 
         if self.context.logger is not None:
             self.context.logger.info("interpolate sky radiance")
         else:
             print("interpolate sky radiance")
-            dataset_l1c_int = self.interpolate_skyradiance(
+
+        dataset_l1c_int = self.interpolate_skyradiance(
                 dataset_l1c_int, dataset_l1b_downrad
         )
 

@@ -13,6 +13,6 @@ in, check_valid_sequence , L & W , L1C , Halt processing if there are no valid s
 cl, no_clear_sky_sequence , L & W , L1C , If all irradiance series are flagged with the `no_clear_sky_irradiance' flag, False  , 19
 d, discontinuity_VNIR_SWIR , L , L1B , Checks if the VNIR and SWIR are different by more than 25\%, False, 20
 nd, variable_radiance, W , L1C , More than 10\% difference between start and end $L_d$ at 550~nm, True ,
-l, variable_radiance, W , L1C , Ld missing for sky reflectance correction, True,
+l, ld_missing, W , L1C , Ld missing for sky reflectance correction, True,
 x, unexpected_error, L & W , , unexpected error during processing; catches all errors, True,
 

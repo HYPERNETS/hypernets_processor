@@ -116,7 +116,7 @@ setup(
         "dataset",
         "sqlalchemy==1.3.20",
         "sqlalchemy-utils",
-        "punpy>=0.40.1",
+        "punpy>=0.42.0",
         "matheo",
         "comet_maths>=0.19.10",
         "obsarray",
