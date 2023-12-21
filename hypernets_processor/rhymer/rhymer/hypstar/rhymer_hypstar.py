@@ -164,9 +164,9 @@ class RhymerHypstar:
             sena_lu = np.unique(lu["pointing_azimuth_angle"].values)
             sena_lsky = np.unique(lsky["pointing_azimuth_angle"].values)
             sena_lu = sena_lu % 360
-            print("this is sena_lu:{}".format(sena_lu))
+            #print("this is sena_lu:{}".format(sena_lu))
             sena_lsky = sena_lsky % 360
-            print("this is sena_lsky:{}".format(sena_lsky))
+            #print("this is sena_lsky:{}".format(sena_lsky))
 
             equival_az= 0
             for i in sena_lu:
@@ -181,9 +181,9 @@ class RhymerHypstar:
             senz_lu = np.unique(lu["viewing_zenith_angle"].values)
             senz_lsky = 180 - np.unique(lsky["viewing_zenith_angle"].values)
 
-            print(lsky["viewing_zenith_angle"].values)
-            print("this is senz_lu:{}".format(senz_lu))
-            print("this is senz_lsky:{}".format(senz_lsky))
+            #print(lsky["viewing_zenith_angle"].values)
+            #print("this is senz_lu:{}".format(senz_lu))
+            #print("this is senz_lsky:{}".format(senz_lsky))
 
             equival_zen = 0
             for i in senz_lu:

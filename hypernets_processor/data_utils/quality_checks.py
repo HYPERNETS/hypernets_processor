@@ -625,7 +625,7 @@ class QualityChecks:
         ed = np.mean(l1c.irradiance.values, axis=1)
         wv = l1c.wavelength.values
         popt, pcov, ss_res = self.fitcurve(wv, ld, ed)
-        print("this is ss_res:{}".format(ss_res))
+        #print("this is ss_res:{}".format(ss_res))
         # popt[0]+popt[1]*(x/100)**(-4)
         # plt.plot(wv, popt[0] + popt[1] * (wv / 100) ** (-4), label="Fitted Curve")
 
