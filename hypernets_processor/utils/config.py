@@ -29,7 +29,9 @@ if os.path.exists(WORKING_DIRECTORY_FILE_PATH):
     SCHEDULER_CONFIG_PATH = os.path.join(working_directory, "scheduler.config")
     JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
 else:
-    print("working_directory.txt does not exist so some of the paths for automated processing could not be correctly set up.")
+    print(
+        "working_directory.txt does not exist so some of the paths for automated processing could not be correctly set up."
+    )
     PROCESSOR_CONFIG_PATH = None
     SCHEDULER_CONFIG_PATH = None
     JOBS_FILE_PATH = None

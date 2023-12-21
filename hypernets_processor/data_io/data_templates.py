@@ -72,9 +72,7 @@ class DataTemplates:
 
         return dataset_l0a
 
-    def l0b_template_from_l0a_dataset(
-        self, measurandstring, dataset_l0, swir=False
-    ):
+    def l0b_template_from_l0a_dataset(self, measurandstring, dataset_l0, swir=False):
         """
         Makes all L1 templates for the data, and propagates the appropriate keywords from the L0 datasets.
 

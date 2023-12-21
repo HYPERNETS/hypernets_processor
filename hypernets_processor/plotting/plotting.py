@@ -280,7 +280,7 @@ class Plotting:
             + self.plot_format,
         )
 
-        if self.context.get_config_value("mcsteps")>0:
+        if self.context.get_config_value("mcsteps") > 0:
             yrand = dataset["u_rel_random_" + measurandstring].values
             if refl:
                 ysyst = dataset["u_rel_systematic_" + measurandstring].values
@@ -295,7 +295,9 @@ class Plotting:
                 ysyst_corr = dataset[
                     "u_rel_systematic_corr_rad_irr_" + measurandstring
                 ].values
-                ysyst_indep = dataset["u_rel_systematic_indep_" + measurandstring].values
+                ysyst_indep = dataset[
+                    "u_rel_systematic_indep_" + measurandstring
+                ].values
                 yerr = np.concatenate((yrand, ysyst_indep, ysyst_corr), axis=1)
                 ylabel = np.concatenate(
                     (
@@ -668,7 +670,13 @@ class Plotting:
         ax.set_theta_direction(-1)
         ax.set_theta_offset(np.pi / 2.0)
         im = ax.pcolormesh(
-            vaa_mesh, vza_mesh, refl_2d.T, shading="auto", cmap=plt.get_cmap("jet"), vmin=self.context.get_config_value("plot_polar_min"), vmax=self.context.get_config_value("plot_polar_max"),
+            vaa_mesh,
+            vza_mesh,
+            refl_2d.T,
+            shading="auto",
+            cmap=plt.get_cmap("jet"),
+            vmin=self.context.get_config_value("plot_polar_min"),
+            vmax=self.context.get_config_value("plot_polar_max"),
         )
 
         ax.plot(np.radians(saa), sza, color="k", ls="none", marker="o")

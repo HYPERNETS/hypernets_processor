@@ -19,13 +19,13 @@ class InterpolationTimeLinearCoscorrected(MeasurementFunction):
             out = np.empty((len(irradiance), len(output_time)))
             for i in range(len(output_time)):
                 if output_time[i] >= np.max(input_time[:, i]):
-                    out[:, i] = irradiance[:, input_time[:, i] == np.max(input_time[:, i]), i][
-                        :, 0
-                    ]
+                    out[:, i] = irradiance[
+                        :, input_time[:, i] == np.max(input_time[:, i]), i
+                    ][:, 0]
                 elif output_time[i] <= np.min(input_time[:, i]):
-                    out[:, i] = irradiance[:, input_time[:, i] == np.min(input_time[:, i]), i][
-                        :, 0
-                    ]
+                    out[:, i] = irradiance[
+                        :, input_time[:, i] == np.min(input_time[:, i]), i
+                    ][:, 0]
                 else:
                     irradiance_intfunc = scipy.interpolate.interp1d(
                         input_time[:, i], irradiance[:, :, i]
@@ -86,4 +86,4 @@ class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(MeasurementFunction
         return "WaterNetworkInterpolationSkyRadianceLinearCoscorrected"
 
     def get_argument_names(self):
-        return ["output_time", "input_time", "radiance",  "output_sza", "input_sza"]
+        return ["output_time", "input_time", "radiance", "output_sza", "input_sza"]

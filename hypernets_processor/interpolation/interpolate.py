@@ -60,9 +60,13 @@ class Interpolate:
                 dataset_l1a_uprad["u_rel_random_radiance"].sel(scan=upscan).values
             )
             dataset_l1c_int["u_rel_systematic_indep_upwelling_radiance"].values = (
-                dataset_l1a_uprad["u_rel_systematic_indep_radiance"].sel(scan=upscan).values
+                dataset_l1a_uprad["u_rel_systematic_indep_radiance"]
+                .sel(scan=upscan)
+                .values
             )
-            dataset_l1c_int["u_rel_systematic_corr_rad_irr_upwelling_radiance"].values = (
+            dataset_l1c_int[
+                "u_rel_systematic_corr_rad_irr_upwelling_radiance"
+            ].values = (
                 dataset_l1a_uprad["u_rel_systematic_corr_rad_irr_radiance"]
                 .sel(scan=upscan)
                 .values
@@ -72,7 +76,9 @@ class Interpolate:
             ].values = dataset_l1a_uprad["err_corr_systematic_indep_radiance"].values
             dataset_l1c_int[
                 "err_corr_systematic_corr_rad_irr_upwelling_radiance"
-            ].values = dataset_l1a_uprad["err_corr_systematic_corr_rad_irr_radiance"].values
+            ].values = dataset_l1a_uprad[
+                "err_corr_systematic_corr_rad_irr_radiance"
+            ].values
 
         if self.context.logger is not None:
             self.context.logger.info("interpolate sky radiance")
@@ -80,7 +86,7 @@ class Interpolate:
             print("interpolate sky radiance")
 
         dataset_l1c_int = self.interpolate_skyradiance(
-                dataset_l1c_int, dataset_l1b_downrad
+            dataset_l1c_int, dataset_l1b_downrad
         )
 
         if self.context.logger is not None:
