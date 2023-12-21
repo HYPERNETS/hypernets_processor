@@ -113,7 +113,7 @@ def main(scheduler_config, processor_config):
     processor_sch = Scheduler(logger=logger)
 
     inputs = np.empty(len(jobs_list), dtype=object)
-
+    print(jobs_list)
     for ij, job_config_path in enumerate(jobs_list):
 
         # define scheduler job config
@@ -137,7 +137,7 @@ def main(scheduler_config, processor_config):
             "parallel"
         ]
 
-        print(job_config.keys())
+        print(list(job_config.keys()))
         if scheduler_job_config["parallel"]:
             job_config["Databases"] = {
                 "metadata_db_url": processor_config["Databases"][
