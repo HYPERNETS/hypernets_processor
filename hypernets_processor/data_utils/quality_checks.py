@@ -44,7 +44,7 @@ class QualityChecks:
     def perform_quality_check_angles(
         self, datasetl0, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
     ):
-        print("vza_ref:{}, vza_abs:{}, paa_ref:{}, paa_abs:{}".format(vza_ref, vza_abs, paa_ref, paa_abs))
+        #print("vza_ref:{}, vza_abs:{}, paa_ref:{}, paa_abs:{}".format(vza_ref, vza_abs, paa_ref, paa_abs))
 
         if (vza_ref == -1 and paa_ref == -1) or (vza_ref <= -999 and paa_ref <= -999):
             self.context.logger.warning(
@@ -625,7 +625,7 @@ class QualityChecks:
         ed = np.mean(l1c.irradiance.values, axis=1)
         wv = l1c.wavelength.values
         popt, pcov, ss_res = self.fitcurve(wv, ld, ed)
-        print("this is ss_res:{}".format(ss_res))
+        #print("this is ss_res:{}".format(ss_res))
         # popt[0]+popt[1]*(x/100)**(-4)
         # plt.plot(wv, popt[0] + popt[1] * (wv / 100) ** (-4), label="Fitted Curve")
 
