@@ -137,7 +137,7 @@ def main(scheduler_config, processor_config):
             "parallel"
         ]
 
-        print(job_config)
+        print(job_config.keys())
         if scheduler_job_config["parallel"]:
             job_config["Databases"] = {
                 "metadata_db_url": processor_config["Databases"][
