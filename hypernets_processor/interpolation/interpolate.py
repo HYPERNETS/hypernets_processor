@@ -78,7 +78,7 @@ class Interpolate:
             self.context.logger.info("interpolate sky radiance")
         else:
             print("interpolate sky radiance")
-            dataset_l1c_int = self.interpolate_skyradiance(
+        dataset_l1c_int = self.interpolate_skyradiance(
                 dataset_l1c_int, dataset_l1b_downrad
         )
 
