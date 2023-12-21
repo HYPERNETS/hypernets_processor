@@ -44,6 +44,8 @@ class QualityChecks:
     def perform_quality_check_angles(
         self, datasetl0, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
     ):
+        print("vza_ref:{}, vza_abs:{}, paa_ref:{}, paa_abs:{}".format(vza_ref, vza_abs, paa_ref, paa_abs))
+
         if (vza_ref == -1 and paa_ref == -1) or (vza_ref <= -999 and paa_ref <= -999):
             self.context.logger.warning(
                 "vza_ref and paa_ref are both invalid, using pt_abs instead"

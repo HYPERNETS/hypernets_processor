@@ -398,7 +398,7 @@ L0B_RAD_VARIABLES = {
     },
     "digital_number": {
         "dim": [WL_DIM, SERIES_DIM],
-        "dtype": np.uint32,
+        "dtype": np.int32,
         "attributes": {
             "standard_name": "digital_number",
             "long_name": "Digital number, raw data",
