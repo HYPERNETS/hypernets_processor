@@ -137,18 +137,19 @@ def main(scheduler_config, processor_config):
             "parallel"
         ]
 
+        print(job_config)
         if scheduler_job_config["parallel"]:
             job_config["Databases"] = {
                 "metadata_db_url": processor_config["Databases"][
                     "metadata_db_url"
-                ].replace(".db", "_" + job_config["Job"]["site_id"] + ".db")
+                ].replace(".db", "_" + job_config["site_id"] + ".db")
             }
             job_config["Databases"]["archive_db_url"] = processor_config["Databases"][
                 "archive_db_url"
-            ].replace(".db", "_" + job_config["Job"]["site_id"] + ".db")
+            ].replace(".db", "_" + job_config["site_id"] + ".db")
             job_config["Databases"]["anomaly_db_url"] = processor_config["Databases"][
                 "anomaly_db_url"
-            ].replace(".db", "_" + job_config["Job"]["site_id"] + ".db")
+            ].replace(".db", "_" + job_config["site_id"] + ".db")
 
             inputs[ij] = (processor_config, job_config, True)
 
