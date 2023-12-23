@@ -131,6 +131,7 @@ def main(processor_config, job_config, to_archive, parallel=None):
     if "job_name" in job_config["Job"].keys():
         name = job_config["Job"]["job_name"]
 
+
     logger = configure_logging(config=job_config, name=name)
 
     # Define context
