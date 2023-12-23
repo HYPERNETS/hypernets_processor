@@ -97,10 +97,16 @@ class SequenceProcessor:
                         L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = cal.calibrate_l1a(
                             "radiance", l0a_rad, l0a_bla, calibration_data_rad
                         )
+                    else:
+                        L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = None, None, None
+
                     if l0a_irr:
                         L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = cal.calibrate_l1a(
                             "irradiance", l0a_irr, l0a_bla, calibration_data_irr
                         )
+                    else:
+                        L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = None, None, None
+
                     self.context.logger.info("Done")
 
                 if l0a_rad and l0a_irr:
@@ -127,6 +133,9 @@ class SequenceProcessor:
                             l0a_irr_bla_masked,
                             calibration_data_irr,
                         )
+                else:
+                    L1b_rad = None
+                    L1b_irr = None
 
                 if L1b_rad and L1b_irr:
                     if self.context.get_config_value("max_level") in ["L1C", "L2A"]:
@@ -206,10 +215,16 @@ class SequenceProcessor:
                         L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = cal.calibrate_l1a(
                             "radiance", l0a_rad, l0a_bla, calibration_data_rad
                         )
+                    else:
+                        L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = None, None, None
+
                     if l0a_irr:
                         L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = cal.calibrate_l1a(
                             "irradiance", l0a_irr, l0a_bla, calibration_data_irr
                         )
+                    else:
+                        L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = None, None, None
+
                     if l0a_swir_rad:
                         (
                             L1a_swir_rad,
@@ -222,6 +237,13 @@ class SequenceProcessor:
                             calibration_data_swir_rad,
                             swir=True,
                         )
+                    else:
+                        L1a_swir_rad, l0a_swir_rad_masked, l0a_swir_rad_bla_masked = (
+                            None,
+                            None,
+                            None,
+                        )
+
                     if l0a_swir_irr:
                         (
                             L1a_swir_irr,
@@ -234,6 +256,13 @@ class SequenceProcessor:
                             calibration_data_swir_irr,
                             swir=True,
                         )
+                    else:
+                        L1a_swir_irr, l0a_swir_irr_masked, l0a_swir_irr_bla_masked = (
+                            None,
+                            None,
+                            None,
+                        )
+
                     self.context.logger.info("Done")
 
                 if self.context.get_config_value("max_level") in ["L1B", "L1C", "L2A"]:
@@ -249,6 +278,8 @@ class SequenceProcessor:
                             calibration_data_swir_rad,
                         )
                         self.context.logger.info("Done")
+                    else:
+                        L1b_rad = None
 
                     if l0a_irr_masked and l0a_swir_irr_masked:
                         self.context.logger.info("Processing to L1b irradiance...")
@@ -262,6 +293,8 @@ class SequenceProcessor:
                             calibration_data_swir_irr,
                         )
                         self.context.logger.info("Done")
+                    else:
+                        L1b_irr = None
 
                 if L1b_rad and L1b_irr:
                     if self.context.get_config_value("max_level") in ["L1C", "L2A"]:
