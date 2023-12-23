@@ -60,7 +60,7 @@ class CalibrationConverter:
                 instrument_id = int(globalattr["sn_hypstar"])
             else:
                 instrument_id = self.context.get_config_value("hypstar_cal_number")
-                self.context.logger.error(
+                self.context.logger.warning(
                     "No SN set for hypstar instrument! using hypstar_cal_number from config file instead."
                 )
         else:

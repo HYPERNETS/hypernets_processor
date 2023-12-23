@@ -51,7 +51,7 @@ class QualityChecks:
         )
 
         if (vza_ref == -1 and paa_ref == -1) or (vza_ref <= -999 and paa_ref <= -999):
-            self.context.logger.warning(
+            self.context.logger.debug(
                 "vza_ref and paa_ref are both invalid, using pt_abs instead"
             )
             paa_ref, vza_ref = paa_abs, vza_abs
@@ -83,7 +83,7 @@ class QualityChecks:
             datasetl0["quality_flag"].values[scan_number] = DatasetUtil.set_flag(
                 datasetl0["quality_flag"][scan_number], "bad_pointing"
             )
-            self.context.logger.error(
+            self.context.logger.warning(
                 "Error in Accuracy of tilt is above %s° (vza_abs=%s; vza_ref=%s). Check your system and/or data before processing."
                 % (
                     self.context.get_config_value("bad_pointing_threshold_zenith"),
@@ -97,7 +97,7 @@ class QualityChecks:
             datasetl0["quality_flag"].values[scan_number] = DatasetUtil.set_flag(
                 datasetl0["quality_flag"][scan_number], "bad_pointing"
             )
-            self.context.logger.error(
+            self.context.logger.warning(
                 "Error in Accuracy of pan is above %s° (vaa_abs=%s; vaa_ref=%s). Check your system and/or data before processing."
                 % (
                     self.context.get_config_value("bad_pointing_threshold_azimuth"),
@@ -128,7 +128,7 @@ class QualityChecks:
             mask_all_i[np.where(mask_discontinuity_i == 1)] = 1
 
             if all(mask_all_i == 1):
-                self.context.logger.error(
+                self.context.logger.warning(
                     "None of the scans for series passed the quality control criteria"
                 )
                 raise_mask_anomaly = True
@@ -172,7 +172,7 @@ class QualityChecks:
             # mask_all_i[np.where(mask_discontinuity_i==1)] = 1
 
             if all(mask_all_i == 1):
-                self.context.logger.error(
+                self.context.logger.warning(
                     "None of the dark scans for series passed the quality control criteria"
                 )
                 raise_mask_anomaly = True
@@ -331,7 +331,7 @@ class QualityChecks:
                     dataset_l0b["quality_flag"][i], "not_enough_dark_scans"
                 )
                 if self.context.logger is not None:
-                    self.context.logger.error(
+                    self.context.logger.warning(
                         "Not enough dark scans for sequence {}".format(
                             dataset_l0b.attrs["sequence_id"]
                         )
@@ -373,11 +373,6 @@ class QualityChecks:
                 ds_irr["quality_flag"], ["variable_irradiance"]
             )
         ):
-            self.context.logger.info(
-                "Non constant irradiance for sequence {}".format(
-                    ds_irr.attrs["sequence_id"]
-                )
-            )
             self.context.anomaly_handler.add_anomaly("nu")
 
         flags = ["not_enough_dark_scans", "not_enough_irr_scans", "vza_irradiance"]
@@ -468,7 +463,7 @@ class QualityChecks:
                     ds["quality_flag"][:] = DatasetUtil.set_flag(
                         ds["quality_flag"][:], "series_missing"
                     )
-                    self.context.logger.error(
+                    self.context.logger.warning(
                         "There is a missing geometry (vza=%s,vaa=%s,paa=%s) for the land standard sequence."
                         % (geom[0], geom[1], (geom[1] - 180) % 360)
                     )
@@ -486,7 +481,7 @@ class QualityChecks:
         wav_idx = np.argmin(np.abs(wv - 550))
         if measurand == "irradiance":
             if len(dataset.irradiance.values[wav_idx, :]) == 1:
-                self.context.logger.error(
+                self.context.logger.warning(
                     "There is only one irradiance being considered when doing qc_illumination and thus no variability of irradiance is checked."
                 )
                 return 0
@@ -503,7 +498,7 @@ class QualityChecks:
                 )
         elif measurand == "radiance":
             if len(dataset.radiance.values[wav_idx, :]) == 1:
-                self.context.logger.error(
+                self.context.logger.warning(
                     "There is only one radiance being considered when doing qc_illumination and thus no variability of radiance is checked."
                 )
                 return 0

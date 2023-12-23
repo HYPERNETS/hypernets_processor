@@ -143,7 +143,7 @@ class HypernetsReader:
         for i in range(int(data_len)):  # Last read data is count
             data = f.read(2)
             if len(data) != 2:
-                self.context.logger.error("Warning : impossible to read 2 bytes")
+                self.context.logger.warning("Warning : impossible to read 2 bytes")
                 break
                 continue
 
@@ -438,7 +438,7 @@ class HypernetsReader:
                     )
 
                 else:
-                    self.context.logger.error(
+                    self.context.logger.warning(
                         "Latitude is not found, using default values instead for lat, lon, sza and saa."
                     )
 
@@ -566,7 +566,7 @@ class HypernetsReader:
                         byte_pointer = f.tell()
                         chunk_counter += 1
             else:
-                self.context.logger.error(
+                self.context.logger.warning(
                     "A file (%s) listed in the metadata.txt is missing." % (spectra)
                 )
 
@@ -671,7 +671,7 @@ class HypernetsReader:
                                     float(lat), float(lon), acquisitionTime
                                 )
                             elif scan_number == 0:
-                                self.context.logger.error(
+                                self.context.logger.warning(
                                     "Lattitude is not found, using default values instead for lat, lon, sza and saa."
                                 )
                             ds["quality_flag"][scan_number] = flag
@@ -769,7 +769,7 @@ class HypernetsReader:
                                 ] = get_azimuth(float(lat), float(lon), acquisitionTime)
 
                             elif scan_number_swir == 0:
-                                self.context.logger.error(
+                                self.context.logger.warning(
                                     "Latitude is not found, using default values instead for lat, lon, sza and saa."
                                 )
                             ds_swir["quality_flag"][scan_number_swir] = flag
@@ -1071,7 +1071,7 @@ class HypernetsReader:
             #     axis=1, ignore_index=True)
             data.columns = ["temp", "RH", "pressure", "lux"]
         else:
-            self.context.logger.error(
+            self.context.logger.warning(
                 "Missing meteo file in sequence directory. No meteo data added to your output file."
             )
             self.context.anomaly_handler.add_anomaly("s")
@@ -1301,7 +1301,7 @@ class HypernetsReader:
                     shutil.copy(os.path.join(seq_dir, "RADIOMETER/" + i), path)
 
         else:
-            self.context.logger.error("No pictures for this sequence")
+            self.context.logger.warning("No pictures for this sequence")
         if self.context.get_config_value("network") == "w":
             return l0a_irr, l0a_rad, l0a_bla
         else:

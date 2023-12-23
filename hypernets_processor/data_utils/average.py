@@ -57,7 +57,7 @@ class Average:
                 for i in range(len(np.unique(dataset_l0["series_id"])))
             ]
         ):
-            self.context.logger.error(
+            self.context.logger.warning(
                 "The dark series_id did not match the expected series_id from (ir)radiance"
             )
             dataset_l0, dataset_l0_bla = self.remove_missing_series(
