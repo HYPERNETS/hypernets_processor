@@ -81,7 +81,8 @@ def read_jobs_list(fname):
         # lines = [line.rstrip() for line in f.readlines()]
         jobs = [
             relative_path(line.rstrip(), os.path.dirname(fname))
-            for line in f.readlines() if not line[0]=="#"
+            for line in f.readlines()
+            if not line[0] == "#"
         ]
 
     return jobs

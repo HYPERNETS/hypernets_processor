@@ -661,8 +661,24 @@ class Plotting:
                         < self.context.get_config_value("bad_pointing_threshold_zenith")
                     )
                 )[0]
-                if len(id_series) > 0:
+                if len(id_series) == 1:
                     refl_2d[i, ii] = np.abs(refl[id_wav, id_series])
+                elif len(id_series) > 1:
+                    self.context.logger.info(
+                        "There are multiple series that match the same vaa (%s) and vza (%s) "
+                        "within a tolerance of %s and %s degrees respectively."
+                        % (
+                            vaa_grid[i],
+                            vza_grid[ii],
+                            self.context.get_config_value(
+                                "bad_pointing_threshold_azimuth"
+                            ),
+                            self.context.get_config_value(
+                                "bad_pointing_threshold_zenith"
+                            ),
+                        )
+                    )
+                    refl_2d[i, ii] = np.mean(np.abs(refl[id_wav, id_series]))
         refl_2d[refl_2d == 0] = np.nan
 
         fig = plt.figure()
