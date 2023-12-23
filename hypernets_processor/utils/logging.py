@@ -10,7 +10,6 @@ import sys
 import os
 import argparse
 import configparser
-import multiprocessing_logging
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -86,7 +85,5 @@ def configure_logging(fname=None, verbose=None, quiet=None, config=None, name=No
         logger.addHandler(stream_handler)
 
     loggers[name] = logger
-
-    multiprocessing_logging.install_mp_handler()
 
     return logger
