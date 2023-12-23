@@ -11,7 +11,6 @@ from hypernets_processor.main.sequence_processor_main import main as processor_m
 
 import numpy as np
 from multiprocessing import Pool
-import multiprocessing_logging
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -164,8 +163,6 @@ def main(scheduler_config, processor_config):
             )
 
     if scheduler_job_config["parallel"]:
-        multiprocessing_logging.install_mp_handler()
-
         pool = Pool(len(jobs_list))
         outs = pool.starmap(processor_main, inputs)
 
