@@ -173,7 +173,7 @@ class SequenceProcessor:
 
                 else:
                     self.context.logger.info("Not a standard sequence")
-                    self.context.anomaly_handler.add_anomaly("s")
+                    self.context.anomaly_handler.add_anomaly("ms")
 
             elif self.context.get_config_value("network") == "l":
                 comb = CombineSWIR(self.context)
@@ -307,7 +307,7 @@ class SequenceProcessor:
                         self.context.logger.info("Done")
                 else:
                     self.context.logger.info("Not a standard sequence")
-                    self.context.anomaly_handler.add_anomaly("b")
+                    self.context.anomaly_handler.add_anomaly("ms")
 
             else:
                 raise NameError(
