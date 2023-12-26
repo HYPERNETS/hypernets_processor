@@ -60,7 +60,8 @@ def get_target_sequences(context, to_archive):
             product["sequence_name"]
             for product in context.archive_db["products"].find(
                 site_id=context.get_config_value("site_id")
-            ) if "L2A" in product["product_level"]
+            )
+            if "L2A" in product["product_level"]
         ]
 
         failed_products = [

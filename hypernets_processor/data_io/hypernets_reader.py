@@ -541,27 +541,30 @@ class HypernetsReader:
                     chunk_size = 1
                     chunk_counter = 1
                     while file_size - byte_pointer:
-                        self.context.logger.debug(
-                            "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
-                                chunk_counter, chunk_size, file_size - byte_pointer
+                        try:
+                            self.context.logger.debug(
+                                "Parsing chunk No {}, size {} bytes, bytes left: {}".format(
+                                    chunk_counter, chunk_size, file_size - byte_pointer
+                                )
                             )
-                        )
-                        chunk_size = unpack("<H", f.read(2))[0]
-                        if chunk_size == 4119:
-                            chunk_size = 4131
-                        f.seek(byte_pointer)
-                        chunk_body = f.read(chunk_size)
-                        spectrum = Spectrum.parse_raw(chunk_body)
-                        if len(spectrum.body) > 500:
-                            if len(vnir) == 0:
-                                vnir = np.array(spectrum.body)
+                            chunk_size = unpack("<H", f.read(2))[0]
+                            if chunk_size == 4119:
+                                chunk_size = 4131
+                            f.seek(byte_pointer)
+                            chunk_body = f.read(chunk_size)
+                            spectrum = Spectrum.parse_raw(chunk_body)
+                            if len(spectrum.body) > 500:
+                                if len(vnir) == 0:
+                                    vnir = np.array(spectrum.body)
+                                else:
+                                    vnir = np.vstack([vnir, spectrum.body])
                             else:
-                                vnir = np.vstack([vnir, spectrum.body])
-                        else:
-                            if len(swir) == 0:
-                                swir = np.array(spectrum.body)
-                            else:
-                                swir = np.vstack([swir, spectrum.body])
+                                if len(swir) == 0:
+                                    swir = np.array(spectrum.body)
+                                else:
+                                    swir = np.vstack([swir, spectrum.body])
+                        except:
+                            self.context.logger.warning("reading of spectrum failed")
 
                         byte_pointer = f.tell()
                         chunk_counter += 1
@@ -643,189 +646,200 @@ class HypernetsReader:
                             chunk_size = 4131
                         f.seek(byte_pointer)
                         chunk_body = f.read(chunk_size)
-                        spectrum = Spectrum.parse_raw(chunk_body)
+                        try:
+                            spectrum = Spectrum.parse_raw(chunk_body)
 
-                        if len(spectrum.body) > 500:
-                            if scan_number == 0:
-                                print(spectrum.return_header())
-                            scan = (
-                                spectrum.body
-                            )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
+                            if len(spectrum.body) > 500:
+                                if scan_number == 0:
+                                    print(spectrum.return_header())
+                                scan = (
+                                    spectrum.body
+                                )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                            series_id = model["series_id"]
-                            ds["series_id"][scan_number] = series_id
+                                series_id = model["series_id"]
+                                ds["series_id"][scan_number] = series_id
 
-                            # estimate time based on timestamp
-                            ds["acquisition_time"][
-                                scan_number
-                            ] = datetime.datetime.timestamp(acquisitionTime)
-                            if lat is not None:
-                                ds.attrs["site_latitude"] = lat
-                                ds.attrs["site_longitude"] = lon
-                                ds["solar_zenith_angle"][
+                                # estimate time based on timestamp
+                                ds["acquisition_time"][
                                     scan_number
-                                ] = 90 - get_altitude(
-                                    float(lat), float(lon), acquisitionTime
-                                )
-                                ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                                    float(lat), float(lon), acquisitionTime
-                                )
-                            elif scan_number == 0:
-                                self.context.logger.warning(
-                                    "Lattitude is not found, using default values instead for lat, lon, sza and saa."
-                                )
-                            ds["quality_flag"][scan_number] = flag
-                            ds["integration_time"][
-                                scan_number
-                            ] = spectrum.header.exposure_time
-                            ds["temperature"][scan_number] = spectrum.header.temperature
-
-                            ds = self.read_angles(
-                                ds,
-                                scan_number,
-                                specattr,
-                                offset_pan,
-                                offset_tilt,
-                                angle2use,
-                                land=True,
-                            )
-
-                            # accelaration:
-                            # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
-                            # acceleration measurements respectively. These are factory-calibrated steady-state
-                            # reference acceleration measurements of the gravity vector when instrument is in
-                            # horizontal position. Due to device manufacturing tolerances, these are
-                            # device-specific and should be applied, when estimating tilt from the measured
-                            # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
-                            # Acceleration for each axis can be calculated per Eq. (4).
-
-                            a = 19.6
-                            b = 2**15
-                            ds["acceleration_x_mean"][scan_number] = (
-                                spectrum.header.accel_stats.mean_x * a / b
-                            )
-                            ds["acceleration_x_std"][scan_number] = (
-                                spectrum.header.accel_stats.std_x * a / b
-                            )
-                            ds["acceleration_y_mean"][scan_number] = (
-                                spectrum.header.accel_stats.mean_y * a / b
-                            )
-                            ds["acceleration_y_std"][scan_number] = (
-                                spectrum.header.accel_stats.std_y * a / b
-                            )
-                            ds["acceleration_z_mean"][scan_number] = (
-                                spectrum.header.accel_stats.mean_z * a / b
-                            )
-                            ds["acceleration_z_std"][scan_number] = (
-                                spectrum.header.accel_stats.std_z * a / b
-                            )
-                            ds["digital_number"][:, scan_number] = scan
-                            scan_number += 1
-
-                        else:
-                            if scan_number_swir == 0:
-                                print(spectrum.return_header())
-
-                            scan = (
-                                spectrum.body
-                            )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
-
-                            series_id = model["series_id"]
-                            ds_swir["series_id"][scan_number_swir] = series_id
-
-                            # estimate time based on timestamp
-                            ds_swir["acquisition_time"][
-                                scan_number_swir
-                            ] = datetime.datetime.timestamp(acquisitionTime)
-                            #            #print(datetime.fromtimestamp(acquisitionTime))
-
-                            #             # didn't use acquisition time from instrument
-                            #             # possibility that acquisition time is time since reboot, but how to now reboot time?
-                            #             # if we use the metadata time header
-                            #             timestamp=header['acquisition_time']
-                            #             ts = int(timestamp)/1000
-
-                            #             date_time_str = timereboot+'UTC'
-                            #             print(date_time_str)
-                            #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
-                            #             print(date_time_obj)
-
-                            #             timereboot = datetime.timestamp(date_time_obj)
-                            #             print("timereboot =", timereboot)
-                            #             print(datetime.fromtimestamp(timereboot))
-
-                            #             print(datetime.fromtimestamp(int(ts+timereboot)))
-                            #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
-                            if lat is not None:
-                                ds_swir.attrs["site_latitude"] = lat
-                                ds_swir.attrs["site_longitude"] = lon
-                                ds_swir["solar_zenith_angle"][
-                                    scan_number_swir
-                                ] = 90 - get_altitude(
-                                    float(lat), float(lon), acquisitionTime
-                                )
-                                ds_swir["solar_azimuth_angle"][
-                                    scan_number_swir
-                                ] = get_azimuth(float(lat), float(lon), acquisitionTime)
-
-                            elif scan_number_swir == 0:
-                                self.context.logger.warning(
-                                    "Latitude is not found, using default values instead for lat, lon, sza and saa."
-                                )
-                            ds_swir["quality_flag"][scan_number_swir] = flag
-                            if spectrum.header.exposure_time > 0:
-                                ds_swir["integration_time"][
-                                    scan_number_swir
+                                ] = datetime.datetime.timestamp(acquisitionTime)
+                                if lat is not None:
+                                    ds.attrs["site_latitude"] = lat
+                                    ds.attrs["site_longitude"] = lon
+                                    ds["solar_zenith_angle"][
+                                        scan_number
+                                    ] = 90 - get_altitude(
+                                        float(lat), float(lon), acquisitionTime
+                                    )
+                                    ds["solar_azimuth_angle"][
+                                        scan_number
+                                    ] = get_azimuth(
+                                        float(lat), float(lon), acquisitionTime
+                                    )
+                                elif scan_number == 0:
+                                    self.context.logger.warning(
+                                        "Lattitude is not found, using default values instead for lat, lon, sza and saa."
+                                    )
+                                ds["quality_flag"][scan_number] = flag
+                                ds["integration_time"][
+                                    scan_number
                                 ] = spectrum.header.exposure_time
+                                ds["temperature"][
+                                    scan_number
+                                ] = spectrum.header.temperature
+
+                                ds = self.read_angles(
+                                    ds,
+                                    scan_number,
+                                    specattr,
+                                    offset_pan,
+                                    offset_tilt,
+                                    angle2use,
+                                    land=True,
+                                )
+
+                                # accelaration:
+                                # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
+                                # acceleration measurements respectively. These are factory-calibrated steady-state
+                                # reference acceleration measurements of the gravity vector when instrument is in
+                                # horizontal position. Due to device manufacturing tolerances, these are
+                                # device-specific and should be applied, when estimating tilt from the measured
+                                # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
+                                # Acceleration for each axis can be calculated per Eq. (4).
+
+                                a = 19.6
+                                b = 2**15
+                                ds["acceleration_x_mean"][scan_number] = (
+                                    spectrum.header.accel_stats.mean_x * a / b
+                                )
+                                ds["acceleration_x_std"][scan_number] = (
+                                    spectrum.header.accel_stats.std_x * a / b
+                                )
+                                ds["acceleration_y_mean"][scan_number] = (
+                                    spectrum.header.accel_stats.mean_y * a / b
+                                )
+                                ds["acceleration_y_std"][scan_number] = (
+                                    spectrum.header.accel_stats.std_y * a / b
+                                )
+                                ds["acceleration_z_mean"][scan_number] = (
+                                    spectrum.header.accel_stats.mean_z * a / b
+                                )
+                                ds["acceleration_z_std"][scan_number] = (
+                                    spectrum.header.accel_stats.std_z * a / b
+                                )
+                                ds["digital_number"][:, scan_number] = scan
+                                scan_number += 1
+
                             else:
-                                ds_swir["integration_time"][scan_number_swir] = ds[
-                                    "integration_time"
-                                ][0]
-                            ds_swir["temperature"][
-                                scan_number_swir
-                            ] = spectrum.header.temperature
+                                if scan_number_swir == 0:
+                                    print(spectrum.return_header())
 
-                            ds_swir = self.read_angles(
-                                ds_swir,
-                                scan_number_swir,
-                                specattr,
-                                offset_pan,
-                                offset_tilt,
-                                angle2use,
-                                land=True,
-                            )
+                                scan = (
+                                    spectrum.body
+                                )  # should include this back again when crc32 is in the headers!  #crc32 = self.read_footer(f, 4)
 
-                            # accelaration:
-                            # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
-                            # acceleration measurements respectively. These are factory-calibrated steady-state
-                            # reference acceleration measurements of the gravity vector when instrument is in
-                            # horizontal position. Due to device manufacturing tolerances, these are
-                            # device-specific and should be applied, when estimating tilt from the measured
-                            # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
-                            # Acceleration for each axis can be calculated per Eq. (4).
+                                series_id = model["series_id"]
+                                ds_swir["series_id"][scan_number_swir] = series_id
 
-                            a = 19.6
-                            b = 2**15
-                            ds_swir["acceleration_x_mean"][scan_number_swir] = (
-                                spectrum.header.accel_stats.mean_x * a / b
+                                # estimate time based on timestamp
+                                ds_swir["acquisition_time"][
+                                    scan_number_swir
+                                ] = datetime.datetime.timestamp(acquisitionTime)
+                                #            #print(datetime.fromtimestamp(acquisitionTime))
+
+                                #             # didn't use acquisition time from instrument
+                                #             # possibility that acquisition time is time since reboot, but how to now reboot time?
+                                #             # if we use the metadata time header
+                                #             timestamp=header['acquisition_time']
+                                #             ts = int(timestamp)/1000
+
+                                #             date_time_str = timereboot+'UTC'
+                                #             print(date_time_str)
+                                #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
+                                #             print(date_time_obj)
+
+                                #             timereboot = datetime.timestamp(date_time_obj)
+                                #             print("timereboot =", timereboot)
+                                #             print(datetime.fromtimestamp(timereboot))
+
+                                #             print(datetime.fromtimestamp(int(ts+timereboot)))
+                                #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
+                                if lat is not None:
+                                    ds_swir.attrs["site_latitude"] = lat
+                                    ds_swir.attrs["site_longitude"] = lon
+                                    ds_swir["solar_zenith_angle"][
+                                        scan_number_swir
+                                    ] = 90 - get_altitude(
+                                        float(lat), float(lon), acquisitionTime
+                                    )
+                                    ds_swir["solar_azimuth_angle"][
+                                        scan_number_swir
+                                    ] = get_azimuth(
+                                        float(lat), float(lon), acquisitionTime
+                                    )
+
+                                elif scan_number_swir == 0:
+                                    self.context.logger.warning(
+                                        "Latitude is not found, using default values instead for lat, lon, sza and saa."
+                                    )
+                                ds_swir["quality_flag"][scan_number_swir] = flag
+                                if spectrum.header.exposure_time > 0:
+                                    ds_swir["integration_time"][
+                                        scan_number_swir
+                                    ] = spectrum.header.exposure_time
+                                else:
+                                    ds_swir["integration_time"][scan_number_swir] = ds[
+                                        "integration_time"
+                                    ][0]
+                                ds_swir["temperature"][
+                                    scan_number_swir
+                                ] = spectrum.header.temperature
+
+                                ds_swir = self.read_angles(
+                                    ds_swir,
+                                    scan_number_swir,
+                                    specattr,
+                                    offset_pan,
+                                    offset_tilt,
+                                    angle2use,
+                                    land=True,
+                                )
+
+                                # accelaration:
+                                # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
+                                # acceleration measurements respectively. These are factory-calibrated steady-state
+                                # reference acceleration measurements of the gravity vector when instrument is in
+                                # horizontal position. Due to device manufacturing tolerances, these are
+                                # device-specific and should be applied, when estimating tilt from the measured
+                                # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
+                                # Acceleration for each axis can be calculated per Eq. (4).
+
+                                a = 19.6
+                                b = 2**15
+                                ds_swir["acceleration_x_mean"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.mean_x * a / b
+                                )
+                                ds_swir["acceleration_x_std"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.std_x * a / b
+                                )
+                                ds_swir["acceleration_y_mean"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.mean_y * a / b
+                                )
+                                ds_swir["acceleration_y_std"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.std_y * a / b
+                                )
+                                ds_swir["acceleration_z_mean"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.mean_z * a / b
+                                )
+                                ds_swir["acceleration_z_std"][scan_number_swir] = (
+                                    spectrum.header.accel_stats.std_z * a / b
+                                )
+                                ds_swir["digital_number"][:, scan_number_swir] = scan
+                                scan_number_swir += 1
+                        except:
+                            self.context.logger.warning(
+                                "reading of spectrum for series %s failed" % series_id
                             )
-                            ds_swir["acceleration_x_std"][scan_number_swir] = (
-                                spectrum.header.accel_stats.std_x * a / b
-                            )
-                            ds_swir["acceleration_y_mean"][scan_number_swir] = (
-                                spectrum.header.accel_stats.mean_y * a / b
-                            )
-                            ds_swir["acceleration_y_std"][scan_number_swir] = (
-                                spectrum.header.accel_stats.std_y * a / b
-                            )
-                            ds_swir["acceleration_z_mean"][scan_number_swir] = (
-                                spectrum.header.accel_stats.mean_z * a / b
-                            )
-                            ds_swir["acceleration_z_std"][scan_number_swir] = (
-                                spectrum.header.accel_stats.std_z * a / b
-                            )
-                            ds_swir["digital_number"][:, scan_number_swir] = scan
-                            scan_number_swir += 1
 
                         byte_pointer = f.tell()
                         chunk_counter += 1

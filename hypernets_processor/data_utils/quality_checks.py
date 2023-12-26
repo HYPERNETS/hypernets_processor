@@ -207,6 +207,32 @@ class QualityChecks:
         self, dataset_l1b, dataset_l1b_swir, measurandstring
     ):
         wav_range = 20
+
+        if len(dataset_l1b["series_id"]) != len(dataset_l1b_swir["series_id"]):
+
+            id_series_swir = np.concatenate(
+                [
+                    np.where(
+                        dataset_l1b_swir["series_id"].values
+                        == dataset_l1b["series_id"].values[i]
+                    )[0]
+                    for i in range(len(dataset_l1b["series_id"]))
+                ]
+            )
+
+            id_series = np.concatenate(
+                [
+                    np.where(
+                        dataset_l1b["series_id"].values
+                        == dataset_l1b_swir["series_id"].values[i]
+                    )[0]
+                    for i in range(len(dataset_l1b_swir["series_id"]))
+                ]
+            )
+
+            dataset_l1b_swir = dataset_l1b_swir.isel(series=id_series_swir)
+            dataset_l1b = dataset_l1b.isel(series=id_series)
+
         for i in range(len(dataset_l1b["series_id"])):
             if dataset_l1b["series_id"][i] != dataset_l1b_swir["series_id"][i]:
                 raise ValueError("Series ID of VNIR and SWIR should be the same!")
