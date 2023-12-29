@@ -565,7 +565,7 @@ class HypernetsReader:
                                     swir = np.vstack([swir, spectrum.body])
                         except:
                             self.context.logger.warning("reading of spectrum failed")
-
+                            break
                         byte_pointer = f.tell()
                         chunk_counter += 1
             else:
@@ -840,6 +840,7 @@ class HypernetsReader:
                             self.context.logger.warning(
                                 "reading of spectrum for series %s failed" % series_id
                             )
+                            break
 
                         byte_pointer = f.tell()
                         chunk_counter += 1
