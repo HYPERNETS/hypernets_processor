@@ -35,7 +35,7 @@ def remove_files(archive_path, file, table_name):
     for i, row in enumerate(cursor_b.execute("SELECT * FROM " + table_name)):
         row = ["none" if (is_invalid(v)) else v for v in row]
         row = tuple(row)
-        print(row)
+        print(row[7])
 
 def is_invalid(v):
     if v is None:
@@ -67,22 +67,6 @@ if __name__ == "__main__":
     db_a.close()
     print(table_names)
     for file in files_archive:
-        print(file)
-        for table_name in table_names:
-            remove_files(archive_path, file, table_name)
-
-    db_a = sqlite3.connect(os.path.join(archive_path, files_anomaly[0]))
-    table_names = load_table_names(db_a)
-    db_a.close()
-    for file in files_anomaly:
-        print(file)
-        for table_name in table_names:
-            remove_files(archive_path, file, table_name)
-
-    db_a = sqlite3.connect(os.path.join(archive_path, files_metadata[0]))
-    table_names = load_table_names(db_a)
-    db_a.close()
-    for file in files_metadata:
         print(file)
         for table_name in table_names:
             remove_files(archive_path, file, table_name)
