@@ -27,8 +27,8 @@ ANOMALIES_DICT = {
     },
     "x": {
         "description": "unexpected error during processing",
-        "error": None,
-        "error_msg": None,
+        "error": ValueError,
+        "error_msg": "unexpected error during processing",
     },
     "o": {
         "description": "more than 50% of data has random error above 100% (probably corrupted data)",
