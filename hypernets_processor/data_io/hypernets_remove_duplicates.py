@@ -46,7 +46,10 @@ def remove_files(archive_path, file, table_name):
 
         for item in test:
             if date in item:
-                print(os.path.join(dir_name, item))
+                try:
+                    os.remove(os.path.join(dir_name, item))
+                except:
+                    print(os.path.join(dir_name, item), "file does not exist")
 
         try:
             os.remove(row[7])
