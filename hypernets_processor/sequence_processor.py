@@ -211,21 +211,21 @@ class SequenceProcessor:
                     "L2A",
                 ]:
                     self.context.logger.info("Processing to L1a...")
-                    if l0a_rad:
+                    if l0a_rad and l0a_bla:
                         L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = cal.calibrate_l1a(
                             "radiance", l0a_rad, l0a_bla, calibration_data_rad
                         )
                     else:
                         L1a_rad, l0a_rad_masked, l0a_rad_bla_masked = None, None, None
 
-                    if l0a_irr:
+                    if l0a_irr and l0a_bla:
                         L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = cal.calibrate_l1a(
                             "irradiance", l0a_irr, l0a_bla, calibration_data_irr
                         )
                     else:
                         L1a_irr, l0a_irr_masked, l0a_irr_bla_masked = None, None, None
 
-                    if l0a_swir_rad:
+                    if l0a_swir_rad and l0a_swir_bla:
                         (
                             L1a_swir_rad,
                             l0a_swir_rad_masked,
@@ -244,7 +244,7 @@ class SequenceProcessor:
                             None,
                         )
 
-                    if l0a_swir_irr:
+                    if l0a_swir_irr and l0a_swir_bla:
                         (
                             L1a_swir_irr,
                             l0a_swir_irr_masked,
