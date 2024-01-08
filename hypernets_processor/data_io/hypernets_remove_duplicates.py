@@ -36,6 +36,7 @@ def remove_files(archive_path, file, table_name):
         row = ["none" if (is_invalid(v)) else v for v in row]
         row = tuple(row)
         print(row[7])
+        os.remove(row[7])
 
 def is_invalid(v):
     if v is None:
