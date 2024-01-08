@@ -35,7 +35,7 @@ def remove_files(archive_path, file, table_name):
     for i, row in enumerate(cursor_b.execute("SELECT * FROM " + table_name)):
         row = ["none" if (is_invalid(v)) else v for v in row]
         row = tuple(row)
-        print(row[1][37:49])
+        print(row[1][39:53])
         try:
             os.remove(row[7])
         except:
