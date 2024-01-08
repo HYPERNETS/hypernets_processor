@@ -35,11 +35,24 @@ def remove_files(archive_path, file, table_name):
     for i, row in enumerate(cursor_b.execute("SELECT * FROM " + table_name)):
         row = ["none" if (is_invalid(v)) else v for v in row]
         row = tuple(row)
-        print(row[1][39:53])
+        date=row[1][39:52]
         try:
             os.remove(row[7])
         except:
             print(row[7], "file does not exist")
+
+        dir_name=os.path.join(os.path.dirname(row[7]),"plots")
+        test = os.listdir(dir_name)
+
+        for item in test:
+            if date in item:
+                print(os.path.join(dir_name, item))
+
+        try:
+            os.remove(row[7])
+        except:
+            print(row[7], "file does not exist")
+
 def is_invalid(v):
     if v is None:
         return True
