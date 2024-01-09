@@ -34,8 +34,12 @@ class Plotting:
             self.path = HypernetsWriter(context).return_plot_directory()
         else:
             self.path = path
-        self.fontsize = context.get_config_value("plot_fontsize")
-        self.legendfontsize = context.get_config_value("plot_legendfontsize")
+        try:
+            self.fontsize = context.get_config_value("plot_fontsize")
+            self.legendfontsize = context.get_config_value("plot_legendfontsize")
+        except:
+            self.fontsize = None
+            self.legendfontsize = None
         if self.fontsize is None:
             self.fontsize = 10
         if self.legendfontsize is None:
