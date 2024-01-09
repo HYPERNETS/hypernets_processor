@@ -573,37 +573,47 @@ class HypernetsReader:
                     "A file (%s) listed in the metadata.txt is missing." % (spectra)
                 )
 
-        if len(vnir.shape) == 1:
-            vnir = vnir[None, :]
-        if len(swir.shape) == 1:
-            swir = swir[None, :]
+        if len(vnir)>0:
+            if len(vnir.shape) == 1:
+                vnir = vnir[None, :]
 
-        self.context.logger.debug(
-            "vnir data shape in combined raw files: %s \n "
-            "swir data shape in combined raw files: %s" % (vnir.shape, swir.shape)
-        )
 
-        scanDim = vnir.shape[0]
-        wvl = self.read_wavelength(vnir.shape[1], cal_data)
-        ds = self.templ.l0a_template_dataset(wvl, scanDim, fileformat)
+            scanDim = vnir.shape[0]
+            wvl = self.read_wavelength(vnir.shape[1], cal_data)
+            ds = self.templ.l0a_template_dataset(wvl, scanDim, fileformat)
 
-        ds.attrs["sequence_id"] = str(os.path.basename(seq_dir))
-        ds.attrs["instrument_id"] = str(instrument_id)
-        ds.attrs["site_id"] = str(site_id)
-        ds.attrs["source_file"] = str(os.path.basename(seq_dir))
-        ds["bandwidth"].values = 3 * np.ones_like(wvl)
+            ds.attrs["sequence_id"] = str(os.path.basename(seq_dir))
+            ds.attrs["instrument_id"] = str(instrument_id)
+            ds.attrs["site_id"] = str(site_id)
+            ds.attrs["source_file"] = str(os.path.basename(seq_dir))
+            ds["bandwidth"].values = 3 * np.ones_like(wvl)
 
-        scanDim = swir.shape[0]
-        wvl_swir = self.read_wavelength(swir.shape[1], cal_data_swir)
-        ds_swir = self.templ.l0a_template_dataset(
-            wvl_swir, scanDim, fileformat, swir=True
-        )
+        else:
+            ds=None
 
-        ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
-        ds_swir.attrs["instrument_id"] = str(instrument_id)
-        ds_swir.attrs["site_id"] = str(site_id)
-        ds_swir.attrs["source_file"] = str(os.path.basename(seq_dir))
-        ds_swir["bandwidth"].values = 10 * np.ones_like(wvl_swir)
+        if len(swir) > 0:
+            if len(swir.shape) == 1:
+                swir = swir[None, :]
+
+            self.context.logger.debug(
+                "vnir data shape in combined raw files: %s \n "
+                "swir data shape in combined raw files: %s" % (vnir.shape, swir.shape)
+            )
+
+            scanDim = swir.shape[0]
+            wvl_swir = self.read_wavelength(swir.shape[1], cal_data_swir)
+            ds_swir = self.templ.l0a_template_dataset(
+                wvl_swir, scanDim, fileformat, swir=True
+            )
+
+            ds_swir.attrs["sequence_id"] = str(os.path.basename(seq_dir))
+            ds_swir.attrs["instrument_id"] = str(instrument_id)
+            ds_swir.attrs["site_id"] = str(site_id)
+            ds_swir.attrs["source_file"] = str(os.path.basename(seq_dir))
+            ds_swir["bandwidth"].values = 10 * np.ones_like(wvl_swir)
+
+        else:
+            ds_swir = None
 
         scan_number = 0
         scan_number_swir = 0
@@ -1184,8 +1194,9 @@ class HypernetsReader:
                     offset_pan,
                     angle2use,
                 )
-                if self.context.get_config_value("write_l0a"):
+                if self.context.get_config_value("write_l0a") and l0a_irr:
                     self.writer.write(l0a_irr, overwrite=True)
+                if self.context.get_config_value("write_l0a") and l0a_swir_irr:
                     self.writer.write(l0a_swir_irr, overwrite=True)
 
         else:
@@ -1229,8 +1240,9 @@ class HypernetsReader:
                     angle2use,
                 )
 
-                if self.context.get_config_value("write_l0a"):
+                if self.context.get_config_value("write_l0a") and l0a_rad:
                     self.writer.write(l0a_rad, overwrite=True)
+                if self.context.get_config_value("write_l0a") and l0a_swir_rad:
                     self.writer.write(l0a_swir_rad, overwrite=True)
 
         else:
@@ -1273,8 +1285,9 @@ class HypernetsReader:
                     offset_pan,
                     angle2use,
                 )
-                if self.context.get_config_value("write_l0a"):
+                if self.context.get_config_value("write_l0a") and l0a_bla:
                     self.writer.write(l0a_bla, overwrite=True)
+                if self.context.get_config_value("write_l0a") and l0a_swir_bla:
                     self.writer.write(l0a_swir_bla, overwrite=True)
 
         else:
