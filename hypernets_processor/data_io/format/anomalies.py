@@ -92,4 +92,10 @@ ANOMALIES_DICT = {
         "error": None,
         "error_msg": None,
     },
+    "mf": {
+        "description": "Invalid sequence,files mentioned in metadatafile are missing in DATA directory",
+        "error": ValueError,
+        "error_msg": None,
+        "error_msg": None,
+    },
 }
