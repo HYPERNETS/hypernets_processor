@@ -77,7 +77,7 @@ ARCHIVE_DB = {
     "products": {
         "columns": {
             "product_name": {"type": str},
-            "datetime": {"type": str},
+            "datetime_SEQ": {"type": str},
             "sequence_name": {"type": str},
             "site_id": {"type": str},
             "system_id": {"type": str},
@@ -87,6 +87,8 @@ ARCHIVE_DB = {
             "sequence_path": {"type": str},
             "latitude": {"type": float},
             "longitude": {"type": float},
+            "datetime_start": {"type": str},
+            "datetime_end": {"type": str},
             "solar_zenith_angle_min": {"type": float},
             "solar_zenith_angle_max": {"type": float},
             "solar_azimuth_angle_min": {"type": float},
