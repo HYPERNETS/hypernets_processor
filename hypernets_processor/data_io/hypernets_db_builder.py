@@ -14,6 +14,7 @@ import dataset
 from os import makedirs
 from os.path import dirname
 import numpy as np
+from datetime import datetime as dt
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -149,8 +150,8 @@ class ArchiveDB(dataset.Database):
                 rel_product_dir=self.writer.return_rel_directory(),
                 product_level=ds.attrs["product_level"],
                 datetime_SEQ=self.context.get_config_value("time"),
-                datetime_start=np.nanmin(ds["acquisition_time"].values),
-                datetime_end=np.nanmax(ds["acquisition_time"].values),
+                datetime_start=dt.strptime(np.nanmin(ds["acquisition_time"].values), "%Y%m%dT%H%M%S"),
+                datetime_end=dt.strptime(np.nanmax(ds["acquisition_time"].values), "%Y%m%dT%H%M%S"),
                 sequence_name=self.context.get_config_value("sequence_name"),
                 sequence_path=self.context.get_config_value("sequence_path"),
                 site_id=ds.attrs["site_id"],
