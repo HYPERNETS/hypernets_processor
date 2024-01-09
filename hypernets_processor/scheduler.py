@@ -7,6 +7,7 @@ import time
 import functools
 from schedule import Scheduler as Sched
 import threading
+import traceback
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
