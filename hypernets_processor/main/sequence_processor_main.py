@@ -14,6 +14,7 @@ import cProfile, pstats
 from itertools import repeat
 import numpy as np
 from multiprocessing import Pool
+import gc
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -84,7 +85,8 @@ def get_target_sequences(context, to_archive):
 
 
 def run_sequence(inputs):
-    target_sequence, sp, context, logger = inputs
+    target_sequence, context, logger = inputs
+    sp = SequenceProcessor(context=context)
     context.logger.info("Processing sequence: " + target_sequence)
     try:
         # profiler = cProfile.Profile()
@@ -99,6 +101,8 @@ def run_sequence(inputs):
             )
 
         context.logger.info(target_sequence + " Complete")
+        del sp
+        gc.collect()
         return 1
 
     except Exception as e:
@@ -111,6 +115,8 @@ def run_sequence(inputs):
 
         logger.error(target_sequence + "Failed: " + repr(e))
         logger.info(traceback.format_exc())
+        del sp
+        gc.collect()
         return 0
 
 
@@ -144,7 +150,6 @@ def main(processor_config, job_config, to_archive, parallel=None):
     target_sequences = get_target_sequences(context, to_archive)
 
     # Run processor
-    sp = SequenceProcessor(context=context)
     target_sequences_total = len(target_sequences)
 
     if target_sequences_total == 0:
@@ -154,7 +159,7 @@ def main(processor_config, job_config, to_archive, parallel=None):
         success = np.zeros_like(target_sequences, dtype=int)
 
         for i, target_sequence in enumerate(target_sequences):
-            success[i] = run_sequence((target_sequence, sp, context, logger))
+            success[i] = run_sequence((target_sequence, context, logger))
 
         msg = (
             str(np.sum(success))
