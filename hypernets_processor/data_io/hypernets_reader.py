@@ -390,96 +390,105 @@ class HypernetsReader:
             # -----------------------
             # read the file
             # -----------------------
-            f = open(FOLDER_NAME + spectra, "rb")
+            if os.path.exists(FOLDER_NAME + spectra):
+                with open(FOLDER_NAME + spectra, "rb") as f:
+                    try:
+                        nextLine = True
+                        while nextLine:
+                            # if no header comment those lines
+                            header = self.read_header(f, HEADER_DEF)
+                            if bool(header) == False:
+                                # self.context.logger.error("Data corrupt go to next line")
+                                break
+                                continue
+                            # -------------------------------------------------------
+                            pixCount = header["Pixel Count"]
+                            scan = self.read_data(f, pixCount)
+                            # should include this back again when crc32 is in the headers!
+                            crc32 = self.read_footer(f, 4)
 
-            nextLine = True
-            while nextLine:
-                # if no header comment those lines
-                header = self.read_header(f, HEADER_DEF)
-                if bool(header) == False:
-                    # self.context.logger.error("Data corrupt go to next line")
-                    break
-                    continue
-                # -------------------------------------------------------
-                pixCount = header["Pixel Count"]
-                scan = self.read_data(f, pixCount)
-                # should include this back again when crc32 is in the headers!
-                crc32 = self.read_footer(f, 4)
+                            # HypernetsReader(self.context).plot_spectra(spectra, scan)
 
-                # HypernetsReader(self.context).plot_spectra(spectra, scan)
+                            # fill in dataset
+                            # maybe xarray has a better way to do - check merge, concat, ...
+                            series_id = model["series_id"]
+                            ds["series_id"][scan_number] = series_id
 
-                # fill in dataset
-                # maybe xarray has a better way to do - check merge, concat, ...
-                series_id = model["series_id"]
-                ds["series_id"][scan_number] = series_id
+                            # estimate time based on timestamp
+                            ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(
+                                acquisitionTime
+                            )
+                            if lat is not None:
+                                ds.attrs["site_latitude"] = lat
+                                ds.attrs["site_longitude"] = lon
+                                ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
+                                    float(lat), float(lon), acquisitionTime
+                                )
+                                ds["solar_azimuth_angle"][scan_number] = get_azimuth(
+                                    float(lat), float(lon), acquisitionTime
+                                )
 
-                # estimate time based on timestamp
-                ds["acquisition_time"][scan_number] = datetime.datetime.timestamp(
-                    acquisitionTime
+                                ds = self.read_angles(
+                                    ds,
+                                    scan_number,
+                                    specattr,
+                                    offset_pan,
+                                    offset_tilt,
+                                    angle2use,
+                                    land=False,
+                                )
+
+                            else:
+                                self.context.logger.warning(
+                                    "Latitude is not found, using default values instead for lat, lon, sza and saa."
+                                )
+
+                            ds["quality_flag"][scan_number] = flag
+                            ds["integration_time"][scan_number] = header["integration_time"]
+                            ds["temperature"][scan_number] = header["temperature"]
+
+                            # accelaration:
+                            # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
+                            # acceleration measurements respectively. These are factory-calibrated steady-state
+                            # reference acceleration measurements of the gravity vector when instrument is in
+                            # horizontal position. Due to device manufacturing tolerances, these are
+                            # device-specific and should be applied, when estimating tilt from the measured
+                            # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
+                            # Acceleration for each axis can be calculated per Eq. (4).
+
+                            a = 19.6
+                            b = 2**15
+                            ds["acceleration_x_mean"][scan_number] = (
+                                header["acceleration_x_mean"] * a / b
+                            )
+                            ds["acceleration_x_std"][scan_number] = (
+                                header["acceleration_x_std"] * a / b
+                            )
+                            ds["acceleration_y_mean"][scan_number] = (
+                                header["acceleration_y_mean"] * a / b
+                            )
+                            ds["acceleration_y_std"][scan_number] = (
+                                header["acceleration_y_std"] * a / b
+                            )
+                            ds["acceleration_z_mean"][scan_number] = (
+                                header["acceleration_z_mean"] * a / b
+                            )
+                            ds["acceleration_z_std"][scan_number] = (
+                                header["acceleration_z_std"] * a / b
+                            )
+                            ds["digital_number"][0:pixCount, scan_number] = scan
+
+                            scan_number += 1
+
+                    except:
+                        self.context.logger.warning(
+                            "reading of spectrum for series %s failed" % series_id
+                        )
+                        break
+            else:
+                self.context.logger.warning(
+                    "A file (%s) listed in the metadata.txt is missing." % (spectra)
                 )
-                if lat is not None:
-                    ds.attrs["site_latitude"] = lat
-                    ds.attrs["site_longitude"] = lon
-                    ds["solar_zenith_angle"][scan_number] = 90 - get_altitude(
-                        float(lat), float(lon), acquisitionTime
-                    )
-                    ds["solar_azimuth_angle"][scan_number] = get_azimuth(
-                        float(lat), float(lon), acquisitionTime
-                    )
-
-                    ds = self.read_angles(
-                        ds,
-                        scan_number,
-                        specattr,
-                        offset_pan,
-                        offset_tilt,
-                        angle2use,
-                        land=False,
-                    )
-
-                else:
-                    self.context.logger.warning(
-                        "Latitude is not found, using default values instead for lat, lon, sza and saa."
-                    )
-
-                ds["quality_flag"][scan_number] = flag
-                ds["integration_time"][scan_number] = header["integration_time"]
-                ds["temperature"][scan_number] = header["temperature"]
-
-                # accelaration:
-                # Reference acceleration data contains 3x 16 bit signed integers with X, Y and Z
-                # acceleration measurements respectively. These are factory-calibrated steady-state
-                # reference acceleration measurements of the gravity vector when instrument is in
-                # horizontal position. Due to device manufacturing tolerances, these are
-                # device-specific and should be applied, when estimating tilt from the measured
-                # acceleration data. Each measurement is bit count of full range Â±19.6 m sâˆ’2 .
-                # Acceleration for each axis can be calculated per Eq. (4).
-
-                a = 19.6
-                b = 2**15
-                ds["acceleration_x_mean"][scan_number] = (
-                    header["acceleration_x_mean"] * a / b
-                )
-                ds["acceleration_x_std"][scan_number] = (
-                    header["acceleration_x_std"] * a / b
-                )
-                ds["acceleration_y_mean"][scan_number] = (
-                    header["acceleration_y_mean"] * a / b
-                )
-                ds["acceleration_y_std"][scan_number] = (
-                    header["acceleration_y_std"] * a / b
-                )
-                ds["acceleration_z_mean"][scan_number] = (
-                    header["acceleration_z_mean"] * a / b
-                )
-                ds["acceleration_z_std"][scan_number] = (
-                    header["acceleration_z_std"] * a / b
-                )
-                ds["digital_number"][0:pixCount, scan_number] = scan
-
-                scan_number += 1
-                if f.tell() == eof:
-                    nextLine = False
 
         return ds
 
