@@ -27,8 +27,8 @@ dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 # archive_path = r"\\eoserver\home\data\insitu\hypernets\archive_qc"
 archive_path = r"/home/data/insitu/hypernets/archive"
-out_path = r"/home/data/insitu/hypernets/archive_qc_Sept2023/best_files"
-plot_path = r"/home/data/insitu/hypernets/archive_qc_Sept2023/qc_plots"
+out_path = r"/home/data/insitu/hypernets/archive_qc_Jan2024/best_files"
+plot_path = r"/home/data/insitu/hypernets/archive_qc_Jan2024/qc_plots"
 plotter = Plotting("", plot_path, ".png")
 
 
@@ -429,14 +429,14 @@ if __name__ == "__main__":
     sites = [
         "GHNA",
         "WWUK",
-        "ATGE",
-        "BASP",
-        "PEAN1A",
-        "PEAN1B",
-        "PEAN1C",
-        "PEAN2",
-        "DEGE",
-        "IFAR",
+        # "ATGE",
+        # "BASP",
+        # "PEAN1A",
+        # "PEAN1B",
+        # "PEAN1C",
+        # "PEAN2",
+        # "DEGE",
+        # "IFAR",
     ]
     sites = ["WWUK"]
     sites_thresh = [2, 2, 2, 2, 2, 2, 2, 2, 3, 3]
@@ -528,7 +528,7 @@ if __name__ == "__main__":
             if files_nmaskedseries[ifile] < len(site_ds[ifile].series) / 2:
                 print(files_nmaskedseries[ifile], os.path.basename(files[ifile]))
                 site_ds[ifile].to_netcdf(
-                    os.path.join(out_path, site, os.path.basename(files[ifile]))
+                    os.path.join(out_path, site, os.path.basename(files[ifile]).replace("L2A","L2B"))
                 )
                 f.write(
                     "%s,%s,%s,%s \n"
