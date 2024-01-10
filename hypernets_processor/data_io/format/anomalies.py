@@ -84,7 +84,7 @@ ANOMALIES_DICT = {
         "description": "There are series missing from the standard sequence (either because not present, "
         "or flagged by `not_enough_dark_scans', `not_enough_irr_scans', `not_enough_rad_scans' "
         "or `vza_irradiance').",
-        "error": None,
+        "error": ValueError,
         "error_msg": None,
     },
     "d": {

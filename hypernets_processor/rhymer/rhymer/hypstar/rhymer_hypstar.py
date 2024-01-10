@@ -327,7 +327,6 @@ class RhymerHypstar:
 
             rhof_raa[i] = ((ra - 180) % 360) - 180
 
-            print(rhof_raa)
 
             ## get air_water_int reflectance
             if self.context.get_config_value("rhof_option") == "Mobley1999":
