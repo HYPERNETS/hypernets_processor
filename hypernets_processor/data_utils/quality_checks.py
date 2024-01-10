@@ -646,7 +646,7 @@ class QualityChecks:
         return (popt, pcov, ss_res)
 
     def qc_bird(self, l1c):
-        ld = np.mean(l1c.downwelling_radiance.values, axis=1)
+        ld = np.nanmean(l1c.downwelling_radiance.values, axis=1)
         ed = np.mean(l1c.irradiance.values, axis=1)
         wv = l1c.wavelength.values
         popt, pcov, ss_res = self.fitcurve(wv, ld, ed)

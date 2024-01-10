@@ -58,3 +58,15 @@ where:
 * `job_config_path` - path of a job configuration file. See :ref:`user_processor-job_setup` for information on initialising a job configuration file.
 
 Specifying processing with a custom job configuration file allows non-network-default configuration values to be set, for example, chosen calibration function.
+
+Examples
+-------------------
+
+Ad-hoc processing of a single sequence for a site called M1BE can be done with the following command::
+
+   $ hypernets_sequence_processor -i /home/waterhypernet/HYPSTAR/Raw/M1BE/DATA/SEQ20231031T182051 -o /home/waterhypernet/HYPSTAR/Processed/test/ -n water --max-level L2A
+
+While, processing all sequences within a single directory can be done with::
+
+   $ hypernets_sequence_processor -i /home/waterhypernet/HYPSTAR/Raw/M1BE/DATA/ -o /home/waterhypernet/HYPSTAR/Processed/test/ -n water  --max-level L2A
+

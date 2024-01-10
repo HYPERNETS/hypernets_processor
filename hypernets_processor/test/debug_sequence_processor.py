@@ -31,7 +31,6 @@ def process_sequence():
     """
 
     network = "water"
-    network = "land"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
     print(job_config_path)
