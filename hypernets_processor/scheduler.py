@@ -7,6 +7,7 @@ import time
 import functools
 from schedule import Scheduler as Sched
 import threading
+import traceback
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -140,7 +141,7 @@ class Scheduler:
                         exception_type = type(exception).__name__
                         exception_value = exception.__str__()
 
-                        logger.info(
+                        logger.error(
                             "Failed: "
                             + name
                             + " - "
@@ -148,6 +149,7 @@ class Scheduler:
                             + ": "
                             + exception_value
                         )
+                        logger.info(traceback.format_exc())
 
                 return wrapper
 

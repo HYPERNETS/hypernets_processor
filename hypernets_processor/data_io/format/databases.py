@@ -38,6 +38,7 @@ Database schema specification for Hypernets land and water network
 # Hypernets Team, Product Data Format Specification, v0.5 (2020)
 
 from hypernets_processor.data_io.format.metadata import METADATA_DEFS
+from datetime import date, datetime
 
 # Metadata Database
 METADATA_DB = {}
@@ -77,7 +78,7 @@ ARCHIVE_DB = {
     "products": {
         "columns": {
             "product_name": {"type": str},
-            "datetime_SEQ": {"type": str},
+            "datetime_SEQ": {"type": datetime},
             "sequence_name": {"type": str},
             "site_id": {"type": str},
             "system_id": {"type": str},
@@ -87,8 +88,8 @@ ARCHIVE_DB = {
             "sequence_path": {"type": str},
             "latitude": {"type": float},
             "longitude": {"type": float},
-            "datetime_start": {"type": str},
-            "datetime_end": {"type": str},
+            "datetime_start": {"type": datetime},
+            "datetime_end": {"type": datetime},
             "solar_zenith_angle_min": {"type": float},
             "solar_zenith_angle_max": {"type": float},
             "solar_azimuth_angle_min": {"type": float},
