@@ -112,3 +112,40 @@ Updates
 -------
 
 Updates to the processor are then made by merging release branches onto the operational branch.
+
+Examples
+-------------------
+
+As an example, the following steps are required to automatically process data transferred from the field (e.g., from a site called M1BE) to a server.
+
+After running the `hypernets_processor_setup` as follow::
+
+$ hypernets_processor_setup
+
+the following fields are required (examples in bold):
+
+* Update network, currently 'w' (y/n) [n]: **y**
+* Set network default config values (overwrites existing) (y/n) [y]: **y**
+* Update archive_directory, currently '/home/hypstar/Processed' (y/n) [n]: **y**
+* Set archive_directory: **/waterhypernet/HYPSTAR/Processed**
+* Update processor_working_directory, currently '/home/rhymer/.hypernets' (y/n) [n]:**y**
+* Set processor_working_directory: **/home/processor/working_directory**
+* Update metadata_db_url, currently 'sqlite:////waterhypernet/hypstar/Processed/metadata.db' (y/n) [n]:**y**
+* Set metadata_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db**
+* Update anomaly_db_url, currently 'sqlite:////waterhypernet/hypstar/Processed/anomaly.db' (y/n) [n]:**y**
+* Set anomaly_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/HYPSTAR/Processed/anomaly.db**
+* Update archive_db_url, currently 'sqlite:////waterhypernet/hypstar/Processed/archive.db' (y/n) [n]:**y**
+* Set archive_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/HYPSTAR/Processed/archive.db**
+
+Once the processor configuration has been setup, jobs need to be initiated using the following command ::
+
+$ hypernets_processor_job_init -n M1BE -s M1BE -w /home/processor/working_directory/ -i /waterhypernet/HYPSTAR/Raw/M1BE/DATA/ --add-to-scheduler
+
+Note, several jobs can be initiated in the single `jobs.txt` file using the same line as above adding the proper directory for each site.
+
+
+nohup hypernets_scheduler &
+
+[3] 13091
+(procv2) rhymer@enhydra:~/.hypernets/lparproc$ nohup: ignoring input and appending output to 'nohup.out'
+
