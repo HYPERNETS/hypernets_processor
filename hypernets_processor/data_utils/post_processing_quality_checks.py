@@ -45,7 +45,7 @@ def make_time_series_plot(
 ):
     # get a datetime that is equal to epoch
     epoch = datetime.datetime(1970, 1, 1)
-    times_sec = np.array([(d - epoch).total_seconds() for d in times])
+    times_sec = np.array([(d - epoch).total_seconds() if d else 0 for d in times])
     for i in range(len(wavs)):
         measurand_wav = measurands[:, i]
         for ii in range(len(hour_bins) - 1):
@@ -480,7 +480,6 @@ if __name__ == "__main__":
             vza = round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times, refl, mask = extract_reflectances(files, wavs, vza, vaa, site)
-            print(vza, vaa, times)
             if site == "WWUK" or site == "BASP":
                 for ifile in range(len(site_ds)):
                     if not vegetation_checks(site_ds[ifile], iseries):
