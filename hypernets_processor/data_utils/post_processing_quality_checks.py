@@ -214,7 +214,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         ds = read_hypernets_file(
             files[i], vza=vza, vaa=vaa, filter_flags=False, max_angle_tolerance=2
         )
-        if ds is None:
+        if ds is None or len(ds.series)==0:
             mask[i] = 1
             print("bad angle for file:", vza, vaa, files[i])
             continue
