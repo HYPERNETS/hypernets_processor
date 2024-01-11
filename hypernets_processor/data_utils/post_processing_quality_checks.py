@@ -238,8 +238,9 @@ def extract_reflectances(files, wavs, vza, vaa, site):
                 mask[i] = 0
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = np.mean(ds.reflectance.values[ids, :])
+            print(ds, ds.acquisition_time.values[:])
             times[i] = datetime.datetime.utcfromtimestamp(
-                np.mean(ds.acquisition_time.values[:])
+                np.mean(ds.acquisition_time)
             )
     return times, refl, mask
 
