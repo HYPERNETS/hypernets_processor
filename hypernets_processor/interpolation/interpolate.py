@@ -135,6 +135,21 @@ class Interpolate:
 
     def interpolate_irradiance(self, dataset_l1c, dataset_l1b_irr, razangle=None):
 
+        flags = [
+            "no_clear_sky_irradiance",
+            "vza_irradiance",
+            "not_enough_dark_scans",
+            "not_enough_irr_scans",
+        ]
+        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
+        mask_notflagged = np.where(flagged == False)[0]
+        if len(mask_notflagged) == 0:
+            self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
+            acqui_irr = dataset_l1b_irr["acquisition_time"].values
+            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
+            )
+
         measurement_function_interpolate_wav = self.context.get_config_value(
             "measurement_function_interpolate_wav"
         )
@@ -196,21 +211,21 @@ class Interpolate:
             "not_enough_dark_scans",
             "not_enough_irr_scans",
         ]
-        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
-        mask_notflagged = np.where(flagged == False)[0]
-        if len(mask_notflagged) == 0:
-            self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
-            acqui_irr = dataset_l1b_irr["acquisition_time"].values
-            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
-            )
+        # flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
+        # mask_notflagged = np.where(flagged == False)[0]
+        # if len(mask_notflagged) == 0:
+        #     self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
+        #     acqui_irr = dataset_l1b_irr["acquisition_time"].values
+        #     dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+        #         dataset_l1c["quality_flag"], "no_clear_sky_sequence"
+        #     )
+        # else:
+        if self.context.get_config_value("network") == "w":
+            dataset_l1c_temp = dataset_l1c_temp.isel(scan=mask_notflagged)
+            acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
         else:
-            if self.context.get_config_value("network") == "w":
-                dataset_l1c_temp = dataset_l1c_temp.isel(scan=mask_notflagged)
-                acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
-            else:
-                dataset_l1c_temp = dataset_l1c_temp.isel(series=mask_notflagged)
-                acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
+            dataset_l1c_temp = dataset_l1c_temp.isel(series=mask_notflagged)
+            acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
 
         dataset_l1c = interpolation_function_time.propagate_ds_specific(
             ["random", "systematic_indep", "systematic_corr_rad_irr"],
