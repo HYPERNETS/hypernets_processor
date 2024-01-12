@@ -45,7 +45,7 @@ def make_time_series_plot(
 ):
     # get a datetime that is equal to epoch
     epoch = datetime.datetime(1970, 1, 1)
-    times_sec = np.array([(d - epoch).total_seconds() for d in times])
+    times_sec = np.array([(d - epoch).total_seconds() if d else 0 for d in times])
     for i in range(len(wavs)):
         measurand_wav = measurands[:, i]
         for ii in range(len(hour_bins) - 1):
@@ -214,7 +214,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         ds = read_hypernets_file(
             files[i], vza=vza, vaa=vaa, filter_flags=False, max_angle_tolerance=2
         )
-        if ds is None:
+        if ds is None or len(ds.series)==0:
             mask[i] = 1
             print("bad angle for file:", vza, vaa, files[i])
             continue
@@ -238,8 +238,9 @@ def extract_reflectances(files, wavs, vza, vaa, site):
                 mask[i] = 0
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = np.mean(ds.reflectance.values[ids, :])
+            print(ds, ds.acquisition_time.values[:])
             times[i] = datetime.datetime.utcfromtimestamp(
-                np.mean(ds.acquisition_time.values[:])
+                np.mean(ds.acquisition_time)
             )
     return times, refl, mask
 
@@ -479,7 +480,6 @@ if __name__ == "__main__":
             vza = round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
             times, refl, mask = extract_reflectances(files, wavs, vza, vaa, site)
-            print(vza, vaa)
             if site == "WWUK" or site == "BASP":
                 for ifile in range(len(site_ds)):
                     if not vegetation_checks(site_ds[ifile], iseries):
