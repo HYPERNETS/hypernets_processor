@@ -81,20 +81,20 @@ class Interpolate:
             ].values
 
         if self.context.logger is not None:
+            self.context.logger.info("interpolate irradiance")
+        else:
+            print("interpolate irradiance")
+        dataset_l1c_int = self.interpolate_irradiance(
+            dataset_l1c_int, dataset_l1b_irr, azangle
+        )
+
+        if self.context.logger is not None:
             self.context.logger.info("interpolate sky radiance")
         else:
             print("interpolate sky radiance")
 
         dataset_l1c_int = self.interpolate_skyradiance(
             dataset_l1c_int, dataset_l1b_downrad
-        )
-
-        if self.context.logger is not None:
-            self.context.logger.info("interpolate irradiance")
-        else:
-            print("interpolate irradiance")
-        dataset_l1c_int = self.interpolate_irradiance(
-            dataset_l1c_int, dataset_l1b_irr, azangle
         )
         return dataset_l1c_int
 
