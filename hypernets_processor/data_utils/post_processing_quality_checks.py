@@ -220,8 +220,8 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         )
         if ds is None or len(ds.series)==0:
             mask[i] = 1
-            times[i] = 0
-            print("bad angle for file:", vza, vaa, files[i])
+            times[i] = datetime.datetime.utcfromtimestamp(0)
+            #print("bad angle for file:", vza, vaa, files[i])
             continue
 
         flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], bad_flags)
