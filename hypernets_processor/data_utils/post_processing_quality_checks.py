@@ -31,6 +31,10 @@ out_path = r"/home/data/insitu/hypernets/archive_qc_Jan2024/best_files"
 plot_path = r"/home/data/insitu/hypernets/archive_qc_Jan2024/qc_plots"
 plotter = Plotting("", plot_path, ".png")
 
+bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
+           "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
+           "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR"]
+check_flags = ["single_irradiance_use"]
 
 def make_time_series_plot(
     wavs,
@@ -45,7 +49,7 @@ def make_time_series_plot(
 ):
     # get a datetime that is equal to epoch
     epoch = datetime.datetime(1970, 1, 1)
-    times_sec = np.array([(d - epoch).total_seconds() if d else 0 for d in times])
+    times_sec = np.array([(d - epoch).total_seconds() for d in times])
     for i in range(len(wavs)):
         measurand_wav = measurands[:, i]
         for ii in range(len(hour_bins) - 1):
@@ -216,8 +220,11 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         )
         if ds is None or len(ds.series)==0:
             mask[i] = 1
+            times[i] = 0
             print("bad angle for file:", vza, vaa, files[i])
             continue
+
+        flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], bad_flags)
 
         if len(ds.quality_flag.values) == 1:
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
@@ -226,15 +233,13 @@ def extract_reflectances(files, wavs, vza, vaa, site):
                 ds.acquisition_time.values[0],
             )
 
-            if ds.quality_flag.values == 0 or (
-                site == "DEGE" and ds.quality_flag.values == 32768
-            ):
+            if not flagged:
                 mask[i] = 0
-            # else:
-            #     print(site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+            else:
+                print(site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
 
         else:
-            if np.mean(ds.quality_flag.values) == 0:
+            if not any(flagged):
                 mask[i] = 0
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = np.mean(ds.reflectance.values[ids, :])
@@ -243,7 +248,6 @@ def extract_reflectances(files, wavs, vza, vaa, site):
                 np.mean(ds.acquisition_time)
             )
     return times, refl, mask
-
 
 def read_hypernets_file(
     filepath,
