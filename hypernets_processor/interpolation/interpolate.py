@@ -81,20 +81,20 @@ class Interpolate:
             ].values
 
         if self.context.logger is not None:
+            self.context.logger.info("interpolate irradiance")
+        else:
+            print("interpolate irradiance")
+        dataset_l1c_int = self.interpolate_irradiance(
+            dataset_l1c_int, dataset_l1b_irr, azangle
+        )
+
+        if self.context.logger is not None:
             self.context.logger.info("interpolate sky radiance")
         else:
             print("interpolate sky radiance")
 
         dataset_l1c_int = self.interpolate_skyradiance(
             dataset_l1c_int, dataset_l1b_downrad
-        )
-
-        if self.context.logger is not None:
-            self.context.logger.info("interpolate irradiance")
-        else:
-            print("interpolate irradiance")
-        dataset_l1c_int = self.interpolate_irradiance(
-            dataset_l1c_int, dataset_l1b_irr, azangle
         )
         return dataset_l1c_int
 
@@ -135,6 +135,21 @@ class Interpolate:
 
     def interpolate_irradiance(self, dataset_l1c, dataset_l1b_irr, razangle=None):
 
+        flags = [
+            "no_clear_sky_irradiance",
+            "vza_irradiance",
+            "not_enough_dark_scans",
+            "not_enough_irr_scans",
+        ]
+        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
+        mask_notflagged = np.where(flagged == False)[0]
+        if len(mask_notflagged) == 0:
+            self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
+            acqui_irr = dataset_l1b_irr["acquisition_time"].values
+            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
+            )
+
         measurement_function_interpolate_wav = self.context.get_config_value(
             "measurement_function_interpolate_wav"
         )
@@ -163,14 +178,15 @@ class Interpolate:
         dataset_l1c_temp = self.templ.l1ctemp_dataset(
             dataset_l1c, dataset_l1b_irr, razangle
         )
-        dataset_l1c_temp = interpolation_function_wav.propagate_ds_specific(
-            ["random", "systematic_indep", "systematic_corr_rad_irr"],
-            dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
-            dataset_l1b_irr,
-            ds_out_pre=dataset_l1c_temp,
-            use_ds_out_pre_unmodified=True,
-            store_unc_percent=True,
-        )
+        if self.context.get_config_value("mcsteps") > 0:
+            dataset_l1c_temp = interpolation_function_wav.propagate_ds_specific(
+                ["random", "systematic_indep", "systematic_corr_rad_irr"],
+                dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
+                dataset_l1b_irr,
+                ds_out_pre=dataset_l1c_temp,
+                use_ds_out_pre_unmodified=True,
+                store_unc_percent=True,
+            )
 
         measurement_function_interpolate_time = self.context.get_config_value(
             "measurement_function_interpolate_time"
@@ -196,34 +212,53 @@ class Interpolate:
             "not_enough_dark_scans",
             "not_enough_irr_scans",
         ]
-        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
-        mask_notflagged = np.where(flagged == False)[0]
-        if len(mask_notflagged) == 0:
-            self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
-            acqui_irr = dataset_l1b_irr["acquisition_time"].values
-            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
+        # flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
+        # mask_notflagged = np.where(flagged == False)[0]
+        # if len(mask_notflagged) == 0:
+        #     self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
+        #     acqui_irr = dataset_l1b_irr["acquisition_time"].values
+        #     dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+        #         dataset_l1c["quality_flag"], "no_clear_sky_sequence"
+        #     )
+        # else:
+        if self.context.get_config_value("network") == "w":
+            dataset_l1c_temp = dataset_l1c_temp.isel(scan=mask_notflagged)
+            acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
+        else:
+            dataset_l1c_temp = dataset_l1c_temp.isel(series=mask_notflagged)
+            acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
+
+        if self.context.get_config_value("mcsteps") > 0:
+            dataset_l1c = interpolation_function_time.propagate_ds_specific(
+                ["random", "systematic_indep", "systematic_corr_rad_irr"],
+                dataset_l1c_temp,
+                {
+                    "input_time": acqui_irr,
+                    "output_time": acqui_rad,
+                    "input_sza": input_sza,
+                    "output_sza": output_sza,
+                },
+                ds_out_pre=dataset_l1c,
+                store_unc_percent=True,
             )
         else:
-            if self.context.get_config_value("network") == "w":
-                dataset_l1c_temp = dataset_l1c_temp.isel(scan=mask_notflagged)
-                acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
-            else:
-                dataset_l1c_temp = dataset_l1c_temp.isel(series=mask_notflagged)
-                acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
-
-        dataset_l1c = interpolation_function_time.propagate_ds_specific(
-            ["random", "systematic_indep", "systematic_corr_rad_irr"],
-            dataset_l1c_temp,
-            {
-                "input_time": acqui_irr,
-                "output_time": acqui_rad,
-                "input_sza": input_sza,
-                "output_sza": output_sza,
-            },
-            ds_out_pre=dataset_l1c,
-            store_unc_percent=True,
-        )
+            measurandstring = 'irradiance'
+            measurand = interpolation_function_time.run(dataset_l1c_temp, {
+                    "input_time": acqui_irr,
+                    "output_time": acqui_rad,
+                    "input_sza": input_sza,
+                    "output_sza": output_sza,
+                })
+            dataset_l1c[measurandstring].values = measurand
+            dataset_l1c = dataset_l1c.drop(
+                [
+                    "u_rel_random_" + measurandstring,
+                    "u_rel_systematic_indep_" + measurandstring,
+                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
+                    "err_corr_systematic_indep_" + measurandstring,
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
+                ]
+            )
 
         if len(acqui_irr) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
@@ -252,18 +287,38 @@ class Interpolate:
         output_sza = dataset_l1c["solar_zenith_angle"].values
         input_sza = dataset_l1b_skyrad["solar_zenith_angle"].values
 
-        dataset_l1c = interpolation_function_time.propagate_ds_specific(
-            ["random", "systematic_indep", "systematic_corr_rad_irr"],
-            dataset_l1b_skyrad,
-            {
-                "input_time": acqui_skyrad,
-                "output_time": acqui_rad,
-                "input_sza": input_sza,
-                "output_sza": output_sza,
-            },
-            ds_out_pre=dataset_l1c,
-            store_unc_percent=True,
-        )
+        if self.context.get_config_value("mcsteps") > 0:
+            dataset_l1c = interpolation_function_time.propagate_ds_specific(
+                ["random", "systematic_indep", "systematic_corr_rad_irr"],
+                dataset_l1b_skyrad,
+                {
+                    "input_time": acqui_skyrad,
+                    "output_time": acqui_rad,
+                    "input_sza": input_sza,
+                    "output_sza": output_sza,
+                },
+                ds_out_pre=dataset_l1c,
+                store_unc_percent=True,
+            )
+        else:
+            measurandstring='downwelling_radiance'
+            measurand = interpolation_function_time.run(dataset_l1b_skyrad, {
+                    "input_time": acqui_skyrad,
+                    "output_time": acqui_rad,
+                    "input_sza": input_sza,
+                    "output_sza": output_sza,
+                })
+            dataset_l1c[measurandstring].values = measurand
+            dataset_l1a = dataset_l1c.drop(
+                [
+                    "u_rel_random_" + measurandstring,
+                    "u_rel_systematic_indep_" + measurandstring,
+                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
+                    "err_corr_systematic_indep_" + measurandstring,
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
+                ]
+            )
+
 
         if len(acqui_skyrad) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
