@@ -13,7 +13,7 @@ ANOMALIES_DICT = {
     "a": {
         "description": "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
         "error": None,
-        "error_msg": None,
+        "error_msg":  "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
     },
     "m": {
         "description": "Metadata file missing",
@@ -23,17 +23,17 @@ ANOMALIES_DICT = {
     "s": {
         "description": "meteo data missing",
         "error": None,
-        "error_msg": None,
+        "error_msg": "meteo data missing",
     },
     "x": {
         "description": "unexpected error during processing",
         "error": None,
-        "error_msg": None,
+        "error_msg": "unexpected error during processing",
     },
     "o": {
         "description": "more than 50% of data has random error above 100% (probably corrupted data)",
         "error": None,
-        "error_msg": None,
+        "error_msg": "more than 50% of data has random error above 100% (probably corrupted data)"
     },
     "u": {
         "description": "some of the uncertainties have negative values",
@@ -48,17 +48,17 @@ ANOMALIES_DICT = {
     "nlu": {
         "description": "Not enough Lu scans for series",
         "error": None,
-        "error_msg": None,
+        "error_msg": "Not enough Lu scans for series",
     },
     "nld": {
         "description": "Not enough Lsky scans for series",
         "error": None,
-        "error_msg": None,
+        "error_msg": "Not enough Lsky scans for series",
     },
     "ned": {
         "description": "Not enough Ed scans for series",
         "error": None,
-        "error_msg": None,
+        "error_msg":  "Not enough Ed scans for series",
     },
     "nu": {
         "description": "Non constant illumination",
@@ -72,8 +72,8 @@ ANOMALIES_DICT = {
     },
     "cl": {
         "description": "No clear sky irradiance in sequence (i.e. overcast conditions)",
-        "error": None,
-        "error_msg": None,
+        "error": ValueError,
+        "error_msg": "No clear sky irradiance in sequence (i.e. overcast conditions)",
     },
     "in": {
         "description": "Invalid sequence (due to not enough valid radiance or irradiance series)",
@@ -85,7 +85,7 @@ ANOMALIES_DICT = {
         "or flagged by `not_enough_dark_scans', `not_enough_irr_scans', `not_enough_rad_scans' "
         "or `vza_irradiance').",
         "error": ValueError,
-        "error_msg": None,
+        "error_msg": "series missing from the standard sequence",
     },
     "d": {
         "description": "Discontinuity between VNIR and SWIR",
@@ -95,7 +95,6 @@ ANOMALIES_DICT = {
     "mf": {
         "description": "Invalid sequence,files mentioned in metadatafile are missing in DATA directory",
         "error": ValueError,
-        "error_msg": None,
-        "error_msg": None,
+        "error_msg": "Invalid sequence,files mentioned in metadatafile are missing in DATA directory",
     },
 }
