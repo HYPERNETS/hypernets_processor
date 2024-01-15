@@ -73,12 +73,26 @@ class SurfaceReflectance:
 
         water_protocol_function.setup(context=self.context)
 
-        L1c = water_protocol_function.propagate_ds_specific(
-            ["random", "systematic_indep", "systematic_corr_rad_irr"],
-            L1c,
-            ds_out_pre=L1c,
-            store_unc_percent=True,
-        )
+        if self.context.get_config_value("mcsteps") > 0:
+            L1c = water_protocol_function.propagate_ds_specific(
+                ["random", "systematic_indep", "systematic_corr_rad_irr"],
+                L1c,
+                ds_out_pre=L1c,
+                store_unc_percent=True,
+            )
+        else:
+            measurandstring="water_leaving_radiance"
+            measurand = water_protocol_function.run(L1c)
+            L1c[measurandstring].values = measurand
+            L1c = L1c.drop(
+                [
+                    "u_rel_random_" + measurandstring,
+                    "u_rel_systematic_indep_" + measurandstring,
+                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
+                    "err_corr_systematic_indep_" + measurandstring,
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
+                ]
+            )
 
         measurement_function_protocol = self.context.get_config_value(
             "measurement_function_surface_reflectance"
@@ -94,14 +108,31 @@ class SurfaceReflectance:
 
         water_protocol_function.setup(context=self.context)
 
-        L1c = water_protocol_function.propagate_ds_specific(
-            ["random", "systematic_indep"],
-            L1c,
-            comp_list_out=["random", "systematic"],
-            ds_out_pre=L1c,
-            store_unc_percent=True,
-            simple_systematic=False,
-        )
+        if self.context.get_config_value("mcsteps") > 0:
+            L1c = water_protocol_function.propagate_ds_specific(
+                ["random", "systematic_indep"],
+                L1c,
+                comp_list_out=["random", "systematic"],
+                ds_out_pre=L1c,
+                store_unc_percent=True,
+                simple_systematic=False,
+            )
+        else:
+            measurandstring = ["reflectance_nosc", "reflectance", "epsilon"]
+            reflectance_nosc, reflectance, epsilon = water_protocol_function.run(L1c)
+            L1c[measurandstring[0]].values = reflectance_nosc
+            L1c[measurandstring[1]].values =reflectance
+            L1c[measurandstring[2]].values =epsilon
+            # for varsurf in measurandstring:
+            #     L1c = L1c.drop(
+            #         [
+            #             "u_rel_random_" + varsurf,
+            #             "u_rel_systematic_indep_" + varsurf,
+            #             "u_rel_systematic_corr_rad_irr_" + varsurf,
+            #             "err_corr_systematic_indep_" + varsurf,
+            #             "err_corr_systematic_corr_rad_irr_" + varsurf,
+            #         ]
+            #     )
 
         failSimil = self.qual.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
