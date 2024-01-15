@@ -6,7 +6,6 @@ import warnings
 import os
 import xarray as xr
 import matplotlib as mpl
-import matplotlib.colors as mcolors
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
@@ -102,7 +101,7 @@ def make_time_series_plot(
                 )
             )[0]
             if len(hour_ids) > 0:
-                color = next(mcolors.TABLEAU_COLORS)
+                color = next(ax._get_lines.prop_cycler)["color"]
                 std, mean, mask_clip = sigma_clip(
                     times_sec[hour_ids],
                     measurand_wav[hour_ids],
