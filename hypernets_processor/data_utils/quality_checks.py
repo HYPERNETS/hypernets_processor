@@ -266,6 +266,7 @@ class QualityChecks:
         vzas = dataset_l1b_irr["viewing_zenith_angle"].values
         szas = dataset_l1b_irr["solar_zenith_angle"].values
 
+        print("Check if vza=180")
         for i, vza in enumerate(vzas):
             if np.abs(vza - 180) > self.context.get_config_value(
                 "irradiance_zenith_treshold"
@@ -279,6 +280,7 @@ class QualityChecks:
                 )  # for i in range(len(mask))]
 
         if self.context.get_config_value("clear_sky_check"):
+            print("Clearsky check")
             # could also be done by: https://pvlib-python.readthedocs.io/en/stable/auto_examples/plot_spectrl2_fig51A.html
             ref_szas = [0, 10, 20, 40, 60, 70, 80]
             ref_sza = ref_szas[np.argmin(np.abs(ref_szas - np.mean(szas)))]
@@ -337,6 +339,7 @@ class QualityChecks:
         flags = ["vza_irradiance"]
         flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
+        print("Check variable illumination in irradiance")
         if (
             self.qc_illumination(
                 dataset_l1b_irr.isel(series=mask_notflagged), "irradiance"
