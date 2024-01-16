@@ -24,9 +24,10 @@ class WaterNetworkProtocol(MeasurementFunction):
 
         # NIR SIMIL CORRECTION
         # retrieve variables for NIR SIMIL correction
-        w1 = 720  # self.context.get_config_value("similarity_w1")
-        w2 = 780  # self.context.get_config_value("similarity_w2")
-        alpha = 2.35  # self.context.get_config_value("similarity_alpha")
+        w1 = self.context.get_config_value("similarity_w1")
+        w2 = self.context.get_config_value("similarity_w2")
+        alpha = 1/self.context.get_config_value("similarity_alpha") # take ^-1 as in Ruddick et al., 2005
+        print("NSIMIL COR applied with lambda {}, {} and alpha {}".format(w1, w2, alpha))
 
         iref1, wref1 = self.rhs.closest_idx(wavelength, w1)
         iref2, wref2 = self.rhs.closest_idx(wavelength, w2)
