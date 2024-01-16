@@ -115,7 +115,7 @@ def make_time_series_plot(
                     fit_poly_n=fit_poly_n,
                     n_max_points=n_max_points,
                 )
-                # print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
+                print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean.shape, hour_ids.shape,times_sec.shape, times.shape)
                 plt.plot(times[hour_ids], mean, color=color, linestyle="-")
                 plt.plot(
                     times[hour_ids],
