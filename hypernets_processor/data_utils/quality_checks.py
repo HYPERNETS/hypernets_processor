@@ -192,7 +192,7 @@ class QualityChecks:
     def perform_quality_check_rand_unc(self, dataset, measurandstring):
 
         if np.count_nonzero(dataset["u_rel_random_" + measurandstring].values < 0) > 0:
-            self.context.anomaly_handler.add_anomaly("u", dataset)
+            self.context.anomaly_handler.add_anomaly("u") #, dataset)
 
         if (
             np.count_nonzero(dataset["u_rel_random_" + measurandstring].values > 100)
@@ -201,7 +201,7 @@ class QualityChecks:
             dataset["quality_flag"][:] = DatasetUtil.set_flag(
                 dataset["quality_flag"][:], "half_of_uncertainties_too_big"
             )
-            self.context.anomaly_handler.add_anomaly("o", dataset)
+            self.context.anomaly_handler.add_anomaly("o") #, dataset)
 
     def perform_quality_check_comb(
         self, dataset_l1b, dataset_l1b_swir, measurandstring
