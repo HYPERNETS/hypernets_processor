@@ -187,6 +187,21 @@ class Interpolate:
                 use_ds_out_pre_unmodified=True,
                 store_unc_percent=True,
             )
+        else:
+            measurandstring = 'irradiance'
+            measurand = interpolation_function_wav.run(
+                dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
+                dataset_l1b_irr)
+            dataset_l1c_temp[measurandstring].values = measurand
+            dataset_l1c_temp = dataset_l1c_temp.drop(
+                [
+                    "u_rel_random_" + measurandstring,
+                    "u_rel_systematic_indep_" + measurandstring,
+                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
+                    "err_corr_systematic_indep_" + measurandstring,
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
+                ]
+            )
 
         measurement_function_interpolate_time = self.context.get_config_value(
             "measurement_function_interpolate_time"
@@ -309,7 +324,7 @@ class Interpolate:
                     "output_sza": output_sza,
                 })
             dataset_l1c[measurandstring].values = measurand
-            dataset_l1a = dataset_l1c.drop(
+            dataset_l1c = dataset_l1c.drop(
                 [
                     "u_rel_random_" + measurandstring,
                     "u_rel_systematic_indep_" + measurandstring,

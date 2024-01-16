@@ -166,13 +166,27 @@ class Calibrate:
             self.context.get_config_value("measurement_function_calibrate")
         )
 
-        dataset_l1b = calibrate_function.propagate_ds_specific(
-            ["random", "systematic_indep", "systematic_corr_rad_irr"],
-            dataset_l0b,
-            calibration_data,
-            ds_out_pre=dataset_l1b,
-            store_unc_percent=True,
-        )
+        if self.context.get_config_value("mcsteps") > 0:
+            dataset_l1b = calibrate_function.propagate_ds_specific(
+                ["random", "systematic_indep", "systematic_corr_rad_irr"],
+                dataset_l0b,
+                calibration_data,
+                ds_out_pre=dataset_l1b,
+                store_unc_percent=True,
+            )
+        else:
+            measurand = calibrate_function.run(dataset_l0b, calibration_data)
+            dataset_l1b[measurandstring].values = measurand
+            dataset_l1b = dataset_l1b.drop(
+                [
+                    "u_rel_random_" + measurandstring,
+                    "u_rel_systematic_indep_" + measurandstring,
+                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
+                    "err_corr_systematic_indep_" + measurandstring,
+                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
+                ]
+            )
+
 
         if self.context.get_config_value("mcsteps") > 0:
             self.qual.perform_quality_check_rand_unc(dataset_l1b, measurandstring)
@@ -210,8 +224,9 @@ class Calibrate:
         if self.context.get_config_value("network") == "w":
             dataset_l1b = dataset_l1b.drop("n_valid_scans_SWIR")
             if measurandstring == "irradiance":
+                print("Perform QC on irradiance")
                 dataset_l1b = self.qual.perform_quality_irradiance(dataset_l1b)
-
+            print("Check if standard sequence")
             self.qual.check_standard_sequence_L1B(dataset_l1b, measurandstring, "water")
 
             if self.context.get_config_value("write_l1b"):
