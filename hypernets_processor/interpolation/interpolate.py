@@ -154,15 +154,18 @@ class Interpolate:
             "measurement_function_interpolate_wav"
         )
         prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1
+            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1, verbose=True
         )
         if self.context.get_config_value("network") == "w":
+            # interpolation_function_wav = self._measurement_function_factory(
+            #     prop=prop,
+            #     yvariable="irradiance",
+            #     ydims=["wavelength", "series"],
+            #     corr_dims=["wavelength"],
+            #     use_err_corr_dict=False,
+            # ).get_measurement_function(measurement_function_interpolate_wav)
             interpolation_function_wav = self._measurement_function_factory(
-                prop=prop,
-                yvariable="irradiance",
-                ydims=["wavelength", "series"],
-                corr_dims=["wavelength"],
-                use_err_corr_dict=False,
+                prop=prop, corr_dims="wavelength", yvariable="irradiance"
             ).get_measurement_function(measurement_function_interpolate_wav)
         else:
             interpolation_function_wav = self._measurement_function_factory(
