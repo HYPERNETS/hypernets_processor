@@ -36,6 +36,10 @@ bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "n
            "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR"]
 check_flags = ["single_irradiance_use"]
 
+colors = ["red", "green", "blue", "magenta", "yellow", "cyan", "black", "orange", "navy", "gray", "brown",
+          "greenyellow", "purple"]
+
+
 def make_time_series_plot(
     wavs,
     times,
@@ -101,7 +105,7 @@ def make_time_series_plot(
                 )
             )[0]
             if len(hour_ids) > 0:
-                color = next(ax._get_lines.prop_cycler)["color"]
+                color = colors[ii]
                 std, mean, mask_clip = sigma_clip(
                     times_sec[hour_ids],
                     measurand_wav[hour_ids],
@@ -430,7 +434,6 @@ def vegetation_checks(ds, iseries):
 if __name__ == "__main__":
     wavs = [500, 900, 1100, 1600]
     hour_bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
-
     sites = [
         "GHNA",
         "WWUK",
