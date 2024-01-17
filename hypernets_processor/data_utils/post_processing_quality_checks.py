@@ -115,7 +115,7 @@ def make_time_series_plot(
                     fit_poly_n=fit_poly_n,
                     n_max_points=n_max_points,
                 )
-                print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean.shape, hour_ids.shape,times_sec.shape, times.shape)
+                print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean.shape, hour_ids.shape,times_sec.shape, times.shape, np.where(np.isnan(measurand_wav[hour_ids]) == False))
                 plt.plot(times[hour_ids], mean, color=color, linestyle="-")
                 plt.plot(
                     times[hour_ids],
@@ -324,6 +324,7 @@ def sigma_clip(
 
     mask = np.zeros([len(values)])
 
+    print(values.shape,xvals.shape)
     # Continue loop until result converges
     diff = 10e10
     while diff > tolerance:
