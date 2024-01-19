@@ -115,7 +115,7 @@ def make_time_series_plot(
                     fit_poly_n=fit_poly_n,
                     n_max_points=n_max_points,
                 )
-                print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean.shape, hour_ids.shape,times_sec.shape, times.shape, np.where(np.isnan(measurand_wav[hour_ids])))
+                # print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean.shape, hour_ids.shape,times_sec.shape, times.shape, np.where(np.isnan(measurand_wav[hour_ids])))
                 plt.plot(times[hour_ids], mean, color=color, linestyle="-")
                 plt.plot(
                     times[hour_ids],
@@ -323,7 +323,6 @@ def sigma_clip(
     values = np.array(values)
     mask[np.where(np.isnan(values))]=2
 
-    print(values.shape,xvals.shape)
     # Continue loop until result converges
     diff = 10e10
     while diff > tolerance:
@@ -400,6 +399,7 @@ def fit_2weekbins(xvals, yvals, mask):
 
 
 def vegetation_checks(ds, iseries):
+    print(ds["reflectance"].values.shape, ds.wavelength.values.shape, np.argmin(np.abs(ds.wavelength.values - 490)), iseries)
     b2 = ds["reflectance"].values[
         np.argmin(np.abs(ds.wavelength.values - 490)), iseries
     ]  # 490 nm
