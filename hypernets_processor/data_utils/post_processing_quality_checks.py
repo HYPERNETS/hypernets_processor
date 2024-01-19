@@ -521,13 +521,18 @@ if __name__ == "__main__":
                             "placeholder1", "postprocessing_outliers"
                         )
 
+                    iseries_file = np.argmin((
+                                                     site_ds[ifile]["viewing_zenith_angle"].values - vza
+                                             ) ** 2 + (
+                                                 np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
+                                             ) ** 2)
                     if mask2[ifile] > 0:
-                        ds_curr.reflectance[:, iseries] *= np.nan
-                        ds_curr.u_rel_random_reflectance[:, iseries] *= np.nan
-                        ds_curr.u_rel_systematic_reflectance[:, iseries] *= np.nan
-                        ds_curr.std_reflectance[:, iseries] *= np.nan
+                        ds_curr.reflectance[:, iseries_file] *= np.nan
+                        ds_curr.u_rel_random_reflectance[:, iseries_file] *= np.nan
+                        ds_curr.u_rel_systematic_reflectance[:, iseries_file] *= np.nan
+                        ds_curr.std_reflectance[:, iseries_file] *= np.nan
                         if mask2[ifile] == 2:
-                            ds_curr.quality_flag[iseries] = 16
+                            ds_curr.quality_flag[iseries_file] = 16
                         files_nmaskedseries[ifile] += 1
                     site_ds[ifile] = ds_curr
 
