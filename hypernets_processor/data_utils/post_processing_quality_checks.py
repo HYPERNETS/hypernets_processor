@@ -224,7 +224,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         )
         if ds is None or len(ds.series)==0:
             mask[i] = 1
-            times[i] = datetime.datetime.utcfromtimestamp(0)
+            times[i] = times[i-1]
             #print("bad angle for file:", vza, vaa, files[i])
             continue
 
@@ -489,7 +489,12 @@ if __name__ == "__main__":
             times, refl, mask = extract_reflectances(files, wavs, vza, vaa, site)
             if site == "WWUK" or site == "BASP":
                 for ifile in range(len(site_ds)):
-                    if not vegetation_checks(site_ds[ifile], iseries):
+                    iseries_file=np.argmin((
+                            site_ds[ifile]["viewing_zenith_angle"].values - vza
+                        ) ** 2 + (
+                            np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
+                        ) ** 2)
+                    if not vegetation_checks(site_ds[ifile], iseries_file):
                         mask[ifile] = 3
             if True:
                 mask2 = make_time_series_plot(
