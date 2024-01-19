@@ -317,12 +317,11 @@ def sigma_clip(
     fit_poly_n=0,
     n_max_points=0,
 ):
+    mask = np.zeros([len(values)])
+
     # Remove NaNs from input values
     values = np.array(values)
-    values = values[np.where(np.isnan(values) == False)]
-    values_original = np.copy(values)
-
-    mask = np.zeros([len(values)])
+    mask[np.where(np.isnan(values))]=2
 
     print(values.shape,xvals.shape)
     # Continue loop until result converges
