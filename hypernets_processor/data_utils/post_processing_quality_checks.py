@@ -229,6 +229,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
             continue
 
         flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], bad_flags)
+        flagged_check = DatasetUtil.get_flags_mask_or(ds["quality_flag"], check_flags)
 
         if len(ds.quality_flag.values) == 1:
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
@@ -239,12 +240,20 @@ def extract_reflectances(files, wavs, vza, vaa, site):
 
             if not flagged:
                 mask[i] = 0
-            else:
-                print(site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+            # else:
+            #     print(site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+
+            if flagged_check:
+                print("check",site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+
 
         else:
             if not any(flagged):
                 mask[i] = 0
+
+            if any(flagged_check):
+                print("check",site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = np.mean(ds.reflectance.values[ids, :])
             print(ds, ds.acquisition_time.values[:])
@@ -437,12 +446,12 @@ if __name__ == "__main__":
     sites = [
         "GHNA",
         "WWUK",
-        # "ATGE",
-        # "BASP",
+        "ATGE",
+        "BASP",
         # "PEAN1A",
         # "PEAN1B",
         # "PEAN1C",
-        # "PEAN2",
+        "PEAN",
         # "DEGE",
         # "IFAR",
     ]
