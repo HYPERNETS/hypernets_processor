@@ -34,9 +34,9 @@ plotter = Plotting("", plot_path, ".png")
 bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
            "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
            "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR"]
-check_flags = ["single_irradiance_use"]
+check_flags = ["single_irradiance_used"]
 
-colors = ["red", "green", "blue", "magenta", "yellow", "cyan", "black", "orange", "navy", "gray", "brown",
+colors = ["magenta", "yellow", "cyan", "red", "green", "blue", "black", "orange", "navy", "gray", "brown",
           "greenyellow", "purple"]
 
 
