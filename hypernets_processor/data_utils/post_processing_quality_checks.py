@@ -565,7 +565,7 @@ if __name__ == "__main__":
                         site_ds[ifile].attrs["site_longitude"],
                     )
                 )
-                plotter.plot_series_in_sequence("reflectance", site_ds[ifile])
+                # plotter.plot_series_in_sequence("reflectance", site_ds[ifile])
                 # plotter.plot_series_in_sequence_vaa("reflectance", site_ds[ifile], 98)
                 # plotter.plot_series_in_sequence_vza("reflectance", site_ds[ifile], 30)
         f.close()
