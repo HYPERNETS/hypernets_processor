@@ -445,7 +445,7 @@ if __name__ == "__main__":
     hour_bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
     sites = [
         "GHNA",
-        "WWUK",
+        # "WWUK",
         "ATGE",
         "BASP",
         # "PEAN1A",
