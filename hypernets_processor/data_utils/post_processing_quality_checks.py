@@ -455,10 +455,10 @@ if __name__ == "__main__":
         # "DEGE",
         # "IFAR",
     ]
-    sites = ["WWUK"]
+    # sites = ["WWUK"]
     sites_thresh = [2, 2, 2, 2, 2, 2, 2, 2, 3, 3]
-    sites_thresh = [2]
-    sites_points = [0]
+    # sites_thresh = [2]
+    # sites_points = [0]
 
     if not os.path.exists(out_path):
         os.makedirs(out_path)
@@ -513,7 +513,7 @@ if __name__ == "__main__":
                     mask,
                     hour_bins,
                     "%s_%s_%s" % (site, vza, vaa),
-                    n_max_points=sites_points[isite],
+                    #n_max_points=sites_points[isite],
                     sigma_thresh=sites_thresh[isite],
                 )
                 for ifile in range(len(site_ds)):
