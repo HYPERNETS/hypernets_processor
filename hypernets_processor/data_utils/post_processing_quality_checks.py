@@ -181,7 +181,7 @@ def make_time_series_plot(
         plt.ylim(
             [
                 min(valids) - 0.3 * (max(valids) - min(valids)),
-                max(1, max(valids) + 0.3 * (max(valids) - min(valids))),
+                max(0, max(valids) + 0.3 * (max(valids) - min(valids))),
             ]
         )
         plt.legend()
@@ -258,7 +258,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
             refl[i] = np.mean(ds.reflectance.values[ids, :])
             print(ds, ds.acquisition_time.values[:])
             times[i] = datetime.datetime.utcfromtimestamp(
-                np.mean(ds.acquisition_time)
+                np.mean(ds.acquisition_time.values)
             )
     return times, refl, mask
 
@@ -445,7 +445,7 @@ if __name__ == "__main__":
     hour_bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
     sites = [
         "GHNA",
-        # "WWUK",
+        "WWUK",
         "ATGE",
         "BASP",
         # "PEAN1A",
