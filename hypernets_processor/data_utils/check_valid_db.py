@@ -121,10 +121,10 @@ def read_hypernets_file(
 
 if __name__ == "__main__":
     sites = [
-        "GHNA",
+        #"GHNA",
+        "BASP",
         "WWUK",
         "ATGE",
-        "BASP",
         # "PEAN1A",
         # "PEAN1B",
         # "PEAN1C",
@@ -140,10 +140,11 @@ if __name__ == "__main__":
     print("dbpath:", dbpath)
     engine = sqlite3.connect(dbpath)
     cursor = engine.cursor()
-    query = "delete FROM products WHERE site_id='DEGE'"
-    cursor.execute(query)
 
-    engine.commit()
+    # query = "delete FROM products WHERE site_id='DEGE'"
+    # cursor.execute(query)
+    #
+    # engine.commit()
 
     # dbpath = os.path.join(archive_folder, "metadata.db")
     # print("dbpath:", dbpath)
@@ -157,15 +158,15 @@ if __name__ == "__main__":
     # engine2.commit()
     # engine2.close()
 
-    dbpath = os.path.join(archive_folder, "anomaly.db")
-    print("dbpath:", dbpath)
-    engine3 = sqlite3.connect(dbpath)
-    cursor3 = engine3.cursor()
-    query = "delete FROM anomalies WHERE site_id='DEGE'"
-    cursor3.execute(query)
-
-    engine3.commit()
-    engine3.close()
+    # dbpath = os.path.join(archive_folder, "anomaly.db")
+    # print("dbpath:", dbpath)
+    # engine3 = sqlite3.connect(dbpath)
+    # cursor3 = engine3.cursor()
+    # query = "delete FROM anomalies WHERE site_id='DEGE'"
+    # cursor3.execute(query)
+    #
+    # engine3.commit()
+    # engine3.close()
 
     for isite in range(len(sites)):
         query = "select * FROM products WHERE site_id='%s'"%(sites[isite])
