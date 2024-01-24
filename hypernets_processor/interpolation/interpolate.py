@@ -154,7 +154,7 @@ class Interpolate:
             "measurement_function_interpolate_wav"
         )
         prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1, verbose=True
+            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1, verbose=False
         )
         if self.context.get_config_value("network") == "w":
             # interpolation_function_wav = self._measurement_function_factory(
