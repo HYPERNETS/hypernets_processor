@@ -132,8 +132,8 @@ if __name__ == "__main__":
         # "DEGE",
         # "IFAR",
     ]
-    hypernets_path_db = r"\\eoserver\home\data\calvalresults\v2"
-    hypernets_path = r"\\eoserver\home\data\insitu\hypernets\archive"
+    hypernets_path_db = r"/home/data/calvalresults/v2"
+    hypernets_path = r"/home/data/insitu/hypernets/archive"
 
     archive_folder = os.path.abspath(hypernets_path_db)
     dbpath = os.path.join(archive_folder, "archive.db")
