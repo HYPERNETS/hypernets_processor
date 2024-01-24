@@ -149,7 +149,7 @@ if __name__ == "__main__":
     print("dbpath:", dbpath)
     engine2 = sqlite3.connect(dbpath)
     cursor2 = engine2.cursor()
-    for tab in ["CAL", "L0A_BLA","L0A_IRR","L0A_RAD","L0B_IRR","L0B_RAD","L_L1A_IRR","L_L1A_RAD","L_L1B_IRR","L_L1B_RAD","L_L1C","L_L2A","L_L2B","W_L1A_IRR","W_L1A_RAD","W_L1B_IRR","W_L1B_RAD","W_L1C","W_L2A","W_L2B"]:
+    for tab in ["L0A_BLA","L0A_IRR","L0A_RAD","L0B_IRR","L0B_RAD","L_L1A_IRR","L_L1A_RAD","L_L1B_IRR","L_L1B_RAD","L_L1C","L_L2A","L_L2B","W_L1A_IRR","W_L1A_RAD","W_L1B_IRR","W_L1B_RAD","W_L1C","W_L2A","W_L2B"]:
         query = "delete FROM %s WHERE site_id='DEGE'"%tab
         cursor2.execute(query)
 
