@@ -122,9 +122,9 @@ def read_hypernets_file(
 if __name__ == "__main__":
     sites = [
         "GHNA",
-        # "WWUK",
-        # "ATGE",
-        # "BASP",
+        "WWUK",
+        "ATGE",
+        "BASP",
         # "PEAN1A",
         # "PEAN1B",
         # "PEAN1C",
@@ -140,29 +140,54 @@ if __name__ == "__main__":
     print("dbpath:", dbpath)
     engine = sqlite3.connect(dbpath)
     cursor = engine.cursor()
-    query = "select * FROM products WHERE site_id='GHNA'"
-    print(query)
+    query = "delete FROM products WHERE site_id='DEGE'"
     cursor.execute(query)
-    data = cursor.fetchall()
-    print(len(data))
-    for i in range(len(data)):
-        if i%100==0:
-            print(i*100/len(data),"% complete")
-        row=data[i]
-        path=row[8]
-        product=row[1]
-        #print(os.path.join(hypernets_path,path,product))
-        if os.path.exists(os.path.join(hypernets_path,path,product+".nc")):
-            ds = xr.open_dataset(os.path.join(hypernets_path,path,product+".nc"))
-            #print(min(ds.acquisition_time.values),max(ds.acquisition_time.values))
-            query = "update products set datetime_start = '%s', datetime_end = '%s' WHERE product_name='%s'" % (dt.fromtimestamp(np.nanmin(ds["acquisition_time"].values)),dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values)),product)
-            cursor.execute(query)
-        else:
-            print("not found")
-            query = "delete FROM products WHERE product_name='%s'"%(product)
-            cursor.execute(query)
 
     engine.commit()
+
+    dbpath = os.path.join(archive_folder, "metadata.db")
+    print("dbpath:", dbpath)
+    engine2 = sqlite3.connect(dbpath)
+    cursor2 = engine2.cursor()
+    query = "delete FROM products WHERE site_id='DEGE'"
+    cursor2.execute(query)
+
+    engine2.commit()
+    engine2.close()
+
+    dbpath = os.path.join(archive_folder, "anomaly.db")
+    print("dbpath:", dbpath)
+    engine3 = sqlite3.connect(dbpath)
+    cursor3 = engine3.cursor()
+    query = "delete FROM products WHERE site_id='DEGE'"
+    cursor3.execute(query)
+
+    engine3.commit()
+    engine3.close()
+
+    for isite in range(len(sites)):
+        query = "select * FROM products WHERE site_id='%s'"%(sites[isite])
+        print(query)
+        cursor.execute(query)
+        data = cursor.fetchall()
+        print(len(data))
+        for i in range(len(data)):
+            if i%100==0:
+                print(sites[isite],i*100/len(data),"% complete")
+            row=data[i]
+            path=row[8]
+            product=row[1]
+            #print(os.path.join(hypernets_path,path,product))
+            if os.path.exists(os.path.join(hypernets_path,path,product+".nc")):
+                ds = xr.open_dataset(os.path.join(hypernets_path,path,product+".nc"))
+                #print(min(ds.acquisition_time.values),max(ds.acquisition_time.values))
+                query = "update products set datetime_start = '%s', datetime_end = '%s' WHERE product_name='%s'" % (dt.fromtimestamp(np.nanmin(ds["acquisition_time"].values)),dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values)),product)
+                cursor.execute(query)
+            else:
+                query = "delete FROM products WHERE product_name='%s'"%(product)
+                cursor.execute(query)
+
+        engine.commit()
     engine.close()
 
 
