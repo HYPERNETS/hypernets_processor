@@ -14,33 +14,33 @@ __status__ = "Development"
 archive_path = r"/home/data/insitu/hypernets/archive"
 
 files_archive = [
-    "archive_ATGE.db",
-    "archive_BASP.db",
-    "archive_DEGE.db",
+    # "archive_ATGE.db",
+    # "archive_BASP.db",
+    # "archive_DEGE.db",
     "archive_GHNA.db",
-    "archive_IFAR.db",
+    # "archive_IFAR.db",
     "archive_PEAN.db",
-    "archive_WWUK.db",
+    # "archive_WWUK.db",
     "archive_JAES.db",
 ]
 files_anomaly = [
-    "anomaly_ATGE.db",
-    "anomaly_BASP.db",
-    "anomaly_DEGE.db",
+    # "anomaly_ATGE.db",
+    # "anomaly_BASP.db",
+    # "anomaly_DEGE.db",
     "anomaly_GHNA.db",
-    "anomaly_IFAR.db",
+    # "anomaly_IFAR.db",
     "anomaly_PEAN.db",
-    "anomaly_WWUK.db",
+    # "anomaly_WWUK.db",
     "anomaly_JAES.db",
 ]
 files_metadata = [
-    "metadata_ATGE.db",
-    "metadata_BASP.db",
-    "metadata_DEGE.db",
+    # "metadata_ATGE.db",
+    # "metadata_BASP.db",
+    # "metadata_DEGE.db",
     "metadata_GHNA.db",
-    "metadata_IFAR.db",
+    # "metadata_IFAR.db",
     "metadata_PEAN.db",
-    "metadata_WWUK.db",
+    # "metadata_WWUK.db",
     "metadata_JAES.db",
 ]
 
