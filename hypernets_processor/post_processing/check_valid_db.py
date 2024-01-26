@@ -137,26 +137,26 @@ if __name__ == "__main__":
 
     archive_folder = os.path.abspath(hypernets_path_db)
     dbpath = os.path.join(archive_folder, "archive.db")
-    print("dbpath:", dbpath)
-    engine = sqlite3.connect(dbpath)
-    cursor = engine.cursor()
+    # print("dbpath:", dbpath)
+    # engine = sqlite3.connect(dbpath)
+    # cursor = engine.cursor()
 
     # query = "delete FROM products WHERE site_id='DEGE'"
     # cursor.execute(query)
     #
     # engine.commit()
 
-    # dbpath = os.path.join(archive_folder, "metadata.db")
-    # print("dbpath:", dbpath)
-    # engine2 = sqlite3.connect(dbpath)
-    # cursor2 = engine2.cursor()
-    # for tab in ["L0A_BLA","L0A_IRR","L0A_RAD","L0B_IRR","L0B_RAD","L_L1A_IRR","L_L1A_RAD","L_L1B_IRR","L_L1B_RAD","L_L1C","L_L2A","L_L2B","W_L1A_IRR","W_L1A_RAD","W_L1B_IRR","W_L1B_RAD","W_L1C","W_L2A","W_L2B"]:
-    #     query = "delete FROM %s WHERE site_id='DEGE'"%tab
-    #     print(query)
-    #     cursor2.execute(query)
-    #
-    # engine2.commit()
-    # engine2.close()
+    dbpath = os.path.join(archive_folder, "metadata.db")
+    print("dbpath:", dbpath)
+    engine2 = sqlite3.connect(dbpath)
+    cursor2 = engine2.cursor()
+    for tab in ["L0A_BLA","L0A_IRR","L0A_RAD","L0B_IRR","L0B_RAD","L_L1A_IRR","L_L1A_RAD","L_L1B_IRR","L_L1B_RAD","L_L1C","L_L2A","L_L2B","W_L1A_IRR","W_L1A_RAD","W_L1B_IRR","W_L1B_RAD","W_L1C","W_L2A","W_L2B"]:
+        query = "delete FROM %s WHERE site_id='DEGE'"%tab
+        print(query)
+        cursor2.execute(query)
+
+    engine2.commit()
+    engine2.close()
 
     # dbpath = os.path.join(archive_folder, "anomaly.db")
     # print("dbpath:", dbpath)
@@ -168,29 +168,29 @@ if __name__ == "__main__":
     # engine3.commit()
     # engine3.close()
 
-    for isite in range(len(sites)):
-        query = "select * FROM products WHERE site_id='%s'"%(sites[isite])
-        print(query)
-        cursor.execute(query)
-        data = cursor.fetchall()
-        print(len(data))
-        for i in range(len(data)):
-            if i%100==0:
-                print(sites[isite],i*100/len(data),"% complete")
-            row=data[i]
-            path=row[8]
-            product=row[1]
-            #print(os.path.join(hypernets_path,path,product))
-            if os.path.exists(os.path.join(hypernets_path,path,product+".nc")):
-                ds = xr.open_dataset(os.path.join(hypernets_path,path,product+".nc"))
-                #print(min(ds.acquisition_time.values),max(ds.acquisition_time.values))
-                query = "update products set datetime_start = '%s', datetime_end = '%s' WHERE product_name='%s'" % (dt.fromtimestamp(np.nanmin(ds["acquisition_time"].values)),dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values)),product)
-                cursor.execute(query)
-            else:
-                query = "delete FROM products WHERE product_name='%s'"%(product)
-                cursor.execute(query)
-
-        engine.commit()
-    engine.close()
-
-
+    # for isite in range(len(sites)):
+    #     query = "select * FROM products WHERE site_id='%s'"%(sites[isite])
+    #     print(query)
+    #     cursor.execute(query)
+    #     data = cursor.fetchall()
+    #     print(len(data))
+    #     for i in range(len(data)):
+    #         if i%100==0:
+    #             print(sites[isite],i*100/len(data),"% complete")
+    #         row=data[i]
+    #         path=row[8]
+    #         product=row[1]
+    #         #print(os.path.join(hypernets_path,path,product))
+    #         if os.path.exists(os.path.join(hypernets_path,path,product+".nc")):
+    #             ds = xr.open_dataset(os.path.join(hypernets_path,path,product+".nc"))
+    #             #print(min(ds.acquisition_time.values),max(ds.acquisition_time.values))
+    #             query = "update products set datetime_start = '%s', datetime_end = '%s' WHERE product_name='%s'" % (dt.fromtimestamp(np.nanmin(ds["acquisition_time"].values)),dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values)),product)
+    #             cursor.execute(query)
+    #         else:
+    #             query = "delete FROM products WHERE product_name='%s'"%(product)
+    #             cursor.execute(query)
+    #
+    #     engine.commit()
+    # engine.close()
+    #
+    #
