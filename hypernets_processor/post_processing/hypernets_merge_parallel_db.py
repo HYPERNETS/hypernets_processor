@@ -117,23 +117,23 @@ def load_table_names(db_a):
 
 
 if __name__ == "__main__":
-    print(os.path.join(archive_path, files_archive[0]))
-    db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
-    table_names = load_table_names(db_a)
-    db_a.close()
-    print(table_names)
-    for file in files_archive:
-        print(file)
-        for table_name in table_names:
-            merge(out_archive, file, table_name)
-
-    db_a = sqlite3.connect(os.path.join(archive_path, files_anomaly[0]))
-    table_names = load_table_names(db_a)
-    db_a.close()
-    for file in files_anomaly:
-        print(file)
-        for table_name in table_names:
-            merge(out_anomaly, file, table_name)
+    # print(os.path.join(archive_path, files_archive[0]))
+    # db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
+    # table_names = load_table_names(db_a)
+    # db_a.close()
+    # print(table_names)
+    # for file in files_archive:
+    #     print(file)
+    #     for table_name in table_names:
+    #         merge(out_archive, file, table_name)
+    #
+    # db_a = sqlite3.connect(os.path.join(archive_path, files_anomaly[0]))
+    # table_names = load_table_names(db_a)
+    # db_a.close()
+    # for file in files_anomaly:
+    #     print(file)
+    #     for table_name in table_names:
+    #         merge(out_anomaly, file, table_name)
 
     db_a = sqlite3.connect(os.path.join(archive_path, files_metadata[0]))
     table_names = load_table_names(db_a)
