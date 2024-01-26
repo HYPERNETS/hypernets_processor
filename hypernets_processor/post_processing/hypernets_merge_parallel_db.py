@@ -16,9 +16,10 @@ archive_path = r"/home/data/insitu/hypernets/archive"
 files_archive = [
     # "archive_ATGE.db",
     # "archive_BASP.db",
-    # "archive_DEGE.db",
+    "archive_DEGE.db",
     #"archive_GHNA.db",
-    # "archive_IFAR.db",
+    "archive_IFAR.db",
+    "archive_LOBE.db",
     #"archive_PEAN.db",
     # "archive_WWUK.db",
     #"archive_JAES.db",
@@ -26,9 +27,10 @@ files_archive = [
 files_anomaly = [
     # "anomaly_ATGE.db",
     # "anomaly_BASP.db",
-    # "anomaly_DEGE.db",
+    "anomaly_DEGE.db",
     #"anomaly_GHNA.db",
-    # "anomaly_IFAR.db",
+    "anomaly_IFAR.db",
+    "anomaly_LOBE.db",
     #"anomaly_PEAN.db",
     # "anomaly_WWUK.db",
     #"anomaly_JAES.db",
@@ -36,12 +38,13 @@ files_anomaly = [
 files_metadata = [
     # "metadata_ATGE.db",
     # "metadata_BASP.db",
-    # "metadata_DEGE.db",
-    "metadata_GHNA.db",
-    # "metadata_IFAR.db",
-    "metadata_PEAN.db",
+    "metadata_DEGE.db",
+    # "metadata_GHNA.db",
+    "metadata_IFAR.db",
+    "metadata_LOBE.db",
+    # "metadata_PEAN.db",
     # "metadata_WWUK.db",
-    "metadata_JAES.db",
+    # "metadata_JAES.db",
 ]
 
 out_archive = "archive.db"
@@ -117,23 +120,23 @@ def load_table_names(db_a):
 
 
 if __name__ == "__main__":
-    # print(os.path.join(archive_path, files_archive[0]))
-    # db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
-    # table_names = load_table_names(db_a)
-    # db_a.close()
-    # print(table_names)
-    # for file in files_archive:
-    #     print(file)
-    #     for table_name in table_names:
-    #         merge(out_archive, file, table_name)
-    #
-    # db_a = sqlite3.connect(os.path.join(archive_path, files_anomaly[0]))
-    # table_names = load_table_names(db_a)
-    # db_a.close()
-    # for file in files_anomaly:
-    #     print(file)
-    #     for table_name in table_names:
-    #         merge(out_anomaly, file, table_name)
+    print(os.path.join(archive_path, files_archive[0]))
+    db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
+    table_names = load_table_names(db_a)
+    db_a.close()
+    print(table_names)
+    for file in files_archive:
+        print(file)
+        for table_name in table_names:
+            merge(out_archive, file, table_name)
+
+    db_a = sqlite3.connect(os.path.join(archive_path, files_anomaly[0]))
+    table_names = load_table_names(db_a)
+    db_a.close()
+    for file in files_anomaly:
+        print(file)
+        for table_name in table_names:
+            merge(out_anomaly, file, table_name)
 
     db_a = sqlite3.connect(os.path.join(archive_path, files_metadata[0]))
     table_names = load_table_names(db_a)
