@@ -57,7 +57,9 @@ def get_target_sequences(context, to_archive):
         if context.archive_db is None:
             raise ValueError("archive db has not been set!")
 
-        print(context.archive_db["products"])
+        print(context.archive_db["products"].find(
+                site_id=context.get_config_value("site_id")
+            ))
         processed_products = [
             product["sequence_name"]
             for product in context.archive_db["products"].find(
