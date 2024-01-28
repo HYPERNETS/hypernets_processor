@@ -16,7 +16,7 @@ archive_path = r"/home/data/insitu/hypernets/archive"
 files_archive = [
     # "archive_ATGE.db",
     # "archive_BASP.db",
-    "archive_DEGE.db",
+    #"archive_DEGE.db",
     #"archive_GHNA.db",
     "archive_IFAR.db",
     "archive_LOBE.db",
@@ -27,7 +27,7 @@ files_archive = [
 files_anomaly = [
     # "anomaly_ATGE.db",
     # "anomaly_BASP.db",
-    "anomaly_DEGE.db",
+    #"anomaly_DEGE.db",
     #"anomaly_GHNA.db",
     "anomaly_IFAR.db",
     "anomaly_LOBE.db",
@@ -38,7 +38,7 @@ files_anomaly = [
 files_metadata = [
     # "metadata_ATGE.db",
     # "metadata_BASP.db",
-    "metadata_DEGE.db",
+    #"metadata_DEGE.db",
     # "metadata_GHNA.db",
     "metadata_IFAR.db",
     "metadata_LOBE.db",
