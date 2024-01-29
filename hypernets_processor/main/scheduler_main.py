@@ -43,7 +43,6 @@ def unpack_scheduler_config(scheduler_config):
     scheduler_config_dict = dict()
 
     sections = [sch for sch in scheduler_config.sections()]
-    print(sections)
     sections.remove("Log")
 
     for sch in sections:
