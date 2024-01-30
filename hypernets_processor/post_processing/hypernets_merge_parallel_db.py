@@ -82,7 +82,7 @@ def merge(outfile, file, table_name):
         id_prev = list(cursor_a.execute("SELECT id FROM " + table_name))
         if len(id_prev) > 0:
             #index_prev = id_prev[-1]
-            index_prev = len(id_prev)
+            index_prev = [len(id_prev)]
             for i, row in enumerate(cursor_b.execute("SELECT * FROM " + table_name)):
                 row = ["none" if (is_invalid(v)) else v for v in row]
                 row[0] += int(index_prev[0])
