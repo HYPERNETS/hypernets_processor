@@ -10,7 +10,7 @@ import matplotlib as mpl
 mpl.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-myFmt = mdates.DateFormatter('%d')
+myFmt = mdates.DateFormatter('%y-%m-%d')
 import pysolar
 import datetime
 import glob
