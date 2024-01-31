@@ -7,8 +7,8 @@ import matplotlib.dates as mdates
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
-path2figs="/home/cgoyens/waterhypernet/hypstar/QC/"
-path2files="/home/cgoyens/waterhypernet/hypstar/processed_v2/"
+path2figs="/home/data/insitu/hypernets/QC/"
+path2files="/home/data/insitu/hypernets/archive/"
 
 def closest_idx(xlist, xval):
         idx, xret = min(enumerate(xlist), key=lambda x: abs(float(x[1]) - float(xval)))
