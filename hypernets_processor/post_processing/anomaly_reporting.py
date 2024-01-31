@@ -4,6 +4,7 @@ from datetime import datetime
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from matplotlib.gridspec import GridSpec
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
@@ -104,7 +105,11 @@ for site in df['site_id'].unique():
     nseq = len(prodsel['sequence_name'].unique())
     dfsel = df[df['site_id'] == site]
 
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+    fig = plt.figure(figsize=(15, 5))
+    gs = GridSpec(nrows=2, ncols=2)
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax2 = fig.add_subplot(gs[1, :])
+    ax3 = fig.add_subplot(gs[0, 1])
 
     # print number of anomalies for site
     df1 = pd.crosstab(dfsel.date, dfsel.anomaly_id)
