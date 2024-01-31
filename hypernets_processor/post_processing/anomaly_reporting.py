@@ -9,6 +9,18 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as md
 path2figs="/home/data/insitu/hypernets/QC/"
 path2files="/home/data/insitu/hypernets/archive/"
+import sqlite3
+from sqlite3 import Error
+
+def create_connection(path):
+    connection = None
+    try:
+        connection = sqlite3.connect(path)
+        print("Connection to SQLite DB successful")
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+    return connection
 
 def closest_idx(xlist, xval):
         idx, xret = min(enumerate(xlist), key=lambda x: abs(float(x[1]) - float(xval)))
