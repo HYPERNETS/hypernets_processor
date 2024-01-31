@@ -105,7 +105,7 @@ for site in df['site_id'].unique():
     nseq = len(prodsel['sequence_name'].unique())
     dfsel = df[df['site_id'] == site]
 
-    fig = plt.figure(figsize=(15, 5))
+    fig = plt.figure(figsize=(10, 20))
     gs = GridSpec(nrows=2, ncols=2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, :])
