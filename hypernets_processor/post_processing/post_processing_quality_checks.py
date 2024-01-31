@@ -36,7 +36,7 @@ bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "n
            "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR", "single_irradiance_used"]
 check_flags = ["single_irradiance_used"]
 
-colors = ["magenta", "yellow", "cyan", "red", "green", "blue", "black", "orange", "navy", "gray", "brown",
+colors = ["black", "yellow", "cyan", "red", "green", "blue", "magenta", "orange", "navy", "gray", "brown",
           "greenyellow", "purple"]
 
 
@@ -444,6 +444,7 @@ if __name__ == "__main__":
     wavs = [500, 900, 1100, 1600]
     hour_bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
     sites = [
+        "IFAR",
         "GHNA",
         "WWUK",
         "ATGE",
@@ -452,8 +453,9 @@ if __name__ == "__main__":
         # "PEAN1B",
         # "PEAN1C",
         "PEAN",
-        # "DEGE",
-        # "IFAR",
+        "DEGE",
+        "LOBE",
+        "JAES"
     ]
     # sites = ["WWUK"]
     sites_thresh = [2, 2, 2, 2, 2, 2, 2, 2, 3, 3]
