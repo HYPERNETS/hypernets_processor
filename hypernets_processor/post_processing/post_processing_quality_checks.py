@@ -9,6 +9,8 @@ import matplotlib as mpl
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+myFmt = mdates.DateFormatter('%d')
 import pysolar
 import datetime
 import glob
@@ -187,6 +189,7 @@ def make_time_series_plot(
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
+        plt.gca().xaxis.set_major_formatter(myFmt)
         plt.savefig(os.path.join(plot_path, "qc_%s_%s.png" % (tag, wavs[i])), dpi=300)
         plt.clf()
         print("plot done ", os.path.join(plot_path, "qc_%s_%s.png" % (tag, wavs[i])))
