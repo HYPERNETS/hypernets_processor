@@ -123,11 +123,11 @@ for site in df['site_id'].unique():
     cross = pd.crosstab(dfsel.date, dfsel.anomaly_id)  # ,margins=True, dropna=False)
     cross['date'] = cross.index
     cross = cross.resample('M', on='date').sum().reindex(all_dates)
-    cross.plot(kind="bar", ax=ax2, stacked=True)
+    cross.plot(kind="bar", ax=ax2, stacked=False)
     ax2.legend(loc='center left', bbox_to_anchor=(1, 0.5), title='Anomalies')
     ax2.set_ylabel("Number of sequences")
 
-    filtered_df = prodsel[prodsel["product_level"].str.contains("L0A_RAD|L0A_IRR|W_L1A_RAD|W_L1A_IRR|W_L1C|W_L2A")]
+    filtered_df = prodsel[prodsel["product_level"].str.contains("L0A_RAD|L0A_IRR|L_L1A_RAD|L_L1A_IRR|L_L1B|L_L1C|L_L2A")]
     filtered_df.index = pd.to_datetime(filtered_df.datetime_SEQ)
     filtered_df['date'] = filtered_df.index.floor('D')
     cross = pd.crosstab(filtered_df.date, filtered_df.product_level)  # ,margins=True, dropna=False)
