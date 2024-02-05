@@ -9,7 +9,7 @@ Using HYPERNETS data
 ======================
 
 This section provides on how to use the HYPERNETS data produced by the **hypernets_processor** module.
-The HYPERNETS products include products from L0 (raw data) to L2A (refelctance data), which each have different variables, uncertainties, quality flags and metadata.
+The HYPERNETS products include products from L0 (raw data) to L2A (reflectance data), which each have different variables, uncertainties, quality flags and metadata.
 In this section we will briefly describe what data is available in each of the files and how to access it.
 We will also briefly discuss the plots made by the processor and how to access these.
 The **hypernets_processor** also produces some SQL databases. These are desribed in .
@@ -19,8 +19,21 @@ We do not provide further details on how to access these databases, since they a
 downloading data
 ------------------
 **water network**
+The data for the water HYPERNETS data can also be accessed through an online data portal (`www.waterhypernet.org`_).
+Via waterhypernet.org, monthly and yearly zip files with all the available products per site and per level (i.e., L1C and LA) can be downloaded.
 
+The following lines are also useful terminal commands to access the data. For instance to get the number of directories::
 
+$ ls | wc -l
+$ ls -dq *SEQ* | wc -l
+
+To list all directories::
+
+$ ls /waterhypernet/HYPSTAR/Raw/MAFR/DATA > MAFR_seqlist.csv
+
+To investigate the directory size::
+
+$ du -sh (readable direcotry size)
 
 **land network**
 The L1B and L2A data for the land HYPERNET data can also be accessed through an online data portal (`www.landhypernet.org.uk`_).
