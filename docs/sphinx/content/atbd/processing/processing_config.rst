@@ -273,59 +273,182 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Default: 3
      - Default: 3
 
-[Air_water_inter_correction]
-rhof_option: Mobley1999
-rhof_default: 0.0256
-wind_ancillary: GDAS
-wind_default: 2.0
-wind_max_time_diff: 10
-met_dir=/home/cgoyens/waterhypernet/Ancillary/GDAS/
-thredds_url=https://thredds.rda.ucar.edu/thredds
-rhymer_data_dir:./rhymer/data
-rholut:rhoTable_AO1999
 
-[VariabilityCheck]
-## scale ed with cos sun zenith for variability check
-ed_cos_sza: True
-no_go_zone:/home/cgoyens/HYPSTAR/Ancillary/nogo_zone/azimuth_range.config
+.. list-table:: [Air_water_inter_correction]
+   :widths: 25 50 25
+   :header-rows: 1
 
-[SimSpecSettings]
-similarity_test: False
-similarity_correct: True
-similarity_wr: 670
-similarity_wp: 0.05
-similarity_w1: 780
-similarity_w2: 870
-similarity_alpha: 0.523
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - rhof_option
+     - rhof_default
+     - wind_ancillary
+     - wind_default
+     - met_dir
+     - thredds_url
+     - rhymer_data_dir
+     - rholut
+   * - Option to be used for the correction of the air-water interface reflectance factor.
+     - Default value to be used in case above method fails and/or if no method is given.
+     - Source for wind speed to be used for the air-water interface reflectance factor.
+     - Default wind speed value if above method fails and/or no wind speed is provided.
+     - Path to directory with ancillary data files for wind speed. If `wind_ancillary` is set to GDAS and no wind speed is present for the given dat and location, wind speed is extracted from https://thredds.rda.ucar.edu/thredds and saved in the `met_dir` directory for later (re)processing.
+     - URL for wind source if no wind speed is found for time and location in `met_dir`.
+     - Data directory for ancillary data to be used within RHYMER (e.g., directory including LUT for air-water interface reflectance correction).
+     - Name of LUT to be used to retrieve the air-water interface reflectance factor.
+   * - e.g., Mobley1999
+     - Default: 0.0256
+     - e.g.,  GDAS
+     - Default: 2.0
+     - e.g., /waterhypernet/Ancillary/GDAS/
+     - e.g., https://thredds.rda.ucar.edu/thredds
+     - e.g., ./rhymer/data
+     - e.g., rhoTable_AO1999
 
-[WaterFinalMeasurementTest]
-test_measurement: True
-test_sun_wave: 750
-test_sun_threshold: 0.05
-test_var_wave: 780
-test_var_threshold: 0.10
 
-[Output]
-product_format = netcdf
-remove_vars_strings:
-remove_vars_strings_L2:
-write_l0a: True
-write_l0b: True
-write_l1a: True
-write_l1b: True
-write_l1c: True
-write_l2a: True
+.. list-table:: [Air_water_inter_correction]
+   :widths: 25 50 25
+   :header-rows: 1
 
-[Plotting]
-plotting_format = png
-plot_fontsize = 14
-plot_legendfontsize = 10
-plot_l0: True
-plot_l1a: True
-plot_l1a_diff: True
-plot_l1b: True
-plot_l1c: False
-plot_l2a: True
-plot_uncertainty: True
-plot_correlation: False
-plot_clear_sky_check=True
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - ed_cos_sza
+     - no_go_zone
+   * - Boolean wether or not the irradiance is normalized by the cosinus of the solar zenith angle before the above quality checks are applied (i.e., irr_variability_percent)
+     - Place holder to include the path to an site specific configuration file
+   * - True or flase
+     - e.g., /waterhypernet/Ancillary/nogo_zone/azimuth_range.config (not used yet)
+
+
+.. list-table:: [SimSpecSettings]
+   :widths: 25 50 25
+   :header-rows: 1
+
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - similarity_test
+     - similarity_correct
+     - similarity_wr
+     - similarity_wp
+     - similarity_w1
+     - similarity_w2
+     - similarity_alph
+   * - Apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152)
+     - Apply similarity correction
+     - Reference wavelength to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
+     - Threshold to be used to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
+     - Reference wavelength 1 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
+     - Reference wavelength 2 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
+     - Similarity reflectance spectrum for the two wavelength, similarity_w1 and similarity_w2, to apply the NIR Similarity Correction (see Table 1 in Ruddick et al., 2006 DOI: 10.2307/3841124).
+   * - Default: False
+     - Default: True
+     - Default: 670
+     - Default: 0.05
+     - Default: 780
+     - Default: 870
+     - Default: 0.523
+
+.. list-table:: [WaterFinalMeasurementTest]
+   :widths: 25 50 25
+   :header-rows: 1
+
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - test_measurement: True
+     - test_sun_wave: 750
+     - test_sun_threshold: 0.05
+     - test_var_wave: 780
+     - test_var_threshold: 0.10
+   * - test_measurement: True
+     - test_sun_wave: 750
+     - test_sun_threshold: 0.05
+     - test_var_wave: 780
+     - test_var_threshold: 0.10
+   * - test_measurement: True
+     - test_sun_wave: 750
+     - test_sun_threshold: 0.05
+     - test_var_wave: 780
+     - test_var_threshold: 0.10
+
+.. list-table:: [Output]
+   :widths: 25 50 25
+   :header-rows: 1
+
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - product_format = netcdf
+     - remove_vars_strings:
+     - remove_vars_strings_L2:
+     - write_l0a: True
+     - write_l0b: True
+     - write_l1a: True
+     - write_l1b: True
+     - write_l1c: True
+     - write_l2a: True
+   * - product_format = netcdf
+     - remove_vars_strings:
+     - remove_vars_strings_L2:
+     - write_l0a: True
+     - write_l0b: True
+     - write_l1a: True
+     - write_l1b: True
+     - write_l1c: True
+     - write_l2a: True
+   * - product_format = netcdf
+     - remove_vars_strings:
+     - remove_vars_strings_L2:
+     - write_l0a: True
+     - write_l0b: True
+     - write_l1a: True
+     - write_l1b: True
+     - write_l1c: True
+     - write_l2a: True
+
+.. list-table:: [Plotting]
+   :widths: 25 50 25
+   :header-rows: 1
+
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - plotting_format = png
+     - plot_fontsize = 14
+     - plot_legendfontsize = 10
+     - plot_l0: True
+     - plot_l1a: True
+     - plot_l1a_diff: True
+     - plot_l1b: True
+     - plot_l1c: False
+     - plot_l2a: True
+     - plot_uncertainty: True
+     - plot_correlation: False
+     - plot_clear_sky_check=True
+   * - plotting_format = png
+     - plot_fontsize = 14
+     - plot_legendfontsize = 10
+     - plot_l0: True
+     - plot_l1a: True
+     - plot_l1a_diff: True
+     - plot_l1b: True
+     - plot_l1c: False
+     - plot_l2a: True
+     - plot_uncertainty: True
+     - plot_correlation: False
+     - plot_clear_sky_check=True
+   * - plotting_format = png
+     - plot_fontsize = 14
+     - plot_legendfontsize = 10
+     - plot_l0: True
+     - plot_l1a: True
+     - plot_l1a_diff: True
+     - plot_l1b: True
+     - plot_l1c: False
+     - plot_l2a: True
+     - plot_uncertainty: True
+     - plot_correlation: False
+     - plot_clear_sky_check=True
