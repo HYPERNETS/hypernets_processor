@@ -40,7 +40,7 @@ All PDF are assumed to be Gaussian with the input quantities as the mean and the
 
 Once all the uncertainties and their correlation have been quantified, punpy can be used to perform the Propagation and summarizing stage of MC. 
 Punpy returns the measurand (calibrated (ir)radiances for L1A) as well as the uncertainties and correlation matrix w.r.t. wavelength.
-All the HYPERNETS products are stored as digital effects tables (see `https://www.comet-toolkit.org/tools/obsarray/`_), meaning that all the uncertainties and error correlation information
+All the HYPERNETS products are stored as digital effects tables (see `<https://www.comet-toolkit.org/tools/obsarray/>`_), meaning that all the uncertainties and error correlation information
 have been stored in a machine-readable format using a structured metadata standard.
 
 For the processing to L1B, the input quantities are simply the measurands from L1A, for which the uncertainties and error-correlation are already defined. 
