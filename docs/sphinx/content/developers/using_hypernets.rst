@@ -36,7 +36,7 @@ To investigate the directory size::
 $ du -sh (readable direcotry size)
 
 **land network**
-The L1B and L2A data for the land HYPERNET data can also be accessed through an online data portal (`www.landhypernet.org.uk`_).
+The L1B and L2A data for the land HYPERNET data can also be accessed through an online data portal (`<www.landhypernet.org.uk>`_).
 In addition to downloading monthly zip files with all the available products per site, it is also possible to query the achive database,
 and inspect and download sequences satisfying certain conditions (e.g. only sequences within a certain time-of-day range).
 

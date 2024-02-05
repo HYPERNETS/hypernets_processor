@@ -14,34 +14,37 @@ __status__ = "Development"
 archive_path = r"/home/data/insitu/hypernets/archive"
 
 files_archive = [
-    "archive_ATGE.db",
-    "archive_BASP.db",
+    # "archive_ATGE.db",
+    # "archive_BASP.db",
     "archive_DEGE.db",
-    "archive_GHNA.db",
-    "archive_IFAR.db",
-    "archive_PEAN.db",
-    "archive_WWUK.db",
-    "archive_JAES.db",
+    #"archive_GHNA.db",
+    #"archive_IFAR.db",
+    #"archive_LOBE.db",
+    #"archive_PEAN.db",
+    # "archive_WWUK.db",
+    #"archive_JAES.db",
 ]
 files_anomaly = [
-    "anomaly_ATGE.db",
-    "anomaly_BASP.db",
+    # "anomaly_ATGE.db",
+    # "anomaly_BASP.db",
     "anomaly_DEGE.db",
-    "anomaly_GHNA.db",
-    "anomaly_IFAR.db",
-    "anomaly_PEAN.db",
-    "anomaly_WWUK.db",
-    "anomaly_JAES.db",
+    #"anomaly_GHNA.db",
+    #"anomaly_IFAR.db",
+    #"anomaly_LOBE.db",
+    #"anomaly_PEAN.db",
+    # "anomaly_WWUK.db",
+    #"anomaly_JAES.db",
 ]
 files_metadata = [
-    "metadata_ATGE.db",
-    "metadata_BASP.db",
+    # "metadata_ATGE.db",
+    # "metadata_BASP.db",
     "metadata_DEGE.db",
-    "metadata_GHNA.db",
-    "metadata_IFAR.db",
-    "metadata_PEAN.db",
-    "metadata_WWUK.db",
-    "metadata_JAES.db",
+    # "metadata_GHNA.db",
+    #"metadata_IFAR.db",
+    #"metadata_LOBE.db",
+    # "metadata_PEAN.db",
+    # "metadata_WWUK.db",
+    # "metadata_JAES.db",
 ]
 
 out_archive = "archive.db"
@@ -78,7 +81,8 @@ def merge(outfile, file, table_name):
         )
         id_prev = list(cursor_a.execute("SELECT id FROM " + table_name))
         if len(id_prev) > 0:
-            index_prev = id_prev[-1]
+            #index_prev = id_prev[-1]
+            index_prev = [len(id_prev)]
             for i, row in enumerate(cursor_b.execute("SELECT * FROM " + table_name)):
                 row = ["none" if (is_invalid(v)) else v for v in row]
                 row[0] += int(index_prev[0])

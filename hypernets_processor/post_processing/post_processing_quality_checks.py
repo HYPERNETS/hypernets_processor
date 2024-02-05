@@ -9,6 +9,8 @@ import matplotlib as mpl
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+myFmt = mdates.DateFormatter('%y-%m-%d')
 import pysolar
 import datetime
 import glob
@@ -33,10 +35,10 @@ plotter = Plotting("", plot_path, ".png")
 
 bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
            "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
-           "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR"]
-check_flags = ["single_irradiance_use"]
+           "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR", "single_irradiance_used"]
+check_flags = ["single_irradiance_used"]
 
-colors = ["red", "green", "blue", "magenta", "yellow", "cyan", "black", "orange", "navy", "gray", "brown",
+colors = ["black", "yellow", "cyan", "red", "green", "blue", "magenta", "orange", "navy", "gray", "brown",
           "greenyellow", "purple"]
 
 
@@ -115,7 +117,7 @@ def make_time_series_plot(
                     fit_poly_n=fit_poly_n,
                     n_max_points=n_max_points,
                 )
-                # print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean,std)
+                # print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean.shape, hour_ids.shape,times_sec.shape, times.shape, np.where(np.isnan(measurand_wav[hour_ids])))
                 plt.plot(times[hour_ids], mean, color=color, linestyle="-")
                 plt.plot(
                     times[hour_ids],
@@ -181,13 +183,15 @@ def make_time_series_plot(
         plt.ylim(
             [
                 min(valids) - 0.3 * (max(valids) - min(valids)),
-                max(1, max(valids) + 0.3 * (max(valids) - min(valids))),
+                max(0, max(valids) + 0.3 * (max(valids) - min(valids))),
             ]
         )
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
-        plt.savefig(os.path.join(plot_path, "qc_%s_%s.png" % (tag, wavs[i])), dpi=300)
+        plt.gca().xaxis.set_major_formatter(myFmt)
+        plt.xticks(rotation=45)
+        plt.savefig(os.path.join(plot_path, "qc_%s_%s.png" % (tag, wavs[i])), dpi=300, bbox_inches="tight")
         plt.clf()
         print("plot done ", os.path.join(plot_path, "qc_%s_%s.png" % (tag, wavs[i])))
     return mask
@@ -224,11 +228,12 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         )
         if ds is None or len(ds.series)==0:
             mask[i] = 1
-            times[i] = datetime.datetime.utcfromtimestamp(0)
+            times[i] = times[i-1]
             #print("bad angle for file:", vza, vaa, files[i])
             continue
 
         flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], bad_flags)
+        flagged_check = DatasetUtil.get_flags_mask_or(ds["quality_flag"], check_flags)
 
         if len(ds.quality_flag.values) == 1:
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
@@ -239,17 +244,25 @@ def extract_reflectances(files, wavs, vza, vaa, site):
 
             if not flagged:
                 mask[i] = 0
-            else:
-                print(site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+            # else:
+            #     print(site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+
+            if flagged_check:
+                print("check",site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+
 
         else:
             if not any(flagged):
                 mask[i] = 0
+
+            if any(flagged_check):
+                print("check",site,times[i],ds.quality_flag.values,[DatasetUtil.get_set_flags(flag) for flag in ds["quality_flag"]],files[i])
+
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = np.mean(ds.reflectance.values[ids, :])
             print(ds, ds.acquisition_time.values[:])
             times[i] = datetime.datetime.utcfromtimestamp(
-                np.mean(ds.acquisition_time)
+                np.mean(ds.acquisition_time.values)
             )
     return times, refl, mask
 
@@ -317,12 +330,11 @@ def sigma_clip(
     fit_poly_n=0,
     n_max_points=0,
 ):
+    mask = np.zeros([len(values)])
+
     # Remove NaNs from input values
     values = np.array(values)
-    values = values[np.where(np.isnan(values) == False)]
-    values_original = np.copy(values)
-
-    mask = np.zeros([len(values)])
+    mask[np.where(np.isnan(values))]=2
 
     # Continue loop until result converges
     diff = 10e10
@@ -400,6 +412,7 @@ def fit_2weekbins(xvals, yvals, mask):
 
 
 def vegetation_checks(ds, iseries):
+    print(ds["reflectance"].values.shape, ds.wavelength.values.shape, np.argmin(np.abs(ds.wavelength.values - 490)), iseries)
     b2 = ds["reflectance"].values[
         np.argmin(np.abs(ds.wavelength.values - 490)), iseries
     ]  # 490 nm
@@ -435,21 +448,23 @@ if __name__ == "__main__":
     wavs = [500, 900, 1100, 1600]
     hour_bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
     sites = [
+        "IFAR",
         "GHNA",
         "WWUK",
-        # "ATGE",
-        # "BASP",
+        "ATGE",
+        "BASP",
         # "PEAN1A",
         # "PEAN1B",
         # "PEAN1C",
-        # "PEAN2",
-        # "DEGE",
-        # "IFAR",
+        "PEAN",
+        "DEGE",
+        "LOBE",
+        "JAES"
     ]
-    sites = ["WWUK"]
+    # sites = ["WWUK"]
     sites_thresh = [2, 2, 2, 2, 2, 2, 2, 2, 3, 3]
-    sites_thresh = [2]
-    sites_points = [0]
+    # sites_thresh = [2]
+    # sites_points = [0]
 
     if not os.path.exists(out_path):
         os.makedirs(out_path)
@@ -489,7 +504,12 @@ if __name__ == "__main__":
             times, refl, mask = extract_reflectances(files, wavs, vza, vaa, site)
             if site == "WWUK" or site == "BASP":
                 for ifile in range(len(site_ds)):
-                    if not vegetation_checks(site_ds[ifile], iseries):
+                    iseries_file=np.argmin((
+                            site_ds[ifile]["viewing_zenith_angle"].values - vza
+                        ) ** 2 + (
+                            np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
+                        ) ** 2)
+                    if not vegetation_checks(site_ds[ifile], iseries_file):
                         mask[ifile] = 3
             if True:
                 mask2 = make_time_series_plot(
@@ -499,7 +519,7 @@ if __name__ == "__main__":
                     mask,
                     hour_bins,
                     "%s_%s_%s" % (site, vza, vaa),
-                    n_max_points=sites_points[isite],
+                    #n_max_points=sites_points[isite],
                     sigma_thresh=sites_thresh[isite],
                 )
                 for ifile in range(len(site_ds)):
@@ -516,13 +536,18 @@ if __name__ == "__main__":
                             "placeholder1", "postprocessing_outliers"
                         )
 
+                    iseries_file = np.argmin((
+                                                     site_ds[ifile]["viewing_zenith_angle"].values - vza
+                                             ) ** 2 + (
+                                                 np.abs(site_ds[ifile]["viewing_azimuth_angle"].values - vaa)
+                                             ) ** 2)
                     if mask2[ifile] > 0:
-                        ds_curr.reflectance[:, iseries] *= np.nan
-                        ds_curr.u_rel_random_reflectance[:, iseries] *= np.nan
-                        ds_curr.u_rel_systematic_reflectance[:, iseries] *= np.nan
-                        ds_curr.std_reflectance[:, iseries] *= np.nan
+                        ds_curr.reflectance[:, iseries_file] *= np.nan
+                        ds_curr.u_rel_random_reflectance[:, iseries_file] *= np.nan
+                        ds_curr.u_rel_systematic_reflectance[:, iseries_file] *= np.nan
+                        ds_curr.std_reflectance[:, iseries_file] *= np.nan
                         if mask2[ifile] == 2:
-                            ds_curr.quality_flag[iseries] = 16
+                            ds_curr.quality_flag[iseries_file] = 16
                         files_nmaskedseries[ifile] += 1
                     site_ds[ifile] = ds_curr
 
@@ -546,7 +571,7 @@ if __name__ == "__main__":
                         site_ds[ifile].attrs["site_longitude"],
                     )
                 )
-                plotter.plot_series_in_sequence("reflectance", site_ds[ifile])
+                # plotter.plot_series_in_sequence("reflectance", site_ds[ifile])
                 # plotter.plot_series_in_sequence_vaa("reflectance", site_ds[ifile], 98)
                 # plotter.plot_series_in_sequence_vza("reflectance", site_ds[ifile], 30)
         f.close()

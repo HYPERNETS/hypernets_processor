@@ -72,7 +72,7 @@ ANOMALIES_DICT = {
     },
     "cl": {
         "description": "No clear sky irradiance in sequence (i.e. overcast conditions)",
-        "error": ValueError,
+        "error": None,
         "error_msg": "No clear sky irradiance in sequence (i.e. overcast conditions)",
     },
     "in": {
@@ -84,13 +84,13 @@ ANOMALIES_DICT = {
         "description": "There are series missing from the standard sequence (either because not present, "
         "or flagged by `not_enough_dark_scans', `not_enough_irr_scans', `not_enough_rad_scans' "
         "or `vza_irradiance').",
-        "error": ValueError,
-        "error_msg": "series missing from the standard sequence",
+        "error": None,
+        "error_msg": "There are series missing from the standard sequence",
     },
     "d": {
         "description": "Discontinuity between VNIR and SWIR",
         "error": None,
-        "error_msg": None,
+        "error_msg": "Discontinuity between VNIR and SWIR",
     },
     "mf": {
         "description": "Invalid sequence,files mentioned in metadatafile are missing in DATA directory",
