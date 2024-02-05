@@ -113,6 +113,36 @@ Updates
 
 Updates to the processor are then made by merging release branches onto the operational branch.
 
+Processing databases
+-------
+
+During the data processing three sqlite databases are populated :ref:`SQL_databases`.
+These databases can be viewed in a terminal using, for instance, sqlite3.
+To open the anomaly database::
+
+$ sqlite3 anomaly.db
+
+In sqlite select anomalies based on site id and/or anomaly id (:ref:`SQL_databases`)::
+
+$ sqlite> SELECT * FROM anomalies WHERE site_id=="VEIT" AND anomaly_id=="x";
+
+Get more information about the anomalies table::
+
+$.schema anomalies
+
+To open the archive database and check the products, you can use the following commands::
+
+$ sqlite3 anomaly.db
+$ sqlite> PRAGMA table_info(products);
+
+To investigate specific products, e.g., based on date, processing level and or processing version::
+
+$ sqlite> SELECT * FROM products WHERE sequence_name LIKE "%SEQ2023%";
+$ sqlite> SELECT * FROM products WHERE product_level =="L2A";
+$ SELECT * FROM products WHERE product_name LIKE '%v1.0.nc%';
+
+To quit, use CTRL+D.
+
 Examples
 -------------------
 
@@ -127,25 +157,48 @@ the following fields are required (examples in bold):
 * Update network, currently 'w' (y/n) [n]: **y**
 * Set network default config values (overwrites existing) (y/n) [y]: **y**
 * Update archive_directory, currently '/home/hypstar/Processed' (y/n) [n]: **y**
-* Set archive_directory: **/waterhypernet/HYPSTAR/Processed**
+* Set archive_directory: **/waterhypernet/hypstar/processed**
 * Update processor_working_directory, currently '/home/rhymer/.hypernets' (y/n) [n]:**y**
 * Set processor_working_directory: **/home/processor/working_directory**
 * Update metadata_db_url, currently 'sqlite:////waterhypernet/hypstar/Processed/metadata.db' (y/n) [n]:**y**
-* Set metadata_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db**
+* Set metadata_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/hypstar/processed/metadata.db**
 * Update anomaly_db_url, currently 'sqlite:////waterhypernet/hypstar/Processed/anomaly.db' (y/n) [n]:**y**
-* Set anomaly_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/HYPSTAR/Processed/anomaly.db**
+* Set anomaly_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/hypstar/processed/anomaly.db**
 * Update archive_db_url, currently 'sqlite:////waterhypernet/hypstar/Processed/archive.db' (y/n) [n]:**y**
-* Set archive_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/HYPSTAR/Processed/archive.db**
+* Set archive_db_url [sqlite:////waterhypernet/HYPSTAR/Processed/metadata.db]: **sqlite:////waterhypernet/hypstar/processed/archive.db**
 
 Once the processor configuration has been setup, jobs need to be initiated using the following command ::
 
 $ hypernets_processor_job_init -n M1BE -s M1BE -w /home/processor/working_directory/ -i /waterhypernet/HYPSTAR/Raw/M1BE/DATA/ --add-to-scheduler
 
-Note, several jobs can be initiated in the single `jobs.txt` file using the same line as above adding the proper directory for each site.
+Note, several jobs can be initiated in the single `jobs.txt` file using the same line as above with the site specific raw data directory and processing name for each site.
+Before launching the scheduler, ensure that the following configuration files are present in your working directory:
+
+* [site_id].config : For instance, for the above example, M1BE.config, contains all the input parameters for the processing of this particular job.
+* processor.config : Contains the common input parameters for all the jobs initiated in `jobs.txt`.
+* scheduler.config : Includes input parameters for the scheduler.
 
 
-nohup hypernets_scheduler &
+Next, launch the hypernets scheduler as follow::
 
-[3] 13091
-(procv2) rhymer@enhydra:~/.hypernets/lparproc$ nohup: ignoring input and appending output to 'nohup.out'
+$ hypernets_scheduler
+
+Or use nohup, screen or any other tool allowing to run commands in background. Using nohup, the hypernets_scheduler can be launched::
+
+$ nohup hypernets_scheduler &
+
+Once launched, the following log files will be populated with all the required notifications about the ongoing processing.
+
+* [site_id].log (e.g., M1BE.log)
+* scheduler.log
+
+An handy command that lists the ongoing nohup tasks is:
+
+$ lsof | grep nohup.out
+
+If an ongoing nohup task needs to be aborted, kill the task with:
+
+$ kill -9 [ID of the ongoing processing]
+
+
 
