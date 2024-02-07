@@ -42,26 +42,25 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - siteid
-     - offset_pan
-     - offset_tilt
-     - azimuth_switch
-     - latitude
-     - longitude
-     - angle2use
-   * - site id as given in the jobs list
+     - site id as given in the jobs list
+     - e.g., VEIT
+   * - offset_pan
      - offset pan with true North
+     - default 0°
+   * - offset_tilt
      - offset tilt with Nadir
+     - default 0°
+   * - azimuth_switch
      - angle for which the system switches 180° relative to the requested angle
+     - default 0°
+   * - latitude
      - system latitude
-     - system longitude
-     - Ange used to compute the viewing geometry (i.e., pt_ref is the pan
-        and tilt angles with the HYPSTAR as reference - use offset pan and tilt to retrieve viewing geometry with true North)
-   * - e.g., VEIT
-     - default 0°
-     - default 0°
-     - default 0°
      - latitude of site
+   * - longitude
+     - system longitude
      - longitude of site
+   * - angle2use
+     - Ange used to compute the viewing geometry (i.e., pt_ref is the pan and tilt angles with the HYPSTAR as reference - use offset pan and tilt to retrieve viewing geometry with true North)
      - pt_ref, pt_ask or pt_abs
 
 
@@ -74,25 +73,25 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - version
-     - network
-     - mcsteps
-     - max_level
-     - uncertainty_l1a
-     - bad_wavelenth_ranges
-     - verbose
-   * - version number of the processor
+     - version number of the processor
+     -
+   * - network
      - network, i.e.,'l' for land network or 'w' for water network
-     - number of photons for MC simulation for computation of the uncertainties (if 0, no uncertainties)
-     - maximum level of processing
-     - uncertainty computation of the level L1A
-     - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
-     - printing warnings and errors in terminal
-   * -
      - l/w
+   * - mcsteps
+     - number of photons for MC simulation for computation of the uncertainties (if 0, no uncertainties)
      - 0 no uncertainties, suggested > 100 when uncertainties
+   * - max_level
+     - maximum level of processing
      - default: L2A
+   * - uncertainty_l1a
+     - uncertainty computation of the level L1A
      - default: False
+   * - bad_wavelenth_ranges
+     - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
      - default: 757.5-767.5, 1350-1390
+   * - verbose
+     - printing warnings and errors in terminal
      - default: False
 
 
@@ -105,38 +104,17 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - to_archive
-     - metadata_db_url
-     - archive_db_url
-     - anomaly_db_url
-   * - if True, the processor will save all products, anomalies and metadata in the archive, anomaly and metadata database.
+     - if True, the processor will save all products, anomalies and metadata in the archive, anomaly and metadata database.
+     - True/False
+   * - metadata_db_url
      - path to sql database for the metadata
+     - e.g., sqlite:///waterhypernet/HYPSTAR/Processed/metadata.db
+   * - archive_db_url
      - path to sql database for the archive
+     - e.g., sqlite:///waterhypernet/HYPSTAR/Processed/archive.db
+   * - anomaly_db_url
      - path to sql database for the anoamlies
-   * - True/False
-     - e.g., sqlite:////home/cgoyens/waterhypernet/HYPSTAR/Processed/metadata.db
-     - e.g., sqlite:////home/cgoyens/waterhypernet/HYPSTAR/Processed/archive.db
-     - e.g., sqlite:////home/cgoyens/waterhypernet/HYPSTAR/Processed/anomaly.db
-
-
-.. list-table:: [Databases]
-   :widths: 10 20 10
-   :header-rows: 1
-
-   * - Configuration parameter
-     - Definition
-     - Options/example
-   * - to_archive
-     - metadata_db_url
-     - archive_db_url
-     - anomaly_db_url
-   * - if True, the processor will save all products, anomalies and metadata in the archive, anomaly and metadata database.
-     - path to sql database for the metadata
-     - path to sql database for the archive
-     - path to sql database for the anoamlies
-   * - True/False
-     - e.g., sqlite:////home/cgoyens/waterhypernet/HYPSTAR/Processed/metadata.db
-     - e.g., sqlite:////home/cgoyens/waterhypernet/HYPSTAR/Processed/archive.db
-     - e.g., sqlite:////home/cgoyens/waterhypernet/HYPSTAR/Processed/anomaly.db
+     - e.g., sqlite:///waterhypernet/HYPSTAR/Processed/anomaly.db
 
 
 .. list-table:: [Metadata]
@@ -146,12 +124,12 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - Configuration parameter
      - Definition
    * - comment
-     - creator_name
-     - creator_email
-     - responsible_party
-   * - Comment that should be added within the metadata of each processed file.
+     - Comment that should be added within the metadata of each processed file.
+   * - creator_name
      - Name of the creator of the processed files.
+   * - creator_email
      - Contact email of the creator.
+   * - responsible_party
      - Responsible party
 
 
@@ -161,9 +139,11 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
 
    * - Configuration parameter
      - Definition
+     - Options/example
    * - model
-   * - Model that should be followed by the processor to read the filenames of the raw SPE files.
-   * - default: series_rep,series_id,vaa,azimuth_ref,vza,mode,action,it,scan_total,series_time
+     - Model that should be followed by the processor to read the filenames of the raw SPE files.
+     - default: series_rep, series_id, vaa, azimuth_ref, vza, mode, action, it, scan_total, series_time
+
 
 
 .. list-table:: [Quality]
@@ -174,44 +154,45 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - l0_threshold
-     - l0_discontinuity
-     - bad_pointing_threshold_zenith
-     - bad_pointing_threshold_azimuth
-     - irradiance_zenith_treshold
-     - n_valid_irr
-     - n_valid_dark
-     - n_valid_rad
-     - irr_variability_percent
-     - ld_variability_percent
-     - diff_wave
-     - diff_threshold
-     - clear_sky_check
-   * - Threshold for the maximum digital number over which the spectrum is considered to saturate (triggering saturation flag)
+     - Threshold for the maximum digital number over which the spectrum is considered to saturate (triggering saturation flag)
+     - Default: 64000
+   * - l0_discontinuity
      - Threshold for the maximum difference in digital number between two neighbouring wavelengths (triggering discontinuity flag)
-     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle (in degrees, i.e., difference between pt_ref and pt_abs).
-     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) azimuth angle (in degrees, i.e., difference between pt_ref and pt_abs).
-     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle for irradiance measurements (in degrees, i.e., difference between pt_ref and pt_abs).
-     - Minimum number of valid irradiance scans for a single series.
-     - Minimum number of valid dark scans for a single series.
-     - Minimum number of valid radiance scans for a single series.
-     - Threshold for the coefficient of variation (in percentage) between series of irradiance within a singe sequence (if only one series within a sequence this quality check is not raised).
-     - Threshold for the coefficient of variation (in percentage) between series of downwelling radiance within a singe sequence
-     - Wavelength used to check temporal variability in downwelling, upwelling radiance and irradiance (for water network only)
-     - Threshold used for the temporal variability in downwelling, upwelling radiance and irradiance (for water network only) between scans in L1C data.
-     - Compare irradiance series with simulated clear sky
-   * - Default: 64000
      - Default: 10000
+   * - bad_pointing_threshold_zenith
+     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle (in degrees, i.e., difference between pt_ref and pt_abs).
      - Default: 3
+   * - bad_pointing_threshold_azimuth
+     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) azimuth angle (in degrees, i.e., difference between pt_ref and pt_abs).
      - Default: 3
+   * - irradiance_zenith_treshold
+     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle for irradiance measurements (in degrees, i.e., difference between pt_ref and pt_abs).
      - Default: 2
+   * - n_valid_irr
+     - Minimum number of valid irradiance scans for a single series.
      - Default: 3
+   * - n_valid_dark
+     - Minimum number of valid dark scans for a single series.
      - Default: 3
+   * - n_valid_rad
+     - Minimum number of valid radiance scans for a single series.
      - Default: 3
+   * - irr_variability_percent
+     - Threshold for the coefficient of variation (in percentage) between series of irradiance within a singe sequence (if only one series within a sequence this quality check is not raised).
      - Default: 10
+   * - ld_variability_percent
+     - Threshold for the coefficient of variation (in percentage) between series of downwelling radiance within a singe sequence
      - Default: 25
+   * - diff_wave
+     - Wavelength used to check temporal variability in downwelling, upwelling radiance and irradiance (for water network only)
      - Default: 550
+   * - diff_threshold
+     - Threshold used for the temporal variability in downwelling, upwelling radiance and irradiance (for water network only) between scans in L1C data.
      - Default: 0.25
+   * - clear_sky_check
+     - Compare irradiance series with simulated clear sky
      - Default: True
+
 
 
 .. list-table:: [Calibration]
@@ -221,13 +202,12 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - Configuration parameter
      - Definition
      - Options/example
-   * - hypstar_cal_number:120241
-     - measurement_function_calibrate: StandardMeasurementFunction
-   * - HYPSTAR ID number (usually overwritten by the ID number given in the metadata file from the sequence directory)
+   * - hypstar_cal_number
+     - HYPSTAR ID number (usually overwritten by the ID number given in the metadata file from the sequence directory)
+     - e.g., 120241
+   * - measurement_function_calibrate
      - measurement function used for the calibration of the radiance and irradiance scans
-   * - e.g., 120241
      - e.g., StandardMeasurementFunction
-
 
 .. list-table:: [Interpolate]
    :widths: 10 20 10
@@ -237,14 +217,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - measurement_function_interpolate_time
-     - measurement_function_interpolate_time_skyradiance
-     - measurement_function_interpolate_wav
-     - measurement_function_interpolate
-   * - Measurement function used to interpolate the irradiance scans at the timestamp of the upwelling radiance (for the computation of the reflectance).
+     - Measurement function used to interpolate the irradiance scans at the timestamp of the upwelling radiance (for the computation of the reflectance).
+     - e.g., InterpolationTimeLinearCoscorrected
+   * - measurement_function_interpolate_time_skyradiance
      - Measurement function used to interpolate the downwelling radiance scans (for water network only) at the timestamp of the upwelling radiance (for the air-water interface reflectance correction).
-     - Measurement function used to interpolate the irradiance scans at the wavelengths of the upwelling radiance.
-   * - e.g., InterpolationTimeLinearCoscorrected
      - e.g., WaterNetworkInterpolationSkyRadianceLinearCoscorrected
+   * - measurement_function_interpolate_wav
+     - Measurement function used to interpolate the irradiance scans at the wavelengths of the upwelling radiance.
      - e.g., InterpolationWavLinear
 
 
@@ -255,12 +234,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - Configuration parameter
      - Definition
      - Options/example
-   * - measurement_function_surface_reflectance: WaterNetworkProtocol
-     - measurement_function_water_leaving_radiance = WaterNetworkProtocolWaterLeavingRadiance
-   * - Measurement function used for the computation of the surface reflectance.
+   * - measurement_function_surface_reflectance
+     - Measurement function used for the computation of the surface reflectance.
+     - e.g., WaterNetworkProtocol
+   * - measurement_function_water_leaving_radiance = WaterNetworkProtocolWaterLeavingRadiance
      - Measurement function used for the computation of the water leaving radiance (for water network only).
-   * - e.g., WaterNetworkProtocol
      - e.g., WaterNetworkProtocolWaterLeavingRadiance
+
 
 .. list-table:: [WaterStandardProtocol]
    :widths: 10 20 10
@@ -270,13 +250,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - protocol
-     - n_upwelling_rad
-     - n_downwelling_rad
-   * - Protocol for the water network
+     - Protocol for the water network
+     - e.g., WaterNetworkProtocol
+   * - n_upwelling_rad
      - Minimum number of the water network protocol for upwelling radiance
-     - Minimum number of the water network protocol for downwelling radiance
-   * - e.g., WaterNetworkProtocol
      - Default: 3
+   * - n_downwelling_rad
+     - Minimum number of the water network protocol for downwelling radiance
      - Default: 3
 
 
@@ -288,28 +268,28 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - rhof_option
-     - rhof_default
-     - wind_ancillary
-     - wind_default
-     - met_dir
-     - thredds_url
-     - rhymer_data_dir
-     - rholut
-   * - Option to be used for the correction of the air-water interface reflectance factor.
+     - Option to be used for the correction of the air-water interface reflectance factor.
+     - e.g., Mobley1999
+   * - rhof_default
      - Default value to be used in case above method fails and/or if no method is given.
-     - Source for wind speed to be used for the air-water interface reflectance factor.
-     - Default wind speed value if above method fails and/or no wind speed is provided.
-     - Path to directory with ancillary data files for wind speed. If `wind_ancillary` is set to GDAS and no wind speed is present for the given dat and location, wind speed is extracted from https://thredds.rda.ucar.edu/thredds and saved in the `met_dir` directory for later (re)processing.
-     - URL for wind source if no wind speed is found for time and location in `met_dir`.
-     - Data directory for ancillary data to be used within RHYMER (e.g., directory including LUT for air-water interface reflectance correction).
-     - Name of LUT to be used to retrieve the air-water interface reflectance factor.
-   * - e.g., Mobley1999
      - Default: 0.0256
+   * - wind_ancillary
+     - Source for wind speed to be used for the air-water interface reflectance factor.
      - e.g.,  GDAS
+   * - wind_default
+     - Default wind speed value if above method fails and/or no wind speed is provided.
      - Default: 2.0
+   * - met_dir
+     - Path to directory with ancillary data files for wind speed. If `wind_ancillary` is set to GDAS and no wind speed is present for the given dat and location, wind speed is extracted from https://thredds.rda.ucar.edu/thredds and saved in the `met_dir` directory for later (re)processing.
      - e.g., /waterhypernet/Ancillary/GDAS/
+   * - thredds_url
      - e.g., https://thredds.rda.ucar.edu/thredds
+     - URL for wind source if no wind speed is found for time and location in `met_dir`.
+   * - rhymer_data_dir
+     - Data directory for ancillary data to be used within RHYMER (e.g., directory including LUT for air-water interface reflectance correction).
      - e.g., ./rhymer/data
+   * - rholut
+     - Name of LUT to be used to retrieve the air-water interface reflectance factor.
      - e.g., rhoTable_AO1999
 
 
@@ -321,10 +301,10 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - ed_cos_sza
-     - no_go_zone
-   * - Boolean wether or not the irradiance is normalized by the cosinus of the solar zenith angle before the above quality checks are applied (i.e., irr_variability_percent)
+     - Boolean wether or not the irradiance is normalized by the cosinus of the solar zenith angle before the above quality checks are applied (i.e., irr_variability_percent)
+     - True or flase
+   * - no_go_zone
      - Place holder to include the path to an site specific configuration file
-   * - True or flase
      - e.g., /waterhypernet/Ancillary/nogo_zone/azimuth_range.config (not used yet)
 
 
@@ -336,25 +316,25 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - similarity_test
-     - similarity_correct
-     - similarity_wr
-     - similarity_wp
-     - similarity_w1
-     - similarity_w2
-     - similarity_alph
-   * - Apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152)
+     - Apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152)
+     - Default: False
+   * - similarity_correct
      - Apply similarity correction
-     - Reference wavelength to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
-     - Threshold to be used to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
-     - Reference wavelength 1 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
-     - Reference wavelength 2 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
-     - Similarity reflectance spectrum for the two wavelength, similarity_w1 and similarity_w2, to apply the NIR Similarity Correction (see Table 1 in Ruddick et al., 2006 DOI: 10.2307/3841124).
-   * - Default: False
      - Default: True
+   * - similarity_wr
      - Default: 670
+     - Reference wavelength to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
+   * - similarity_wp
+     - Threshold to be used to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
      - Default: 0.05
+   * - similarity_w1
+     - Reference wavelength 1 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
      - Default: 780
+   * - similarity_w2
      - Default: 870
+     - Reference wavelength 2 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
+   * - similarity_alph
+     - Similarity reflectance spectrum for the two wavelength, similarity_w1 and similarity_w2, to apply the NIR Similarity Correction (see Table 1 in Ruddick et al., 2006 DOI: 10.2307/3841124).
      - Default: 0.523
 
 .. list-table:: [WaterFinalMeasurementTest]
@@ -365,19 +345,19 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - test_measurement
-     - test_sun_wave
-     - test_sun_threshold
-     - test_var_wave
-     - test_var_threshold
-   * - Extra quality controls on final products to retain or reject spectra (placeholder, not used yet).
+     - Extra quality controls on final products to retain or reject spectra (placeholder, not used yet).
+     - Default: True (placeholder, not used yet).
+   * - test_sun_wave
      - Wavelength to consider to check the Ld /Ed data (placeholder, not used yet).
-     - Threshold to apply on the Ld/Ed ratio (placeholder, not used yet).
-     - Wavelength to consider to check the final water reflectance data (placeholder, not used yet).
-     - Threshold to apply on the final reflectance data (placeholder, not used yet).
-   * - Default: True (placeholder, not used yet).
      - Default: 750 (placeholder, not used yet).
+   * - test_sun_threshold
+     - Threshold to apply on the Ld/Ed ratio (placeholder, not used yet).
      - Default: 0.05 (placeholder, not used yet).
+   * - test_var_wave
+     - Wavelength to consider to check the final water reflectance data (placeholder, not used yet).
      - Default: 780 (placeholder, not used yet).
+   * - test_var_threshold
+     - Threshold to apply on the final reflectance data (placeholder, not used yet).
      - Default: 0.10 (placeholder, not used yet).
 
 
@@ -389,31 +369,31 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - product_format
-     - remove_vars_strings
-     - remove_vars_strings_L2
-     - write_l0a
-     - write_l0b
-     - write_l1a
-     - write_l1b
-     - write_l1c
-     - write_l2a
-   * - Product format for output file
+     - Product format for output file
+     - default: netcdf
+   * - remove_vars_strings
      - List of names from variables to remove from output files
+     -
+   * - remove_vars_strings_L2
      - List of names from variables to remove from L2 files
+     -
+   * - write_l0a
      - Write output file L0A
+     - default: True
+   * - write_l0b
      - Write output file L0B
+     - default: True
+   * - write_l1a
      - Write output file L1A
+     - default: True
+   * - write_l1b
      - Write output file L1B
+     - default: True
+   * - write_l1c
      - Write output file L1C
+     - default: True
+   * - write_l2a
      - Write output file L2A
-   * - default: netcdf
-     -
-     -
-     - default: True
-     - default: True
-     - default: True
-     - default: True
-     - default: True
      - default: True
 
 .. list-table:: [Plotting]
@@ -424,38 +404,38 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - plotting_format
-     - plot_fontsize
-     - plot_legendfontsize
-     - plot_l0
-     - plot_l1a
-     - plot_l1a_diff
-     - plot_l1b
-     - plot_l1c
-     - plot_l2a
-     - plot_uncertainty
-     - plot_correlation
-     - plot_clear_sky_check
-   * - Format of the figures for the different plots
+     - Format of the figures for the different plots
+     - default: png
+   * - plot_fontsize
      - Fontsize for the axis of the plots
-     - Fontsize for the legends in the plots
-     - Plotting L0 data
-     - Plotting L1A data
-     - Plotting differences in L1A data
-     - Plotting L1B data
-     - Plotting L1C data
-     - Plotting L2A data
-     - Plotting uncertainties
-     - Plotting error correlation matrices
-     - Plotting the irradiance L1B data with the clear-sky simulations used for the clear-sky check.
-   * - default: png
      - default: 14
+   * - plot_legendfontsize
+     - Fontsize for the legends in the plots
      - default: 10
+   * - plot_l0
+     - Plotting L0 data
      - default: True
+   * - plot_l1a
+     - Plotting L1A data
      - default: True
+   * - plot_l1a_diff
+     - Plotting differences in L1A data
      - default: True
+   * - plot_l1b
+     - Plotting L1B data
      - default: True
+   * - plot_l1c
+     - Plotting L1C data
+     - default: True
+   * - plot_l2a
+     - Plotting L2A data
+     - default: True
+   * - plot_uncertainty
+     - Plotting uncertainties
+     - default: True
+   * - plot_correlation
+     - Plotting error correlation matrices
      - default: False
-     - default: True
-     - default: True
-     - default: False
+   * - plot_clear_sky_check
+     - Plotting the irradiance L1B data with the clear-sky simulations used for the clear-sky check.
      - default: True
