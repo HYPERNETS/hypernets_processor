@@ -178,6 +178,8 @@ Before launching the scheduler, ensure that the following configuration files ar
 * processor.config : Contains the common input parameters for all the jobs initiated in `jobs.txt`.
 * scheduler.config : Includes input parameters for the scheduler.
 
+See also :ref:`processing-processing_config` for more details about the processing parameters that can be given.
+
 
 Next, launch the hypernets scheduler as follow::
 

@@ -58,6 +58,7 @@ where:
 * `job_config_path` - path of a job configuration file. See :ref:`user_processor-job_setup` for information on initialising a job configuration file.
 
 Specifying processing with a custom job configuration file allows non-network-default configuration values to be set, for example, chosen calibration function.
+See also :ref:`processing-processing_config` for more details about the processing parameters that can be given.
 
 Examples
 -------------------
