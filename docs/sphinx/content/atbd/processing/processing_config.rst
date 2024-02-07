@@ -32,8 +32,10 @@ The default water processing configuration file can be found in `hypernets_proce
 When add-hoc processing is launched, if the configuration parameters are not explicitly given in the command line (see :ref:`user_adhoc`), these are taken from the default processing configuration file for the considered network.
 Default configuration files can be changed in `hypernets_processor/hypernets_processor/etc/processor_water_defaults.config`.
 
+
+
 .. list-table:: [Site_specific]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -65,7 +67,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
 
 
 .. list-table:: [Processor]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -96,7 +98,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
 
 
 .. list-table:: [Databases]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -117,7 +119,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
 
 
 .. list-table:: [Databases]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -138,7 +140,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
 
 
 .. list-table:: [Metadata]
-   :widths: 25 50
+   :widths: 10 20
    :header-rows: 1
 
    * - Configuration parameter
@@ -152,8 +154,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Contact email of the creator.
      - Responsible party
 
+
 .. list-table:: [Reading]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -164,7 +167,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
 
 
 .. list-table:: [Quality]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -210,8 +213,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Default: 0.25
      - Default: True
 
+
 .. list-table:: [Calibration]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -224,8 +228,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - e.g., 120241
      - e.g., StandardMeasurementFunction
 
+
 .. list-table:: [Interpolate]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -242,8 +247,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - e.g., WaterNetworkInterpolationSkyRadianceLinearCoscorrected
      - e.g., InterpolationWavLinear
 
+
 .. list-table:: [SurfaceReflectance]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -257,7 +263,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - e.g., WaterNetworkProtocolWaterLeavingRadiance
 
 .. list-table:: [WaterStandardProtocol]
-   :widths: 25 50 25
+   :widths: 10 20 10
    :header-rows: 1
 
    * - Configuration parameter
@@ -358,21 +364,22 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - Configuration parameter
      - Definition
      - Options/example
-   * - test_measurement: True
-     - test_sun_wave: 750
-     - test_sun_threshold: 0.05
-     - test_var_wave: 780
-     - test_var_threshold: 0.10
-   * - test_measurement: True
-     - test_sun_wave: 750
-     - test_sun_threshold: 0.05
-     - test_var_wave: 780
-     - test_var_threshold: 0.10
-   * - test_measurement: True
-     - test_sun_wave: 750
-     - test_sun_threshold: 0.05
-     - test_var_wave: 780
-     - test_var_threshold: 0.10
+   * - test_measurement
+     - test_sun_wave
+     - test_sun_threshold
+     - test_var_wave
+     - test_var_threshold
+   * - Extra quality controls on final products to retain or reject spectra (placeholder, not used yet).
+     - Wavelength to consider to check the Ld /Ed data (placeholder, not used yet).
+     - Threshold to apply on the Ld/Ed ratio (placeholder, not used yet).
+     - Wavelength to consider to check the final water reflectance data (placeholder, not used yet).
+     - Threshold to apply on the final reflectance data (placeholder, not used yet).
+   * - Default: True (placeholder, not used yet).
+     - Default: 750 (placeholder, not used yet).
+     - Default: 0.05 (placeholder, not used yet).
+     - Default: 780 (placeholder, not used yet).
+     - Default: 0.10 (placeholder, not used yet).
+
 
 .. list-table:: [Output]
    :widths: 25 50 25
@@ -381,33 +388,33 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - Configuration parameter
      - Definition
      - Options/example
-   * - product_format = netcdf
-     - remove_vars_strings:
-     - remove_vars_strings_L2:
-     - write_l0a: True
-     - write_l0b: True
-     - write_l1a: True
-     - write_l1b: True
-     - write_l1c: True
-     - write_l2a: True
-   * - product_format = netcdf
-     - remove_vars_strings:
-     - remove_vars_strings_L2:
-     - write_l0a: True
-     - write_l0b: True
-     - write_l1a: True
-     - write_l1b: True
-     - write_l1c: True
-     - write_l2a: True
-   * - product_format = netcdf
-     - remove_vars_strings:
-     - remove_vars_strings_L2:
-     - write_l0a: True
-     - write_l0b: True
-     - write_l1a: True
-     - write_l1b: True
-     - write_l1c: True
-     - write_l2a: True
+   * - product_format
+     - remove_vars_strings
+     - remove_vars_strings_L2
+     - write_l0a
+     - write_l0b
+     - write_l1a
+     - write_l1b
+     - write_l1c
+     - write_l2a
+   * - Product format for output file
+     - List of names from variables to remove from output files
+     - List of names from variables to remove from L2 files
+     - Write output file L0A
+     - Write output file L0B
+     - Write output file L1A
+     - Write output file L1B
+     - Write output file L1C
+     - Write output file L2A
+   * - default: netcdf
+     -
+     -
+     - default: True
+     - default: True
+     - default: True
+     - default: True
+     - default: True
+     - default: True
 
 .. list-table:: [Plotting]
    :widths: 25 50 25
@@ -416,39 +423,39 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - Configuration parameter
      - Definition
      - Options/example
-   * - plotting_format = png
-     - plot_fontsize = 14
-     - plot_legendfontsize = 10
-     - plot_l0: True
-     - plot_l1a: True
-     - plot_l1a_diff: True
-     - plot_l1b: True
-     - plot_l1c: False
-     - plot_l2a: True
-     - plot_uncertainty: True
-     - plot_correlation: False
-     - plot_clear_sky_check=True
-   * - plotting_format = png
-     - plot_fontsize = 14
-     - plot_legendfontsize = 10
-     - plot_l0: True
-     - plot_l1a: True
-     - plot_l1a_diff: True
-     - plot_l1b: True
-     - plot_l1c: False
-     - plot_l2a: True
-     - plot_uncertainty: True
-     - plot_correlation: False
-     - plot_clear_sky_check=True
-   * - plotting_format = png
-     - plot_fontsize = 14
-     - plot_legendfontsize = 10
-     - plot_l0: True
-     - plot_l1a: True
-     - plot_l1a_diff: True
-     - plot_l1b: True
-     - plot_l1c: False
-     - plot_l2a: True
-     - plot_uncertainty: True
-     - plot_correlation: False
-     - plot_clear_sky_check=True
+   * - plotting_format
+     - plot_fontsize
+     - plot_legendfontsize
+     - plot_l0
+     - plot_l1a
+     - plot_l1a_diff
+     - plot_l1b
+     - plot_l1c
+     - plot_l2a
+     - plot_uncertainty
+     - plot_correlation
+     - plot_clear_sky_check
+   * - Format of the figures for the different plots
+     - Fontsize for the axis of the plots
+     - Fontsize for the legends in the plots
+     - Plotting L0 data
+     - Plotting L1A data
+     - Plotting differences in L1A data
+     - Plotting L1B data
+     - Plotting L1C data
+     - Plotting L2A data
+     - Plotting uncertainties
+     - Plotting error correlation matrices
+     - Plotting the irradiance L1B data with the clear-sky simulations used for the clear-sky check.
+   * - default: png
+     - default: 14
+     - default: 10
+     - default: True
+     - default: True
+     - default: True
+     - default: True
+     - default: False
+     - default: True
+     - default: True
+     - default: False
+     - default: True
