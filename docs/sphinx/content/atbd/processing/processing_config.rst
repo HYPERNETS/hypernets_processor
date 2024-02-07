@@ -33,8 +33,9 @@ When add-hoc processing is launched, if the configuration parameters are not exp
 Default configuration files can be changed in `hypernets_processor/hypernets_processor/etc/processor_water_defaults.config`.
 
 
+**Table 1: Site_specific**
 
-.. list-table:: [Site_specific]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -63,9 +64,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Ange used to compute the viewing geometry (i.e., pt_ref is the pan and tilt angles with the HYPSTAR as reference - use offset pan and tilt to retrieve viewing geometry with true North)
      - pt_ref, pt_ask or pt_abs
 
+**Table 2: Processor**
 
-
-.. list-table:: [Processor]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -95,8 +96,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - default: False
 
 
+**Table 3: Databases**
 
-.. list-table:: [Databases]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -116,8 +118,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - path to sql database for the anoamlies
      - e.g., sqlite:///waterhypernet/HYPSTAR/Processed/anomaly.db
 
+**Table 4: Metadata**
 
-.. list-table:: [Metadata]
+.. list-table::
    :widths: 10 20
    :header-rows: 1
 
@@ -132,8 +135,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - responsible_party
      - Responsible party
 
+**Table 5: Reading**
 
-.. list-table:: [Reading]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -145,8 +149,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - default: series_rep, series_id, vaa, azimuth_ref, vza, mode, action, it, scan_total, series_time
 
 
+**Table 6: Quality**
 
-.. list-table:: [Quality]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -194,8 +199,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Default: True
 
 
+**Table 7: Calibration**
 
-.. list-table:: [Calibration]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -209,7 +215,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - measurement function used for the calibration of the radiance and irradiance scans
      - e.g., StandardMeasurementFunction
 
-.. list-table:: [Interpolate]
+**Table 8: Interpolate**
+
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -226,8 +234,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Measurement function used to interpolate the irradiance scans at the wavelengths of the upwelling radiance.
      - e.g., InterpolationWavLinear
 
+**Table 9: SurfaceReflectance**
 
-.. list-table:: [SurfaceReflectance]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -237,12 +246,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - measurement_function_surface_reflectance
      - Measurement function used for the computation of the surface reflectance.
      - e.g., WaterNetworkProtocol
-   * - measurement_function_water_leaving_radiance = WaterNetworkProtocolWaterLeavingRadiance
+   * - measurement_function_water_leaving_radiance
      - Measurement function used for the computation of the water leaving radiance (for water network only).
      - e.g., WaterNetworkProtocolWaterLeavingRadiance
 
+**Table 10: WaterStandardProtocol**
 
-.. list-table:: [WaterStandardProtocol]
+.. list-table::
    :widths: 10 20 10
    :header-rows: 1
 
@@ -259,8 +269,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Minimum number of the water network protocol for downwelling radiance
      - Default: 3
 
+**Table 11: Air_water_inter_correction**
 
-.. list-table:: [Air_water_inter_correction]
+.. list-table::
    :widths: 25 50 25
    :header-rows: 1
 
@@ -292,8 +303,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Name of LUT to be used to retrieve the air-water interface reflectance factor.
      - e.g., rhoTable_AO1999
 
+**Table 12: VariabilityCheck**
 
-.. list-table:: [Air_water_inter_correction]
+.. list-table::
    :widths: 25 50 25
    :header-rows: 1
 
@@ -307,8 +319,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Place holder to include the path to an site specific configuration file
      - e.g., /waterhypernet/Ancillary/nogo_zone/azimuth_range.config (not used yet)
 
+**Table 13: SimSpecSettings**
 
-.. list-table:: [SimSpecSettings]
+.. list-table::
    :widths: 25 50 25
    :header-rows: 1
 
@@ -337,7 +350,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Similarity reflectance spectrum for the two wavelength, similarity_w1 and similarity_w2, to apply the NIR Similarity Correction (see Table 1 in Ruddick et al., 2006 DOI: 10.2307/3841124).
      - Default: 0.523
 
-.. list-table:: [WaterFinalMeasurementTest]
+**Table 14: WaterFinalMeasurementTest**
+
+.. list-table::
    :widths: 25 50 25
    :header-rows: 1
 
@@ -360,8 +375,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Threshold to apply on the final reflectance data (placeholder, not used yet).
      - Default: 0.10 (placeholder, not used yet).
 
+**Table 15: Output**
 
-.. list-table:: [Output]
+.. list-table::
    :widths: 25 50 25
    :header-rows: 1
 
@@ -396,7 +412,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Write output file L2A
      - default: True
 
-.. list-table:: [Plotting]
+**Table 16: Plotting**
+
+.. list-table::
    :widths: 25 50 25
    :header-rows: 1
 
