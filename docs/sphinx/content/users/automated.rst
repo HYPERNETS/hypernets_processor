@@ -79,7 +79,8 @@ where:
 * `raw_data_directory` - the directory the field data is synced to.
 * `add_to_scheduler` - option to add the job to the list of scheduled jobs, should be set.
 
-As well as defining required job configuration information, the job configuration file can also be used to override any processor configuration defaults (e.g. chosen calibration function, which file levels to write), except the set of protected processor configuration defaults (e.g. processor version number). To see what configuration values may be set review the processor configuration file.
+As well as defining required job configuration information, the job configuration file can also be used to override any processor configuration defaults (e.g. chosen calibration function, which file levels to write, see :ref:`config`), except the set of protected processor configuration defaults (e.g. processor version number).
+To see what configuration values may be set review the processor configuration file (:ref:`config`).
 
 For all jobs, it is important relevant metadata be added to the metadata database, so it can be added to the data products.
 
@@ -178,7 +179,7 @@ Before launching the scheduler, ensure that the following configuration files ar
 * processor.config : Contains the common input parameters for all the jobs initiated in `jobs.txt`.
 * scheduler.config : Includes input parameters for the scheduler.
 
-See also :ref:`processing-processing_config` for more details about the processing parameters that can be given.
+See also :ref:`config` for more details about the processing parameters that can be given.
 
 
 Next, launch the hypernets scheduler as follow::

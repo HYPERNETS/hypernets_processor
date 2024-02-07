@@ -58,7 +58,7 @@ where:
 * `job_config_path` - path of a job configuration file. See :ref:`user_processor-job_setup` for information on initialising a job configuration file.
 
 Specifying processing with a custom job configuration file allows non-network-default configuration values to be set, for example, chosen calibration function.
-See also :ref:`processing-processing_config` for more details about the processing parameters that can be given.
+See also :ref:`config` for more details about the processing parameters that can be given.
 
 Examples
 -------------------
@@ -78,3 +78,4 @@ If the adhoc processing don't refer to a user defined job configuration path, in
 * /hypernets_processor/hypernets_processor/etc/processor_water_defaults.config,
 
 for the land and water network respectively.
+More details about the input parameters for the processing configuration can be found in :ref:`config`.
