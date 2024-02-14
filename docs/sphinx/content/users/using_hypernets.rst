@@ -19,19 +19,16 @@ We do not provide further details on how to access these databases, since they a
 downloading data
 ------------------
 **water network**
-
-
+The data for the water HYPERNETS data can also be accessed through an online data portal (www.waterhypernet.org).
+Via waterhypernet.org, monthly and yearly zip files with all the available products per site and per level (i.e., L1C and LA) can be downloaded.
 
 **land network**
 The data for the land HYPERNETS data can also be accessed through an online data portal (www.landhypernets.org).
 In addition to downloading monthly zip files with all the available products per site, it is also possible to do a query.
 
 
-
-
 accessing data
 ------------------
-
 
 
 Using obsarray

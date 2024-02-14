@@ -54,6 +54,12 @@ You can build the documentation from the `docs/sphinx` directory with:
 
 .. parsed-literal::
 
+   sphinx-build -M html . _build
+
+or
+
+.. parsed-literal::
+
    make html
 
 This documentation is hosted on `ReadTheDocs <https://readthedocs.org>`_. When there is a push the GitHub repository ReadTheDocs automatically rebuilds its copy of the documentation.
