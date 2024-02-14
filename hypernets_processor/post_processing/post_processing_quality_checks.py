@@ -483,7 +483,7 @@ if __name__ == "__main__":
                 (site_ds[ifile].wavelength > 380) & (site_ds[ifile].wavelength < 1700)
             )[0]
             site_ds[ifile] = site_ds[ifile].isel(wavelength=ids_wav)
-            if site == "BASP":
+            #if site == "BASP":
                 #ids_series = np.where((site_ds[ifile]["viewing_zenith_angle"] < 35))[0]
                 #site_ds[ifile] = site_ds[ifile].isel(series=ids_series)
                 # for vza in [5, 10]:
