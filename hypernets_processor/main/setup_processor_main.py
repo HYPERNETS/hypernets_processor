@@ -53,7 +53,7 @@ def main(settings):
         "working_directory"
     ]
     os.makedirs(settings["archive_directory"], exist_ok=True)
-    processor_config["Output"]["archive_directory"] = settings["archive_directory"]
+    processor_config["Processor"]["archive_directory"] = settings["archive_directory"]
 
     with open(WORKING_DIRECTORY_FILE_PATH, "w") as f:
         f.write(settings["working_directory"])
