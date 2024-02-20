@@ -109,7 +109,6 @@ setup(
         "alembic==1.10.2",
         "numpy",
         "netCDF4",
-        "xarray",
         "schedule",
         "matplotlib",
         "pysolar",
