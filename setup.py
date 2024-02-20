@@ -77,7 +77,6 @@ class SetupInstallCommand(install):
         install.run(self)
 
         if self.setup_processor:
-
             post_install_processor_setup()
 
 
@@ -105,6 +104,7 @@ setup(
             os.path.join("etc", "processor_water_defaults.config"),
             "calibration/calibration_files/*/*/*/*"],
     },
+    setup_requires=['numpy'],
     install_requires=[
         "alembic==1.10.2",
         "numpy",
