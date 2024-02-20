@@ -58,6 +58,7 @@ def cli():
         "set network default config values (overwrites existing)"
     )
 
+    print(settings["network_defaults"],settings)
     if settings["network_defaults"] == "y":
         processor_config = read_config_file(PROCESSOR_DEFAULT_CONFIG_PATH)
     else:
