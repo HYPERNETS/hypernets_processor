@@ -135,20 +135,17 @@ class Interpolate:
 
     def interpolate_irradiance(self, dataset_l1c, dataset_l1b_irr, razangle=None):
 
+        dataset_l1c=self.qual.check_overcast(dataset_l1c,dataset_l1b_irr)
         flags = [
-            "no_clear_sky_irradiance",
             "vza_irradiance",
             "not_enough_dark_scans",
             "not_enough_irr_scans",
         ]
+
         flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
         if len(mask_notflagged) == 0:
-            self.context.anomaly_handler.add_anomaly("cl") #, dataset_l1b_irr)
-            acqui_irr = dataset_l1b_irr["acquisition_time"].values
-            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
-            )
+            raise ValueError("one of the quality checks in previous steps has failed, and not correctly picked up that there is no valid irradiance")
 
         measurement_function_interpolate_wav = self.context.get_config_value(
             "measurement_function_interpolate_wav"
@@ -157,13 +154,6 @@ class Interpolate:
             self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1, verbose=False
         )
         if self.context.get_config_value("network") == "w":
-            # interpolation_function_wav = self._measurement_function_factory(
-            #     prop=prop,
-            #     yvariable="irradiance",
-            #     ydims=["wavelength", "series"],
-            #     corr_dims=["wavelength"],
-            #     use_err_corr_dict=False,
-            # ).get_measurement_function(measurement_function_interpolate_wav)
             interpolation_function_wav = self._measurement_function_factory(
                 prop=prop, corr_dims="wavelength", yvariable="irradiance"
             ).get_measurement_function(measurement_function_interpolate_wav)
@@ -224,21 +214,6 @@ class Interpolate:
         output_sza = dataset_l1c["solar_zenith_angle"].values
         input_sza = dataset_l1b_irr["solar_zenith_angle"].values
 
-        flags = [
-            "no_clear_sky_irradiance",
-            "vza_irradiance",
-            "not_enough_dark_scans",
-            "not_enough_irr_scans",
-        ]
-        # flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
-        # mask_notflagged = np.where(flagged == False)[0]
-        # if len(mask_notflagged) == 0:
-        #     self.context.anomaly_handler.add_anomaly("cl", dataset_l1b_irr)
-        #     acqui_irr = dataset_l1b_irr["acquisition_time"].values
-        #     dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-        #         dataset_l1c["quality_flag"], "no_clear_sky_sequence"
-        #     )
-        # else:
         if self.context.get_config_value("network") == "w":
             dataset_l1c_temp = dataset_l1c_temp.isel(scan=mask_notflagged)
             acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]

@@ -353,6 +353,22 @@ class QualityChecks:
 
         return dataset_l1b_irr
 
+    def check_overcast(self, dataset_l1c, dataset_l1b_irr):
+        flags = [
+            "no_clear_sky_irradiance",
+            "vza_irradiance",
+            "not_enough_dark_scans",
+            "not_enough_irr_scans",
+        ]
+        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
+        mask_notflagged = np.where(flagged == False)[0]
+        if len(mask_notflagged) == 0:
+            self.context.anomaly_handler.add_anomaly("cl")  # , dataset_l1b_irr)
+            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
+                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
+            )
+        return dataset_l1c
+
     def check_valid_darks(self, dataset_l0b, n_valid, n_total):
         for i in range(len(n_valid)):
             if n_valid[i] < self.context.get_config_value("n_valid_dark"):
