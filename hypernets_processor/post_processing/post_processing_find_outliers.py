@@ -44,8 +44,8 @@ colors = ["black", "yellow", "cyan", "red", "green", "blue", "magenta", "orange"
 wavs = [500, 900, 1100, 1600]
 hour_bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
 sites = [
-    "IFAR",
     "GHNA",
+    "IFAR",
     "WWUK",
     "ATGE",
     "BASP",
