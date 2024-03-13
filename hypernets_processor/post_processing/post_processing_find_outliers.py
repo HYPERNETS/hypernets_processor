@@ -64,8 +64,8 @@ plot_against = ["acquisition_time",]
 vza_min=0
 vza_max=5
 
-start_datetime=datetime.datetime.strptime("220501T000000",'%y%m%dT%H:%M:%S')
-end_datetime=datetime.datetime.strptime("221031T000000",'%y%m%dT%H:%M:%S')
+start_datetime=datetime.datetime.strptime("20220501T000000",'%Y%m%dT%H%M%S')
+end_datetime=datetime.datetime.strptime("20221031T000000",'%Y%m%dT%H%M%S')
 
 
 
