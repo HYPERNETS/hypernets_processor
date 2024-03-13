@@ -208,11 +208,15 @@ def make_time_series_plot(
                 label="masked by vegetation checks",
             )
         valids = measurand_wav[np.where(mask == 0)[0]]
-        plt.ylim(
-            [
-                plot_min,plot_max
-            ]
-        )
+        if plot_min is not None and plot_max is not None:
+            plt.ylim([plot_min,plot_max])
+        else:
+            plt.ylim(
+                [
+                    min(valids) - 0.3 * (max(valids) - min(valids)),
+                    max(0, max(valids) + 0.3 * (max(valids) - min(valids))),
+                ]
+            )
         plt.legend()
         plt.ylabel("reflectance")
         plt.xlabel("datetime")
