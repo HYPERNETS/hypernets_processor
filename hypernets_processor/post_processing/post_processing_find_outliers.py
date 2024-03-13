@@ -67,7 +67,8 @@ vza_max=5
 start_datetime=datetime.datetime.strptime("20220501T000000",'%Y%m%dT%H%M%S')
 end_datetime=datetime.datetime.strptime("20221031T000000",'%Y%m%dT%H%M%S')
 
-
+plot_min=0
+plot_max=0.5
 
 def make_time_series_plot(
     wavs,
@@ -145,19 +146,19 @@ def make_time_series_plot(
                     n_max_points=n_max_points,
                 )
                 # print(wavs[i],"%s:00-%s:00" % (hour_bins[ii], hour_bins[ii + 1]),mean.shape, hour_ids.shape,times_sec.shape, times.shape, np.where(np.isnan(measurand_wav[hour_ids])))
-                plt.plot(times[hour_ids], mean, color=color, linestyle="-")
-                plt.plot(
-                    times[hour_ids],
-                    mean - sigma_thresh * std,
-                    color=color,
-                    linestyle=":",
-                )
-                plt.plot(
-                    times[hour_ids],
-                    mean + sigma_thresh * std,
-                    color=color,
-                    linestyle=":",
-                )
+                # plt.plot(times[hour_ids], mean, color=color, linestyle="-")
+                # plt.plot(
+                #     times[hour_ids],
+                #     mean - sigma_thresh * std,
+                #     color=color,
+                #     linestyle=":",
+                # )
+                # plt.plot(
+                #     times[hour_ids],
+                #     mean + sigma_thresh * std,
+                #     color=color,
+                #     linestyle=":",
+                # )
                 outlier_ids = np.where(
                     (mask == 2)
                     & (
@@ -209,8 +210,7 @@ def make_time_series_plot(
         valids = measurand_wav[np.where(mask == 0)[0]]
         plt.ylim(
             [
-                min(valids) - 0.3 * (max(valids) - min(valids)),
-                max(0, max(valids) + 0.3 * (max(valids) - min(valids))),
+                plot_min,plot_max
             ]
         )
         plt.legend()
