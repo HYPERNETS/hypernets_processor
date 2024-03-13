@@ -61,6 +61,14 @@ sites = [
 sites_thresh = [2, 2, 2, 2, 2, 2, 2, 2, 3, 3]
 plot_against = ["acquisition_time",]
 
+vza_min=0
+vza_max=5
+
+start_datetime=datetime.datetime.strptime("20220501T000000",'%y%m%dT%H:%M:%S')
+end_datetime=datetime.datetime.strptime("20221031T000000",'%y%m%dT%H:%M:%S')
+
+
+
 def make_time_series_plot(
     wavs,
     times,
@@ -239,7 +247,7 @@ def extract_reflectances(files, wavs, vza, vaa, site):
     refl = np.zeros((len(files), len(wavs)))
     mask = np.ones(len(files))
     times = np.empty(len(files), dtype=datetime.datetime)
-    valid = np.ones(len(files), dtype=int)
+    valid = np.zeros(len(files), dtype=int)
     all_ds = np.empty(len(files), dtype=object)
     for i in range(len(files)):
         ds = read_hypernets_file(
@@ -260,6 +268,9 @@ def extract_reflectances(files, wavs, vza, vaa, site):
             times[i] = datetime.datetime.utcfromtimestamp(
                 ds.acquisition_time.values[0],
             )
+
+            if (times[i]>start_datetime) and (times[i]<end_datetime):
+                valid[i] = 1
 
             if not flagged:
                 mask[i] = 0
@@ -283,6 +294,10 @@ def extract_reflectances(files, wavs, vza, vaa, site):
             times[i] = datetime.datetime.utcfromtimestamp(
                 np.mean(ds.acquisition_time.values)
             )
+
+    times=times[np.where(valid)]
+    refl=refl[np.where(valid)]
+    mask=mask[np.where(valid)]
     return times, refl, mask
 
 def read_hypernets_file(
@@ -485,6 +500,8 @@ if __name__ == "__main__":
         for iseries in range(len(site_ds[0].viewing_zenith_angle.values)):
             vza = round(site_ds[0].viewing_zenith_angle.values[iseries])
             vaa = round(site_ds[0].viewing_azimuth_angle.values[iseries])
+            if (vza<vza_min) or (vza>vza_max):
+                continue
             times, refl, mask = extract_reflectances(files, wavs, vza, vaa, site)
             if site == "WWUK" or site == "BASP":
                 for ifile in range(len(site_ds)):
