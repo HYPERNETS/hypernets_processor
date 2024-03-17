@@ -73,8 +73,8 @@ HypernetsProcessor
 HypernetsReader
    The :py:class:`HypernetsReader` class is responsible for reading the different data files in the Hypernets processing chain.
 
-Checks
-   The :py:class:`Checks` class performs checks on the field acquisition and records any issues to an anomaly database.
+QualityChecks
+   The :py:class:`QualityChecks` class performs checks on the field acquisition and records any issues to an anomaly database.
 
 Calibrate
    The :py:class:`Calibrate` class evaluates uncertainty-quantified radiance and irradiance (Level 1) from the raw field measurements (Level 0).
@@ -82,14 +82,11 @@ Calibrate
 SurfaceReflectance
    The :py:class:`SurfaceReflectance` class evaluates uncertainty-quantified surface reflectance (Level 2a) from the radiance and irradiance measurements (Level 1). This is only performed for standard sequences and uses different algorithms for the land and water network protocols - these are each defined as a :py:class:`Protocol` class.
 
-SurfaceReflectanceModelling
-   The :py:class:`SurfaceReflectanceModelling` class evaluates uncertainty-quantified diurnally interpolated surface reflectance (Level 2b) from the surface reflectance measurements (Level 2a).
-
 HypernetsWriter
    The :py:class:`HypernetsWriter` class writes the Hypernets data products.
 
-Visualisation
-   The :py:class:`Visualisation` class prepares graphs of the evaluated datasets.
+Plotting
+   The :py:class:`Plotting` class prepares graphs of the evaluated datasets.
 
 Command-Line Interface
 ----------------------

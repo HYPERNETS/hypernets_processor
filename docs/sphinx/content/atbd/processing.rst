@@ -41,6 +41,7 @@ Links to each of the subsections can be found here:
    processing/average
    processing/interpolate
    processing/surface_reflectance
+   processing/post_processing
    processing/quality_checks
    processing/uncertainty_propagation
    processing/processing_config

@@ -7,7 +7,7 @@
 
 
 Interpolating - Process to L1C
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Water Network
 --------------
@@ -88,16 +88,33 @@ The L1C processing for the land network consists of two interpolation steps that
 
 1. **Spectral interpolation**: 
 The irradiances are spectrally interpolated to the wavelengths of the radiance measurements (which are not identical to the irradiance measurements).
-Currently, we use a simple linear interpion, but this will substitud by the following:
-To perform the interpolation, we want to account for the spectral variability that is expected for typical solar irradiance measurements. In order to do this, we take a reference simulated solar spectrum, convolved with the HYPERNETS spectral response function, but sampled at 0.1 nm intervals. This high resolution spectrum is used to inform us on the spectral variability between the given data points.
-We then use the interpolation tool within the NPL CoMet toolkit to interpolate between the irradiance wavelengths using this high-resolution reference. The resulting interpolation function goes through the irradiance data at the given irradiance wavelengths, but follows the high-resolution spectrum between these wavelengths.
-The irradiances at the new set of wavelengths are then calculated using this interpolation function.
+Currently, we use a simple linear interpion.
 
 2. **Temporal interpolation**: 
-Next, we use a similar method to perform a temporal interpolation. In this case, we interpolate the irradiance measurements at the start and end of the sequence, to each of the timestamps of the radiance measurements. Here the high-resolution model is the known daily cycle of irradiance, approximately proportional to the cosine of the solar zenith angle.
-The NPL CoMet interpolation tool is again used for the interpolation. 
+Next, we use a similar method to perform a temporal interpolation. In this
+case, we interpolate the irradiance measurements at the start and end of the sequence, to each of the
+timestamps of the radiance measurements. A correction is applied to take into account the change in
+solar zenith angle during the sequence.
 
-The output of the L1C processing is a product with irradiances that now have the same wavelengths and timestamps as the radiance measurements.
+The output of the L1C processing is a product with irradiances that now have the same wavelengths and
+timestamps as the radiance measurements. The radiances in the L1C dataset are unchanged from the L1B
+dataset.
 
+There are multiple options available for the interpolation. For the temporal interpolation, the default
+option includes a correction for the change in solar zenith angle throughout the sequence. Prior to the
+interpolation, the irradiances are divided by the cosine of the solar zenith angle at the time of the irradiance
+acquisition. After the interpolation, the irradiances are multiplied by the cosine of the solar zenith angle at
+the timestamps of the radiances. Alternatively, there is also an option to not apply the solar zenith angle
+correction (i.e. only linear interpolation).
 
+By default, the linear interpolation method is used for both the spectral and temporal interpolations.
+However, optionally, the hypernets_processor can also be set up to do interpolation following a model.
+This is done using the interpolation tool within the NPL CoMet toolkit to interpolate between the irradiance
+wavelengths using a high-resolution reference (`comet_maths documentation <https://comet-maths.readthedocs.io/en/latest/content/interpolation_atbd.html>`_). The high resolution reference for the spectral irradiance
+interpolation comes from a clear-sky model, which gives a good first-order approximation of the short
+scale variability. This model is then scaled to go through the measured irradiance data, while taking into
+account the spectral response function of the different HYPSTAR® measurements.
 
+The interpolation option using a high resolution model has been implemented, but is not currently
+operationally used. Further investigations are required to assess whether these alternative interpolation
+methods lead to sufficient improvement in the performance to justify their significantly slower runtime.
