@@ -26,11 +26,10 @@ If no custom measurement function is provided, a default measurement function is
 This measurement function is defined by::
 
 	def meas_function(digital_number,gains,dark_signal,non_linear,int_time):
-        
         	DN=digital_number-dark_signal
         	DN[DN==0]=1
         	non_lin_func = np.poly1d(np.flip(non_linear))
-            corrected_DN = DN / non_lin_func(DN)
+        	corrected_DN = DN / non_lin_func(DN)
 
         	return gains*corrected_DN/int_time*1000
 
