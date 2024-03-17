@@ -33,17 +33,27 @@ In the main, the processing for each of these use cases will be fairly common, w
 Processing Outline
 ------------------
 
-The following flowchart describes the overall processing flow of the **hypernets_processor**. This is divided between functionality required by Land and Water Networks, as well as for Standard and Custom Sequences of observations. More information can be in the :ref:`atbd` section, however to summarise the steps:
+The network processing is done centrally on the LANDHYPERNET and WATERHYPERNET servers,
+through a command line interface, which continuously checks for new data, and processes it as soon as
+it comes in. The hypernets_processor takes the data from acquisition (raw data) to application of
+calibration and quality controls, computation of correction factors (e.g., air-water interface reflectance
+correction for water processing), temporal interpolation to coincident timestamps, processing to surface
+reflectance and averaging per series. A diagram showing the design for the network processing is provided
+in the Figure below.
 
-* Input is a given raw field acquisition and the instrument characterisation and calibration database (ICCDB).
-* This data is then calibrated to radiance and irradiance, creating Level 1 files. This performed in the same way for the Land and Water Networks, and for standard and custom measurement sequences.
-* Next, the calibrated radiometric data is used to determine surface reflectance, creating Level 2a files. This is only performed for standard sequences and uses different algorithms for the land and water network protocols.
-* Finally the surface reflectance data is interpolated using a model to produce full day data, creating L2b files. This is only performed for standard-sequence, land-network data.
-* Additionally, a series of checks are performed on the data with results populating the Anomalies Database.
+.. image:: processor_design.jpg
+
+The inputs are the raw field acquisitions and the instrument characterisation and calibration database
+(ICCDB). The main outputs are the various L0A-L2B NetCDF datasets listed in :ref:`files`. The
+HYPERNETS PROCESSOR also produces various plots and SQL databases of successfully processed
+products and anomalies (:ref:`sql`). The different processing steps and the plots produced are described
+in the next section. As part of the processing, quality checks are performed which either add quality flags
+to the produced data processing, or in some cases raise anomalies and halt the processing. These quality
+checks are described in :ref:`quality`. Uncertainties are also propagated through each of the processing steps,
+as described in :ref:`uncertainty`. Details on the produced products are provided in :ref:`products`.
 
 Each of the file formats are described in a series of `file format specification documents <https://github.com/HYPERNETS/hypernets_processor/tree/master/docs/file_formats>`_.
 
-.. image:: ../../../images/design-flowchart.png
 
 Architecture
 ------------

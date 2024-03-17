@@ -1,0 +1,7 @@
+parameter, VNIR water, VNIR land, SWIR land
+spectral resolution FWHM, 3 nm, 3 nm, 10 nm
+spectral sampling interval, 0.5 nm, 0.5 nm, 3 nm
+L2B wavelength range, 380-1020 nm, 380-1000 nm, 1000-1680 nm
+number of L2B channels, 1300, 1260, 220
+field of view radiance sensor, 2◦, 5◦, 5◦
+field of view irradiance sensor, 180◦, 180◦, 180◦
