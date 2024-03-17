@@ -36,7 +36,7 @@ The figures bellow illustrate the different terms which are defined as follows:
    * **Relative azimuth angle**: :math:`\Delta \phi` is the relative azimuth angle between sun and sensor (i.e. :math:`\phi_p`-:math:`\phi_s`). It is measured with respect to sun and clockwise from sun to target (sensor viewing direction). :math:`\Delta \phi` equals 0 means that the radiance sensors are pointing into the sun glint direction. :math:`\Delta \phi` =180° corresponding to viewing with the sun behind. :math:`\Delta \phi` ranges between 0 and 360° (see Fig. 3).
 
 .. figure:: geometries_hypernets.jpg
-   :scale: 30 %
+   :scale: 100 %
    :alt: Hypernets geometry definitions
 
    Left: Side-view diagram defining viewing zenith angles :math:`\theta_v` and solar zenith angles :math:`\theta_s`.
@@ -56,7 +56,7 @@ standard water sequence (including only one single azimuth angle) lasts approxim
 executed every 15 to 30 minutes during daylight.
 
 .. figure:: sequence.jpg
-   :scale: 30 %
+   :scale: 100 %
    :alt: map to buried treasure
    
    Illustration of a scan, a series of scans, and, a sequence for a standard water protocol.
@@ -74,7 +74,7 @@ WATERHYPERNET and LANDHYPERNET sequences following the above protocols are calle
 ‘standard’ sequences.
 
 .. figure:: hypernets_land_protocol.jpg
-   :scale: 30 %
+   :scale: 100 %
    :alt: map to buried treasure
 
    Polar plot showing the typical land protocol viewing geometries for the LANDHYPERNET
