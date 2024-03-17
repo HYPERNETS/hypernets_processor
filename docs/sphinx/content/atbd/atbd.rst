@@ -21,5 +21,6 @@ practical implementation of the methods used.
    :maxdepth: 1
    :caption: ATBD
 
+   content/atbd/definitions
    content/atbd/processing
    content/atbd/products
