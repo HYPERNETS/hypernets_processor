@@ -29,7 +29,18 @@ In addition to downloading monthly zip files with all the available products per
 
 accessing data
 ------------------
+The following lines are also useful terminal commands to access the data. For instance to get the number of directories::
 
+$ ls | wc -l
+$ ls -dq *SEQ* | wc -l
+
+To list all directories::
+
+$ ls /waterhypernet/HYPSTAR/Raw/MAFR/DATA > MAFR_seqlist.csv
+
+To investigate the directory size::
+
+$ du -sh (readable direcotry size)
 
 Using obsarray
 -------------------

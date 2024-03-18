@@ -26,7 +26,7 @@ First clone the project repository from GitHub::
 
 Then install the module with pip::
 
-   $ pip install hypernets_processor/
+   $ pip install -e hypernets_processor/
 
 This will also automatically install any dependencies.
 
