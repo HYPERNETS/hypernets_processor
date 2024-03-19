@@ -9,18 +9,6 @@
 Uncertainty Propagation 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The hypernets_processor uses a Monte Carlo (MC) approach (see Supplement 1 to the “Guide
-to the expression of uncertainty in measurement”, (BIPM et al., 2008b) to propagate uncertainties and
-error-correlations between product levels. This MC approach is implemented using the PUNPY module
-from the open-source CoMet toolkit. PUNPY is a Python software package to propagate random, structured
-and systematic uncertainties through a given measurement function. For further info on PUNPY, we refer to
-De Vis & Hunt (in prep.), the CoMet website9 and the PUNPY documentation10.
-In short, we first implement each of the processing steps as a numerical measurement function (e.g.
-measurement function in Section 3.2.2), i.e. a Python function which takes the input quantities (for which
-we are propagating the uncertainties) as arguments and returns the measurand (for which we are calculating
-the uncertainties as output). PUNPY then generates MC samples of the input quantities (taking into account
-the error correlation) proportional to the joint Probability Distribution Function (PDF) of the provided
-
 Uncertainties are propagated from product to product using Monte Carlo (MC) approach (see `Supplement 1 to the “Guide
 to the expression of uncertainty in measurement”<https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf>`_)
 This MC approach is implemented using the punpy module (see also `the punpy ATBD <https://punpy.readthedocs.io/en/latest/content/atbd.html>`_)
@@ -95,12 +83,13 @@ there is one example specific to HYPERNETS).
 Uncertainty contributions
 ############################
 Three uncertainty contributions are tracked throughout the processing:
-* random uncertainty: Uncertainty component arising from the noise in the measurements, which
+   * random uncertainty: Uncertainty component arising from the noise in the measurements, which
 does not have any error-correlation between different wavelengths or different repeated measurements
 (scans/series/sequences). The random uncertainties on the L0 data are taken to be the standard deviation
 between the scans that passed the quality checks. These uncertainties are then propagated all the way
 up to L2A.
-* systematic independent uncertainty: Uncertainty component combining a range of different
+
+   * systematic independent uncertainty: Uncertainty component combining a range of different
 uncertainty contributions in the calibration. Only the components for which the errors are not correlated
 between radiance and irradiance are included. These include contributions from the uncertainties
 on the distance, alignment, non-linearity, wavelength, lamp (power, alignment, interpolation) and
@@ -111,7 +100,8 @@ systematic (error-correlation of one) with respect to different scans/series/seq
 wavelength, we combine the different error-correlations of the different contributions and calculate a
 custom error-correlation matrix between the different wavelengths. These uncertainties are included in
 the L1A-L2A data products.
-* systematic uncertainty correlated between radiance and irradiance: Uncertainty component
+
+   * systematic uncertainty correlated between radiance and irradiance: Uncertainty component
 combining a range of different uncertainty contributions in the calibration. Only the components for
 which the errors are correlated between radiance and irradiance are included. This error-correlation
 means this component will become negligible when taking the ratio of radiance and irradiance (i.e. in
