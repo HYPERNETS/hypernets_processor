@@ -9,10 +9,23 @@
 Uncertainty Propagation 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Uncertainties are propagated from product to product using the punpy tool (see also `the punpy ATBD' <https://punpy.readthedocs.io/en/latest/content/atbd.html>`_), which is part of the NPL CoMet toolkit.
-A metrological approach is followed, where for each processing stage, a measurement function is defined, as well as the input quantities and the measurand. 
-The uncertainties are then propagated from product to product using a Monte Carlo (MC) approach. For a detailed description of the MC method, we refer to `Supplement 1 to the
-"Guide to the expression of uncertainty in measurement" - Propagation of distributions using a Monte Carlo method <https://www.bipm.org/utils/common/documents/jcgm/JCGM_101_2008_E.pdf>`_.
+The hypernets_processor uses a Monte Carlo (MC) approach (see Supplement 1 to the “Guide
+to the expression of uncertainty in measurement”, (BIPM et al., 2008b) to propagate uncertainties and
+error-correlations between product levels. This MC approach is implemented using the PUNPY module
+from the open-source CoMet toolkit. PUNPY is a Python software package to propagate random, structured
+and systematic uncertainties through a given measurement function. For further info on PUNPY, we refer to
+De Vis & Hunt (in prep.), the CoMet website9 and the PUNPY documentation10.
+In short, we first implement each of the processing steps as a numerical measurement function (e.g.
+measurement function in Section 3.2.2), i.e. a Python function which takes the input quantities (for which
+we are propagating the uncertainties) as arguments and returns the measurand (for which we are calculating
+the uncertainties as output). PUNPY then generates MC samples of the input quantities (taking into account
+the error correlation) proportional to the joint Probability Distribution Function (PDF) of the provided
+
+Uncertainties are propagated from product to product using Monte Carlo (MC) approach (see `Supplement 1 to the “Guide
+to the expression of uncertainty in measurement”<https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf>`_)
+This MC approach is implemented using the punpy module (see also `the punpy ATBD <https://punpy.readthedocs.io/en/latest/content/atbd.html>`_)
+from the open-source `CoMet toolkit<https://www.comet-toolkit.org/>`_. A metrological approach is followed, where for each processing stage, a measurement function is defined,
+as well as the input quantities and the measurand.
 
 Here we summarise the main steps and detail how these were implemented for HYPERNETS.
 The main stages consist of:
@@ -55,7 +68,76 @@ Finally, uncertainty are propagated to L2A with punpy using the measurement func
 Some basic information on how to interface with the information with the uncertainty information in the HYPERNETS products is given in the :ref:`user_using_hypernets` page.
 Further information and examples can be found on the CoMet website (``https://www.comet-toolkit.org/`_).
 
+Storing uncertainty information as digital effects tables
+#########################################################
+As previously mentioned, detailed error-correlation information is calculated as part of the uncertainty
+propagation. Storing this information in a space-efficient way is not trivial. To do this we use the `obsarray module<https://obsarray.readthedocs.io/en/latest/>`_
+of the CoMet toolkit. obsarray uses a concept called ‘digital effects tables’ to store the errorcorrelation
+information. This concept takes the parameterised error-correlation forms defined in the Quality
+Assurance Framework for Earth Observation (`QA4EO<https://www.QA4EO.org>`_) and stores them in a standardised metadata
+format. By using these parameterised error-correlation forms, it is not necessary to explicitely store the
+error-correlation along all dimensions. Instead only the error-correlation with wavelength is explicitly
+stored, and error-correlation with scans/series is captured as the ‘random’ or ‘systematic’ error-correlation
+forms.
 
+Another benefit to using obsarray, is that it allows for straightforward encoding of the uncertainty
+and error-correlation variables. The error-correlation (with respect to wavelength) does not need to be
+known at a very high precision. It can be saved as an 8-bit integer (leading to about a 0.01 precision in
+the error-correlation coefficient). Similarly, the uncertainties can be encoded using a 16-bit integer to a
+precision of 0.01%. Together, these encodings significantly reduce the amount of space required to store
+the uncertainty information.
+
+Finally, having the HYPERNETS products saved as ‘digital effects tables’ means they can easily be used
+in further uncertainty propagation where all the error-correlation information is automatically taken into
+account. See De Vis & Hunt (in prep.) and the `CoMet toolkit examples<https://www.comet-toolkit.org/examples/>`_ for further information (note
+there is one example specific to HYPERNETS).
+
+Uncertainty contributions
+############################
+Three uncertainty contributions are tracked throughout the processing:
+* random uncertainty: Uncertainty component arising from the noise in the measurements, which
+does not have any error-correlation between different wavelengths or different repeated measurements
+(scans/series/sequences). The random uncertainties on the L0 data are taken to be the standard deviation
+between the scans that passed the quality checks. These uncertainties are then propagated all the way
+up to L2A.
+* systematic independent uncertainty: Uncertainty component combining a range of different
+uncertainty contributions in the calibration. Only the components for which the errors are not correlated
+between radiance and irradiance are included. These include contributions from the uncertainties
+on the distance, alignment, non-linearity, wavelength, lamp (power, alignment, interpolation) and
+panel (calibration, alignment, interpolation, back reflectance) used during the calibration. Since
+the same lab calibration is used within the HYPERNETS PROCESSOR for repeated measurements
+(scans/series/sequences), the errors in the systematic independent uncertainty are assumed to be fully
+systematic (error-correlation of one) with respect to different scans/series/sequences. With respect to
+wavelength, we combine the different error-correlations of the different contributions and calculate a
+custom error-correlation matrix between the different wavelengths. These uncertainties are included in
+the L1A-L2A data products.
+* systematic uncertainty correlated between radiance and irradiance: Uncertainty component
+combining a range of different uncertainty contributions in the calibration. Only the components for
+which the errors are correlated between radiance and irradiance are included. This error-correlation
+means this component will become negligible when taking the ratio of radiance and irradiance (i.e. in
+the L2A reflectance products), which is why we separate it from the systematic independent uncertainty.
+The systematic uncertainty correlated between radiance and irradiance includes contributions from
+the uncertainties on the lamp (calibration, age). Since the same lab calibration is used within the
+HYPERNETS PROCESSOR for repeated measurements (scans/series/sequences), the errors in the
+systematic independent uncertainty are assumed to be fully systematic (error-correlation made up
+of ones) with respect to different scans/series/sequences. With respect to wavelength, we combine
+the different error-correlations of the different contributions and calculate a custom error-correlation
+matrix between the different wavelengths. These uncertainties are present in the L1A-L1C products.
+
+The temperature and spectral straylight uncertainties will be improved in future versions.
+Additionally, there is an uncertainty to be added on the HYPSTAR responsivity change since calibration
+(drift/ageing of spectrometer and optics). More post-deployment calibrations are necessary before we can
+quantify this contribution. Other uncertainty contributions not yet included in the uncertainty budget will
+also be considered in the future, such as uncertainties on the sensitivity to polarisation, uncertainties in
+the cosine response of the irradiance optics, the effects of the platform/mast on the observed upwelling
+radiances (e.g. Talone and Zibordi, 2018), or on the air-water interface reflectance corrections. Uncertainties
+on the Spectral Response Functions (SRF) of the radiance and irradiance sensors (particularly the difference
+between the two is important when calculating reflectance) should also be considered (see also Ruddick
+et al., 2023). To account for these missing uncertainty contributions, a placeholder uncertainty of 2% is
+added to the systematic independent uncertainty, assuming systematic spectral correlation. In the strong
+atmospheric absorption features (i.e., 757.5-767.5 nm and 1350-1390 nm), an additional placeholder
+uncertainty of 50% (assuming random spectral error correlation) is added to account for the difference in
+SRF becoming dominant.
 
 
 
