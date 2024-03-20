@@ -10,9 +10,9 @@ Uncertainty Propagation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Uncertainties are propagated from product to product using Monte Carlo (MC) approach (see `Supplement 1 to the “Guide
-to the expression of uncertainty in measurement”<https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf>`_)
+to the expression of uncertainty in measurement” <https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf>`_)
 This MC approach is implemented using the punpy module (see also `the punpy ATBD <https://punpy.readthedocs.io/en/latest/content/atbd.html>`_)
-from the open-source `CoMet toolkit<https://www.comet-toolkit.org/>`_. A metrological approach is followed, where for each processing stage, a measurement function is defined,
+from the open-source `CoMet toolkit <https://www.comet-toolkit.org/>`_. A metrological approach is followed, where for each processing stage, a measurement function is defined,
 as well as the input quantities and the measurand.
 
 Here we summarise the main steps and detail how these were implemented for HYPERNETS.
@@ -54,15 +54,15 @@ The measurand (interpolated irradiances) and asoociated uncertainties and error-
 
 Finally, uncertainty are propagated to L2A with punpy using the measurement functions in :ref:`calibrate` and the input quantities from the L1C products. 
 Some basic information on how to interface with the information with the uncertainty information in the HYPERNETS products is given in the :ref:`user_using_hypernets` page.
-Further information and examples can be found on the CoMet website (``https://www.comet-toolkit.org/`_).
+Further information and examples can be found on the CoMet website (`https://www.comet-toolkit.org/`_).
 
 Storing uncertainty information as digital effects tables
 #########################################################
 As previously mentioned, detailed error-correlation information is calculated as part of the uncertainty
-propagation. Storing this information in a space-efficient way is not trivial. To do this we use the `obsarray module<https://obsarray.readthedocs.io/en/latest/>`_
+propagation. Storing this information in a space-efficient way is not trivial. To do this we use the `obsarray module <https://obsarray.readthedocs.io/en/latest/>`_
 of the CoMet toolkit. obsarray uses a concept called ‘digital effects tables’ to store the errorcorrelation
 information. This concept takes the parameterised error-correlation forms defined in the Quality
-Assurance Framework for Earth Observation (`QA4EO<https://www.QA4EO.org>`_) and stores them in a standardised metadata
+Assurance Framework for Earth Observation (`QA4EO <https://www.QA4EO.org>`_) and stores them in a standardised metadata
 format. By using these parameterised error-correlation forms, it is not necessary to explicitely store the
 error-correlation along all dimensions. Instead only the error-correlation with wavelength is explicitly
 stored, and error-correlation with scans/series is captured as the ‘random’ or ‘systematic’ error-correlation
@@ -77,7 +77,7 @@ the uncertainty information.
 
 Finally, having the HYPERNETS products saved as ‘digital effects tables’ means they can easily be used
 in further uncertainty propagation where all the error-correlation information is automatically taken into
-account. See De Vis & Hunt (in prep.) and the `CoMet toolkit examples<https://www.comet-toolkit.org/examples/>`_ for further information (note
+account. See De Vis & Hunt (in prep.) and the `CoMet toolkit examples <https://www.comet-toolkit.org/examples/>`_ for further information (note
 there is one example specific to HYPERNETS).
 
 Uncertainty contributions
