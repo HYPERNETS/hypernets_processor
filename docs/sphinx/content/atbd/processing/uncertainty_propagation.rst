@@ -18,9 +18,9 @@ as well as the input quantities and the measurand.
 Here we summarise the main steps and detail how these were implemented for HYPERNETS.
 The main stages consist of:
 
--  Formulation: Defining the measurand (output quantity Y), the input quantities :math:`X = (X_{i},\ldots,\ X_{N})`, and the measurement function (as a model relating Y and X). 
-One also needs to asign Probability Density Functions (PDF) of each of the input quantities, as well as define the correlation between them (through joint PDF). 
-In our method, the joint PDF's are are made by first generating uncorrelated PDF, which are then correlated using the Cholesky decomposition method.
+-  Formulation: Defining the measurand (output quantity Y), the input quantities :math:`X = (X_{i},\ldots,\ X_{N})`, and the measurement function (as a model relating Y and X).
+   One also needs to asign Probability Density Functions (PDF) of each of the input quantities, as well as define the correlation between them (through joint PDF).
+   In our method, the joint PDF's are are made by first generating uncorrelated PDF, which are then correlated using the Cholesky decomposition method.
 
 -  Propagation: propagate the PDFs for the :math:`X_i` through the model to obtain the PDF for Y. 
 
@@ -83,36 +83,36 @@ there is one example specific to HYPERNETS).
 Uncertainty contributions
 ############################
 Three uncertainty contributions are tracked throughout the processing:
-   * random uncertainty: Uncertainty component arising from the noise in the measurements, which
-does not have any error-correlation between different wavelengths or different repeated measurements
-(scans/series/sequences). The random uncertainties on the L0 data are taken to be the standard deviation
-between the scans that passed the quality checks. These uncertainties are then propagated all the way
-up to L2A.
+-  Random uncertainty: Uncertainty component arising from the noise in the measurements, which
+   does not have any error-correlation between different wavelengths or different repeated measurements
+   (scans/series/sequences). The random uncertainties on the L0 data are taken to be the standard deviation
+   between the scans that passed the quality checks. These uncertainties are then propagated all the way
+   up to L2A.
 
-   * systematic independent uncertainty: Uncertainty component combining a range of different
-uncertainty contributions in the calibration. Only the components for which the errors are not correlated
-between radiance and irradiance are included. These include contributions from the uncertainties
-on the distance, alignment, non-linearity, wavelength, lamp (power, alignment, interpolation) and
-panel (calibration, alignment, interpolation, back reflectance) used during the calibration. Since
-the same lab calibration is used within the HYPERNETS PROCESSOR for repeated measurements
-(scans/series/sequences), the errors in the systematic independent uncertainty are assumed to be fully
-systematic (error-correlation of one) with respect to different scans/series/sequences. With respect to
-wavelength, we combine the different error-correlations of the different contributions and calculate a
-custom error-correlation matrix between the different wavelengths. These uncertainties are included in
-the L1A-L2A data products.
+-  Systematic independent uncertainty: Uncertainty component combining a range of different
+   uncertainty contributions in the calibration. Only the components for which the errors are not correlated
+   between radiance and irradiance are included. These include contributions from the uncertainties
+   on the distance, alignment, non-linearity, wavelength, lamp (power, alignment, interpolation) and
+   panel (calibration, alignment, interpolation, back reflectance) used during the calibration. Since
+   the same lab calibration is used within the HYPERNETS PROCESSOR for repeated measurements
+   (scans/series/sequences), the errors in the systematic independent uncertainty are assumed to be fully
+   systematic (error-correlation of one) with respect to different scans/series/sequences. With respect to
+   wavelength, we combine the different error-correlations of the different contributions and calculate a
+   custom error-correlation matrix between the different wavelengths. These uncertainties are included in
+   the L1A-L2A data products.
 
-   * systematic uncertainty correlated between radiance and irradiance: Uncertainty component
-combining a range of different uncertainty contributions in the calibration. Only the components for
-which the errors are correlated between radiance and irradiance are included. This error-correlation
-means this component will become negligible when taking the ratio of radiance and irradiance (i.e. in
-the L2A reflectance products), which is why we separate it from the systematic independent uncertainty.
-The systematic uncertainty correlated between radiance and irradiance includes contributions from
-the uncertainties on the lamp (calibration, age). Since the same lab calibration is used within the
-HYPERNETS PROCESSOR for repeated measurements (scans/series/sequences), the errors in the
-systematic independent uncertainty are assumed to be fully systematic (error-correlation made up
-of ones) with respect to different scans/series/sequences. With respect to wavelength, we combine
-the different error-correlations of the different contributions and calculate a custom error-correlation
-matrix between the different wavelengths. These uncertainties are present in the L1A-L1C products.
+-  Systematic uncertainty correlated between radiance and irradiance: Uncertainty component
+   combining a range of different uncertainty contributions in the calibration. Only the components for
+   which the errors are correlated between radiance and irradiance are included. This error-correlation
+   means this component will become negligible when taking the ratio of radiance and irradiance (i.e. in
+   the L2A reflectance products), which is why we separate it from the systematic independent uncertainty.
+   The systematic uncertainty correlated between radiance and irradiance includes contributions from
+   the uncertainties on the lamp (calibration, age). Since the same lab calibration is used within the
+   HYPERNETS PROCESSOR for repeated measurements (scans/series/sequences), the errors in the
+   systematic independent uncertainty are assumed to be fully systematic (error-correlation made up
+   of ones) with respect to different scans/series/sequences. With respect to wavelength, we combine
+   the different error-correlations of the different contributions and calculate a custom error-correlation
+   matrix between the different wavelengths. These uncertainties are present in the L1A-L1C products.
 
 The temperature and spectral straylight uncertainties will be improved in future versions.
 Additionally, there is an uncertainty to be added on the HYPSTAR responsivity change since calibration
