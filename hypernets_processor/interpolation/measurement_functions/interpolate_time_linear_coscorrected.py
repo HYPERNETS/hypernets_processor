@@ -69,17 +69,23 @@ class InterpolationTimeLinearCoscorrected(MeasurementFunction):
         return ["output_time", "input_time", "irradiance", "output_sza", "input_sza"]
 
 
-class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(MeasurementFunction):
-    def meas_function(self, output_time, input_time, radiance, output_sza, input_sza):
-        """
-        This function implements the measurement function.
-        Each of the arguments can be either a scalar or a vector (1D-array).
-        """
-        radiance = radiance / np.cos(np.pi / 180.0 * input_sza)
-
-        skyradiance_intfunc = scipy.interpolate.interp1d(input_time, radiance)
-
-        return skyradiance_intfunc(output_time) * np.cos(np.pi / 180.0 * output_sza)
+class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(InterpolationTimeLinearCoscorrected):
+    # def meas_function(self, output_time, input_time, radiance, output_sza, input_sza):
+    #     """
+    #     This function implements the measurement function.
+    #     Each of the arguments can be either a scalar or a vector (1D-array).
+    #     """
+    #     radiance = radiance / np.cos(np.pi / 180.0 * input_sza)
+    #
+    #     if output_time >= max(input_time):
+    #         out = radiance[:, input_time == max(input_time)]
+    #     elif output_time <= min(input_time):
+    #         out = radiance[:, input_time == min(input_time)]
+    #     else:
+    #         skyradiance_intfunc = scipy.interpolate.interp1d(input_time, radiance)
+    #         out = skyradiance_intfunc(output_time)
+    #
+    #     return out * np.cos(np.pi / 180.0 * output_sza)
 
     @staticmethod
     def get_name():
