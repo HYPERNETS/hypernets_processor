@@ -54,7 +54,7 @@ The measurand (interpolated irradiances) and asoociated uncertainties and error-
 
 Finally, uncertainty are propagated to L2A with punpy using the measurement functions in :ref:`calibrate` and the input quantities from the L1C products. 
 Some basic information on how to interface with the information with the uncertainty information in the HYPERNETS products is given in the :ref:`user_using_hypernets` page.
-Further information and examples can be found on the CoMet website (`https://www.comet-toolkit.org/`_).
+Further information and examples can be found on the CoMet website (`<https://www.comet-toolkit.org/>`_).
 
 Storing uncertainty information as digital effects tables
 #########################################################

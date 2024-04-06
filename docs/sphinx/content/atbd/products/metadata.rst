@@ -9,4 +9,4 @@
 Metadata description
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TBC - Clemence/Sam
+TBC

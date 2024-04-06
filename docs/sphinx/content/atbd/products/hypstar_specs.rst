@@ -9,7 +9,7 @@
 HYPSTAR® instrument
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-HYPSTAR® (HYperspectral Pointable System for Terrestrial and Aquatic Radiometry; www.hypstar.eu)
+HYPSTAR® (HYperspectral Pointable System for Terrestrial and Aquatic Radiometry; `<www.hypstar.eu>`_)
 is an autonomous hyperspectral radiometer system dedicated to surface reflectance validation of all optical
 Copernicus satellite data products. For a complete description of the HYPSTAR® system, we refer to Kuusk
 et al. (in prep). HYPSTAR® takes radiance and irradiance measurements using the same spectrometer
@@ -19,7 +19,7 @@ used for water and land: (1) The Standard Range (SR) model provides visible and 
 shortwave-infrared (SWIR) spectrometer module which extends the spectral range up to 1700 nm. The XR
 models are meant to be used on the land sites. Pictures of the SR and XR models of the HYPSTAR® are
 shown in the Figure below. The instrument characteristics are summarised
-in the Table 1.
+in Table 1. For more detailed and up to date information, we refer to `<www.hypstar.eu>`_.
 
 
 .. figure:: hypstar.jpg
@@ -51,7 +51,7 @@ taken by the camera within the system, a file with meteorological information (i
 temperature and pressure measured within the system and illuminance measured by an external light
 sensor), log files made during the acquisition and data transfer, and a metadata file.
 
-The HYPSTAR instruments are calibrated by Tartu University1 (See Kuusk et al. in prep). Currently
+The HYPSTAR instruments are calibrated by Tartu University (See Kuusk et al. in prep). Currently
 this includes radiometric calibration (gains) and non-linearity calibration (non-linearity coefficients).
 Measurements of the temperature responsivity and stray light are also planned/in progress, but these
 characterisations are not yet used in the processing of the data in the current processor version. The lab

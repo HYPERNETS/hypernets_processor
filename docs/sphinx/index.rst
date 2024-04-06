@@ -19,6 +19,7 @@ This documentation aimed at both users and developers of the software, find the 
    content/users/adhoc
    content/users/automated
    content/users/using_hypernets
+   content/users/data_distribution
 
 .. toctree::
    :maxdepth: 1
