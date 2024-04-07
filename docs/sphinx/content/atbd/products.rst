@@ -20,10 +20,10 @@ In the following subsections, we will first discuss the data structure and some 
 
    products/product_files
    products/variables
-   products/SQL_databases
-   products/metadata 
+   products/metadata
    products/flags 
    products/anomalies 
-   
+   products/SQL_databases
+
 
 

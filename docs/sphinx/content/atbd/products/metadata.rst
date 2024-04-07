@@ -17,9 +17,9 @@ describing their error correlation (see :ref:`uncertainty` and :ref:`using_hyper
 there is also a range of global metadata, describing
 information about how, and when the data was processed,
 what data files it used, information about the site (e.g.,
-latitude and longitude) etc. The full list of metadata fields is provided in Table 1.
+latitude and longitude) etc. The full list of global metadata fields is provided in Table 1.
 
-**Table 1: Table of metadata fields. The metadata listed as common are present in all product files for that network**
+**Table 1: Table of global metadata fields. The metadata listed as common are present in all product files**
 
 .. csv-table::
    :file: table_metadata.csv
