@@ -219,7 +219,7 @@ shadows or part of the installation (such as a mast) in the
 field-of-view, to quality checks that are very specific to the
 surface for a given site (e.g., ensuring vegetation is measured
 for the Wytham Woods UK (WWUK) site, or checking abnormal
-high reflectance values over clear or low turbid waters). Such sitespecific
+high reflectance values over clear or low turbid waters). Such site-specific
 checks often use thresholds (determined from analysis of
 the first months/year of data) checking the reflectance (or ratios
 of reflectances, e.g., epsilon for water sites, or NDVI for vegetated
@@ -233,5 +233,7 @@ viewing geometry and time of day) at the same site, to identify
 outliers so that they can be investigated. If these outliers are found to
 come from invalid data, further quality checks can be added to
 remove such cases.
-The resulting site-specific masks are applied on a sequence-bysequence
+The resulting site-specific masks are applied on a sequence-by-sequence
 basis to both L2A data (resulting in L2B dataset) and to the
+L1B dataset (resulting in L1D dataset). The same mask is applied to
+both L2A and L1B so that they remain consistent with each-other.
