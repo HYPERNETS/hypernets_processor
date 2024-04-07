@@ -18,9 +18,9 @@ In the following subsections, we will first discuss the data structure and some 
 .. toctree::
    :maxdepth: 1
 
-   products/data_structure
    products/product_files
-   products/SQL_databases 
+   products/variables
+   products/SQL_databases
    products/metadata 
    products/flags 
    products/anomalies 
