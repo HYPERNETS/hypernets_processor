@@ -36,7 +36,7 @@ L0A: Read raw data
 :::::::::::::::::::
 While reading in the data, there are quality checks that verify
 whether the metadata.txt file is appropriate and all required raw data
-files exist. If this checks fails, an anomaly is raised (see :ref:`anomalies`) and
+files exist. If these checks fail, an anomaly is raised (see :ref:`anomalies`) and
 the processing halts. There is also a quality check which checks whether
 the file with meteorological information exists. If it does not, an
 anomaly is added to the SQL database, but the processing is
@@ -59,7 +59,7 @@ used when averaging the series. This process is repeated until
 convergence and applied to the measured (ir)radiances and to
 the darks. The L0 data is also checked for saturation (digital
 number :math:`DN ≥ 64,000`) and for discontinuities (missing values or
-:math`\Delta DN > 10^4`). A flag is also added to the L1 data if any of the dark
+:math:`\Delta DN > 10^4`). A flag is also added to the L1 data if any of the dark
 scans have been masked by the above processes. Scans not
 satisfying the quality checks are flagged, but no data are
 removed at this stage.
@@ -78,42 +78,50 @@ gone wrong.
 
 L1B: Check calibrated data is fit for purpose
 ::::::::::::::::::::::::::::::::::::::::::::::::
-After calibrating the L0B file,we check all the requiredmeasurements
+After calibrating the L0B file, we check all the required measurements
 to form a standard sequence are included and have not been flagged by
-the previous ‘not_enough_dark_scans’, ‘not_enough_rad_scans’ or ‘not_
-enough_irr_scans’ flags. If any series are missing or flagged, the ‘series_
-missing’ is added to all the series in the sequence. If there are no valid
+the previous ‘not_enough_dark_scans’, ‘not_enough_rad_scans’ or
+‘not_enough_irr_scans’ flags. If any series are missing or flagged, the
+‘series_missing’ is added to all the series in the sequence. If there are no valid
 radiance or irradiance measurements, the processing is halted.
 
 Next, quality checks on the irradiance measurements are applied.
 First, their viewing angles are checked (which must be 180°, with a
 tolerance of 2°, as irradiance measurements have to be pointing up).
 Next, the irradiance is compared to a simulated clear-sky model. This
-clear skymodel is made using the libRadtran radiative transfer software
+clear-sky model is made using the libRadtran radiative transfer software
 package (Emde et al., 2016), assuming its mid-latitude summer
-standard atmosphere and its standard desert surface (for land sites)
+standard atmosphere, its standard desert surface (for land sites)
 and its standard ocean surface (for water sites). Note that the surface
 does not make a big difference as it is only second-order effects that
-affect the downwelling irradiance used in the clear sky model. The
+affect the downwelling irradiance used in the clear-sky model. The
 surface is assumed to be at sea-level and the TSIS solar irradiance model
 is used (Coddington et al., 2021). Given the downwelling irradiance
 measures the full hemisphere, the only relevant angle is the solar zenith
-angle. A clear skymodel is calculated using solar zenith angles of 0°, 10°,
+angle. A clear-sky model is calculated using solar zenith angles of 0°, 10°,
 20°, 40°, 60°, 70° and 80°. These irradiance data are provided at 0.1 nm
 resolution to the HYPERNETS_PROCESSOR.
 
 When performing the clear sky quality check, the irradiance data
 are band integrated to the HYPSTAR® bands (which vary slightly
+from instrument to instrument), as defined by the calibration data,
+using the `matheo tool <https://matheo.readthedocs.io/en/latest/>`_.
+The measured HYPERNETS irradiances are
+then scaled (assuming cosine response) to match the nearest solar
+zenith angle among the provided clear sky models. In Figure 11, we
+show an example of the clear sky checks applied to the irradiance.
+We note that the clear sky models are not always very close, as a midlatitude
+summer atmosphere at sea-level was used as opposed to a
+more realistic site-specific model. Therefore this quality check only
 fails if there are significant differences of more than 50% with the
-clear sky model (for more than 10% of the wavelength bands).
+clear-sky model (for more than 10% of the wavelength bands).
 Overcast conditions consistently trigger this quality flag.
 Then, there is a quality check verifying that the irradiance has
 not changed more than 10% (after correcting for differences in
 solar zenith angle) between the measurements at the start and
 end of the sequence. At this stage the resulting irradiance series
-are flagged and the L1B file is produced. However if this ‘variable_
-irradiance’ check is triggered the processing will be halted at the
-L1C stage.
+are flagged and the L1B file is produced. However if this ‘variable_irradiance’
+check is triggered the processing will be halted at the L1C stage.
 
 There are also some quality checks on the uncertainties. These
 check that there are no negative uncertainties and that less than 50%
@@ -136,15 +144,15 @@ checks verifying the data is valid. If the ‘variable_irradiance’ flag
 was raised in previous levels, we cannot perform reliable
 interpolation and the processing is halted. Next, the processing is
 halted if there are no valid series for either radiance or irradiance
-(checking ‘not_enough_dark_scans’, ‘not_enough_irr_scans’, ‘not_
-enough_rad_scans’ or ‘vza_irradiance’ flags). When all irradiance
+(checking ‘not_enough_dark_scans’, ‘not_enough_irr_scans’, ‘not_enough_rad_scans’
+or ‘vza_irradiance’ flags). When all irradiance
 series have the ‘no_clear_sky_irradiance’ flag, the processing is
 continued, as overcast products might still be useful to some
 users (available by request). A flag is added to all series to
 indicate this is a sequence without clear sky irradiance. No L1D/
 L2B data will be produced (and thus this data will not be provided
-publicly). When only one irradiance series is available (due to ‘vza_
-irradiance’ or missing measurements), the processing is continued,
+publicly). When only one irradiance series is available (due to ‘vza_irradiance’
+or missing measurements), the processing is continued,
 and the same irradiance is used for every radiance series (instead of
 temporally interpolating), with a correction for the changing solar
 zenith angle throughout the sequence. A flag is added to the entire
@@ -167,7 +175,7 @@ downwelling radiance pair does not have a similar pointing azimuth angle
 equals 180-θv for Lu (within 1° accuracy).
 
 The processor also checks for the temporal variability within each
-series. Scans for Ed, Lu and Ld at 550 nm, should not vary bymore than
+series. Scans for Ed, Lu and Ld at 550 nm, should not vary by more than
 a certain threshold with their neighbouring scans (default threshold is
 25%). Note, those flags are not expected to be raised as scans with high
 temporal variability should have been removed by previous flags,

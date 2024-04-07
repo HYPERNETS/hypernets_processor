@@ -201,10 +201,6 @@ class TestEndToEnd(unittest.TestCase):
             "measurement_function_surface_reflectance", "LandNetworkProtocol"
         )
         context.set_config_value("processor_directory", this_directory_path)
-        context.set_config_value(
-            "calibration_directory",
-            os.path.join(this_directory_path, "..\\calibration_files\\HYPSTAR_cal\\"),
-        )
         context.set_config_value("archive_directory", os.path.join(tmpdir, "out"))
         context.set_config_value("mcsteps", 100)
 

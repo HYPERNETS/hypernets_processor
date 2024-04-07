@@ -13,7 +13,7 @@ Bit #,name,network,level,Description,anomaly raised
 12, not_enough_irr_scans, L & W , L0B , Not enough valid irradiance scans for this series (# valid irradiance scans < n_valid_irr from the config file) , `ned'
 13, series_missing , L & W , L1B , Check if there are any missing series (either not present or flagged by `not_enough_dark_scans'; `not_enough_irr_scans'; `not_enough_rad_scans' or `vza_irradiance') , `ms'
 14, vza_irradiance , L & W , L1B , One of the irradiance measurements did not have theta_v=180° (within 2° tolerance) so has been masked  ,
-15, no_clear_sky_irradiance, L & W , L1B , More than 10% of the wavelength bands have a difference of more than 50% with the clear sky model  ,
+15, no_clear_sky_irradiance, L & W , L1B , More than 10% of the wavelength bands have a difference of more than 50% with the clear-sky model  ,
 16, variable_irradiance, L & W , L1B , More than 10\% difference between start and end E_d at 550~nm ,
 17, half_of_unc_too_big , L & W , L1B , More than 50\% of data has random error above 100% (likely corrupted or dark data) , `o'
 18, single_irradiance_used, L & W , L1C , If only one series of irradiance is used for the computation of the reflectance  ,

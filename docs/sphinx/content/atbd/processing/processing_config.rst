@@ -437,7 +437,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Plotting L1A data
      - default: True
    * - plot_l1a_diff
-     - Plotting differences in L1A data
+     - Plotting differences in L1A data (plotted separately per series)
      - default: True
    * - plot_l1b
      - Plotting L1B data
@@ -623,6 +623,10 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - clear_sky_check
      - Compare irradiance series with simulated clear sky
      - Default: True
+   * - vnir_swir_discontinuity_percent
+     - maximum discontinuity allowed between the VNIR ans SWIR spectra
+     - 25%
+
 
 
 **Table 7: Calibration**
@@ -641,7 +645,24 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - measurement function used for the calibration of the radiance and irradiance scans
      - e.g. StandardMeasurementFunction
 
-**Table 8: Interpolate**
+**Table 7: Combine VNIR and SWIR**
+
+.. list-table::
+   :widths: 10 20 10
+   :header-rows: 1
+
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - combine_lim_wav
+     - wavelength at which the data is switched from VNIR to SWIR
+     - 1000
+   * - measurement_function_combine
+     - measurement function used for combining the VNIR and SWIR data into a single spectrum
+     - e.g. StepCombine
+
+
+**Table 9: Interpolate**
 
 .. list-table::
    :widths: 10 20 10
@@ -653,14 +674,11 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - measurement_function_interpolate_time
      - Measurement function used to interpolate the irradiance scans at the timestamp of the upwelling radiance (for the computation of the reflectance).
      - e.g. InterpolationTimeLinearCoscorrected
-   * - measurement_function_interpolate_time_skyradiance
-     - Measurement function used to interpolate the downwelling radiance scans (for water network only) at the timestamp of the upwelling radiance (for the air-water interface reflectance correction).
-     - e.g. WaterNetworkInterpolationSkyRadianceLinearCoscorrected
    * - measurement_function_interpolate_wav
      - Measurement function used to interpolate the irradiance scans at the wavelengths of the upwelling radiance.
      - e.g. InterpolationWavLinear
 
-**Table 9: SurfaceReflectance**
+**Table 10: SurfaceReflectance**
 
 .. list-table::
    :widths: 10 20 10
@@ -671,137 +689,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - measurement_function_surface_reflectance
      - Measurement function used for the computation of the surface reflectance.
-     - e.g. WaterNetworkProtocol
-   * - measurement_function_water_leaving_radiance
-     - Measurement function used for the computation of the water leaving radiance (for water network only).
-     - e.g. WaterNetworkProtocolWaterLeavingRadiance
+     - LandNetworkProtocol
 
-**Table 10: WaterStandardProtocol**
-
-.. list-table::
-   :widths: 10 20 10
-   :header-rows: 1
-
-   * - Configuration parameter
-     - Definition
-     - Options/example
-   * - protocol
-     - Protocol for the water network
-     - e.g. WaterNetworkProtocol
-   * - n_upwelling_rad
-     - Minimum number of the water network protocol for upwelling radiance
-     - Default: 3
-   * - n_downwelling_rad
-     - Minimum number of the water network protocol for downwelling radiance
-     - Default: 3
-
-**Table 11: Air_water_inter_correction**
-
-.. list-table::
-   :widths: 25 50 25
-   :header-rows: 1
-
-   * - Configuration parameter
-     - Definition
-     - Options/example
-   * - rhof_option
-     - Option to be used for the correction of the air-water interface reflectance factor.
-     - e.g. Mobley1999
-   * - rhof_default
-     - Default value to be used in case above method fails and/or if no method is given.
-     - Default: 0.0256
-   * - wind_ancillary
-     - Source for wind speed to be used for the air-water interface reflectance factor.
-     - e.g.  GDAS
-   * - wind_default
-     - Default wind speed value if above method fails and/or no wind speed is provided.
-     - Default: 2.0
-   * - met_dir
-     - Path to directory with ancillary data files for wind speed. If `wind_ancillary` is set to GDAS and no wind speed is present for the given dat and location, wind speed is extracted from https://thredds.rda.ucar.edu/thredds and saved in the `met_dir` directory for later (re)processing.
-     - e.g. /waterhypernet/Ancillary/GDAS/
-   * - thredds_url
-     - e.g. https://thredds.rda.ucar.edu/thredds
-     - URL for wind source if no wind speed is found for time and location in `met_dir`.
-   * - rhymer_data_dir
-     - Data directory for ancillary data to be used within RHYMER (e.g. directory including LUT for air-water interface reflectance correction).
-     - e.g. ./rhymer/data
-   * - rholut
-     - Name of LUT to be used to retrieve the air-water interface reflectance factor.
-     - e.g. rhoTable_AO1999
-
-**Table 12: VariabilityCheck**
-
-.. list-table::
-   :widths: 25 50 25
-   :header-rows: 1
-
-   * - Configuration parameter
-     - Definition
-     - Options/example
-   * - ed_cos_sza
-     - Boolean wether or not the irradiance is normalized by the cosinus of the solar zenith angle before the above quality checks are applied (i.e. irr_variability_percent)
-     - True or flase
-   * - no_go_zone
-     - Place holder to include the path to an site specific configuration file
-     - e.g. /waterhypernet/Ancillary/nogo_zone/azimuth_range.config (not used yet)
-
-**Table 13: SimSpecSettings**
-
-.. list-table::
-   :widths: 25 50 25
-   :header-rows: 1
-
-   * - Configuration parameter
-     - Definition
-     - Options/example
-   * - similarity_test
-     - Apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152)
-     - Default: False
-   * - similarity_correct
-     - Apply similarity correction
-     - Default: True
-   * - similarity_wr
-     - Default: 670
-     - Reference wavelength to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
-   * - similarity_wp
-     - Threshold to be used to apply the NIR Similarity correction test (see Ruddick et al., 2005, DOI: 10.1117/12.615152).
-     - Default: 0.05
-   * - similarity_w1
-     - Reference wavelength 1 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
-     - Default: 780
-   * - similarity_w2
-     - Default: 870
-     - Reference wavelength 2 to apply the NIR Similarity Correction (see Ruddick et al., 2006 DOI: 10.2307/3841124).
-   * - similarity_alph
-     - Similarity reflectance spectrum for the two wavelength, similarity_w1 and similarity_w2, to apply the NIR Similarity Correction (see Table 1 in Ruddick et al., 2006 DOI: 10.2307/3841124).
-     - Default: 0.523
-
-**Table 14: WaterFinalMeasurementTest**
-
-.. list-table::
-   :widths: 25 50 25
-   :header-rows: 1
-
-   * - Configuration parameter
-     - Definition
-     - Options/example
-   * - test_measurement
-     - Extra quality controls on final products to retain or reject spectra (placeholder, not used yet).
-     - Default: True (placeholder, not used yet).
-   * - test_sun_wave
-     - Wavelength to consider to check the Ld /Ed data (placeholder, not used yet).
-     - Default: 750 (placeholder, not used yet).
-   * - test_sun_threshold
-     - Threshold to apply on the Ld/Ed ratio (placeholder, not used yet).
-     - Default: 0.05 (placeholder, not used yet).
-   * - test_var_wave
-     - Wavelength to consider to check the final water reflectance data (placeholder, not used yet).
-     - Default: 780 (placeholder, not used yet).
-   * - test_var_threshold
-     - Threshold to apply on the final reflectance data (placeholder, not used yet).
-     - Default: 0.10 (placeholder, not used yet).
-
-**Table 15: Output**
+**Table 11: Output**
 
 .. list-table::
    :widths: 25 50 25
@@ -838,7 +728,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Write output file L2A
      - default: True
 
-**Table 16: Plotting**
+**Table 12: Plotting**
 
 .. list-table::
    :widths: 25 50 25
@@ -863,7 +753,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Plotting L1A data
      - default: True
    * - plot_l1a_diff
-     - Plotting differences in L1A data
+     - Plotting differences in L1A data (plotted separately per series)
      - default: True
    * - plot_l1b
      - Plotting L1B data
@@ -883,3 +773,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - plot_clear_sky_check
      - Plotting the irradiance L1B data with the clear-sky simulations used for the clear-sky check.
      - default: True
+   * - plot_polar_wav
+     - Wavelength for which to make a polar plot showing the angular variation in reflectance (using colourscale)
+     - default: 900
+   * - plot_polar_min
+     - minimum reflectace in the colourscale for polar plot showing the angular variation in reflectance
+     -
+   * - plot_polar_max
+     - macimum reflectace in the colourscale for polar plot showing the angular variation in reflectance
+     -
+
