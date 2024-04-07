@@ -18,12 +18,12 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 
 1. **Quality check of the scans** (flags: temp_variability_irr, temp_variability_rad):
 
-   The first function in the *rhymer_hypstar.process_l1c* module checks for the variability within a series, i.e., it assigns flags to each scan showing a temporal jump, with the previous and following scan, of more than a given threshold (25% is the default) at 550 nm. 
+   The first function in the *rhymer_hypstar.process_l1c* module checks for the variability within a series, i.e. it assigns flags to each scan showing a temporal jump, with the previous and following scan, of more than a given threshold (25% is the default) at 550 nm.
 
 
 2. **Parse cycle** (flags: angles_missing, lu_eq_missing, fresnel_angle_missing, fresnel_default, min_nbred, min_nbrlu, min_nbrlsky,):
 
-   The second function parses the cycle, i.e., it separates downwelling and upwelling radiance, investigate if all required angles are present and if there are coincident upwelling and downwelling radiance measurements for the retrieval of the water leaving radiance. 
+   The second function parses the cycle, i.e. it separates downwelling and upwelling radiance, investigate if all required angles are present and if there are coincident upwelling and downwelling radiance measurements for the retrieval of the water leaving radiance.
 
 
 3. **Wavelength interpolation**:
@@ -43,8 +43,8 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 
 6. **Ancillary data retrieval**:
 
-   All the required parameters for the computation of the water leaving radiance and reflectance, i.e., wind speed, ws, and the effective fresnel reflectance        coefficient (:math:`\rho(\theta,\theta_0,\Delta\phi,ws)` are retrived. Wind speed may be taken from, e.g., a default value (e.g., 2m/s), in situ measurements,    ancilliary datasets such as NCEP Met data. Similarly, the Fresnel reflectance coefficient can be extracted from : (1) different look-up tables (Mobley 1999       (default); 2015), or, set to a default value, estimated as a function of wind speed (e.g., Ruddick et al. 2006). 
-   The  configuration files (job and processing) determine which option is used for the processing (see Section 6.9, e.g., fresnel_option: Ruddick2006). 
+   All the required parameters for the computation of the water leaving radiance and reflectance, i.e. wind speed, ws, and the effective fresnel reflectance        coefficient (:math:`\rho(\theta,\theta_0,\Delta\phi,ws)` are retrived. Wind speed may be taken from, e.g. a default value (e.g. 2m/s), in situ measurements,    ancilliary datasets such as NCEP Met data. Similarly, the Fresnel reflectance coefficient can be extracted from : (1) different look-up tables (Mobley 1999       (default); 2015), or, set to a default value, estimated as a function of wind speed (e.g. Ruddick et al. 2006).
+   The  configuration files (job and processing) determine which option is used for the processing (see Section 6.9, e.g. fresnel_option in Ruddick et al. 2006).
 
 
 7. **Intermediate L1C surface reflectance**:

@@ -36,7 +36,7 @@ Processing Outline
 The network processing is done centrally on the LANDHYPERNET and WATERHYPERNET servers,
 through a command line interface, which continuously checks for new data, and processes it as soon as
 it comes in. The hypernets_processor takes the data from acquisition (raw data) to application of
-calibration and quality controls, computation of correction factors (e.g., air-water interface reflectance
+calibration and quality controls, computation of correction factors (e.g. air-water interface reflectance
 correction for water processing), temporal interpolation to coincident timestamps, processing to surface
 reflectance and averaging per series. A diagram showing the design for the network processing is provided
 in the Figure below.

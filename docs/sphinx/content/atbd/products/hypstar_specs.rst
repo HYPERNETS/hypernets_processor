@@ -47,7 +47,7 @@ is mounted on a low-cost pointing system which allows the acquisition of autonom
 measurements. A GPS, light and rain sensors as well as cameras to image the target and the sensor heads
 are also included. Data acquired by the HYPSTAR® is saved in separate binary ‘.spe’ files for each viewing
 geometry. These acquisitions are sent to the central server for processing, together with some ‘rgb’ images
-taken by the camera within the system, a file with meteorological information (i.e., relative humidity,
+taken by the camera within the system, a file with meteorological information (i.e. relative humidity,
 temperature and pressure measured within the system and illuminance measured by an external light
 sensor), log files made during the acquisition and data transfer, and a metadata file.
 

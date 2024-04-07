@@ -136,7 +136,7 @@ To open the archive database and check the products, you can use the following c
 $ sqlite3 anomaly.db
 $ sqlite> PRAGMA table_info(products);
 
-To investigate specific products, e.g., based on date, processing level and or processing version::
+To investigate specific products, e.g. based on date, processing level and or processing version::
 
 $ sqlite> SELECT * FROM products WHERE sequence_name LIKE "%SEQ2023%";
 $ sqlite> SELECT * FROM products WHERE product_level =="L2A";
@@ -147,7 +147,7 @@ To quit, use CTRL+D.
 Examples
 -------------------
 
-As an example, the following steps are required to automatically process data transferred from the field (e.g., from a site called M1BE) to a server.
+As an example, the following steps are required to automatically process data transferred from the field (e.g. from a site called M1BE) to a server.
 
 After running the `hypernets_processor_setup` as follow::
 
@@ -192,7 +192,7 @@ $ nohup hypernets_scheduler &
 
 Once launched, the following log files will be populated with all the required notifications about the ongoing processing.
 
-* [site_id].log (e.g., M1BE.log)
+* [site_id].log (e.g. M1BE.log)
 * scheduler.log
 
 A handy command that lists the ongoing nohup tasks is::

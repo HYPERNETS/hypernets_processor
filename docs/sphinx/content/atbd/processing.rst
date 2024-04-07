@@ -11,7 +11,7 @@ Processing Algorithm Description
 
 In this section, we describe the algorithms used within the **hypernets_processor** in order to process 
 the raw data taken by the HYPSTAR instruments to reflectances products for both the WATERHYPERNET and LANDHYPERNET networks.
-The HYPSTAR systems have been deployed at various sites, and collect measurements periodically and and send these to the HYPERNETS servers for processing.
+The HYPSTAR systems have been deployed at various sites, and collect measurements periodically and send these to the HYPERNETS servers for processing.
 Within this ATBD, we focus on the processing of these automatically collected data.
 The main goal of this processing is to produce quality-controlled (ir)radiance and reflectance data with well-characterised 
 uncertainties for all automated sequences measured by the network, and make these available to the international user community.
@@ -35,7 +35,6 @@ Links to each of the subsections can be found here:
 .. toctree::
    :maxdepth: 1
 
-   processing/data_structure
    processing/hypernets_reader
    processing/calibrate
    processing/average

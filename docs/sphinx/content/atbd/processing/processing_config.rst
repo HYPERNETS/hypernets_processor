@@ -44,7 +44,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - siteid
      - site id as given in the jobs list
-     - e.g., VEIT
+     - e.g. VEIT
    * - offset_pan
      - offset pan with true North
      - default 0°
@@ -61,7 +61,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - system longitude
      - longitude of site
    * - angle2use
-     - Ange used to compute the viewing geometry (i.e., pt_ref is the pan and tilt angles with the HYPSTAR as reference - use offset pan and tilt to retrieve viewing geometry with true North)
+     - Ange used to compute the viewing geometry (i.e. pt_ref is the pan and tilt angles with the HYPSTAR as reference - use offset pan and tilt to retrieve viewing geometry with true North)
      - pt_ref, pt_ask or pt_abs
 
 **Table 2: Processor**
@@ -110,13 +110,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - True/False
    * - metadata_db_url
      - path to sql database for the metadata
-     - e.g., sqlite:///waterhypernet/HYPSTAR/Processed/metadata.db
+     - e.g. sqlite:///waterhypernet/HYPSTAR/Processed/metadata.db
    * - archive_db_url
      - path to sql database for the archive
-     - e.g., sqlite:///waterhypernet/HYPSTAR/Processed/archive.db
+     - e.g. sqlite:///waterhypernet/HYPSTAR/Processed/archive.db
    * - anomaly_db_url
      - path to sql database for the anoamlies
-     - e.g., sqlite:///waterhypernet/HYPSTAR/Processed/anomaly.db
+     - e.g. sqlite:///waterhypernet/HYPSTAR/Processed/anomaly.db
 
 **Table 4: Metadata**
 
@@ -165,13 +165,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Threshold for the maximum difference in digital number between two neighbouring wavelengths (triggering discontinuity flag)
      - Default: 10000
    * - bad_pointing_threshold_zenith
-     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle (in degrees, i.e., difference between pt_ref and pt_abs).
+     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle (in degrees, i.e. difference between pt_ref and pt_abs).
      - Default: 3
    * - bad_pointing_threshold_azimuth
-     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) azimuth angle (in degrees, i.e., difference between pt_ref and pt_abs).
+     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) azimuth angle (in degrees, i.e. difference between pt_ref and pt_abs).
      - Default: 3
    * - irradiance_zenith_treshold
-     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle for irradiance measurements (in degrees, i.e., difference between pt_ref and pt_abs).
+     - Maximum allowed difference between the requested (sequence protocol) and reported (by the system in the raw metadata file) viewing angle for irradiance measurements (in degrees, i.e. difference between pt_ref and pt_abs).
      - Default: 2
    * - n_valid_irr
      - Minimum number of valid irradiance scans for a single series.
@@ -210,10 +210,10 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - hypstar_cal_number
      - HYPSTAR ID number (usually overwritten by the ID number given in the metadata file from the sequence directory)
-     - e.g., 120241
+     - e.g. 120241
    * - measurement_function_calibrate
      - measurement function used for the calibration of the radiance and irradiance scans
-     - e.g., StandardMeasurementFunction
+     - e.g. StandardMeasurementFunction
 
 **Table 8: Interpolate**
 
@@ -226,13 +226,13 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - measurement_function_interpolate_time
      - Measurement function used to interpolate the irradiance scans at the timestamp of the upwelling radiance (for the computation of the reflectance).
-     - e.g., InterpolationTimeLinearCoscorrected
+     - e.g. InterpolationTimeLinearCoscorrected
    * - measurement_function_interpolate_time_skyradiance
      - Measurement function used to interpolate the downwelling radiance scans (for water network only) at the timestamp of the upwelling radiance (for the air-water interface reflectance correction).
-     - e.g., WaterNetworkInterpolationSkyRadianceLinearCoscorrected
+     - e.g. WaterNetworkInterpolationSkyRadianceLinearCoscorrected
    * - measurement_function_interpolate_wav
      - Measurement function used to interpolate the irradiance scans at the wavelengths of the upwelling radiance.
-     - e.g., InterpolationWavLinear
+     - e.g. InterpolationWavLinear
 
 **Table 9: SurfaceReflectance**
 
@@ -245,10 +245,10 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - measurement_function_surface_reflectance
      - Measurement function used for the computation of the surface reflectance.
-     - e.g., WaterNetworkProtocol
+     - e.g. WaterNetworkProtocol
    * - measurement_function_water_leaving_radiance
      - Measurement function used for the computation of the water leaving radiance (for water network only).
-     - e.g., WaterNetworkProtocolWaterLeavingRadiance
+     - e.g. WaterNetworkProtocolWaterLeavingRadiance
 
 **Table 10: WaterStandardProtocol**
 
@@ -261,7 +261,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - protocol
      - Protocol for the water network
-     - e.g., WaterNetworkProtocol
+     - e.g. WaterNetworkProtocol
    * - n_upwelling_rad
      - Minimum number of the water network protocol for upwelling radiance
      - Default: 3
@@ -280,28 +280,28 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - rhof_option
      - Option to be used for the correction of the air-water interface reflectance factor.
-     - e.g., Mobley1999
+     - e.g. Mobley1999
    * - rhof_default
      - Default value to be used in case above method fails and/or if no method is given.
      - Default: 0.0256
    * - wind_ancillary
      - Source for wind speed to be used for the air-water interface reflectance factor.
-     - e.g.,  GDAS
+     - e.g.  GDAS
    * - wind_default
      - Default wind speed value if above method fails and/or no wind speed is provided.
      - Default: 2.0
    * - met_dir
      - Path to directory with ancillary data files for wind speed. If `wind_ancillary` is set to GDAS and no wind speed is present for the given dat and location, wind speed is extracted from https://thredds.rda.ucar.edu/thredds and saved in the `met_dir` directory for later (re)processing.
-     - e.g., /waterhypernet/Ancillary/GDAS/
+     - e.g. /waterhypernet/Ancillary/GDAS/
    * - thredds_url
-     - e.g., https://thredds.rda.ucar.edu/thredds
+     - e.g. https://thredds.rda.ucar.edu/thredds
      - URL for wind source if no wind speed is found for time and location in `met_dir`.
    * - rhymer_data_dir
-     - Data directory for ancillary data to be used within RHYMER (e.g., directory including LUT for air-water interface reflectance correction).
-     - e.g., ./rhymer/data
+     - Data directory for ancillary data to be used within RHYMER (e.g. directory including LUT for air-water interface reflectance correction).
+     - e.g. ./rhymer/data
    * - rholut
      - Name of LUT to be used to retrieve the air-water interface reflectance factor.
-     - e.g., rhoTable_AO1999
+     - e.g. rhoTable_AO1999
 
 **Table 12: VariabilityCheck**
 
@@ -313,11 +313,11 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Definition
      - Options/example
    * - ed_cos_sza
-     - Boolean wether or not the irradiance is normalized by the cosinus of the solar zenith angle before the above quality checks are applied (i.e., irr_variability_percent)
+     - Boolean wether or not the irradiance is normalized by the cosinus of the solar zenith angle before the above quality checks are applied (i.e. irr_variability_percent)
      - True or flase
    * - no_go_zone
      - Place holder to include the path to an site specific configuration file
-     - e.g., /waterhypernet/Ancillary/nogo_zone/azimuth_range.config (not used yet)
+     - e.g. /waterhypernet/Ancillary/nogo_zone/azimuth_range.config (not used yet)
 
 **Table 13: SimSpecSettings**
 

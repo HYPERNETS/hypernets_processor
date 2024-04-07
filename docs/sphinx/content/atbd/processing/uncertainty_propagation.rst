@@ -101,7 +101,7 @@ on the Spectral Response Functions (SRF) of the radiance and irradiance sensors 
 between the two is important when calculating reflectance) should also be considered (see also Ruddick
 et al., 2023). To account for these missing uncertainty contributions, a placeholder uncertainty of 2% is
 added to the systematic independent uncertainty, assuming systematic spectral correlation. In the strong
-atmospheric absorption features (i.e., 757.5-767.5 nm and 1350-1390 nm), an additional placeholder
+atmospheric absorption features (i.e. 757.5-767.5 nm and 1350-1390 nm), an additional placeholder
 uncertainty of 50% (assuming random spectral error correlation) is added to account for the difference in
 SRF becoming dominant.
 

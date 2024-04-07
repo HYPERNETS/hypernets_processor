@@ -15,7 +15,7 @@ and further site-specific quality checks are still being added by the site-owner
 restricted to consortium members. In addition, for the WATERHYPERNET network the distribution may
 be delayed to ensure that the NCEP/GDAS forecast data for wind speed are made available for the latest
 sequence (should be less than 24hours). Data transfer from the system to the server may also delay the
-NRT processing (e.g., due to poor 4G connections on the field). In the near future, these data portals will
+NRT processing (e.g. due to poor 4G connections on the field). In the near future, these data portals will
 be opened to the public and will become the reference source of data for HYPERNETS.
 
 In the meantime, a subset of the HYPERNETS data until 2023-04-31 is publicly available and can be
@@ -27,8 +27,8 @@ on Zenodo will be released in the near future, using the v2.0 of the HYPERNETS P
 
 To follow the Findable-Accessible-Interoperable and Reusable principles (FAIR), particular attention
 is given to the data format and metadata, and, data accessibility. Files are in the NetCDF CF-convention
-version 1.8 format. Common metadata (e.g., metadata section added with each data product) follow the
+version 1.8 format. Common metadata (e.g. metadata section added with each data product) follow the
 INSPIRE directives15 in accordance with the EN ISO 19115 for the metadata elements and the Dublin
 Core Metadata Initiative16. Instrument, component and system metadata are bound by a unique metadata
-key (i.e., system id) allowing to trace the history of the system (e.g., replacement, maintenance, system
+key (i.e. system id) allowing to trace the history of the system (e.g. replacement, maintenance, system
 updates or instrument setup improvements).

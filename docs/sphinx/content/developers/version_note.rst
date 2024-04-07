@@ -27,7 +27,7 @@ results using the v1.0 data products can be understood.
 • The first important difference is in the definition of the
 viewing azimuth angles, which have changed by 180° in
 order to be consistent with satellite viewing azimuth angles
-in v2.0 (see Section 2.2). The pointing azimuth angles in
+in v2.0 (see :ref:`definitions`). The pointing azimuth angles in
 v2.0 are equal to the viewing azimuth angles in v1.0.
 Pointing azimuth angles are mainly of interest for the
 WATERHYPERNET network as it is commonly used
@@ -36,16 +36,16 @@ the relative azimuth angles.
 • Uncertainty propagation is now consistently applied to all
 WATERHYPERNET products, in the same way as for the
 LANDHYPERNET network.
-• Output files and their names have slightly changed, e.g., there
+• Output files and their names have slightly changed, e.g. there
 are now L0A and L0B files as opposed to only L0 files, and, the
 relative azimuth angle, used for the approximation of the airwater
 interface reflection factor within the
 WATERHYPERNET network, is also added to the L1C and
 L2A product names.
 • Reflectance files with site specific quality checks applied are
-called L2B files in v2.0 (see Section 3.3.7), as opposed to L2A
+called L2B files in v2.0, as opposed to L2A
 files in v1.0. These are the main files to be distributed.
-• There were many minor changes (e.g., to the metadata and the
+• There were many minor changes (e.g. to the metadata and the
 quality checks) that are not worth noting individually but do
 make a difference to the produced HYPERNETS products.
 

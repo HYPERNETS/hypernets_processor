@@ -33,7 +33,7 @@ The files are stored in the NetCDF data format and so have the extension “.nc�
 +======================+======================================================================================================+
 | SYSTEM               | “HYPERNETS”                                                                                          |
 +----------------------+------------------------------------------------------------------------------------------------------+
-| NETWORK              | Name of product network, i.e., W and L for Water and Land network, respectively.                     |
+| NETWORK              | Name of product network, i.e. W and L for Water and Land network, respectively.                     |
 +----------------------+------------------------------------------------------------------------------------------------------+
 | SITEID               | Abbreviated site names defined in  Table 2.                                                          |
 +----------------------+------------------------------------------------------------------------------------------------------+
@@ -82,7 +82,7 @@ Table 2 defines the abbreviated name convention applicable to the individual Hyp
 
 Data level
 ----------
-The end-to-end prototype processor takes the data from acquisition (raw data) to application of calibration and quality controls, computation of correction factors (e.g., Fresnel correction for water processing), temporal interpolation to coincident timestamps, processing to surface reflectance and averaging per series. To account for all these steps different data levels have been defined (see Table 3). See :ref:`data_structure` for a detailed explanantion of the terminology used.
+The end-to-end prototype processor takes the data from acquisition (raw data) to application of calibration and quality controls, computation of correction factors (e.g. Fresnel correction for water processing), temporal interpolation to coincident timestamps, processing to surface reflectance and averaging per series. To account for all these steps different data levels have been defined (see Table 3). See :ref:`data_structure` for a detailed explanantion of the terminology used.
 
 **Table 3: HYPERNETS processing levels**
 

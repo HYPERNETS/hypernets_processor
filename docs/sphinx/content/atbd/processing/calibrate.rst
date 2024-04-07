@@ -19,7 +19,7 @@ the `calibration laboratory at Tartu University <https://kosmos.ut.ee/en/laborat
 When multiple calibration files are available (i.e. at different calibration dates) the one nearest to the
 acquisition time is used, though only looking backward. When reprocessing data, calibration dates after the
 acquisition date are thus ignored. Interpolation between pre-deployment and post-deployment calibrations
-will be explored in the future (see Section 6).
+will be explored in the future.
 
 The exact measurement function to be used can be specified manually by providing the measurement function as a standalone python script.
 If no custom measurement function is provided, a default measurement function is used (labelled StandardMeasurementFunction). 

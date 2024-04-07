@@ -18,7 +18,7 @@ components.
 
 In addition to these there are coordinate variables,
 wavelength and series/scans, as well as a number of common
-variables (i.e., present in each of the data products) that provide
+variables (i.e. present in each of the data products) that provide
 additional details about the measurement. Acquisition time,
 viewing zenith and azimuth angle, solar zenith and azimuth
 angle are examples of common variables with series or scans
@@ -47,7 +47,7 @@ information about how, and when the data was processed,
 what data files it used, information about the site (e.g.,
 latitude and longitude) etc.
 
-A full list of the available variables in provided in Table 1.
+A full list of the available variables is provided in Table 1.
 
 **Table 1: Table of variables. The variables listed as common are present in all product files**
 

@@ -2,19 +2,19 @@ Bit #,name,network,level,Description,anomaly raised
 1, lon_default, L & W , L0A , Default longitude as given in the configuration file is used (missing Lon in metadata) ,
 2, lat_default, L & W , L0A , same as `lon_default' but for latitude  ,
 3, pt_ref_invalid , L & W , L0A , No effective pan/tilt is returned and the requested pan/tilt was used instead ,
-4, bad_pointing , L & W , L0A , Difference between requested and effective pan/tilt angle is $>=$ 3°  , `a'
+4, bad_pointing , L & W , L0A , Difference between requested and effective pan/tilt angle is >= 3°  , `a'
 5, outliers, L & W , L1A , If the spectrally integrated signal of the scan is more than 3 sigma or more than 25\% (whichever is largest) removed from the mean; it is masked and will not be used when averaging the series. This process is repeated until convergence and applied to the measured (ir)radiances and to the darks. ,
-6, L0_threshold, L & W , L1A , Check if any of the spectral pixels are saturated; i.e. digital number $DN>=64000$ ,
-7, L0_discontinuity, L & W , L1A , Check if there are missing values in the spectrum; or significant discontinuities ($\Delta DN>10^4$)  ,
+6, L0_threshold, L & W , L1A , Check if any of the spectral pixels are saturated; i.e. digital number DN>=64000 ,
+7, L0_discontinuity, L & W , L1A , Check if there are missing values in the spectrum; or significant discontinuities (\Delta DN>10^4)  ,
 8, dark_masked, L & W , L1A , If any of the darks have been masked by `outliers'; `L0_thresholds'; and/or; `L0_discontinuity' ,
 9, half_of_scans_masked, L & W , L0B , Less than half of the scans for a series passed quality checks `bad_pointing'; `outliers'; `L0_thresholds'; and; `L0_discontinuity' ,
-10, not_enough_dark_scans, L & W , L0B ,  Not enough valid dark scans for this series ($\#$ valid dark scans $<$ n_valid_dark from the config file)  ,  `nld'
-11, not_enough_rad_scans, L & W , L0B , Not enough valid radiance scans for this series ($\#$ valid radiance scans $<$ n_valid_rad from the config file) ,`nlu'
-12, not_enough_irr_scans, L & W , L0B , Not enough valid irradiance scans for this series ($\#$ valid irradiance scans $<$ n_valid_irr from the config file) , `ned'
+10, not_enough_dark_scans, L & W , L0B ,  Not enough valid dark scans for this series (# valid dark scans < n_valid_dark from the config file)  ,  `nld'
+11, not_enough_rad_scans, L & W , L0B , Not enough valid radiance scans for this series (# valid radiance scans < n_valid_rad from the config file) ,`nlu'
+12, not_enough_irr_scans, L & W , L0B , Not enough valid irradiance scans for this series (# valid irradiance scans < n_valid_irr from the config file) , `ned'
 13, series_missing , L & W , L1B , Check if there are any missing series (either not present or flagged by `not_enough_dark_scans'; `not_enough_irr_scans'; `not_enough_rad_scans' or `vza_irradiance') , `ms'
-14, vza_irradiance , L & W , L1B , One of the irradiance measurements did not have $\theta_v$=180° (within 2° tolerance) so has been masked  ,
-15, no_clear_sky_irradiance, L & W , L1B , More than 10$\%$ of the wavelength bands have a difference of more than 50$\%$ with the clear sky model  ,
-16, variable_irradiance, L & W , L1B , More than 10\% difference between start and end $E_d$ at 550~nm ,
-17, half_of_unc_too_big , L & W , L1B , More than 50\% of data has random error above 100\% (likely corrupted or dark data) , `o'
+14, vza_irradiance , L & W , L1B , One of the irradiance measurements did not have theta_v=180° (within 2° tolerance) so has been masked  ,
+15, no_clear_sky_irradiance, L & W , L1B , More than 10% of the wavelength bands have a difference of more than 50% with the clear sky model  ,
+16, variable_irradiance, L & W , L1B , More than 10\% difference between start and end E_d at 550~nm ,
+17, half_of_unc_too_big , L & W , L1B , More than 50\% of data has random error above 100% (likely corrupted or dark data) , `o'
 18, single_irradiance_used, L & W , L1C , If only one series of irradiance is used for the computation of the reflectance  ,
 19, no_clear_sky_sequence , L & W , L1C , If all irradiance series are flagged with the `no_clear_sky_irradiance' flag  , `cl'

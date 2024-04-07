@@ -9,7 +9,7 @@
 Averaging - Process to L1B
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In order to get the best averaged results per series, the most robust approach is to first average the L0 data
-(i.e. radiance, irradiance and dark scans in digital numbers) and then calibrate the averaged results using the same approach as in Section :ref:`calibrate`.
+(i.e. radiance, irradiance and dark scans in digital numbers) and then calibrate the averaged results using the same approach as in :ref:`calibrate`.
 The L0 scans are quality checked and only the scans that passed the quality checks are used in the mean (see :ref:`quality`).
 The random uncertainties on the L0 data are then taken to be the standard deviation between the scans that passed the quality checks.
 Once averaged, the mean radiances, irradiances and blacks are then used in the same calibration equation as was used for the L1A calibration.

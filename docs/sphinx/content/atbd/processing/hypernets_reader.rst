@@ -8,7 +8,7 @@
 
 HYPERNETS Reader - Process to L0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Radiometer measurements are taken in a defined set of geometries called a sequence. Each geometry in a sequence is called a series, as it is composed of a set of repeat measurements called scans (see  :doc:`data structure <../products/data_structure.rst>`). A suite of different series thus creates a sequence. A sequence scheduler is used to order the different sequences that need to be executed during the day. Within the sequence scheduler each sequence is executed according to a start and end time
+Radiometer measurements are taken in a defined set of geometries called a sequence. Each geometry in a sequence is called a series, as it is composed of a set of repeat measurements called scans (see :ref:`data_structure`). A suite of different series thus creates a sequence. A sequence scheduler is used to order the different sequences that need to be executed during the day. Within the sequence scheduler each sequence is executed according to a start and end time
 (HH:MM UTC with a 24 hours format and an automatic update of the system to UTC time when connecting to the internet), the time-lapse between each sequence (in minutes), the filename in which the sequence is defined and the number of times the sequence needs to be repeated.
 
 Once a sequence has been completed succesfully, the data is sent to the server with the following data format, name convention and data structure:
