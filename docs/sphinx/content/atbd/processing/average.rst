@@ -37,7 +37,7 @@ Simlarly for the land network, the L1B data processing starts by averaging the L
    5. VNIR irradiance scans taken at the end of the sequence (standard protocol requires minimum 3 scans, typically >10 are used).
    6. SWIR irradiance scans taken at the end of the sequence (standard protocol requires minimum 3 scans, typically 10 are used).
 
-The number of scans in the VNIR is typically larger than the number of scans in the SWIR since SWIR scans have loner integration times, and thus more VNIR scans can be taken within the same amount of time.
+The number of scans in the VNIR is typically larger than the number of scans in the SWIR since SWIR scans have longer integration times, and thus more VNIR scans can be taken within the same amount of time.
 The average per series is calculated excluding scans which did not pass the :ref:`quality`.
 
 The next stage of the L1B processing consists of combining the VNIR and SWIR data. 
