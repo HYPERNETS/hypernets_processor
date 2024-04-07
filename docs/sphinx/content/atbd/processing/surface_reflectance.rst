@@ -25,7 +25,7 @@ The water leaving radiance is then converted into water reflectance as follows:
 
 .. math:: \rho_w_nosc =\pi\frac{L_w}{E_d}
 
-with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. Indeed, although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied. :math:`\epsilon` is estimated using two wavelengths in the NIR (Ruddick et al., 2006), where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm. The :math:`\epsilon` correction factor is calculated in the L1C processing, see :ref:`interpolate`.
+with :math:`E_d` being the downwelling irradiance. And `nosc` stands for non similarity corrected reflectance. Indeed, although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied. :math:`\epsilon` is estimated using two wavelengths in the NIR (`Ruddick et al. 2016 <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_), where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm. The :math:`\epsilon` correction factor is calculated in the L1C processing, see :ref:`interpolate`.
 
 The final L2a product is the averaged water reflectance corrected for the NIR similarity spectrum:
 

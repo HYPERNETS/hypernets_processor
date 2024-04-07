@@ -173,7 +173,7 @@ a certain threshold with their neighbouring scans (default threshold is
 temporal variability should have been removed by previous flags,
 i.e., ‘outliers’ or ‘L0_discontinuty’ flags. However, these flags are kept
 to ensure consistency with other common water network processing
-(Ruddick et al., 2006; Vansteenwegen et al., 2019).
+(`Ruddick et al. 2016 <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_; Vansteenwegen et al., 2019).
 
 The number of scans per series is important to assess the
 uncertainties. Hence, if the number of scans, not flagged by ‘bad
@@ -191,7 +191,7 @@ with a default wind speed value.
 
 Finally, the flag ‘simil_fail’ is raised if the quality check applied
 on the NIR similarity spectrum is not verified as suggested by
-Ruddick et al. (2006). Note, this flag should only be considered
+`Ruddick et al. (2016) <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_. Note, this flag should only be considered
 for water types satisfying the NIR Similarity spectrum theory
 (i.e., clear to moderately turbid waters).
 

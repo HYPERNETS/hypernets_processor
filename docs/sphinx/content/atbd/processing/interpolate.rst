@@ -12,7 +12,7 @@ Interpolating - Process to L1C
 Water Network
 --------------
 
-To process the water network data, the hypernets processor includes RHYMER ("Reliable processing of HYperspectral MEasurement of Radiance", version 20190718 on 16/10/2020, written by Quinten Vanhellemont and adapted for the HYPSTAR by Clémence Goyens). RHYMER provides all the required functions to process the above water measurements (currently including Mobley 1999 and 2015 and Ruddick et al., 2006 for the Fresnel correction). RHYMER is written as such that it can easily welcome any additional look-up-tables, processing functions, quality flags, ...
+To process the water network data, the hypernets processor includes RHYMER ("Reliable processing of HYperspectral MEasurement of Radiance", version 20190718 on 16/10/2020, written by Quinten Vanhellemont and adapted for the HYPSTAR by Clémence Goyens). RHYMER provides all the required functions to process the above water measurements (currently including Mobley 1999 and 2015 and `Ruddick et al. 2016 <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_ for the Fresnel correction). RHYMER is written as such that it can easily welcome any additional look-up-tables, processing functions, quality flags, etc.
 
 Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and not the L1B. Indeed it checks for additional (water-application specific) quality flags. The L1C processor will then average the series (often at the start and end of the sequence) of downwelling radiance and irradiance scans and interpolate these averages to the upwelling radiance scans (standard configuration file requires 6 scans for upwelling radiance). Hence, the final dimensions for the upwelling radiance, downwelling irradiance and radiance and reflectance outputs for the L1C data level is wavelength and upwelling radiance scans (default 6).
 
@@ -43,8 +43,8 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 
 6. **Ancillary data retrieval**:
 
-   All the required parameters for the computation of the water leaving radiance and reflectance, i.e. wind speed, ws, and the effective fresnel reflectance        coefficient (:math:`\rho(\theta,\theta_0,\Delta\phi,ws)` are retrived. Wind speed may be taken from, e.g. a default value (e.g. 2m/s), in situ measurements,    ancilliary datasets such as NCEP Met data. Similarly, the Fresnel reflectance coefficient can be extracted from : (1) different look-up tables (Mobley 1999       (default); 2015), or, set to a default value, estimated as a function of wind speed (e.g. Ruddick et al. 2006).
-   The  configuration files (job and processing) determine which option is used for the processing (see Section 6.9, e.g. fresnel_option in Ruddick et al. 2006).
+   All the required parameters for the computation of the water leaving radiance and reflectance, i.e. wind speed (:math:`ws`), and the effective fresnel reflectance coefficient (:math:`\rho(\theta,\theta_0,\Delta\phi,ws)`) are retrieved. Wind speed may be taken from, e.g. a default value (e.g. 2m/s), in situ measurements,    ancilliary datasets such as NCEP Met data. Similarly, the Fresnel reflectance coefficient can be extracted from : (1) different look-up tables (Mobley 1999       (default); 2015), or, set to a default value, estimated as a function of wind speed (e.g. `Ruddick et al. 2016 <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_).
+   The  configuration files (job and processing) determine which option is used for the processing (see Section 6.9, e.g. fresnel_option in `Ruddick et al. 2016 <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_).
 
 
 7. **Intermediate L1C surface reflectance**:
@@ -67,11 +67,11 @@ Note the funtion *rhymer_hypstar.process_l1c* takes as input the L1A files and n
 
 8. **Intermediate L1C similarity corrected reflectance** (flag: simil_fail):
 
-   Although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target            radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied.          :math:`\epsilon` is estimated using two wavelengths in the NIR `(Ruddick et al. (2016) <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_, where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm.
+   Although most acquisition protocols attempt to avoid sun glint, over wind roughened surfaces, sun glint may still be present when measuring the target            radiance. Therefore a spectrally flat measurement error, :math:`\epsilon`, based on the “near infrared (NIR) similarity spectrum” correction, is applied.          :math:`\epsilon` is estimated using two wavelengths in the NIR `Ruddick et al. 2016 <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_, where :math:`\lambda_1` = 780 nm and :math:`\lambda_2` = 870 nm.
 
    .. math:: \epsilon = [ \alpha\rho_wnosc(\lambda_2)-\rho_wnosc(\lambda_1)]/[(\alpha-1)]
 
-   and :math:`\alpha` is the similarity spectrum `(Ruddick et al. (2016) <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_ ratio for the bands used; the default is, :math:`\alpha(780, 870)` equals 1/0.523 = 1.912.
+   and :math:`\alpha` is the similarity spectrum `(Ruddick et al. (2016) <https://odnature.naturalsciences.be/downloads/publications/ruddick_et_al-2006-limnology_and_oceanography21.pdf>`_ ratio for the bands used; the default is, :math:`\alpha(780, 870)` equals 1/0.523 = 1.912).
 
    
    To avoid negative reflectance data, if :math:`\epsilon` exceeds a given percentage of the reflectance at a reference wavelength the *simil_fail* flag is raised (see :doc:`flags description <../products/flags.rst>`. The default percentage is 5% and reference wavelength is 670 nm.
