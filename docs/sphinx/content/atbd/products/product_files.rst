@@ -14,15 +14,15 @@ File Name conventions
 
 The naming convention is intended to allow the unique identification of all product files and summarise the contents. It is composed of a defined sequence of data fields, separated by an underscore. For the HYPERNETS measurement data, the file name is composed as in the following way:
 
-**SYSTEM_NETWORK_SITEID_LEVEL_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_version.nc**
+*SYSTEM_NETWORK_SITEID_LEVEL_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_version.nc*
 
 For the HYPSTAR calibration data, the file name is similar except that it includes the system_id and the date and time of the calibration.
 
-**SYSTEM_NETWORK_SYSTEMID_TYPE_CALIBRATIONDATETIME_version.nc**
+*SYSTEM_NETWORK_SYSTEMID_TYPE_CALIBRATIONDATETIME_version.nc*
 
-For the RGB images taken during the measurements, the file name is similar except that it also includes the series ID, viewing and azimuth angle. 
+For the RGB images taken during the measurements, the file name is similar except that it also includes the series ID, viewing and azimuth angle.
 
-**SYSTEM_NETWORK_SITEID_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_SERIESID_ZENITH_AZIMUTH_version.nc**
+*SYSTEM_NETWORK_SITEID_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_SERIESID_ZENITH_AZIMUTH_version.nc*
 
 The files are stored in the NetCDF data format and so have the extension “.nc” (except for the RGB images taken during the measurements by the instrument). The definition of the data fields and their allowed contents is described as follows:
 
@@ -37,9 +37,9 @@ The files are stored in the NetCDF data format and so have the extension “.nc�
 +----------------------+------------------------------------------------------------------------------------------------------+
 | SITEID               | Abbreviated site names defined in  Table 2.                                                          |
 +----------------------+------------------------------------------------------------------------------------------------------+
-| LEVEL                | Data processing Level as defined in  Table 3.                |
+| LEVEL                | Data processing Level as defined in  Table 3.                                                        |
 +----------------------+------------------------------------------------------------------------------------------------------+
-| TYPE                 | Name of product typeas defined in Table 3.               |
+| TYPE                 | Name of product typeas defined in Table 3.                                                           |
 +----------------------+------------------------------------------------------------------------------------------------------+
 | DATETIME_ACQUISITION | Denotes the acquisition end date and time as UTC, formatted as “YYYYMMDDTHHMM”.                      |
 +----------------------+------------------------------------------------------------------------------------------------------+

@@ -54,44 +54,10 @@ as described in :ref:`uncertainty`. Details on the produced products are provide
 
 Each of the file formats are described in a series of `file format specification documents <https://github.com/HYPERNETS/hypernets_processor/tree/master/docs/file_formats>`_.
 
-
-Architecture
-------------
-
-The high-level architecture is as outlined in the diagram below, where the boxes represent the main classes in the software and the arrows represent how they interact. The design is fairly simple with the :py:class:`HypernetsProcessor` orchestrating the overall processing and separate classes providing the required functionality. These main classes are described in the next section. The :py:class:`HypernetsProcessor` class may then be interacted with by the user from a command-line interface, described below.
-
-.. image:: ../../../images/design-class_interations.png
-
-Class Description
------------------
-
-In this section each of the key **hypernets_processor** classes are briefly described. See the API documentation for more detailed information.
-
-HypernetsProcessor
-   The :py:class:`HypernetsProcessor` class orchestrates the overall processing, taking functionality other **hypernets_processor** classes.
-
-HypernetsReader
-   The :py:class:`HypernetsReader` class is responsible for reading the different data files in the Hypernets processing chain.
-
-QualityChecks
-   The :py:class:`QualityChecks` class performs checks on the field acquisition and records any issues to an anomaly database.
-
-Calibrate
-   The :py:class:`Calibrate` class evaluates uncertainty-quantified radiance and irradiance (Level 1) from the raw field measurements (Level 0).
-
-SurfaceReflectance
-   The :py:class:`SurfaceReflectance` class evaluates uncertainty-quantified surface reflectance (Level 2a) from the radiance and irradiance measurements (Level 1). This is only performed for standard sequences and uses different algorithms for the land and water network protocols - these are each defined as a :py:class:`Protocol` class.
-
-HypernetsWriter
-   The :py:class:`HypernetsWriter` class writes the Hypernets data products.
-
-Plotting
-   The :py:class:`Plotting` class prepares graphs of the evaluated datasets.
-
 Command-Line Interface
 ----------------------
 
-The software will be run by the user through a command-line interface (CLI). It is not seen that this time that a GUI is necessary.
+The software will be run by the user through a command-line interface (CLI).
 
 Module Structure
 ----------------

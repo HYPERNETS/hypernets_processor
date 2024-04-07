@@ -36,6 +36,7 @@ This documentation aimed at both users and developers of the software, find the 
    content/developers/getting_started
    content/developers/automated
    content/developers/software_design
+   content/developers/version_note
 
 .. toctree::
    :maxdepth: 2

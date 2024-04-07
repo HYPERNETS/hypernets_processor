@@ -34,7 +34,7 @@ The figures bellow illustrate the different terms which are defined as follows:
 
 The figure below illustrates the measurement protocol for a WATERHYPERNET sequence. The current standard
 water protocol follows commonly used measurement protocols (Ruddick et al., 2019, and references
-therein). Upwelling above-water radiance, :math:`L_u`, series are taken at :math:`\theta_v=40` and sun-sensor relative azimuths,
+therein). Upwelling above-water radiance, :math:`L_u`, series are taken at :math:`\theta_v=40°` and sun-sensor relative azimuths,
 :math:`\Delta \varphi`, at +/- 90° and/or +/- 135° (to avoid sun glint and high skylight reflectance within the sensor field of
 view). Each series of :math:`L_u` is preceded and followed by a series of above-water downwelling (sky) radiance,
 :math:`L_d`, in the specular reflection direction for the correction of the reflected skylight (i.e., :math:`\theta_v` for :math:`L_u = 180° -\theta_v`
@@ -53,7 +53,7 @@ multiple upwelling radiance series covering a range of different viewing geometr
 of five view zenith and six view azimuth angles). The design of the land measurement protocol aims to
 optimise the viewing geometry during satellite’s overpass times and by its repeats through the day to obtain
 information about Bidirectional Reflectance Distribution Function (BRDF) properties of the site. A plot
-illustrating the different viewing geometries for a land sequence is illustrated in Figure 4. Land sequences
+illustrating the different viewing geometries for a land sequence is illustrated in Figure below. Land sequences
 do not measure the downwelling (sky) radiance. A standard land sequence typically lasts approximately 15
 minutes (depending on illumination) and is executed every 30 minutes during daylight.
 
