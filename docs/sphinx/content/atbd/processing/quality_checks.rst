@@ -27,7 +27,7 @@ check is only a warning the data should be used with caution.
 In each of these cases, a quality flag is added to the data, and
 the processing is continued. In some cases, it is still useful to
 also raise an anomaly and store it in the anomaly database for
-future reference. The anomalies are detailed in :ref:`anomalies1
+future reference. The anomalies are detailed in :ref:`anomalies`.
 
 The different quality checks are detailed below, the triggered
 flags in :ref:`flags` and raised anomalies in :ref:`anomalies`.
