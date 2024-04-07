@@ -34,7 +34,7 @@ Then install the module with setup tools, including the option to setup the proc
 
    $ python setup.py develop --setup-processor
 
-This automatically installs the processor and its the dependencies, followed by the running a processor setup routine (see :ref:`user_processor-processor_setup` more details).
+This automatically installs the processor and its dependencies, followed by the running a processor setup routine (see :ref:`user_processor-processor_setup` more details).
 
 Finally, commit any changes to the module made during set up and push::
 

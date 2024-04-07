@@ -49,7 +49,7 @@ latitude and longitude) etc.
 
 A full list of the available variables in provided in Table 1.
 
-**Table 1: List of variables**
+**Table 1: Table of variables. The variables listed as common are present in all product files**
 
 .. csv-table::
    :file: table_variables.csv
