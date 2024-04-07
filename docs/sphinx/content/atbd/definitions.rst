@@ -15,30 +15,30 @@ The figures bellow illustrate the different terms which are defined as follows:
    * **Number of replicates** :math:`N_x` :  Number of replicate scans in a single series allowing to have one measurement (x is :math:`E_d`, :math:`L_u` or :math:`L_d` to denote the number of replicates for downwelling irradiance and upwelling and downwelling radiance, respectively). The number of repeat scans in a single series depends on the desired parameter and its natural variability, potentially constrained by the total duration and power consumption. For the land XR instruments, the SWIR sensors typically have larger integration times than the VNIR sensors (in order to reach the same signal-to-noise ratio). Typically, a fixed number (the default is 10) of SWIR scans will be set, and the VNIR sensor will keep taking scans until the SWIR sensor has completed its scans (leading to a larger number of scans for VNIR than for SWIR).
    * **Integration time of a single scan**: is the time required by a single radiometer to make one hyperspectral scan.
    * **acquisition_time**: time of acquisition, measured in seconds since 1970-01-01.
-   * **Viewing zenith angle**: :math:`\theta_v` is the zenith angle of the radiometer (radiance and irradiance). :math:`\theta_v`  = 0° is pointing vertically down, measuring upwelling light. :math:`\theta_v` = 180° is pointing vertically upward, measuring downwelling light. :math:`\theta_v`  ranges from 0 to 180° (see Fig. 3).
-   * **Sun zenith angle**: :math:`\theta_s` is the zenith angle of the sun. When the sun is at zenith, :math:`\theta_s` = 0°. At sunset, :math:`\theta_s` = 90° (see Fig. 3) .
-   * **Viewing azimuth angle**: :math:`\phi_v` is the angle measured clockwise from North to the direction of the sensor (i.e., the line from the target to the sensor; see Figure below). This definition of the viewing azimuth angle matches that of most optical satellite geometries (such as those of Sentinel-2, Sentinel-3, Landsat 8).
-   * **Pointing-to azimuth angle**: :math:`\phi_p` is measured clockwise from North to the pointing direction (i.e., the line from the sensor to the target, or, :math:`\phi_v+180°`; see Figure below).
-   * **Sun azimuth angle**: :math:`\phi_s` is the sun azimuth measured clockwise from North (see Figure below).
-   * **Relative azimuth angle**: :math:`\Delta \phi` is the relative azimuth angle between sun and sensor (i.e. :math:`\phi_p`-:math:`\phi_s`). It is measured with respect to sun and clockwise from sun to target (sensor viewing direction). :math:`\Delta \phi` equals 0 means that the radiance sensors are pointing into the sun glint direction. :math:`\Delta \phi` =180° corresponding to viewing with the sun behind. :math:`\Delta \phi` ranges between 0 and 360° (see Fig. 3).
+   * **Viewing zenith angle**: :math:`\theta_v` is the zenith angle of the radiometer (radiance and irradiance). :math:`\theta_v`  = 0° is pointing vertically down, measuring upwelling light. :math:`\theta_v` = 180° is pointing vertically upward, measuring downwelling light. :math:`\theta_v` ranges from 0 to 180° (see figure below).
+   * **Sun zenith angle**: :math:`\theta_s` is the zenith angle of the sun. When the sun is at zenith, :math:`\theta_s` = 0°. At sunset, :math:`\theta_s` = 90° (see figure below) .
+   * **Viewing azimuth angle**: :math:`\varphi_v` is the angle measured clockwise from North to the direction of the sensor (i.e., the line from the target to the sensor; see Figure below). This definition of the viewing azimuth angle matches that of most optical satellite geometries (such as those of Sentinel-2, Sentinel-3, Landsat 8).
+   * **Pointing-to azimuth angle**: :math:`\varphi_p` is measured clockwise from North to the pointing direction (i.e., the line from the sensor to the target, or, :math:`\varphi_v+180°`; see Figure below).
+   * **Sun azimuth angle**: :math:`\varphi_s` is the sun azimuth measured clockwise from North (see Figure below).
+   * **Relative azimuth angle**: :math:`\Delta \varphi` is the relative azimuth angle between sun and sensor (i.e. :math:`\varphi_p`-:math:`\varphi_s`). It is measured with respect to sun and clockwise from sun to target (sensor viewing direction). :math:`\Delta \varphi` equals 0 means that the radiance sensors are pointing into the sun glint direction. :math:`\Delta \varphi` =180° corresponding to viewing with the sun behind. :math:`\Delta \varphi` ranges between 0 and 360° (see figure below).
 
 .. figure:: geometries_hypernets.jpg
    :scale: 100 %
    :alt: Hypernets geometry definitions
 
    Left: Side-view diagram defining viewing zenith angles :math:`\theta_v` and solar zenith angles :math:`\theta_s`.
-   Right: Top-view diagram defining the viewing azimuth angles :math:`\phi_v`, ‘pointing-to’ azimuth angle :math:`\phi_p` and solar
-   azimuth angles :math:`\phi_s`, measured clockwise from North. The relative azimuth angle :math:`\Delta \phi` is defined as the
-   difference between :math:`\phi_p` and :math:`\phi_s`. All angles are defined in the reference frame centred on the measurement
+   Right: Top-view diagram defining the viewing azimuth angles :math:`\varphi_v`, ‘pointing-to’ azimuth angle :math:`\varphi_p` and solar
+   azimuth angles :math:`\varphi_s`, measured clockwise from North. The relative azimuth angle :math:`\Delta \varphi` is defined as the
+   difference between :math:`\varphi_p` and :math:`\varphi_s`. All angles are defined in the reference frame centred on the measurement
    location on the surface.
 
 The figure below illustrates the measurement protocol for a WATERHYPERNET sequence. The current standard
 water protocol follows commonly used measurement protocols (Ruddick et al., 2019, and references
-therein). Upwelling above-water radiance, :math:`L_u`, series are taken at :math:`\theta_v`=40° and sun-sensor relative azimuths,
-:math:`\Delta \phi`, at +/- 90° and/or +/- 135° (to avoid sun glint and high skylight reflectance within the sensor field of
-view). Each series of Lu is preceded and followed by a series of above-water downwelling (sky) radiance,
-Ld, in the specular reflection direction for the correction of the reflected skylight (i.e., :math:`\theta_v` for :math:`L_u` = 180° -
-:math:`\theta_v` for :math:`L_d`). Downwelling irradiance, :math:`E_d`, series are taken at the beginning and the end of each sequence. A
+therein). Upwelling above-water radiance, :math:`L_u`, series are taken at :math:`\theta_v=40` and sun-sensor relative azimuths,
+:math:`\Delta \varphi`, at +/- 90° and/or +/- 135° (to avoid sun glint and high skylight reflectance within the sensor field of
+view). Each series of :math:`L_u` is preceded and followed by a series of above-water downwelling (sky) radiance,
+:math:`L_d`, in the specular reflection direction for the correction of the reflected skylight (i.e., :math:`\theta_v` for :math:`L_u = 180° -\theta_v`
+for :math:`L_d`). Downwelling irradiance, :math:`E_d`, series are taken at the beginning and the end of each sequence. A
 standard water sequence (including only one single azimuth angle) lasts approximately 5 minutes and is
 executed every 15 to 30 minutes during daylight.
 
