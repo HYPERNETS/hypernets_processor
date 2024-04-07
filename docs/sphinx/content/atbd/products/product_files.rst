@@ -14,15 +14,15 @@ File Name conventions
 
 The naming convention is intended to allow the unique identification of all product files and summarise the contents. It is composed of a defined sequence of data fields, separated by an underscore. For the HYPERNETS measurement data, the file name is composed as in the following way:
 
-**SYSTEM_NETWORK_SITEID_LEVEL_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_VERSION.nc**
+**SYSTEM_NETWORK_SITEID_LEVEL_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_version.nc**
 
 For the HYPSTAR calibration data, the file name is similar except that it includes the system_id and the date and time of the calibration.
 
-**SYSTEM_NETWORK_SYSTEMID_TYPE_CALIBRATIONDATETIME_VERSION.nc**
+**SYSTEM_NETWORK_SYSTEMID_TYPE_CALIBRATIONDATETIME_version.nc**
 
 For the RGB images taken during the measurements, the file name is similar except that it also includes the series ID, viewing and azimuth angle. 
 
-**SYSTEM_NETWORK_SITEID_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_SERIESID_ZENITH_AZIMUTH_VERSION.nc**
+**SYSTEM_NETWORK_SITEID_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_SERIESID_ZENITH_AZIMUTH_version.nc**
 
 The files are stored in the NetCDF data format and so have the extension “.nc” (except for the RGB images taken during the measurements by the instrument). The definition of the data fields and their allowed contents is described as follows:
 
@@ -37,9 +37,9 @@ The files are stored in the NetCDF data format and so have the extension “.nc�
 +----------------------+------------------------------------------------------------------------------------------------------+
 | SITEID               | Abbreviated site names defined in  Table 2.                                                          |
 +----------------------+------------------------------------------------------------------------------------------------------+
-| LEVEL                | Data processing Level as defined in  Table 3. For the RGB images the level is “IMG”.                 |
+| LEVEL                | Data processing Level as defined in  Table 3.                |
 +----------------------+------------------------------------------------------------------------------------------------------+
-| TYPE                 | Name of product type. Values may be abbreviated product type names defined in  Table 4               |
+| TYPE                 | Name of product typeas defined in Table 3.               |
 +----------------------+------------------------------------------------------------------------------------------------------+
 | DATETIME_ACQUISITION | Denotes the acquisition end date and time as UTC, formatted as “YYYYMMDDTHHMM”.                      |
 +----------------------+------------------------------------------------------------------------------------------------------+
@@ -56,7 +56,7 @@ The files are stored in the NetCDF data format and so have the extension “.nc�
 Example:
 For version 1 of water network L1B product, acquired at Blankaart South at 11:30 on 4/2/2020 and processed at 11:30 on 5/2/2020, the filename should be:
 
-*HYPERNETS_W_BSBE_L1B_RAD_20200204T1130_20200205T1130 _v01.0.nc*
+*HYPERNETS_W_BSBE_L1B_RAD_20200204T1130_20200205T1130 _v1.0.nc*
 
 Table 2 defines the abbreviated name convention applicable to the individual Hypernets sites. Site name convention is a 4 letter abbreviation [LLCC] with LL standing for the location abbreviation and CC for the country abbreviation.
 
@@ -84,34 +84,66 @@ Data level
 ----------
 The end-to-end prototype processor takes the data from acquisition (raw data) to application of calibration and quality controls, computation of correction factors (e.g., Fresnel correction for water processing), temporal interpolation to coincident timestamps, processing to surface reflectance and averaging per series. To account for all these steps different data levels have been defined (see Table 3). See :ref:`data_structure` for a detailed explanantion of the terminology used.
 
-**Table 3: List Hypernets Processor processing levels**
+**Table 3: HYPERNETS processing levels**
 
 .. csv-table::
    :file: table_datalevel.csv
    :class: longtable
-   :widths: 1 1 4 4
+   :widths: 1 1 5 2
    :header-rows: 1
 
 
-Product output format
-----------------------
-Files are in netcdf CF-convention version 1.8 format. Detailed file format per data level is given in Table 4.
+Product format, variables and metadata
+----------------------------------------
+Files are in NetCDF CF-convention version 1.8 format.
+The different NetCDF files contain a range of different
+variables and metadata. The main measurands, as well as their
+dimensions for the different levels of data files are described in
+Table 2. For these measurand variables, there are also uncertainty
+variables for each of the components described in :ref:`uncertainty` as
+well as error-correlation variables for the systematic uncertainty
+components.
 
-**Table 4: Hypernets products definition including level and abvreviated names used for the file conventions, main variables and file scope.**
+In addition to these there are coordinate variables,
+wavelength and series/scans, as well as a number of common
+variables (i.e., present in each of the data products) that provide
+additional details about the measurement. Acquisition time,
+viewing zenith and azimuth angle, solar zenith and azimuth
+angle are examples of common variables with series or scans
+as dimension. Bandwidth is also a common variable which has
+the wavelength dimension. Then there are a few additional
+variables such as the quality flag variable and variables
+specifying the number of valid and total VNIR scans and
+specifying the number of valid and total SWIR scans (for the
+LANDHYPERNET network). The quality flag field consists of 32 bits. Every bit is related to the
+absence or presence of a flag as described in :ref:`flags`.
+
+There are also a number of variables that are only present in
+some of the data products. For example, there is some additional
+information in the L0A files, such as integration times, values of
+the accelerometers, the requested and returned pan/tilt angles.
+This information is propagated to the L1A and L0B files, but
+not beyond.
+
+There is also a range of metadata contained within the files.
+For each variable, there is metadata such as the standard name,
+long name, units and uncertainty components (where relevant).
+The uncertainty variables will have additional metadata
+describing their error correlation (see :ref:`uncertainty` and :ref:`using_hypernets`). Finally,
+there is also a range of global metadata, describing
+information about how, and when the data was processed,
+what data files it used, information about the site (e.g.,
+latitude and longitude) etc.
+
+A full list of the available variables in provided in Table 4.
+
+**Table 4: List of variables**
 
 .. csv-table::
-   :file: table_dataformat.csv
+   :file: table_variables.csv
    :class: longtable
-   :widths: 1 1 4 4 4
+   :widths: 1 1 2 2 4 1
    :header-rows: 1
-
-
-
-
-
-
-
-
 
 
 

@@ -3,7 +3,7 @@
    Email: pieter.de.vis@npl.co.uk
    Created: 20/03/24
 
-.. _user_using_hypernets:
+.. _using_hypernets:
 
 Using HYPERNETS data
 ======================
@@ -61,7 +61,7 @@ As well as functions to check if certain flags are set for each series::
    print(DatasetUtil.get_flags_mask_or(ds_HYP["quality_flag"], ["outliers", "series_missing"]))
    print(DatasetUtil.get_flags_mask_and(ds_HYP["quality_flag"], ["outliers", "series_missing"]))
 
-This can also be used to remove data with certain flags from the hupernets products::
+This can also be used to remove data with certain flags from the HYPERNETS products::
 
    bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
               "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
@@ -74,7 +74,7 @@ For further details we refer to the `Jupyter notebook <https://colab.research.go
 
 Accessing and propagating HYPERNETS uncertainties
 --------------------------------------------------
-The examples shown below are also available in `this Jupyter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_surface_reflectance.ipynb>`_.
+The examples shown below are also available in this `Jupyter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_surface_reflectance.ipynb>`_.
 
 **xarray**:
 The uncertainty variables in the netCDF files can be accessed simply using xarray, and include error correlation information in the attributes:::
@@ -99,7 +99,7 @@ It can e.g. be used to inspect uncertainty variables for a particular variable, 
    print(ds_HYP.unc["reflectance"])
    print(ds.unc["temperature"].total_unc())
 
-For further functionality we refer to `this jupiter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/obsarray_example.ipynb>`_ on using obsarray.
+For further functionality we refer to the `using obsarray jupiter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/obsarray_example.ipynb>`_.
 
 **punpy**:
 `punpy <https://punpy.readthedocs.io/en/latest/>`_ can be used to conveniently propagate uncertainties in the HYPERNETS products.
@@ -117,7 +117,7 @@ Once this is done, the uncertainties can simply be propagated as follows::
 For site owners
 ################
 
-accessing data directories on HYPERNETS servers
+Accessing data directories on HYPERNETS servers
 ----------------------------------------------------
 The following lines are also useful terminal commands to access the data. For instance to get the number of directories::
 

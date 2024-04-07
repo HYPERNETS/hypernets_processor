@@ -20,10 +20,10 @@ be opened to the public and will become the reference source of data for HYPERNE
 
 In the meantime, a subset of the HYPERNETS data until 2023-04-31 is publicly available and can be
 found on Zenodo (`Brando et al., 2023 <https://doi.org/10.5281/zenodo.8057823>`_; `Brando and Vilas, 2023 <https://doi.org/10.5281/zenodo.8057531>`_; `De Vis et al., 2023 <https://doi.org/10.5281/zenodo.8039303>`_; `Dogliotti et al., 2023 <https://doi.org/10.5281/zenodo.8057728>`_;
-`Doxaran and Corizzi, 2023a <https://doi.org/10.5281/zenodo.8057777>`_;`Doxaran and Corizzi, 2023b <https://doi.org/10.5281/zenodo.8057789>`_; `Piegari et al., 2023 <https://doi.org/10.5281/zenodo.8048425>`_; `Goyens and Gammaru, 2023 <https://doi.org/10.5281/zenodo.8059881>`_; `Morris et al., 2023 <https://doi.org/10.5281/zenodo.7962557>`_;
+`Doxaran and Corizzi, 2023a <https://doi.org/10.5281/zenodo.8057777>`_; `Doxaran and Corizzi, 2023b <https://doi.org/10.5281/zenodo.8057789>`_; `Piegari et al., 2023 <https://doi.org/10.5281/zenodo.8048425>`_; `Goyens and Gammaru, 2023 <https://doi.org/10.5281/zenodo.8059881>`_; `Morris et al., 2023 <https://doi.org/10.5281/zenodo.7962557>`_;
 `Saberioon et al., 2023a <https://doi.org/10.5281/zenodo.8048348>`_; `Saberioon et al., 2023b <https://doi.org/10.5281/zenodo.8044522>`_; `Sinclair et al., 2023 <https://doi.org/10.5281/zenodo.8060798>`_). The initial datasets provided here in June 2023 were
 produced using the v1.0 of the HYPERNETS PROCESSOR (see Section 2.5). A new version of the datasets
-on Zenodo will be released upon publication of this paper, using the v2.0 of the HYPERNETS PROCESSOR.
+on Zenodo will be released in the near future, using the v2.0 of the HYPERNETS PROCESSOR.
 
 To follow the Findable-Accessible-Interoperable and Reusable principles (FAIR), particular attention
 is given to the data format and metadata, and, data accessibility. Files are in the NetCDF CF-convention

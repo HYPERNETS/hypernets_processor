@@ -11,7 +11,7 @@ Definitions and protocols
 The figures bellow illustrate the different terms which are defined as follows:
    * **sequence**: Radiometer measurements are taken in a defined set of geometries called a sequence. For the WATERHYPERNET network, the output of a single sequence is the resulting water-leaving reflectance (possibly measured at different relative azimuth angles between sun and sensor) and associated uncertainty and quality flags. For the LANDHYPERNET network, it is a set of surface reflectance measurements for different viewing geometries with associated uncertainties and quality flags.
    * **Series**: Set of acquisitions at each viewing geometry in a sequence. A series is composed of :math:`N_x` repeat measurements called scans (which will be averaged).
-   * **Scan**: a single radiance or irradiance scan from the target (upwelling radiance) or the sky (downwelling radiance). One scan results in a single unique spectra (with an integration time , see below).
+   * **Scan**: a single radiance or irradiance scan from the target (upwelling radiance) or the sky (downwelling radiance). One scan results in a single unique spectra (with an integration time, see below).
    * **Number of replicates** :math:`N_x` :  Number of replicate scans in a single series allowing to have one measurement (x is :math:`E_d`, :math:`L_u` or :math:`L_d` to denote the number of replicates for downwelling irradiance and upwelling and downwelling radiance, respectively). The number of repeat scans in a single series depends on the desired parameter and its natural variability, potentially constrained by the total duration and power consumption. For the land XR instruments, the SWIR sensors typically have larger integration times than the VNIR sensors (in order to reach the same signal-to-noise ratio). Typically, a fixed number (the default is 10) of SWIR scans will be set, and the VNIR sensor will keep taking scans until the SWIR sensor has completed its scans (leading to a larger number of scans for VNIR than for SWIR).
    * **Integration time of a single scan**: is the time required by a single radiometer to make one hyperspectral scan.
    * **acquisition_time**: time of acquisition, measured in seconds since 1970-01-01.
@@ -43,7 +43,7 @@ standard water sequence (including only one single azimuth angle) lasts approxim
 executed every 15 to 30 minutes during daylight.
 
 .. figure:: sequence.jpg
-   :scale: 60 %
+   :scale: 100 %
    :alt: map to buried treasure
    
    Illustration of a scan, a series of scans, and, a sequence for a standard water protocol.
@@ -61,7 +61,7 @@ WATERHYPERNET and LANDHYPERNET sequences following the above protocols are calle
 ‘standard’ sequences.
 
 .. figure:: hypernets_land_protocol.jpg
-   :scale: 100 %
+   :scale: 60 %
    :alt: map to buried treasure
 
    Polar plot showing the typical land protocol viewing geometries for the LANDHYPERNET

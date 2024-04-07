@@ -1,9 +1,20 @@
-Level,Network, Type,Dimensions
-test, test, tes, test
-Ancillary,L and W ,"Generic term covering nonmeasurement data used in processing chain",
-Spe files,"L and W","Raw binary files (.spe format)","wavelength/scan"
-Level 0,"L and W",Raw data in readable netcdf format with metadata,"wavelength/scan"
-Level 1a,"L and W","Calibrated radiance or irradiance scans corrected for dark samples and any other instrument corrections (thermal, straylight, etc.)","wavelength/scan"
-Level 1b,"L and W","Calibrated and quality checked radiance or irradiance scans averaged per series.","wavelength/lu_scan"
-Level 1c,"W","Water reflectance and radiance, downwelling radiance and irradiance for each upwelling (Lu) water scan and all correction factors. Intermediate level for L2A computation","wavelength/lu_scan"
-Level 2a,"L and W","Reflectance averaged per series (with and without corrections applied for the water network). Land and water specific variables and metadata.","wavelength/sequence"
+Network, Level_Type, Description, Dimensions
+Both, Ancillary, Generic term covering non-measurement data used in processing chain, -
+Both, Spe files, Raw binary files (.spe format), wavelength & scan
+Both, jpg files, RGB images taken by the HYPSTAR®, image
+Both, L0A_RAD, Raw data for radiance scans stored in NetCDF files, wavelength & scan
+Both, L0A_IRR, Raw data for irradiance scans stored in NetCDF files, wavelength & scan
+Both, L0A_BLA, Raw data for dark scans stored in NetCDF files, wavelength & scan
+Both, L0B_RAD, Raw data for radiance averaged per series and corresponding dark scans averaged per series, wavelength & series
+Both, L0B_IRR, Raw data for irradiance averaged per series and corresponding dark scans averaged per series, wavelength & series
+Both, L1A_RAD, Calibrated data for radiance scans corrected for dark samples and any other instrument corrections (e.g. non-linearity), wavelength & scan
+Both, L1A_IRR, Calibrated data for irradiance scans corrected for dark samples and any other instrument corrections (e.g. non-linearity), wavelength & scan
+Both, L1B_RAD, Calibrated data for radiance averaged over scans within one series stored in NetCDF files, wavelength & series
+Both, L1B_IRR, Calibrated data for irradiance averaged over scans within one series stored in NetCDF files, wavelength & series
+Land, L1C_ALL, LANDHYPERNET network file with (upwelling) radiance and irradiance which has been temporally and spectrally interpolated to match the radiance series, wavelength & series
+Water, L1C_ALL, WATERHYPERNET network file with downwelling radiance and irradiance which has been temporally and spectrally interpolated to match the upwelling radiance scans and wavelength - upwelling radiance scans and estimated water-leaving radiance and reflectance with and without the NIR similarity correction, wavelength & upwelling radiance scan
+Land, L2A_REF, LANDHYPERNET network file with surface reflectances per series, wavelength & series
+Water, L2A_REF, WATERHYPERNET network file with water-leaving radiance and surface reflectance with and without the NIR similarity correction Ruddick et al. (2006), wavelength & series
+Both, L2B_REF, Only includes L2A_REF measurements which have passed site specific quality checks, wavelength & series
+Both, L1D_RAD, Only includes L1B_RAD measurements which have passed site specific quality checks, wavelength & series
+Both, L1D_IRR, Only includes L1B_IRR measurements which have passed site specific quality checks, wavelength & series

@@ -1,0 +1,185 @@
+Level,network, variable_name, dimensions,Description,units
+common, both, wavelength, wavelength, wavelength as determined from lab calibration of HYPSTAR instrument, nm
+common, both, scan/series, wavelength, index of each series/scan in the file (counting from 0), nm
+common, both, bandwidth, wavelength, bandwidth FWHM assuming a Gaussian SRF, nm
+common, both, viewing_azimuth_angle, series/scan, viewing_azimuth_angle is the horizontal angle between the line of sight from the observation point to the sensor and True North. The angle is measured clockwise positive starting from the North direction. , degrees
+common, both, pointing_azimuth_angle, series/scan, pointing_azimuth_angle is the horizontal angle between the direction the sensor is pointing to and True North. The angle is measured clockwise positive starting from True North direction. This angle is 180 degrees different from the viewing_azimuth_angle. ,degrees
+common, both, viewing_zenith_angle, series/scan, viewing_zenith_angle is the vertical angle between the local zenith and the direction from the location being measured to the sensor. This angle is measured starting from directly overhead and its range is from zero (directly overhead the observation target i.e. sensor looking down) to 180 degrees (directly below the observation target i.e. sensor pointing at local zenith)., degrees
+common, both, solar_azimuth_angle, series/scan, solar_azimuth_angle is the horizontal angle between the line of sight to the sun and True North. The angle is measured clockwise., degrees
+common, both, solar_zenith_angle, series/scan, solar_zenith_angle is the vertical angle between the line of sight to the sun and the local zenith. This angle is measured starting from directly overhead and its range is from zero (directly overhead the observation target i.e. sensor looking down) to 180 degrees (directly below the observation target i.e. sensor pointing at local zenith)., degrees
+common, both, solar_zenith_angle, series/scan, Acquisition time in seconds since 1970-01-01 00:00:00, s
+common, both, series_id, series/scan, Series id number, -
+common, both, quality_flag, series/scan, The quality flag field consists of 32 bits. Every bit is related to the absence or presence of a a flag where each bit encodes a flag given in the flag_meanings attribute, -
+L0A_RAD, both, integration_time, scan, Integration time during measurement, s
+L0A_RAD, both, temperature, scan, temperature of instrument, degrees C
+L0A_RAD, both, digital_number, wavelength & scan, Digital number of raw data, -
+L0A_RAD, both, acceleration_x_mean, scan, acceleration_x_mean, -
+L0A_RAD, both, acceleration_x_std, scan, acceleration_x_std, -
+L0A_RAD, both, acceleration_y_mean, scan, acceleration_y_mean, -
+L0A_RAD, both, acceleration_y_std, scan, acceleration_y_std, -
+L0A_RAD, both, acceleration_z_mean, scan, acceleration_z_mean, -
+L0A_RAD, both, acceleration_z_std, scan, acceleration_z_std, -
+L0A_RAD, both, paa_ref, scan, pan (pointing azimuth angle) from pt_ref in metadata, degrees
+L0A_RAD, both, paa_abs, scan, pan (pointing azimuth angle) from pt_abs in metadata, degrees
+L0A_RAD, both, paa_ask, scan, pan (pointing azimuth angle) from pt_ask in metadata, degrees
+L0B_RAD, both, integration_time, series, Integration time during measurement, s
+L0B_RAD, both, temperature, series, temperature of instrument, degrees C
+L0B_RAD, both, digital_number, wavelength & series, Digital number of raw data, -
+L0B_RAD, both, u_rel_random_digital_number, wavelength & series, random relative uncertainty on digital number, %
+L0B_RAD, both, dark_signal, wavelength & series, digital number for dark signal, -
+L0B_RAD, both, u_rel_random_dark_signal, wavelength & series, random relative uncertainty on digital number for dark signal, %
+L0B_RAD, both, n_valid_scans, series, number of valid scans used in average of VNIR, -
+L0B_RAD, both, n_total_scans, series, number of total scans acquired for VNIR, -
+L0B_RAD, both, std_digital_number, wavelength & series, standard deviation on digital number, -
+L0B_RAD, both, std_dark_signal, wavelength & series, standard deviation on dark signal, -
+L0B_RAD, both, acceleration_x_mean, series, acceleration_x_mean, -
+L0B_RAD, both, acceleration_x_std, series, acceleration_x_std, -
+L0B_RAD, both, acceleration_y_mean, series, acceleration_y_mean, -
+L0B_RAD, both, acceleration_y_std, series, acceleration_y_std, -
+L0B_RAD, both, acceleration_z_mean, series, acceleration_z_mean, -
+L0B_RAD, both, acceleration_z_std, series, acceleration_z_std, -
+L0B_RAD, both, paa_ref, scan, pan (pointing azimuth angle) from pt_ref in metadata, degrees
+L0B_RAD, both, paa_abs, scan, pan (pointing azimuth angle) from pt_abs in metadata, degrees
+L0B_RAD, both, paa_ask, scan, pan (pointing azimuth angle) from pt_ask in metadata, degrees
+L1A_RAD, both, radiance, wavelength & scan, upwelling radiance, mW m^-2 nm^-1 sr^-1
+L1A_RAD, both, u_rel_random_radiance, wavelength & scan, random relative uncertainty on upwelling radiance, %
+L1A_RAD, both, u_rel_systematic_indep_radiance, wavelength & scan, the systematic relative uncertainty component on upwelling radiance that is not correlated with radiance, %
+L1A_RAD, both, u_rel_systematic_corr_rad_irr_radiance, wavelength & scan, random relative uncertainty on upwelling radiance, %
+L1A_RAD, both, err_corr_systematic_indep_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with radiance, -
+L1A_RAD, both, err_corr_systematic_corr_rad_irr_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is correlated with radiance, -
+L1A_RAD, both, acceleration_x_mean, scan, acceleration_x_mean, -
+L1A_RAD, both, acceleration_x_std, scan, acceleration_x_std, -
+L1A_RAD, both, acceleration_y_mean, scan, acceleration_y_mean, -
+L1A_RAD, both, acceleration_y_std, scan, acceleration_y_std, -
+L1A_RAD, both, acceleration_z_mean, scan, acceleration_z_mean, -
+L1A_RAD, both, acceleration_z_std, scan, acceleration_z_std, -
+L1A_RAD, both, paa_ref, scan, pan (pointing azimuth angle) from pt_ref in metadata, degrees
+L1A_RAD, both, paa_abs, scan, pan (pointing azimuth angle) from pt_abs in metadata, degrees
+L1A_RAD, both, paa_ask, scan, pan (pointing azimuth angle) from pt_ask in metadata, degrees
+L1A_IRR, both, irradiance, wavelength & scan, downwelling irradiance, mW m^-2 nm^-1
+L1A_IRR, both, u_rel_random_irradiance, wavelength & scan, random relative uncertainty on downwelling irradiance, %
+L1A_IRR, both, u_rel_systematic_indep_irradiance, wavelength & scan, the systematic relative uncertainty component on downwelling irradiance that is not correlated with radiance, %
+L1A_IRR, both, u_rel_systematic_corr_rad_irr_irradiance, wavelength & scan, random relative uncertainty on downwelling irradiance, %
+L1A_IRR, both, err_corr_systematic_indep_irradiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on irradiance that is not correlated with radiance, -
+L1A_IRR, both, err_corr_systematic_corr_rad_irr_irradiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on irradiance that is correlated with radiance, -
+L1A_IRR, both, acceleration_x_mean, scan, acceleration_x_mean, -
+L1A_IRR, both, acceleration_x_std, scan, acceleration_x_std, -
+L1A_IRR, both, acceleration_y_mean, scan, acceleration_y_mean, -
+L1A_IRR, both, acceleration_y_std, scan, acceleration_y_std, -
+L1A_IRR, both, acceleration_z_mean, scan, acceleration_z_mean, -
+L1A_IRR, both, acceleration_z_std, scan, acceleration_z_std, -
+L1A_IRR, both, paa_ref, scan, pan (pointing azimuth angle) from pt_ref in metadata, degrees
+L1A_IRR, both, paa_abs, scan, pan (pointing azimuth angle) from pt_abs in metadata, degrees
+L1A_IRR, both, paa_ask, scan, pan (pointing azimuth angle) from pt_ask in metadata, degrees
+L1B_RAD, both, radiance, wavelength & series, upwelling radiance, mW m^-2 nm^-1 sr^-1
+L1B_RAD, both, u_rel_random_radiance, wavelength & series, random relative uncertainty on upwelling radiance, %
+L1B_RAD, both, u_rel_systematic_indep_radiance, wavelength & series, the systematic relative uncertainty component on upwelling radiance that is not correlated with radiance, %
+L1B_RAD, both, u_rel_systematic_corr_rad_irr_radiance, wavelength & series, random relative uncertainty on upwelling radiance, %
+L1B_RAD, both, err_corr_systematic_indep_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with radiance, -
+L1B_RAD, both, err_corr_systematic_corr_rad_irr_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is correlated with radiance, -
+L1B_RAD, both, n_valid_scans, series, number of valid scans used in average of VNIR, -
+L1B_RAD, both, n_total_scans, series, number of total scans acquired for VNIR, -
+L1B_RAD, L, n_valid_scans_SWIR, series, number of valid scans used in average of SWIR, -
+L1B_RAD, L, n_total_scans_SWIR, series, number of total scans acquired for SWIR, -
+L1B_RAD, both, std_radiance, wavelength & series, standard deviation on upwelling radiance, mW m^-2 nm^-1 sr^-1
+L1B_RAD, both, acceleration_x_mean, series, acceleration_x_mean, -
+L1B_RAD, both, acceleration_x_std, series, acceleration_x_std, -
+L1B_RAD, both, acceleration_y_mean, series, acceleration_y_mean, -
+L1B_RAD, both, acceleration_y_std, series, acceleration_y_std, -
+L1B_RAD, both, acceleration_z_mean, series, acceleration_z_mean, -
+L1B_RAD, both, acceleration_z_std, series, acceleration_z_std, -
+L1B_IRR, both, irradiance, wavelength & series, downwelling irradiance, mW m^-2 nm^-1
+L1B_IRR, both, u_rel_random_irradiance, wavelength & series, random relative uncertainty on downwelling irradiance, %
+L1B_IRR, both, u_rel_systematic_indep_irradiance, wavelength & series, the systematic relative uncertainty component on downwelling irradiance that is not correlated with radiance, %
+L1B_IRR, both, u_rel_systematic_corr_rad_irr_irradiance, wavelength & series, random relative uncertainty on downwelling irradiance, %
+L1B_IRR, both, err_corr_systematic_indep_irradiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on irradiance that is not correlated with radiance, -
+L1B_IRR, both, err_corr_systematic_corr_rad_irr_irradiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on irradiance that is correlated with radiance, -
+L1B_IRR, both, n_valid_scans, series, number of valid scans used in average of VNIR, -
+L1B_IRR, both, n_total_scans, series, number of total scans acquired for VNIR, -
+L1B_IRR, L, n_valid_scans_SWIR, series, number of valid scans used in average of SWIR, -
+L1B_IRR, L, n_total_scans_SWIR, series, number of total scans acquired for SWIR, -
+L1B_IRR, both, std_irradiance, wavelength & series, standard deviation on downwelling irradiance, mW m^-2 nm^-1
+L1B_IRR, both, acceleration_x_mean, series, acceleration_x_mean, -
+L1B_IRR, both, acceleration_x_std, series, acceleration_x_std, -
+L1B_IRR, both, acceleration_y_mean, series, acceleration_y_mean, -
+L1B_IRR, both, acceleration_y_std, series, acceleration_y_std, -
+L1B_IRR, both, acceleration_z_mean, series, acceleration_z_mean, -
+L1B_IRR, both, acceleration_z_std, series, acceleration_z_std, -
+L1C_ALL, W, upwelling_radiance, wavelength & scan, upwelling radiance, mW m^-2 nm^-1 sr^-1
+L1C_ALL, W, u_rel_random_upwelling_radiance, wavelength & scan, random relative uncertainty on upwelling radiance, %
+L1C_ALL, W, u_rel_systematic_indep_upwelling_radiance, wavelength & scan, the systematic relative uncertainty component on upwelling radiance that is not correlated with radiance, %
+L1C_ALL, W, u_rel_systematic_corr_rad_irr_upwelling_radiance, wavelength & scan, random relative uncertainty on upwelling radiance, %
+L1C_ALL, W, err_corr_systematic_indep_upwelling_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with radiance, -
+L1C_ALL, W, err_corr_systematic_corr_rad_irr_upwelling_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is correlated with radiance, -
+L1C_ALL, W, std_upwelling_radiance, wavelength & scan, standard deviation on upwelling radiance, mW m^-2 nm^-1 sr^-1
+L1C_ALL, W, downwelling_radiance, wavelength & scan, downwelling radiance, mW m^-2 nm^-1 sr^-1
+L1C_ALL, W, u_rel_random_downwelling_radiance, wavelength & scan, random relative uncertainty on downwelling radiance, %
+L1C_ALL, W, u_rel_systematic_indep_downwelling_radiance, wavelength & scan, the systematic relative uncertainty component on downwelling radiance that is not correlated with radiance, %
+L1C_ALL, W, u_rel_systematic_corr_rad_irr_downwelling_radiance, wavelength & scan, random relative uncertainty on downwelling radiance, %
+L1C_ALL, W, err_corr_systematic_indep_downwelling_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with radiance, -
+L1C_ALL, W, err_corr_systematic_corr_rad_irr_downwelling_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on radiance that is correlated with radiance, -
+L1C_ALL, W, std_downwelling_radiance, wavelength & scan, standard deviation on downwelling radiance, mW m^-2 nm^-1 sr^-1
+L1C_ALL, W, irradiance, wavelength & scan, downwelling irradiance, mW m^-2 nm^-1
+L1C_ALL, W, u_rel_random_irradiance, wavelength & scan, random relative uncertainty on downwelling irradiance, %
+L1C_ALL, W, u_rel_systematic_indep_irradiance, wavelength & scan, the systematic relative uncertainty component on downwelling irradiance that is not correlated with radiance, %
+L1C_ALL, W, u_rel_systematic_corr_rad_irr_irradiance, wavelength & scan, random relative uncertainty on downwelling irradiance, %
+L1C_ALL, W, err_corr_systematic_indep_irradiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on irradiance that is not correlated with radiance, -
+L1C_ALL, W, err_corr_systematic_corr_rad_irr_irradiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic error component on irradiance that is correlated with radiance, -
+L1C_ALL, W, std_irradiance, wavelength & scan, standard deviation on downwelling irradiance, mW m^-2 nm^-1
+L1C_ALL, W, rhof, scan, Fraction of downwelling sky radiance reflected at the air-water interface, -
+L1C_ALL, W, rhof_wind, scan, Surface wind speed used for the retrieval of the fraction of downwelling sky radiance reflected at the air-water interface, ms^-1
+L1C_ALL, W, rhof_sza, scan, Solar zenith angle used for the retrieval of the fraction of downwelling sky radiance reflected at the air-water interface, degrees
+L1C_ALL, W, rhof_raa, scan, Relative azimuth angle from sun to sensor (0° when sun and sensor are aligned 180° when the sensor is looking into the sunglint) used for the retrieval of the fraction of downwelling sky radiance reflected at the air-water interface, degrees
+L1C_ALL, W, rhof_vza, scan, Sensor zenith angle used for the retrieval of the fraction of downwelling sky radiance reflected at the air-water interface, degrees
+L1C_ALL, W, reflectance, wavelength & scan, Reflectance of the water column at the surface with correction for the NIR similarity spectrum (see Ruddick et al. 2006), -
+L1C_ALL, W, u_rel_random_reflectance, wavelength & scan, random relative uncertainty on reflectance, %
+L1C_ALL, W, u_rel_systematic_reflectance, wavelength & scan, the systematic relative uncertainty component on reflectance, %
+L1C_ALL, W, err_corr_systematic_reflectance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on reflectance, -
+L1C_ALL, W, water_leaving_radiance, wavelength & scan, water-leaving radiance of electromagnetic radiation (unspecified single wavelength) from the water body by cosine-collector radiometer, mW m^-2 nm^-1 sr^-1
+L1C_ALL, W, u_rel_random_water_leaving_radiance, wavelength & scan, random relative uncertainty on water_leaving_radiance, %
+L1C_ALL, W, u_rel_systematic_indep_water_leaving_radiance, wavelength & scan, the systematic relative uncertainty component on water_leaving_radiance for the component for which errors are not correlated between radiance and irradiance, %
+L1C_ALL, W, err_corr_systematic_indep_water_leaving_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on the water_leaving_radiance for the component for which errors are not correlated between radiance and irradiance, -
+L1C_ALL, W, u_rel_systematic_corr_rad_irr_water_leaving_radiance, wavelength & scan, the systematic relative uncertainty component on water_leaving_radiance for the component for which errors are correlated between radiance and irradiance, %
+L1C_ALL, W, err_corr_systematic_corr_rad_irr_water_leaving_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on the water_leaving_radiance for the component for which errors are correlated between radiance and irradiance, -
+L1C_ALL, W, reflectance_nosc, wavelength & scan, Reflectance of the water column at the surface without correction for the NIR similarity spectrum (see Ruddick et al. 2006), -
+L1C_ALL, W, u_rel_random_reflectance_nosc, wavelength & scan, random relative uncertainty on reflectance_nosc, %
+L1C_ALL, W, u_rel_systematic_reflectance_nosc, wavelength & scan, the systematic relative uncertainty component on reflectance_nosc, %
+L1C_ALL, W, err_corr_systematic_reflectance_nosc, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on reflectance_nosc, -
+L1C_ALL, W, epsilon, wavelength & scan, Similarity spectrum ratio at two wavelengths see Ruddick et al. (2016), -
+L1C_ALL, W, u_rel_random_epsilon, wavelength & scan, random relative uncertainty on epsilon, %
+L1C_ALL, W, u_rel_systematic_epsilon, wavelength & scan, the systematic relative uncertainty component on epsilon, %
+L1C_ALL, W, err_corr_systematic_epsilon, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on epsilon, -
+L2A_REF/L2B_REF, L, reflectance, wavelength & series, hemispherical-conical reflectance factor, -
+L2A_REF/L2B_REF, L, u_rel_random_reflectance, wavelength & series, random relative uncertainty on hemispherical-conical reflectance factor, %
+L2A_REF/L2B_REF, L, u_rel_systematic_reflectance, wavelength & series, the systematic relative uncertainty component on hemispherical-conical reflectance factor, %
+L2A_REF/L2B_REF, L, err_corr_systematic_reflectance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on the hemispherical-conical reflectance factor, -
+L2A_REF/L2B_REF, L, n_valid_scans, series, number of valid radiance scans used in average of VNIR, -
+L2A_REF/L2B_REF, L, n_total_scans, series, number of total radiance scans acquired for VNIR, -
+L2A_REF/L2B_REF, L, n_valid_scans_SWIR, series, number of valid radiance scans used in average of SWIR, -
+L2A_REF/L2B_REF, L, n_total_scans_SWIR, series, number of total radiance scans acquired for SWIR, -
+L2A_REF/L2B_REF, L, std_reflectance, wavelength & series, standard deviation on hemispherical-conical reflectance factor, -
+L2A_REF/L2B_REF, W, reflectance, wavelength & series, Reflectance of the water column at the surface with correction for the NIR similarity spectrum (see Ruddick et al. 2006), -
+L2A_REF/L2B_REF, W, u_rel_random_reflectance, wavelength & series, random relative uncertainty on reflectance, %
+L2A_REF/L2B_REF, W, u_rel_systematic_reflectance, wavelength & series, the systematic relative uncertainty component on reflectance, %
+L2A_REF/L2B_REF, W, err_corr_systematic_reflectance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on reflectance, -
+L2A_REF/L2B_REF, W, water_leaving_radiance, wavelength & series, water-leaving radiance of electromagnetic radiation (unspecified single wavelength) from the water body by cosine-collector radiometer, mW m^-2 nm^-1 sr^-1
+L2A_REF/L2B_REF, W, u_rel_random_water_leaving_radiance, wavelength & series, random relative uncertainty on water_leaving_radiance, %
+L2A_REF/L2B_REF, W, u_rel_systematic_indep_water_leaving_radiance, wavelength & series, the systematic relative uncertainty component on water_leaving_radiance for the component for which errors are not correlated between radiance and irradiance, %
+L2A_REF/L2B_REF, W, err_corr_systematic_indep_water_leaving_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on the water_leaving_radiance for the component for which errors are not correlated between radiance and irradiance, -
+L2A_REF/L2B_REF, W, u_rel_systematic_corr_rad_irr_water_leaving_radiance, wavelength & series, the systematic relative uncertainty component on water_leaving_radiance for the component for which errors are correlated between radiance and irradiance, %
+L2A_REF/L2B_REF, W, err_corr_systematic_corr_rad_irr_water_leaving_radiance, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on the water_leaving_radiance for the component for which errors are correlated between radiance and irradiance, -
+L2A_REF/L2B_REF, W, reflectance_nosc, wavelength & series, Reflectance of the water column at the surface without correction for the NIR similarity spectrum (see Ruddick et al. 2006), -
+L2A_REF/L2B_REF, W, u_rel_random_reflectance_nosc, wavelength & series, random relative uncertainty on reflectance_nosc, %
+L2A_REF/L2B_REF, W, u_rel_systematic_reflectance_nosc, wavelength & series, the systematic relative uncertainty component on reflectance_nosc, %
+L2A_REF/L2B_REF, W, err_corr_systematic_reflectance_nosc, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on reflectance_nosc, -
+L2A_REF/L2B_REF, W, epsilon, wavelength & series, Similarity spectrum ratio at two wavelengths see Ruddick et al. (2016), -
+L2A_REF/L2B_REF, W, u_rel_random_epsilon, wavelength & series, random relative uncertainty on epsilon, %
+L2A_REF/L2B_REF, W, u_rel_systematic_epsilon, wavelength & series, the systematic relative uncertainty component on epsilon, %
+L2A_REF/L2B_REF, W, err_corr_systematic_epsilon, wavelength & wavelength, Error-correlation matrix between wavelengths for the systematic uncertainty on epsilon, -
+L2A_REF/L2B_REF, W, rhof, wavelength & series, Fraction of downwelling sky radiance reflected at the air-water interface, -
+L2A_REF/L2B_REF, W, n_valid_scans, series, number of valid radiance scans used in average of VNIR, -
+L2A_REF/L2B_REF, W, n_total_scans, series, number of total radiance scans acquired for VNIR, -
+L2A_REF/L2B_REF, L, std_reflectance, wavelength & series, standard deviation on reflectance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance), -
+L2A_REF/L2B_REF, L, std_water_leaving_radiance, wavelength & series, standard deviation on water leaving radiance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance), mW m^-2 nm^-1 sr^-1
+L2A_REF/L2B_REF, L, std_reflectance_nosc, wavelength & series, standard deviation on reflectance_nosc that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance), -
+L2A_REF/L2B_REF, L, std_epsilon, wavelength & series, standard deviation on epsilon that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance), -

@@ -195,11 +195,11 @@ Once launched, the following log files will be populated with all the required n
 * [site_id].log (e.g., M1BE.log)
 * scheduler.log
 
-An handy command that lists the ongoing nohup tasks is:
+A handy command that lists the ongoing nohup tasks is::
 
 $ lsof | grep nohup.out
 
-If an ongoing nohup task needs to be aborted, kill the task with:
+If an ongoing nohup task needs to be aborted, kill the task with::
 
 $ kill -9 [ID of the ongoing processing]
 

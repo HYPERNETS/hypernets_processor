@@ -49,7 +49,7 @@ COMMON_VARIABLES_SERIES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "wavelength",
-            "long_name": "Wavelength",
+            "long_name": "wavelength as determined from lab calibration of HYPSTAR instrument",
             "units": "nm",
             "preferred_symbol": "wv",
         },
@@ -58,7 +58,12 @@ COMMON_VARIABLES_SERIES = {
     "bandwidth": {
         "dim": [WL_DIM],
         "dtype": np.float32,
-        "attributes": {},
+        "attributes": {
+            "standard_name": "bandwidth",
+            "long_name": "bandwidth FWHM assuming a Gaussian SRF",
+            "units": "nm",
+            "preferred_symbol": "FWHM",
+        },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.1, "offset": 0.0},
     },
     "viewing_azimuth_angle": {
@@ -110,12 +115,7 @@ COMMON_VARIABLES_SERIES = {
             "target, i.e. sensor looking down) "
             "to 180 degrees (directly below"
             " the observation target, i.e. sensor"
-            "pointing at local zenith). Local zenith"
-            " is a line perpendicular to the "
-            "Earth's surface at a given location. "
-            "'Observation target' means a location"
-            " on the Earth defined by the sensor "
-            "performing the observations.",
+            "pointing at local zenith).",
             "units": "degrees",
             "preferred_symbol": "vza",
         },
@@ -126,10 +126,9 @@ COMMON_VARIABLES_SERIES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "solar_azimuth_angle",
-            "long_name": "Solar azimuth angle is the horizontal "
+            "long_name": "solar_azimuth_angle is the horizontal "
             "angle between the line of sight to the "
-            "sun and a reference direction which "
-            "is often due north. The angle is "
+            "sun and True North. The angle is "
             "measured clockwise.",
             "units": "degrees",
             "reference": "True North",
@@ -142,9 +141,16 @@ COMMON_VARIABLES_SERIES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "solar_zenith_angle",
-            "long_name": "Solar zenith angle is the the angle "
+            "long_name": "solar_zenith_angle is the the angle "
             "between the line of sight to the sun and"
-            " the local vertical.",
+            " the local zenith. This angle is "
+            "measured starting from directly "
+            "overhead and its range is from zero "
+            "(directly overhead the observation "
+            "target, i.e. sensor looking down) "
+            "to 180 degrees (directly below"
+            " the observation target, i.e. sensor"
+            "pointing at local zenith).",
             "units": "degrees",
             "preferred_symbol": "sza",
         },
@@ -207,7 +213,7 @@ L0A_RAD_VARIABLES = {
         "attributes": {
             "standard_name": "temperature",
             "long_name": "temperature of instrument",
-            "units": "degrees",
+            "units": "degrees C",
         },
     },
     "acceleration_x_mean": {
@@ -333,7 +339,7 @@ L0B_RAD_VARIABLES = {
         "attributes": {
             "standard_name": "temperature",
             "long_name": "temperature of instrument",
-            "units": "degrees",
+            "units": "degrees C",
         },
     },
     "acceleration_x_mean": {
@@ -603,7 +609,7 @@ CAL_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on gains",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on gains (calibration coefficients) that is not correlated between radiance and irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on gains (calibration coefficients) that is not correlated between radiance and irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int16, "scale_factor": 0.0001, "offset": 0.0},
@@ -613,7 +619,7 @@ CAL_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on gains (correlated radiance and irradiance)",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on gains (calibration coefficients) that is correlated between radiance and irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on gains (calibration coefficients) that is correlated between radiance and irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int16, "scale_factor": 0.0001, "offset": 0.0},
@@ -657,14 +663,14 @@ CAL_VARIABLES = {
     # "err_corr_systematic_indep_non_linearity_coefficients":{"dim":[NL_DIM,NL_DIM],
     #                                   "dtype":np.int16,"attributes":{
     #         "standard_name":"independent correlation matrix of systematic error on non linearity coefficients",
-    #         "long_name":"Correlation matrix bewtween wavelengths for the systematic error component on non linearity coefficients that is not correlated between radiance and irradiance",
+    #         "long_name":"Error-correlation matrix between wavelengths for the systematic error component on non linearity coefficients that is not correlated between radiance and irradiance",
     #         "units":"-"},"encoding":{'dtype':np.int16,
     #                                                    "scale_factor":0.001,
     #                                                    "offset":0.0}},
     # "err_corr_systematic_corr_rad_irr_non_linearity_coefficients":{"dim":[NL_DIM,NL_DIM],
     #                                          "dtype":np.int16,"attributes":{
     #         "standard_name":"correlation matrix of systematic error on non linearity coefficients (correlated radiance and irradiance)",
-    #         "long_name":"Correlation matrix bewtween wavelengths for the systematic error component on non linearity coefficients that is correlated between radiance and irradiance",
+    #         "long_name":"Error-correlation matrix between wavelengths for the systematic error component on non linearity coefficients that is correlated between radiance and irradiance",
     #         "units":"-"},"encoding":{'dtype':np.int16,
     #                                                    "scale_factor":0.001,
     #                                                    "offset":0.0}},
@@ -730,7 +736,7 @@ L1A_RAD_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radiance that is not correlated with irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -740,7 +746,7 @@ L1A_RAD_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on radiance, correlated with irradiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radiance that is correlated with irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radiance that is correlated with irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -915,7 +921,7 @@ L1A_IRR_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on irradiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on irradiance that is not correlated with radiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on irradiance that is not correlated with radiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -925,7 +931,7 @@ L1A_IRR_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on irradiance, correlated with radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on irradiance that is correlated with radiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on irradiance that is correlated with radiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1100,7 +1106,7 @@ L1B_RAD_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radiance that is not correlated with irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1110,7 +1116,7 @@ L1B_RAD_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on radiance, correlated with irradiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radianc that is correlated with irradiancee",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radianc that is correlated with irradiancee",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1247,7 +1253,7 @@ L1B_IRR_VARIABLES = {
             "units": "%",
             "err_corr": [
                 {"dim": WL_DIM, "form": "random", "params": [], "units": []},
-                {"dim": SCAN_DIM, "form": "random", "params": [], "units": []},
+                {"dim": SERIES_DIM, "form": "random", "params": [], "units": []},
             ],
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
@@ -1295,7 +1301,7 @@ L1B_IRR_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on irradiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on irradiance that is not correlated with radiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on irradiance that is not correlated with radiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1305,7 +1311,7 @@ L1B_IRR_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on irradiance, correlated with radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on irradiance that is correlated with radiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on irradiance that is correlated with radiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1490,7 +1496,7 @@ W_L1C_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radiance that is not correlated with irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1500,7 +1506,7 @@ W_L1C_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radiance that is correlated with irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radiance that is correlated with irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1590,7 +1596,7 @@ W_L1C_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radiance that is not correlated with irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radiance that is not correlated with irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1600,7 +1606,7 @@ W_L1C_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on radiance that is correlated with irradiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on radiance that is correlated with irradiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1676,7 +1682,7 @@ W_L1C_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on irradiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on irradiance that is not correlated with radiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on irradiance that is not correlated with radiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1686,7 +1692,7 @@ W_L1C_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on irradiance, correlated with radiance",
-            "long_name": "Correlation matrix bewtween wavelengths for the systematic error component on irradiance that is correlated with radiance",
+            "long_name": "Error-correlation matrix between wavelengths for the systematic error component on irradiance that is correlated with radiance",
             "units": "-",
         },
         "encoding": {"dtype": np.int8, "scale_factor": 0.01, "offset": 0.0},
@@ -1792,7 +1798,7 @@ L_L2A_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "u_rel_random_reflectance",
-            "long_name": "Random reflectance relative uncertainty",
+            "long_name": "Random relative uncertainty on hemispherical-conical reflectance factor",
             "units": "%",
             "err_corr": [
                 {"dim": WL_DIM, "form": "random", "params": [], "units": []},
@@ -1806,7 +1812,7 @@ L_L2A_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "u_rel_systematic_reflectance",
-            "long_name": "Systematic reflectance " "relative uncertainty",
+            "long_name": "Systematic relative uncertainty on hemispherical-conical reflectance factor",
             "units": "%",
             "err_corr": [
                 {
@@ -1825,7 +1831,7 @@ L_L2A_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "err_corr_systematic_reflectance",
-            "long_name": "Correlation matrix of systematic "
+            "long_name": "Error-correlation matrix of systematic uncertainty on hemispherical-conical reflectance factor"
             "reflectance "
             "uncertainty",
             "units": "-",
@@ -1836,7 +1842,7 @@ L_L2A_REFLECTANCE_VARIABLES = {
         "dim": [SERIES_DIM],
         "dtype": np.uint8,
         "attributes": {
-            "standard_name": "number of valid scans used in average of VNIR",
+            "standard_name": "number of valid radiance scans used in average of VNIR",
             "long_name": "",
             "units": "-",
         },
@@ -1854,7 +1860,7 @@ L_L2A_REFLECTANCE_VARIABLES = {
         "dim": [SERIES_DIM],
         "dtype": np.uint8,
         "attributes": {
-            "standard_name": "number of valid scans used in average of SWIR",
+            "standard_name": "number of valid radiance scans used in average of SWIR",
             "long_name": "",
             "units": "-",
         },
@@ -1873,16 +1879,7 @@ L_L2A_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "reflectance",
-            "long_name": "The surface called surface means the lower "
-            "boundary of the atmosphere. "
-            "Bidirectional_reflectance depends on"
-            "the angles of incident and measured"
-            "radiation.Reflectance is the ratio of the "
-            "energy of the reflected to the incident "
-            "radiation. A coordinate variable of "
-            "radiation_wavelength or radiation_frequency "
-            "can be used to specify the wavelength or "
-            "frequency, respectively, of the radiation.",
+            "long_name": "hemispherical-conical reflectance factor",
             "units": "-",
             "unc_comps": [
                 "u_rel_random_reflectance",
@@ -1894,8 +1891,8 @@ L_L2A_REFLECTANCE_VARIABLES = {
         "dim": [WL_DIM, SERIES_DIM],
         "dtype": np.float32,
         "attributes": {
-            "standard_name": "standard deviation reflectance",
-            "long_name": "standard deviation on surface reflectance that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
+            "standard_name": "standard deviation hemispherical-conical reflectance factor",
+            "long_name": "standard deviation on hemispherical-conical reflectance factor that is due to the variability in radiance (i.e. not accounting for variability in darks or in irradiance)",
             "units": "-",
         },
     },
@@ -2007,7 +2004,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "err_corr_systematic_indep_water_leaving_radiance",
-            "long_name": "Correlation matrix of water leaving radiance Systematic uncertainty component that is independent with uncertainties on irradiance"
+            "long_name": "Error-correlation matrix of water leaving radiance Systematic uncertainty component that is independent with uncertainties on irradiance"
             "leaving radiance uncertainty",
             "units": "-",
         },
@@ -2038,7 +2035,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "err_corr_systematic_corr_rad_irr_water_leaving_radiance",
-            "long_name": "Correlation matrix of water leaving radiance Systematic uncertainty component that is correlated with uncertainties on irradiance"
+            "long_name": "Error-correlation matrix of water leaving radiance Systematic uncertainty component that is correlated with uncertainties on irradiance"
             "leaving radiance uncertainty",
             "units": "-",
         },
@@ -2082,7 +2079,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "err_corr_systematic_reflectance",
-            "long_name": "Correlation matrix of systematic water leaving "
+            "long_name": "Error-correlation matrix of systematic water leaving "
             "reflectance uncertainty",
             "units": "-",
         },
@@ -2129,7 +2126,7 @@ W_L1C_REFLECTANCE_VARIABLES = {
         "dtype": np.float32,
         "attributes": {
             "standard_name": "err_corr_systematic_reflectance_nosc",
-            "long_name": "Correlation matrix of systematic water "
+            "long_name": "Error-correlation matrix of systematic water "
             "leaving reflectance not corrected for NIR "
             "similarity spectrum uncertainty",
             "units": "-",
@@ -2305,13 +2302,7 @@ L_QUALITY = {
         "dtype": "flag",
         "attributes": {
             "standard_name": "quality_flag",
-            "long_name": "A variable with the standard name of quality_"
-            "flag contains an indication of assessed "
-            "quality information of another data variable."
-            " The linkage between the data variable and the"
-            " variable or variables with the standard_name"
-            " of quality_flag is achieved using the "
-            "ancillary_variables attribute.",
+            "long_name": "The quality flag field consists of 32 bits. Every bit is related to the absence or presence of a a flag where each bit encodes a flag given in the flag_meanings attribute",
             "flag_meanings": FLAG_COMMON + FLAG_LAND,
         },
     }

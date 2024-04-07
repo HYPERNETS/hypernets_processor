@@ -17,7 +17,6 @@ This documentation aimed at both users and developers of the software, find the 
    :caption: User Guide
 
    content/users/adhoc
-   content/users/automated
    content/users/using_hypernets
    content/users/data_distribution
 
@@ -35,6 +34,7 @@ This documentation aimed at both users and developers of the software, find the 
    :caption: Developer Guide
 
    content/developers/getting_started
+   content/developers/automated
    content/developers/software_design
 
 .. toctree::

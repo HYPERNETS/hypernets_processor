@@ -53,32 +53,8 @@ This tool also handles uncertainty propagation (which internally uses punpy) in 
 The measurand (interpolated irradiances) and asoociated uncertainties and error-correlations are returned by the tool.
 
 Finally, uncertainty are propagated to L2A with punpy using the measurement functions in :ref:`calibrate` and the input quantities from the L1C products. 
-Some basic information on how to interface with the information with the uncertainty information in the HYPERNETS products is given in the :ref:`user_using_hypernets` page.
+Some basic information on how to interface with the information with the uncertainty information in the HYPERNETS products is given in the :ref:`using_hypernets` page.
 Further information and examples can be found on the CoMet website (`<https://www.comet-toolkit.org/>`_).
-
-Storing uncertainty information as digital effects tables
-#########################################################
-As previously mentioned, detailed error-correlation information is calculated as part of the uncertainty
-propagation. Storing this information in a space-efficient way is not trivial. To do this we use the `obsarray module <https://obsarray.readthedocs.io/en/latest/>`_
-of the CoMet toolkit. obsarray uses a concept called ‘digital effects tables’ to store the errorcorrelation
-information. This concept takes the parameterised error-correlation forms defined in the Quality
-Assurance Framework for Earth Observation (`QA4EO <https://www.QA4EO.org>`_) and stores them in a standardised metadata
-format. By using these parameterised error-correlation forms, it is not necessary to explicitely store the
-error-correlation along all dimensions. Instead only the error-correlation with wavelength is explicitly
-stored, and error-correlation with scans/series is captured as the ‘random’ or ‘systematic’ error-correlation
-forms.
-
-Another benefit to using obsarray, is that it allows for straightforward encoding of the uncertainty
-and error-correlation variables. The error-correlation (with respect to wavelength) does not need to be
-known at a very high precision. It can be saved as an 8-bit integer (leading to about a 0.01 precision in
-the error-correlation coefficient). Similarly, the uncertainties can be encoded using a 16-bit integer to a
-precision of 0.01%. Together, these encodings significantly reduce the amount of space required to store
-the uncertainty information.
-
-Finally, having the HYPERNETS products saved as ‘digital effects tables’ means they can easily be used
-in further uncertainty propagation where all the error-correlation information is automatically taken into
-account. See De Vis & Hunt (in prep.) and the `CoMet toolkit examples <https://www.comet-toolkit.org/examples/>`_ for further information (note
-there is one example specific to HYPERNETS).
 
 Uncertainty contributions
 ############################
@@ -128,6 +104,31 @@ added to the systematic independent uncertainty, assuming systematic spectral co
 atmospheric absorption features (i.e., 757.5-767.5 nm and 1350-1390 nm), an additional placeholder
 uncertainty of 50% (assuming random spectral error correlation) is added to account for the difference in
 SRF becoming dominant.
+
+
+Storing uncertainty information as digital effects tables
+#########################################################
+As previously mentioned, detailed error-correlation information is calculated as part of the uncertainty
+propagation. Storing this information in a space-efficient way is not trivial. To do this we use the `obsarray module <https://obsarray.readthedocs.io/en/latest/>`_
+of the CoMet toolkit. obsarray uses a concept called ‘digital effects tables’ to store the errorcorrelation
+information. This concept takes the parameterised error-correlation forms defined in the Quality
+Assurance Framework for Earth Observation (`QA4EO <https://www.QA4EO.org>`_) and stores them in a standardised metadata
+format. By using these parameterised error-correlation forms, it is not necessary to explicitely store the
+error-correlation along all dimensions. Instead only the error-correlation with wavelength is explicitly
+stored, and error-correlation with scans/series is captured as the ‘random’ or ‘systematic’ error-correlation
+forms.
+
+Another benefit to using obsarray, is that it allows for straightforward encoding of the uncertainty
+and error-correlation variables. The error-correlation (with respect to wavelength) does not need to be
+known at a very high precision. It can be saved as an 8-bit integer (leading to about a 0.01 precision in
+the error-correlation coefficient). Similarly, the uncertainties can be encoded using a 16-bit integer to a
+precision of 0.01%. Together, these encodings significantly reduce the amount of space required to store
+the uncertainty information.
+
+Finally, having the HYPERNETS products saved as ‘digital effects tables’ means they can easily be used
+in further uncertainty propagation where all the error-correlation information is automatically taken into
+account. See De Vis & Hunt (in prep.) and the `CoMet toolkit examples <https://www.comet-toolkit.org/examples/>`_ for further information (note
+there is one example specific to HYPERNETS).
 
 
 

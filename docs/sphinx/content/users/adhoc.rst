@@ -30,7 +30,7 @@ Then install the module with pip::
 
 This will also automatically install any dependencies.
 
-If you are installing the module to contribute to its development, it is recommended you follow the install instructions on the :ref:`developers` page.
+If you are installing the module to contribute to its development, it is recommended you follow the install instructions on the :ref:`developers_getting_started` page.
 
 Sequence Processing
 -------------------
@@ -67,12 +67,12 @@ Ad-hoc processing of a single sequence for a site called M1BE can be done with t
 
    $ hypernets_sequence_processor -i /home/waterhypernet/HYPSTAR/Raw/M1BE/DATA/SEQ20231031T182051 -o /home/waterhypernet/HYPSTAR/Processed/test/ -n water --max-level L2A
 
-While, processing all sequences within a single directory can be done with::
+While processing all sequences within a single directory can be done with::
 
    $ hypernets_sequence_processor -i /home/waterhypernet/HYPSTAR/Raw/M1BE/DATA/ -o /home/waterhypernet/HYPSTAR/Processed/test/ -n water  --max-level L2A
 
 
-If the adhoc processing don't refer to a user defined job configuration path, input parameters for the processing configuration are taken by default from
+If the adhoc processing arguments do not refer to a user defined job configuration path, input parameters for the processing configuration are taken by default from:
 
 * /hypernets_processor/hypernets_processor/etc/processor_land_defaults.config, or,
 * /hypernets_processor/hypernets_processor/etc/processor_water_defaults.config,
