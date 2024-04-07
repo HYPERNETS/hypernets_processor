@@ -10,7 +10,7 @@ Uncertainty Propagation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Uncertainties are propagated from product to product using Monte Carlo (MC) approach (see `Supplement 1 to the “Guide
-to the expression of uncertainty in measurement” <https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf>`_)
+to the expression of uncertainty in measurement” <https://www.bipm.org/documents/20126/2071204/JCGM_101_2008_E.pdf>`_).
 This MC approach is implemented using the punpy module (see also `the punpy ATBD <https://punpy.readthedocs.io/en/latest/content/atbd.html>`_)
 from the open-source `CoMet toolkit <https://www.comet-toolkit.org/>`_. A metrological approach is followed, where for each processing stage, a measurement function is defined,
 as well as the input quantities and the measurand.

@@ -37,16 +37,6 @@ the accelerometers, the requested and returned pan/tilt angles.
 This information is propagated to the L1A and L0B files, but
 not beyond.
 
-There is also a range of metadata contained within the files.
-For each variable, there is metadata such as the standard name,
-long name, units and uncertainty components (where relevant).
-The uncertainty variables will have additional metadata
-describing their error correlation (see :ref:`uncertainty` and :ref:`using_hypernets`). Finally,
-there is also a range of global metadata, describing
-information about how, and when the data was processed,
-what data files it used, information about the site (e.g.,
-latitude and longitude) etc.
-
 A full list of the available variables is provided in Table 1.
 
 **Table 1: Table of variables. The variables listed as common are present in all product files**
