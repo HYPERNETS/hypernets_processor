@@ -20,7 +20,7 @@ The main stages consist of:
 
 -  Formulation: Defining the measurand (output quantity Y), the input quantities :math:`X = (X_{i},\ldots,\ X_{N})`, and the measurement function (as a model relating Y and X).
    One also needs to asign Probability Density Functions (PDF) of each of the input quantities, as well as define the correlation between them (through joint PDF).
-   In our method, the joint PDF's are are made by first generating uncorrelated PDF, which are then correlated using the Cholesky decomposition method.
+   In our method, the joint PDF's are made by first generating uncorrelated PDF, which are then correlated using the Cholesky decomposition method.
 
 -  Propagation: propagate the PDFs for the :math:`X_i` through the model to obtain the PDF for Y. 
 
@@ -29,7 +29,7 @@ The main stages consist of:
 
 For the HYPERNETS processing, the first propagation of uncertainties is applied when calibrating the L1A scans. The measurement function for this step is given in :ref:`calibrate`. 
 The input quantities are the measured signal (in digital numbers), the dark signal, the calibration coefficients, the non-linearity coefficients, and the integration time of the measurement.
-All that remains to be done in order to complete the `Formulation' stage of MC, we need to define the uncertainties and error-correlations for each of the input quantities as well as their PDF.
+All that remains to be done in order to complete the `Formulation' stage of MC is to define the uncertainties and error-correlations for each of the input quantities as well as their PDF.
 
 For the measured signal and dark signal, the random uncertainties can be determined from calculating the standard deviation between the different scans.
 In addition, systematic uncertainties in the measured signal will cancel with systematic uncertainties in the dark signal. 
@@ -53,12 +53,13 @@ This tool also handles uncertainty propagation (which internally uses punpy) in 
 The measurand (interpolated irradiances) and asoociated uncertainties and error-correlations are returned by the tool.
 
 Finally, uncertainty are propagated to L2A with punpy using the measurement functions in :ref:`calibrate` and the input quantities from the L1C products. 
-Some basic information on how to interface with the information with the uncertainty information in the HYPERNETS products is given in the :ref:`using_hypernets` page.
+Some basic information on how to interface with the uncertainty information in the HYPERNETS products is given in the :ref:`using_hypernets` page.
 Further information and examples can be found on the CoMet website (`<https://www.comet-toolkit.org/>`_).
 
 Uncertainty contributions
 ############################
 Three uncertainty contributions are tracked throughout the processing:
+
 -  Random uncertainty: Uncertainty component arising from the noise in the measurements, which
    does not have any error-correlation between different wavelengths or different repeated measurements
    (scans/series/sequences). The random uncertainties on the L0 data are taken to be the standard deviation
@@ -110,7 +111,7 @@ Storing uncertainty information as digital effects tables
 #########################################################
 As previously mentioned, detailed error-correlation information is calculated as part of the uncertainty
 propagation. Storing this information in a space-efficient way is not trivial. To do this we use the `obsarray module <https://obsarray.readthedocs.io/en/latest/>`_
-of the CoMet toolkit. obsarray uses a concept called ‘digital effects tables’ to store the errorcorrelation
+of the CoMet toolkit. obsarray uses a concept called ‘digital effects tables’ to store the error-correlation
 information. This concept takes the parameterised error-correlation forms defined in the Quality
 Assurance Framework for Earth Observation (`QA4EO <https://www.QA4EO.org>`_) and stores them in a standardised metadata
 format. By using these parameterised error-correlation forms, it is not necessary to explicitely store the

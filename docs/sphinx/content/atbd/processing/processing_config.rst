@@ -84,16 +84,16 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - 0 no uncertainties, suggested > 100 when uncertainties
    * - max_level
      - maximum level of processing
-     - default: L2A
+     - Default: L2A
    * - uncertainty_l1a
      - uncertainty computation of the level L1A
-     - default: False
+     - Default: False
    * - bad_wavelenth_ranges
      - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
-     - default: 757.5-767.5, 1350-1390
+     - Default: 757.5-767.5, 1350-1390
    * - verbose
      - printing warnings and errors in terminal
-     - default: False
+     - Default: False
 
 
 **Table 3: Databases**
@@ -146,7 +146,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - model
      - Model that should be followed by the processor to read the filenames of the raw SPE files.
-     - default: series_rep, series_id, vaa, azimuth_ref, vza, mode, action, it, scan_total, series_time
+     - Default: series_rep, series_id, vaa, azimuth_ref, vza, mode, action, it, scan_total, series_time
 
 
 **Table 6: Quality**
@@ -386,7 +386,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - product_format
      - Product format for output file
-     - default: netcdf
+     - Default: netcdf
    * - remove_vars_strings
      - List of names from variables to remove from output files
      -
@@ -395,22 +395,22 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      -
    * - write_l0a
      - Write output file L0A
-     - default: True
+     - Default: True
    * - write_l0b
      - Write output file L0B
-     - default: True
+     - Default: True
    * - write_l1a
      - Write output file L1A
-     - default: True
+     - Default: True
    * - write_l1b
      - Write output file L1B
-     - default: True
+     - Default: True
    * - write_l1c
      - Write output file L1C
-     - default: True
+     - Default: True
    * - write_l2a
      - Write output file L2A
-     - default: True
+     - Default: True
 
 **Table 16: Plotting**
 
@@ -423,40 +423,40 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - plotting_format
      - Format of the figures for the different plots
-     - default: png
+     - Default: png
    * - plot_fontsize
      - Fontsize for the axis of the plots
-     - default: 14
+     - Default: 14
    * - plot_legendfontsize
      - Fontsize for the legends in the plots
-     - default: 10
+     - Default: 10
    * - plot_l0
      - Plotting L0 data
-     - default: True
+     - Default: True
    * - plot_l1a
      - Plotting L1A data
-     - default: True
+     - Default: True
    * - plot_l1a_diff
      - Plotting differences in L1A data (plotted separately per series)
-     - default: True
+     - Default: True
    * - plot_l1b
      - Plotting L1B data
-     - default: True
+     - Default: True
    * - plot_l1c
      - Plotting L1C data
-     - default: True
+     - Default: True
    * - plot_l2a
      - Plotting L2A data
-     - default: True
+     - Default: True
    * - plot_uncertainty
      - Plotting uncertainties
-     - default: True
+     - Default: True
    * - plot_correlation
      - Plotting error correlation matrices
-     - default: False
+     - Default: False
    * - plot_clear_sky_check
      - Plotting the irradiance L1B data with the clear-sky simulations used for the clear-sky check.
-     - default: True
+     - Default: True
 
 Land processing configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -519,16 +519,16 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - 0 no uncertainties, suggested >= 100 when uncertainties
    * - max_level
      - maximum level of processing
-     - default: L2A
+     - Default: L2A
    * - uncertainty_l1a
      - uncertainty computation of the level L1A
-     - default: False
+     - Default: False
    * - bad_wavelenth_ranges
      - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
-     - default: 757.5-767.5, 1350-1390
+     - Default: 757.5-767.5, 1350-1390
    * - verbose
      - printing warnings and errors in terminal
-     - default: False
+     - Default: False
 
 
 **Table 3: Databases**
@@ -581,7 +581,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - model
      - Model that should be followed by the processor to read the filenames of the raw SPE files.
-     - default: series_rep, series_id, vaa, azimuth_ref, vza, mode, action, it, scan_total, series_time
+     - Default: series_rep, series_id, vaa, azimuth_ref, vza, mode, action, it, scan_total, series_time
 
 
 **Table 6: Quality**
@@ -702,7 +702,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - product_format
      - Product format for output file
-     - default: netcdf
+     - Default: netcdf
    * - remove_vars_strings
      - List of names from variables to remove from output files
      -
@@ -711,22 +711,22 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      -
    * - write_l0a
      - Write output file L0A
-     - default: True
+     - Default: True
    * - write_l0b
      - Write output file L0B
-     - default: True
+     - Default: True
    * - write_l1a
      - Write output file L1A
-     - default: True
+     - Default: True
    * - write_l1b
      - Write output file L1B
-     - default: True
+     - Default: True
    * - write_l1c
      - Write output file L1C
-     - default: True
+     - Default: True
    * - write_l2a
      - Write output file L2A
-     - default: True
+     - Default: True
 
 **Table 12: Plotting**
 
@@ -739,43 +739,43 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - Options/example
    * - plotting_format
      - Format of the figures for the different plots
-     - default: png
+     - Default: png
    * - plot_fontsize
      - Fontsize for the axis of the plots
-     - default: 14
+     - Default: 14
    * - plot_legendfontsize
      - Fontsize for the legends in the plots
-     - default: 10
+     - Default: 10
    * - plot_l0
      - Plotting L0 data
-     - default: True
+     - Default: True
    * - plot_l1a
      - Plotting L1A data
-     - default: True
+     - Default: True
    * - plot_l1a_diff
      - Plotting differences in L1A data (plotted separately per series)
-     - default: True
+     - Default: True
    * - plot_l1b
      - Plotting L1B data
-     - default: True
+     - Default: True
    * - plot_l1c
      - Plotting L1C data
-     - default: True
+     - Default: True
    * - plot_l2a
      - Plotting L2A data
-     - default: True
+     - Default: True
    * - plot_uncertainty
      - Plotting uncertainties
-     - default: True
+     - Default: True
    * - plot_correlation
      - Plotting error correlation matrices
-     - default: False
+     - Default: False
    * - plot_clear_sky_check
      - Plotting the irradiance L1B data with the clear-sky simulations used for the clear-sky check.
-     - default: True
+     - Default: True
    * - plot_polar_wav
      - Wavelength for which to make a polar plot showing the angular variation in reflectance (using colourscale)
-     - default: 900
+     - Default: 900
    * - plot_polar_min
      - minimum reflectace in the colourscale for polar plot showing the angular variation in reflectance
      -
