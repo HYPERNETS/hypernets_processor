@@ -19,7 +19,7 @@ products should be used.
 V2.0
 ------------
 The current version of the HYPERNETS_PROCESSOR is v2.0. This is
-the first version that is intended for operational use. This version is described in De Vis et al. (2024a).
+the first version that is intended for operational use. This version is described in `De Vis et al. (2024a)<https://doi.org/10.3389/frsen.2024.1347230>`_.
 
 Compared to the v1.0, there are a few changes in the
 v2.0 HYPERNETS_PROCESSOR worth noting, so that any HYPERNETS
@@ -28,7 +28,7 @@ results using the v1.0 data products can be understood.
 • The first important difference is in the definition of the
   viewing azimuth angles, which have changed by 180° in
   order to be consistent with satellite viewing azimuth angles
-  in v2.0 (see :ref:`definitions`). The pointing azimuth angles in
+  in v2.0 (see :ref:`data_structure`). The pointing azimuth angles in
   v2.0 are equal to the viewing azimuth angles in v1.0.
   Pointing azimuth angles are mainly of interest for the
   WATERHYPERNET network as it is commonly used
@@ -60,6 +60,6 @@ This version was used to produce the first public dataset on Zenodo.
 
 Beta
 -----
-This version is described in Goyens et al. (2021)
+This version is described in `Goyens et al. (2021)<https://doi.org/10.1109/IGARSS47720.2021.9553738>`_
 
 
