@@ -123,7 +123,15 @@ setup(
         "importlib-metadata==4.0.1",
         "pyhdf",
         # "psycopg2",
-    ],
+        ],
+    extras_require={
+           "docs": [
+            "sphinx",
+            "sphinx_design",
+            "sphinx_book_theme",
+            "ipython",
+            "sphinx_autosummary_accessors",
+        ]},
     entry_points={
         "console_scripts": [
             "hypernets_sequence_processor = hypernets_processor.cli.sequence_processor_cli:cli",

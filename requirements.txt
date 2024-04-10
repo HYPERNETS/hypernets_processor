@@ -13,6 +13,8 @@ pytest >=5.4.1
 pytest-cov >=2.8.1
 
 # for docs
-sphinx>=3.0.1
-sphinx-rtd-theme>=0.4.3
-Jinja2<3.1
+sphinx
+sphinx_design
+ipython
+sphinx_autosummary_accessors
+sphinx_book_theme
