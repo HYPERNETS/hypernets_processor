@@ -4,7 +4,7 @@ FLAG_COMMON = [
     "pt_ref_invalid",
     "bad_pointing",
     "outliers",
-    "L0_thresholds",
+    "L0_threshold",
     "L0_discontinuity",
     "dark_masked",
     "half_of_scans_masked",

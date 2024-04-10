@@ -72,6 +72,56 @@ This can also be used to remove data with certain flags from the HYPERNETS produ
 
 For further details we refer to the `Jupyter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_surface_reflectance.ipynb>`_.
 
+band integrating HYPERNETS data with satellite SRF
+--------------------------------------------------
+The main goal of HYPERNETS is the validation of a wide range of satellite products.
+Before the HYPERNETS data can be compared to the satellite data, an important step is that the
+HYPERNETS data will have to be spectrally integrated over the satellite spectral response functions (SRF).
+This can conveniently be done using the matheo tool (https://matheo.readthedocs.io/en/latest/).
+We again provide an example on how to do this for HYPERNETS data in `this Jupyter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_band_integration.ipynb>`_.
+
+In short, for any sensor included in pyspectral (see https://pyspectral.readthedocs.io/en/master/platforms_supported.html for supported platforms), the
+band integration can be performed as follows::
+
+   from matheo.band_integration import band_integration
+   import xarray as xr
+   import numpy as np
+
+   ds_HYP = xr.open_dataset("comet_training/HYPERNETS_L_GHNA_L2A_REF_20231103T0901_20240124T2246_v2.0.nc")  # read digital effects table
+   reflectance_HYP=ds_HYP["reflectance"].values
+   wavelength_HYP=ds_HYP["wavelength"].values
+
+   refl_S2, band_centres_S2 = band_integration.spectral_band_int_sensor(
+       d=reflectance_HYP,
+       wl=wavelength_HYP,
+       platform_name="Sentinel-2A",
+       sensor_name="MSI",
+   )
+
+   print(refl_S2, band_centres_S2)
+
+For any other sensors, the SRF can be provided by setting the shape and providing sensor wavelengths and widths::
+
+   wav_sat = np.arange(400,1600,10)
+   width_sat = 10*np.ones_like(wav_sat)
+
+   refl_band = band_integration.pixel_int(
+      d=reflectance_HYP,
+      x=wavelength_HYP,
+      x_pixel=wav_sat,
+      width_pixel=width_sat,
+      band_shape="triangle"
+   )
+
+   print(refl_band.shape)
+
+Or by providing an array r_SRF with the SRF for each band::
+
+   wav_SRF = np.arange(390,1610,0.1)
+   r_SRF = np.array([fd.f_triangle(wav_SRF, sat_wav_i, 10) for sat_wav_i in wav_sat])
+   refl_band2 = band_integration.band_int(reflectance_HYP, wavelength_HYP, r_SRF, wav_SRF)
+   print(refl_band2.shape)
+
 Accessing and propagating HYPERNETS uncertainties
 --------------------------------------------------
 The examples shown below are also available in this `Jupyter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_surface_reflectance.ipynb>`_.

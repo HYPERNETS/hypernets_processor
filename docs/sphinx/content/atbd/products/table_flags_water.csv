@@ -5,8 +5,8 @@ Bit #,name,network,level,Description,anomaly raised
 23, rhof_default, W , L1C , If the viewing geometry of the upwelling and downwelling radiance measurements are outside the viewing geometry range of the selected LUT for the `rhof_option' (e.g. Delta \phi > 180° when using the LUT from Mobley et al 1999 a default rho_F is used for the air-water interface correction factor (default: rho_F=0.0256)   ,
 24, temp_variability_irr, W , L1C ,  If the difference in E_d scans does not exceed a given threshold between two neighbouring scans (default: threshold = 25% for wavelength = 550nm; see also Ruddick et al. (2006))  ,
 25, temp_variability_rad, W , L1C ,  If the difference in L_d or L_u scans does not exceed a given threshold between two neighbouring scans (default: threshold = 25% for wavelength = 550nm; Ruddick et al. (2006))  ,
-26, min_nbred, W , L1C , If the total number of scans not flagged by either `nonlinearity'; `bad_pointing' or `outliers' is less than a given threshold (default: 3)  , `ned'
-27, min_nbrlu, W , L1C , If the total number of scans not flagged by either `nonlinearity'; `bad_pointing' or `outliers' is less than a given threshold (default: 3)  , `nlu'
-28, min_nblsky, W , L1C , If the total number of scans not flagged by either `nonlinearity'; `bad_pointing' or `outliers' is less than a given threshold (default: 3)  , `nld'
+26, min_nbred, W , L1C , If the total number of scans not flagged by either `L0_threshold'; `bad_pointing' or `outliers' is less than a given threshold (default: 3)  , `ned'
+27, min_nbrlu, W , L1C , If the total number of scans not flagged by either `L0_threshold'; `bad_pointing' or `outliers' is less than a given threshold (default: 3)  , `nlu'
+28, min_nblsky, W , L1C , If the total number of scans not flagged by either `L0_threshold'; `bad_pointing' or `outliers' is less than a given threshold (default: 3)  , `nld'
 29, def_wind_flag, W , L1C , If a default wind speed is used (by default: wind speed = 2m/s) ,
 30, simil_fail, W , L1C , If the quality check applied on the NIR similarity spectrum is not verified as suggested by Ruddick et al. (2005) (see Section 3.2 and Fig. 4 in Ruddick et al. (2005)) with default values for the computation of the NIR Similarity being 780 and 870~nm; the reference wavelength 670~nm and the threshold 5% ,
