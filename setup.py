@@ -120,7 +120,7 @@ setup(
         "comet_maths>=1.0.0",
         "obsarray>=1.0.0",
         "freezegun",
-        "importlib-metadata==4.0.1",
+        "importlib-metadata>=4.0.1",
         "pyhdf",
         ],
     extras_require={
