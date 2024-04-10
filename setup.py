@@ -122,16 +122,20 @@ setup(
         "freezegun",
         "importlib-metadata==4.0.1",
         "pyhdf",
-        # "psycopg2",
         ],
     extras_require={
-           "docs": [
-            "sphinx",
-            "sphinx_design",
-            "sphinx_book_theme",
-            "ipython",
-            "sphinx_autosummary_accessors",
-        ]},
+       "docs": [
+        "sphinx",
+        "sphinx_design",
+        "sphinx_book_theme",
+        "ipython",
+        "sphinx_autosummary_accessors",
+        ],
+        "dev": [
+        "pytest >=5.4.1",
+        "pytest-cov >=2.8.1",
+        ]
+    },
     entry_points={
         "console_scripts": [
             "hypernets_sequence_processor = hypernets_processor.cli.sequence_processor_cli:cli",
