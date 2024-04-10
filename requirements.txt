@@ -18,3 +18,4 @@ sphinx_design
 ipython
 sphinx_autosummary_accessors
 sphinx_book_theme
+sphinx-rtd-theme

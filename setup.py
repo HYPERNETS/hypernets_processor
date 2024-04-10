@@ -130,6 +130,7 @@ setup(
         "sphinx_book_theme",
         "ipython",
         "sphinx_autosummary_accessors",
+        "sphinx-rtd-theme"
         ],
         "dev": [
         "pytest >=5.4.1",
