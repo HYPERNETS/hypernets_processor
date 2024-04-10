@@ -200,7 +200,7 @@ class RhymerHypstar:
             del equival_zen
 
             # check if correct number of radiance and irradiance data
-            flags = ["bad_pointing", "outliers", "L0_thresholds", "L0_discontinuity"]
+            flags = ["bad_pointing", "outliers", "L0_threshold", "L0_discontinuity"]
             flagged = np.any(
                 [du.unpack_flags(lu["quality_flag"])[x] for x in flags], axis=0
             )
@@ -398,7 +398,7 @@ class RhymerHypstar:
             dataset_l1flags, L1a_uprad, L1b_downrad, L1b_irr
         )
 
-        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
+        flags = ["outliers", "L0_threshold", "L0_discontinuity", "bad_pointing"]
         # "temp_variability_irr", "temp_variability_rad"])
         #                 "air_water_int_default",  "simil_fail"]
 

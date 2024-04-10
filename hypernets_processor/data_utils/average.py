@@ -70,7 +70,7 @@ class Average:
         )
 
         #first do fast averaging of 1d variables
-        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
+        flags = ["outliers", "L0_threshold", "L0_discontinuity", "bad_pointing"]
 
         flagged = DatasetUtil.get_flags_mask_or(
             dataset_l0["quality_flag"], flags
@@ -166,7 +166,7 @@ class Average:
         )
 
         # first do fast averaging of 1d variables
-        flags = ["outliers", "L0_thresholds", "L0_discontinuity", "bad_pointing"]
+        flags = ["outliers", "L0_threshold", "L0_discontinuity", "bad_pointing"]
 
         flagged = DatasetUtil.get_flags_mask_or(
             dataset_l1a["quality_flag"], flags
@@ -251,7 +251,7 @@ class Average:
         flags = [
             "bad_pointing",
             "outliers",
-            "L0_thresholds",
+            "L0_threshold",
             "L0_discontinuity",
             "rhof_angle_missing",
             "temp_variability_irr",

@@ -94,6 +94,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - verbose
      - printing warnings and errors in terminal
      - Default: False
+   * - archive_directory
+     - directory where products will be saved when running automated processing
+     -
 
 
 **Table 3: Databases**
@@ -529,7 +532,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - verbose
      - printing warnings and errors in terminal
      - Default: False
-
+   * - archive_directory
+     - directory where products will be saved when running automated processing
+     -
 
 **Table 3: Databases**
 

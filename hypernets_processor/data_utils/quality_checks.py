@@ -141,7 +141,7 @@ class QualityChecks:
             datasetl0["quality_flag"][np.where(mask_outliers == 1)], "outliers"
         )  # for i in range(len(mask))]
         datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
-            datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_thresholds"
+            datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_threshold"
         )  # for i in range(len(mask))]
         datasetl0["quality_flag"][
             np.where(mask_discontinuity == 1)
@@ -184,7 +184,7 @@ class QualityChecks:
             datasetl0["quality_flag"][np.where(mask == 1)], "dark_masked"
         )
         # datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
-        #     datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_thresholds"
+        #     datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_threshold"
         # )  # for i in range(len(mask))]
 
         return datasetl0, mask

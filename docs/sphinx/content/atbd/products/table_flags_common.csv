@@ -6,8 +6,8 @@ Bit #,name,network,level,Description,anomaly raised
 5, outliers, L & W , L1A , If the spectrally integrated signal of the scan is more than 3 sigma or more than 25\% (whichever is largest) removed from the mean; it is masked and will not be used when averaging the series. This process is repeated until convergence and applied to the measured (ir)radiances and to the darks. ,
 6, L0_threshold, L & W , L1A , Check if any of the spectral pixels are saturated; i.e. digital number DN>=64000 ,
 7, L0_discontinuity, L & W , L1A , Check if there are missing values in the spectrum; or significant discontinuities (\Delta DN>10^4)  ,
-8, dark_masked, L & W , L1A , If any of the darks have been masked by `outliers'; `L0_thresholds'; and/or; `L0_discontinuity' ,
-9, half_of_scans_masked, L & W , L0B , Less than half of the scans for a series passed quality checks `bad_pointing'; `outliers'; `L0_thresholds'; and; `L0_discontinuity' ,
+8, dark_masked, L & W , L1A , If any of the darks have been masked by `outliers'; `L0_threshold'; and/or; `L0_discontinuity' ,
+9, half_of_scans_masked, L & W , L0B , Less than half of the scans for a series passed quality checks `bad_pointing'; `outliers'; `L0_threshold'; and; `L0_discontinuity' ,
 10, not_enough_dark_scans, L & W , L0B ,  Not enough valid dark scans for this series (# valid dark scans < n_valid_dark from the config file)  ,  `nld'
 11, not_enough_rad_scans, L & W , L0B , Not enough valid radiance scans for this series (# valid radiance scans < n_valid_rad from the config file) ,`nlu'
 12, not_enough_irr_scans, L & W , L0B , Not enough valid irradiance scans for this series (# valid irradiance scans < n_valid_irr from the config file) , `ned'

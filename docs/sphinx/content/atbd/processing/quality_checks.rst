@@ -185,7 +185,7 @@ to ensure consistency with other common water network processing
 
 The number of scans per series is important to assess the
 uncertainties. Hence, if the number of scans, not flagged by ‘bad
-pointing’, ‘outliers’, ‘L0_thresholds’, or ‘L0_discontinuity’, for Ed, Lu
+pointing’, ‘outliers’, ‘L0_threshold’, or ‘L0_discontinuity’, for Ed, Lu
 and Ld is below a given threshold, an anomaly is raised, and the
 processing is halted. The current default value is three which is a
 compromise between shortening the duration of the sequences and
