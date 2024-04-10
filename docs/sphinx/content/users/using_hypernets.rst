@@ -38,7 +38,7 @@ The `obsarray <https://obsarray.readthedocs.io/en/latest/>`_ package (which is a
 A Jupyter notebook showing how to do this is avaiable `here <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_surface_reflectance.ipynb>`_.
 
 Handling HYPERNETS flags
--------------------------
+##########################
 The flags detailed in :ref:`flags`, are stored in the netCDF files as a binary number, where each bit encodes for one flag.
 There is a flag for each series in the HYPERNETS sequence (see :ref:`data_structure`).
 The binary numbers as well as a list with the meanings of each flag can be accessed as follows using xarray::
@@ -73,7 +73,7 @@ This can also be used to remove data with certain flags from the HYPERNETS produ
 For further details we refer to the `Jupyter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_surface_reflectance.ipynb>`_.
 
 band integrating HYPERNETS data with satellite SRF
---------------------------------------------------
+####################################################
 The main goal of HYPERNETS is the validation of a wide range of satellite products.
 Before the HYPERNETS data can be compared to the satellite data, an important step is that the
 HYPERNETS data will have to be spectrally integrated over the satellite spectral response functions (SRF).
@@ -123,7 +123,7 @@ Or by providing an array r_SRF with the SRF for each band::
    print(refl_band2.shape)
 
 Accessing and propagating HYPERNETS uncertainties
---------------------------------------------------
+####################################################
 The examples shown below are also available in this `Jupyter notebook <https://colab.research.google.com/github/comet-toolkit/comet_training/blob/main/hypernets_surface_reflectance.ipynb>`_.
 
 **xarray**:
