@@ -47,15 +47,16 @@ def get_target_sequences(context, to_archive):
     else:
         for path in os.listdir(context.get_config_value("raw_data_directory")):
             if parse_sequence_path(path) is not None:
-                if os.path.exists(os.path.join(context.get_config_value("raw_data_directory"), path,"metadata.txt")):
-                    raw_paths.append(
-                        os.path.join(context.get_config_value("raw_data_directory"), path)
-                    )
+                sequence_path=os.path.join(context.get_config_value("raw_data_directory"), path)
+                if os.path.exists(os.path.join(sequence_path,"metadata.txt")):
+                    raw_paths.append(sequence_path)
                 else:
                     context.set_config_value("time", parse_sequence_path(path)["datetime"])
                     context.set_config_value("sequence_name", path)
-                    context.logger.error("metadata.txt not found in directory %s, will try processing again later"%(path))
-                    context.anomaly_handler.add_anomaly("m")
+                    context.set_config_value("sequence_path", sequence_path)
+                    context.logger.error("metadata.txt not found in directory %s, will try processing again later"%(sequence_path))
+                    #context.anomaly_handler.anomaly_db.add_anomaly("m")
+
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
     if to_archive is True:
