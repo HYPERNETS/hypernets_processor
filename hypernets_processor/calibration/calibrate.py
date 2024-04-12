@@ -109,6 +109,7 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
             dataset_l1a[measurandstring].values = measurand
+            dataset_l1a[measurandstring].attrs["unc_comps"] = []
             dataset_l1a = dataset_l1a.drop(
                 [
                     "u_rel_random_" + measurandstring,
@@ -177,6 +178,7 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0b, calibration_data)
             dataset_l1b[measurandstring].values = measurand
+            dataset_l1b[measurandstring].attrs["unc_comps"] = []
             dataset_l1b = dataset_l1b.drop(
                 [
                     "u_rel_random_" + measurandstring,
