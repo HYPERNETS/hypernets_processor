@@ -1,7 +1,7 @@
 """
 Module of helper functions for file path operations
 """
-
+import warnings
 
 from hypernets_processor.version import __version__
 from datetime import datetime as dt
@@ -56,8 +56,11 @@ def parse_sequence_path(path):
 
     if sequence_path[:3] == "SEQ":
         date_str = sequence_path[3:]
-        date = dt.strptime(date_str, "%Y%m%dT%H%M%S")
-        return {"datetime": date}
+        try:
+            date = dt.strptime(date_str, "%Y%m%dT%H%M%S")
+            return {"datetime": date}
+        except:
+            warnings.warn("The following path does not match the expected format and will not be processed (%s)"%(path))
     return None
 
 

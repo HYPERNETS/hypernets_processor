@@ -9,7 +9,7 @@ Data Distribution
 
 The distribution of Near Real-Time (NRT, 24 hours between data acquisition and data availability)
 LANDHYPERNET and WATERHYPERNET data will happen through the data portals for the
-LANDHYPERNET (www.landhypernet.org.uk) and WATERHYPERNET (www.waterhypernet.org).
+LANDHYPERNET (https://www.landhypernet.org.uk ) and WATERHYPERNET (https://www.waterhypernet.org ).
 However, during the current prototype phase, where improvement of the quality checks is still ongoing,
 and further site-specific quality checks are still being added by the site-owners, these data portals are
 restricted to consortium members. In addition, for the WATERHYPERNET network the distribution may
