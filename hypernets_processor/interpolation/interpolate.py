@@ -254,16 +254,6 @@ class Interpolate:
                     "err_corr_systematic_corr_rad_irr_" + measurandstring,
                 ]
             )
-            dataset_l1c["radiance"].attrs["unc_comps"] = []
-            dataset_l1c = dataset_l1c.drop(
-                [
-                    "u_rel_random_" + "radiance",
-                    "u_rel_systematic_indep_" + "radiance",
-                    "u_rel_systematic_corr_rad_irr_" + "radiance",
-                    "err_corr_systematic_indep_" + "radiance",
-                    "err_corr_systematic_corr_rad_irr_" + "radiance",
-                ]
-            )
 
 
         if len(acqui_irr) == 1:
