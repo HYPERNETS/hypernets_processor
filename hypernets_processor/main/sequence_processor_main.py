@@ -55,7 +55,7 @@ def get_target_sequences(context, to_archive):
                     context.set_config_value("sequence_name", path)
                     context.set_config_value("sequence_path", sequence_path)
                     context.logger.error("metadata.txt not found in directory %s, will try processing again later"%(sequence_path))
-                    #context.anomaly_handler.anomaly_db.add_anomaly("m")
+                    context.anomaly_handler.anomaly_db.add_anomaly("m")
 
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
@@ -68,7 +68,7 @@ def get_target_sequences(context, to_archive):
             for product in context.archive_db["products"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if "L2A" in product["product_level"]
+            #if "L2A" in product["product_level"] removed 2024-07-17 KGR to prevent infinite loop to reprocess when no L2A and no anomaly
         ]
 
         failed_products = [
