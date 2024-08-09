@@ -92,9 +92,9 @@ class Calibrate:
                 store_unc_percent=True,
             )
 
-            if self.context.get_config_value("bad_wavelenth_ranges"):
+            if self.context.get_config_value("bad_wavelength_ranges"):
                 for maskrange in self.context.get_config_value(
-                    "bad_wavelenth_ranges"
+                    "bad_wavelength_ranges"
                 ).split(","):
                     start_mask = float(maskrange.split("-")[0])
                     end_mask = float(maskrange.split("-")[1])
@@ -193,9 +193,9 @@ class Calibrate:
         if self.context.get_config_value("mcsteps") > 0:
             self.qual.perform_quality_check_rand_unc(dataset_l1b, measurandstring)
 
-            if self.context.get_config_value("bad_wavelenth_ranges"):
+            if self.context.get_config_value("bad_wavelength_ranges"):
                 for maskrange in self.context.get_config_value(
-                    "bad_wavelenth_ranges"
+                    "bad_wavelength_ranges"
                 ).split(","):
                     start_mask = float(maskrange.split("-")[0])
                     end_mask = float(maskrange.split("-")[1])

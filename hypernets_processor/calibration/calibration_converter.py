@@ -1,3 +1,5 @@
+import warnings
+
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.test.test_functions import (
@@ -312,40 +314,53 @@ class CalibrationConverter:
         minwav = 350
         for caldatepath in caldatepaths:
             if measurandstring == "radiance":
-                calpath = glob.glob(
+                filelist = glob.glob(
                     os.path.join(
                         caldatepath,
                         "hypstar_" + str(hypstar) + "_radcal_L_*_%s.dat" % (sensortag),
                     )
-                )[0]
-                caldate = calpath[-15:-9]
-                print(os.path.basename(caldatepath))
-                if ("b" in os.path.basename(caldatepath)) or (
-                    "10C" in os.path.basename(caldatepath)
-                ):
-                    caldate += "T235959"
-                elif "a" in os.path.basename(caldatepath):
-                    caldate += "T000000"
+                )
+                if len(filelist)==1:
+                    calpath = filelist[0]
+                    caldate = calpath[-15:-9]
+                    print(os.path.basename(caldatepath))
+                    if ("b" in os.path.basename(caldatepath)) or (
+                        "10C" in os.path.basename(caldatepath)
+                    ):
+                        caldate += "T235959"
+                    elif "a" in os.path.basename(caldatepath):
+                        caldate += "T000000"
+                    else:
+                        caldate += "T120000"
+                    print(caldate)
                 else:
-                    caldate += "T120000"
-                print(caldate)
+                    warnings.warn("the number of files matching %s is not equal to 1: %s"%(os.path.join(
+                        caldatepath,
+                        "hypstar_" + str(hypstar) + "_radcal_L_*_%s.dat" % (sensortag),
+                    ),filelist))
             else:
-                calpath = glob.glob(
+                filelist = glob.glob(
                     os.path.join(
                         caldatepath,
                         "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
                     )
-                )[0]
-                caldate = calpath[-15:-9]
-                if ("b" in os.path.basename(caldatepath)) or (
-                    "10C" in os.path.basename(caldatepath)
-                ):
-                    caldate += "T235959"
-                elif "a" in os.path.basename(caldatepath):
-                    caldate += "T000000"
+                )
+                if len(filelist)==1:
+                    calpath = filelist[0]
+                    caldate = calpath[-15:-9]
+                    if ("b" in os.path.basename(caldatepath)) or (
+                        "10C" in os.path.basename(caldatepath)
+                    ):
+                        caldate += "T235959"
+                    elif "a" in os.path.basename(caldatepath):
+                        caldate += "T000000"
+                    else:
+                        caldate += "T120000"
                 else:
-                    caldate += "T120000"
-
+                    warnings.warn("the number of files matching %s is not equal to 1: %s" % (os.path.join(
+                        caldatepath,
+                        "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
+                    ), filelist))
             if os.path.exists(calpath):
                 caldates = np.append(caldates, caldate)
                 gains_temp = np.genfromtxt(calpath)
@@ -383,21 +398,29 @@ class CalibrationConverter:
 
         nonlindates = []
         for lincaldatepath in lincaldatepaths:
-            nonlinpath = glob.glob(
+            filelist = glob.glob(
                 os.path.join(
                     lincaldatepath,
                     "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
                 )
-            )[0]
-            lincaldate = nonlinpath[-10:-4]
-            if ("b" in os.path.basename(lincaldatepath)) or (
-                "10C" in os.path.basename(lincaldatepath)
-            ):
-                lincaldate += "T235959"
-            elif "a" in os.path.basename(lincaldatepath):
-                lincaldate += "T000000"
+            )
+            if len(filelist) == 1:
+                nonlinpath = filelist[0]
+                lincaldate = nonlinpath[-10:-4]
+                if ("b" in os.path.basename(lincaldatepath)) or (
+                        "10C" in os.path.basename(lincaldatepath)
+                ):
+                    lincaldate += "T235959"
+                elif "a" in os.path.basename(lincaldatepath):
+                    lincaldate += "T000000"
+                else:
+                    lincaldate += "T120000"
             else:
-                lincaldate += "T120000"
+                warnings.warn("the number of files matching %s is not equal to 1: %s" % (os.path.join(
+                    caldatepath,
+                    "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
+                ), filelist))
+
 
             if os.path.exists(nonlinpath):
                 nonlindates = np.append(nonlindates, lincaldate)
@@ -502,130 +525,135 @@ class CalibrationConverter:
         for caldatepath in caldatepaths:
             # print(caldatepath,)
             if measurandstring == "radiance":
-                calpath = glob.glob(
+                filelist = glob.glob(
                     os.path.join(
                         caldatepath,
                         "hypstar_" + str(hypstar) + "_radcal_L_*_%s.dat" % (sensortag),
                     )
-                )[0]
+                )
+
             else:
-                calpath = glob.glob(
+                filelist = glob.glob(
                     os.path.join(
                         caldatepath,
                         "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
                     )
-                )[0]
+                )
 
-            if os.path.exists(calpath):
-                caldates = np.append(caldates, caldate)
-                gains = np.genfromtxt(calpath)
-                wavs = gains[:, 1]
-                gains = gains[np.where(wavs > 350)[0]]
-                wavs = wavs[np.where(wavs > 350)[0]]
-                placeholder_unc = 2
-                gainlen = len(calibration_data["wavpix"].values[i_cal, :])
-                if True:
-                    # calibration_data["wavelength"].values = gains[:, 1]
-                    calibration_data["wavpix"].values[i_cal, :] = gains[:gainlen, 0]
-                    calibration_data["gains"].values[i_cal, :] = gains[:gainlen, 2]
-                    # calibration_data["u_rel_random_gains"].values = None
+            if len(filelist)==1:
+                calpath = filelist[0]
 
-                    calibration_data["u_rel_systematic_indep_gains"].values[
-                        i_cal, :
-                    ] = (
-                        (
-                            gains[:, 6] ** 2
-                            + gains[:, 7] ** 2
-                            + gains[:, 8] ** 2
-                            + gains[:, 9] ** 2
-                            + gains[:, 10] ** 2
-                            + gains[:, 11] ** 2
-                            + gains[:, 12] ** 2
-                            + gains[:, 13] ** 2
-                            + gains[:, 14] ** 2
-                            + gains[:, 15] ** 2
-                            + gains[:, 16] ** 2
-                            + gains[:, 17] ** 2
-                            + gains[:, 19] ** 2
-                            + nonlin_unc**2
-                            + placeholder_unc**2
+
+                if os.path.exists(calpath):
+                    caldates = np.append(caldates, caldate)
+                    gains = np.genfromtxt(calpath)
+                    wavs = gains[:, 1]
+                    gains = gains[np.where(wavs > 350)[0]]
+                    wavs = wavs[np.where(wavs > 350)[0]]
+                    placeholder_unc = 2
+                    gainlen = len(calibration_data["wavpix"].values[i_cal, :])
+                    if True:
+                        # calibration_data["wavelength"].values = gains[:, 1]
+                        calibration_data["wavpix"].values[i_cal, :] = gains[:gainlen, 0]
+                        calibration_data["gains"].values[i_cal, :] = gains[:gainlen, 2]
+                        # calibration_data["u_rel_random_gains"].values = None
+
+                        calibration_data["u_rel_systematic_indep_gains"].values[
+                            i_cal, :
+                        ] = (
+                            (
+                                gains[:, 6] ** 2
+                                + gains[:, 7] ** 2
+                                + gains[:, 8] ** 2
+                                + gains[:, 9] ** 2
+                                + gains[:, 10] ** 2
+                                + gains[:, 11] ** 2
+                                + gains[:, 12] ** 2
+                                + gains[:, 13] ** 2
+                                + gains[:, 14] ** 2
+                                + gains[:, 15] ** 2
+                                + gains[:, 16] ** 2
+                                + gains[:, 17] ** 2
+                                + gains[:, 19] ** 2
+                                + nonlin_unc**2
+                                + placeholder_unc**2
+                            )
+                            ** 0.5
+                        )[
+                            :gainlen
+                        ]
+
+                        cov_diag = cm.convert_corr_to_cov(
+                            np.eye(len(gains[:, 2])), gains[:, 2] * (gains[:, 19])
                         )
-                        ** 0.5
-                    )[
-                        :gainlen
-                    ]
 
-                    cov_diag = cm.convert_corr_to_cov(
-                        np.eye(len(gains[:, 2])), gains[:, 2] * (gains[:, 19])
-                    )
-
-                    cov_other = cm.convert_corr_to_cov(
-                        np.eye(len(gains[:, 2])),
-                        gains[:, 2]
-                        * (
-                            gains[:, 8] ** 2
-                            + gains[:, 10] ** 2
-                            + gains[:, 11] ** 2
-                            + gains[:, 16] ** 2
-                            + gains[:, 17] ** 2
-                            + nonlin_unc**2
+                        cov_other = cm.convert_corr_to_cov(
+                            np.eye(len(gains[:, 2])),
+                            gains[:, 2]
+                            * (
+                                gains[:, 8] ** 2
+                                + gains[:, 10] ** 2
+                                + gains[:, 11] ** 2
+                                + gains[:, 16] ** 2
+                                + gains[:, 17] ** 2
+                                + nonlin_unc**2
+                            )
+                            ** 0.5,
                         )
-                        ** 0.5,
-                    )
 
-                    cov_full = cm.convert_corr_to_cov(
-                        np.ones((len(gains[:, 2]), len(gains[:, 2]))),
-                        gains[:, 2]
-                        * (
-                            gains[:, 7] ** 2
-                            + gains[:, 9] ** 2
-                            + gains[:, 12] ** 2
-                            + gains[:, 13] ** 2
-                            + gains[:, 14] ** 2
-                            + gains[:, 15] ** 2
-                            + placeholder_unc**2
+                        cov_full = cm.convert_corr_to_cov(
+                            np.ones((len(gains[:, 2]), len(gains[:, 2]))),
+                            gains[:, 2]
+                            * (
+                                gains[:, 7] ** 2
+                                + gains[:, 9] ** 2
+                                + gains[:, 12] ** 2
+                                + gains[:, 13] ** 2
+                                + gains[:, 14] ** 2
+                                + gains[:, 15] ** 2
+                                + placeholder_unc**2
+                            )
+                            ** 0.5,
                         )
-                        ** 0.5,
-                    )
 
-                    cov_filament = cm.convert_corr_to_cov(
-                        np.ones((len(gains[:, 2]), len(gains[:, 2]))),
-                        gains[:, 2] * (gains[:, 6] ** 2) ** 0.5,
-                    )
+                        cov_filament = cm.convert_corr_to_cov(
+                            np.ones((len(gains[:, 2]), len(gains[:, 2]))),
+                            gains[:, 2] * (gains[:, 6] ** 2) ** 0.5,
+                        )
 
-                    calibration_data["err_corr_systematic_indep_gains"].values[
-                        i_cal, :, :
-                    ] = cm.correlation_from_covariance(
-                        cov_diag + cov_other + cov_full + cov_filament
-                    )[
-                        :gainlen, :gainlen
-                    ]
+                        calibration_data["err_corr_systematic_indep_gains"].values[
+                            i_cal, :, :
+                        ] = cm.correlation_from_covariance(
+                            cov_diag + cov_other + cov_full + cov_filament
+                        )[
+                            :gainlen, :gainlen
+                        ]
 
-                    calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[
-                        i_cal, :
-                    ] = (
-                        (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5
-                    )[
-                        :gainlen
-                    ]
+                        calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[
+                            i_cal, :
+                        ] = (
+                            (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5
+                        )[
+                            :gainlen
+                        ]
 
-                    cov_other = cm.convert_corr_to_cov(
-                        np.eye(len(gains[:, 2])),
-                        gains[:, 2] * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5,
-                    )
+                        cov_other = cm.convert_corr_to_cov(
+                            np.eye(len(gains[:, 2])),
+                            gains[:, 2] * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5,
+                        )
 
-                    cov_filament = cm.convert_corr_to_cov(
-                        np.ones((len(gains[:, 2]), len(gains[:, 2]))),
-                        gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
-                    )
+                        cov_filament = cm.convert_corr_to_cov(
+                            np.ones((len(gains[:, 2]), len(gains[:, 2]))),
+                            gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
+                        )
 
-                    calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
-                        i_cal, :, :
-                    ] = cm.correlation_from_covariance(cov_other + cov_filament)[
-                        :gainlen, :gainlen
-                    ]
-                # except:
-                #     print(caldatepath, " failed")
+                        calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
+                            i_cal, :, :
+                        ] = cm.correlation_from_covariance(cov_other + cov_filament)[
+                            :gainlen, :gainlen
+                        ]
+                    # except:
+                    #     print(caldatepath, " failed")
             i_cal += 1
 
         return calibration_data
