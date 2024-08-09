@@ -88,7 +88,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - uncertainty_l1a
      - uncertainty computation of the level L1A
      - Default: False
-   * - bad_wavelenth_ranges
+   * - bad_wavelength_ranges
      - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
      - Default: 757.5-767.5, 1350-1390
    * - verbose
@@ -526,7 +526,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - uncertainty_l1a
      - uncertainty computation of the level L1A
      - Default: False
-   * - bad_wavelenth_ranges
+   * - bad_wavelength_ranges
      - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
      - Default: 757.5-767.5, 1350-1390
    * - verbose
