@@ -65,15 +65,6 @@ STANDARD_METADATA = {
     "illuminance": "NaN",
     "system_relative_humidity": "NaN",
 }
-COMPONENTS_METADATA = {  # "system_id": system_id,
-    "instrument_id": "TBD",  # key metadata
-    # "pointing_system_id": "TBD",  # key metadata
-    # "calibration_device_id": "TBD",  # key metadata
-    # "irr_vis_head_id": "TBD",  # key metadata
-    # "rad_vis_head_id": "TBD",  # key metadata
-    # "rain_sensor_id": "TBD",  # key metadata
-    # "rgb_camera_id": "TBD",  # key metadata
-}
 
 CAL_METADATA = {
     "type": "dataset",
@@ -222,16 +213,14 @@ NETWORK_METADATA = {
     "relative_azimuth_angle_max": "TBD",
 }
 
-SYSTEM_METADATA = {  # "system_id": system_id,
-    "system_model": "TBD",
-    "system_manufacturer": "Laboratoire d'Océanographie de Villefranche UMR 7093 - CNRS / Sorbonne Univ",
-    "system_date_manufacture": "TBD",
-    "system_version": "TBD",
-    "system_firmaware_version": "TBD",
-    "system_documentation_references": "TBD",
-    "system_deployment_date": "TBD",
-    "system_deployment_height": "TBD",
-    "system_comment": "system below bird nest, bad luck",
+COMPONENTS_METADATA = {  # "system_id": system_id,
+    "instrument_id": "TBD",  # key metadata
+    # "pointing_system_id": "TBD",  # key metadata
+    # "calibration_device_id": "TBD",  # key metadata
+    # "irr_vis_head_id": "TBD",  # key metadata
+    # "rad_vis_head_id": "TBD",  # key metadata
+    # "rain_sensor_id": "TBD",  # key metadata
+    # "rgb_camera_id": "TBD",  # key metadata
 }
 
 INSTRUMENT_METADATA = {
@@ -315,6 +304,29 @@ RGB_CAMERA_METADATA = {
     "rgb_camera_id": "TBD",
     "rgb_camera_manufacturer": "ABUS",
     "rgb_camera_date_manufacture": "TBD",
+}
+
+SYSTEM_METADATA = {  # "system_id": system_id,
+    "system_model": "TBD",
+    "system_manufacturer": "Laboratoire d'Océanographie de Villefranche UMR 7093 - CNRS / Sorbonne Univ",
+    "system_date_manufacture": "TBD",
+    "system_version": "TBD",
+    "system_firmware_version": "TBD",
+    "system_documentation_references": "TBD",
+    "system_deployment_date": "TBD",
+    "system_deployment_height": "TBD",
+    "system_comment": "system below bird nest, bad luck",
+}
+
+
+#this needs to be further dicsussed after we have achieved conclusion on what to do in terms of QC for deployment periods
+DEPLOYMENT_METADATA = {
+    "start_date":"NaN",
+    "intstument_id":"NaN",
+    "hypernets_tools_version":"NaN",
+    "site_latitude": "NaN",
+    "site_longitude": "NaN",
+    #components? how do we gather this info and make sure its up to date?
 }
 
 SITE_METADATA = {
