@@ -1,6 +1,7 @@
 """
 Module with main to run sequence file processing chain
 """
+import datetime
 
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.config import read_config_file
@@ -15,6 +16,7 @@ from itertools import repeat
 import numpy as np
 from multiprocessing import Pool
 import gc
+import glob
 
 """___Authorship___"""
 __author__ = "Sam Hunt"
@@ -45,17 +47,27 @@ def get_target_sequences(context, to_archive):
     if parse_sequence_path(context.get_config_value("raw_data_directory")) is not None:
         raw_paths.append(context.get_config_value("raw_data_directory"))
     else:
-        for path in os.listdir(context.get_config_value("raw_data_directory")):
-            if parse_sequence_path(path) is not None:
-                sequence_path=os.path.join(context.get_config_value("raw_data_directory"), path)
-                if os.path.exists(os.path.join(sequence_path,"metadata.txt")):
+        #first add SEQ paths in raw_data_directory
+        paths=os.listdir(context.get_config_value("raw_data_directory"))
+        #then add paths in raw_data_directory/YYYY/mm/DD/SEQ*
+        paths.extend(glob.glob(
+                os.path.join(context.get_config_value("raw_data_directory"), "20*","*","*","SEQ*")
+            ))
+
+        for path in paths:
+            if parse_sequence_path(path, context) is not None:
+                sequence_path = os.path.join(context.get_config_value("raw_data_directory"), path)
+                if os.path.exists(os.path.join(sequence_path, "metadata.txt")):
                     raw_paths.append(sequence_path)
                 else:
                     context.set_config_value("time", parse_sequence_path(path)["datetime"])
                     context.set_config_value("sequence_name", path)
                     context.set_config_value("sequence_path", sequence_path)
-                    context.logger.error("metadata.txt not found in directory %s, will try processing again later"%(sequence_path))
-                    #context.anomaly_handler.anomaly_db.add_anomaly("m")
+                    context.logger.error(
+                        "metadata.txt not found in directory %s, will try processing again later" % (sequence_path))
+                    # context.anomaly_handler.anomaly_db.add_anomaly("m")
+
+
 
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
@@ -83,9 +95,16 @@ def get_target_sequences(context, to_archive):
 
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
         raw_products = list(set(raw_products) - set(complete_products))
-        raw_paths = [
-            os.path.join(directory, raw_product) for raw_product in raw_products
+
+        raw_products_datetimes = [parse_sequence_path(raw_product)["datetime"] for raw_product in raw_products
         ]
+
+        raw_paths = []
+        for i in range(len(raw_products)):
+            if np.abs(raw_products_datetimes[i]-datetime.datetime.now())<datetime.timedelta(minutes=context.get_config_value("delay_min")):
+                print("%s is not processed yet due to not having reached required delay (%s minutes)"%(raw_products[i],context.get_config_value("delay_min")))
+            else:
+                raw_paths.append(os.path.join(directory, raw_products[i]))
 
     return raw_paths
 

@@ -42,7 +42,7 @@ def relative_path(path, directory):
     return full_path
 
 
-def parse_sequence_path(path):
+def parse_sequence_path(path, context=None):
     """
     Unpacks info from raw sequence path, e.g. some/directory/SEQ20200312T135926
 
@@ -60,7 +60,12 @@ def parse_sequence_path(path):
             date = dt.strptime(date_str, "%Y%m%dT%H%M%S")
             return {"datetime": date}
         except:
-            warnings.warn("The following path does not match the expected format and will not be processed (%s)"%(path))
+            if context is not None:
+                context.logger.error(
+                    "The following path does not match the expected format and will not be processed (%s)"%(path))
+            else:
+                warnings.warn(
+                    "The following path does not match the expected format and will not be processed (%s)" % (path))
     return None
 
 
