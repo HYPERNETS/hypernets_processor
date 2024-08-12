@@ -309,6 +309,14 @@ class RhymerAncillary:
         ## hours until archived nowcasts are available
         time_archive = 30
 
+        ## Bug fix for West longitudes 2024-06-08
+        ## change from hypstar lon formaat (-180° to +180°) to GDAS (0° to 360°)
+        if lon > 0:
+            lon360=lon
+        else:
+            lon360=lon+360
+
+
         ## date time
         now = datetime.datetime.utcnow()
         if type(isodate) is str:
@@ -391,7 +399,7 @@ class RhymerAncillary:
                 yy = np.arange(len(lats))
 
                 ## interpolate indices
-                loni = np.interp(lon, lons, xx)
+                loni = np.interp(lon360, lons, xx)
                 if lats[0] > lats[-1]:
                     lati = np.interp(lat * -1, lats * -1, yy)  ## invert lats
                 else:

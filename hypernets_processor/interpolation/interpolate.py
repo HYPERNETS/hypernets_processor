@@ -186,16 +186,6 @@ class Interpolate:
                 dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
                 dataset_l1b_irr)
             dataset_l1c_temp[measurandstring].values = measurand
-            dataset_l1c_temp[measurandstring].attrs["unc_comps"] = []
-            dataset_l1c_temp = dataset_l1c_temp.drop(
-                [
-                    "u_rel_random_" + measurandstring,
-                    "u_rel_systematic_indep_" + measurandstring,
-                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "err_corr_systematic_indep_" + measurandstring,
-                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
-            )
 
         measurement_function_interpolate_time = self.context.get_config_value(
             "measurement_function_interpolate_time"
@@ -244,27 +234,6 @@ class Interpolate:
                     "output_sza": output_sza,
                 })
             dataset_l1c[measurandstring].values = measurand
-            dataset_l1c[measurandstring].attrs["unc_comps"] = []
-            dataset_l1c = dataset_l1c.drop(
-                [
-                    "u_rel_random_" + measurandstring,
-                    "u_rel_systematic_indep_" + measurandstring,
-                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "err_corr_systematic_indep_" + measurandstring,
-                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
-            )
-            dataset_l1c["radiance"].attrs["unc_comps"] = []
-            dataset_l1c = dataset_l1c.drop(
-                [
-                    "u_rel_random_" + "radiance",
-                    "u_rel_systematic_indep_" + "radiance",
-                    "u_rel_systematic_corr_rad_irr_" + "radiance",
-                    "err_corr_systematic_indep_" + "radiance",
-                    "err_corr_systematic_corr_rad_irr_" + "radiance",
-                ]
-            )
-
 
         if len(acqui_irr) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
@@ -315,15 +284,6 @@ class Interpolate:
                     "output_sza": output_sza,
                 })
             dataset_l1c[measurandstring].values = measurand
-            dataset_l1c = dataset_l1c.drop(
-                [
-                    "u_rel_random_" + measurandstring,
-                    "u_rel_systematic_indep_" + measurandstring,
-                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "err_corr_systematic_indep_" + measurandstring,
-                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
-            )
 
 
         if len(acqui_skyrad) == 1:

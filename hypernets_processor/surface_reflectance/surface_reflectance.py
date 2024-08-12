@@ -84,15 +84,6 @@ class SurfaceReflectance:
             measurandstring="water_leaving_radiance"
             measurand = water_protocol_function.run(L1c)
             L1c[measurandstring].values = measurand
-            L1c = L1c.drop(
-                [
-                    "u_rel_random_" + measurandstring,
-                    "u_rel_systematic_indep_" + measurandstring,
-                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "err_corr_systematic_indep_" + measurandstring,
-                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
-            )
 
         measurement_function_protocol = self.context.get_config_value(
             "measurement_function_surface_reflectance"
@@ -121,18 +112,8 @@ class SurfaceReflectance:
             measurandstring = ["reflectance_nosc", "reflectance", "epsilon"]
             reflectance_nosc, reflectance, epsilon = water_protocol_function.run(L1c)
             L1c[measurandstring[0]].values = reflectance_nosc
-            L1c[measurandstring[1]].values =reflectance
-            L1c[measurandstring[2]].values =epsilon
-            # for varsurf in measurandstring:
-            #     L1c = L1c.drop(
-            #         [
-            #             "u_rel_random_" + varsurf,
-            #             "u_rel_systematic_indep_" + varsurf,
-            #             "u_rel_systematic_corr_rad_irr_" + varsurf,
-            #             "err_corr_systematic_indep_" + varsurf,
-            #             "err_corr_systematic_corr_rad_irr_" + varsurf,
-            #         ]
-            #     )
+            L1c[measurandstring[1]].values = reflectance
+            L1c[measurandstring[2]].values = epsilon
 
         failSimil = self.qual.qc_similarity(L1c)
         L1c["quality_flag"][np.where(failSimil == 1)] = DatasetUtil.set_flag(
@@ -277,6 +258,7 @@ class SurfaceReflectance:
                 self.plot.plot_correlation("reflectance", dataset_l2a, refl=True)
         else:
             self.context.logger.error("network is not correctly defined")
+
 
         if self.context.get_config_value("write_l2a"):
             self.writer.write(
