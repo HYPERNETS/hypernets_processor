@@ -66,6 +66,21 @@ class HypernetsWriter:
             else:
                 raise IOError("The file already exists: " + path)
 
+        if self.context.get_config_value("mcsteps") < 2:
+            vars_with_unc_comps=[var for var in ds.keys()
+                                 if "unc_comps" in ds[var].attrs
+                                 and len(ds[var].attrs["unc_comps"])>0]
+            for var in vars_with_unc_comps:
+                unc_comps=ds[var].attrs["unc_comps"]
+                ds[var].attrs["unc_comps"] = []
+                try:
+                    ds = ds.drop(unc_comps)
+                except:
+                    continue
+
+            err_corr_vars = [var for var in ds.keys() if "err_corr" in var]
+            ds = ds.drop(err_corr_vars)
+
         if remove_vars_strings is not None:
             for remove_var_string in remove_vars_strings.split(","):
                 for var_name in ds.data_vars:

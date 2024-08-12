@@ -1532,11 +1532,6 @@ W_L1C_VARIABLES = {
             "standard_name": "std radiance",
             "long_name": "standard deviation for downwelling radiance",
             "units": "mW m^-2 nm^-1 sr^-1",
-            "unc_comps": [
-                "u_rel_random_downwelling_radiance",
-                "u_rel_systematic_indep_downwelling_radiance",
-                "u_rel_systematic_corr_rad_irr_downwelling_radiance",
-            ],
         },
     },
     "u_rel_random_upwelling_radiance": {
@@ -1718,11 +1713,6 @@ W_L1C_VARIABLES = {
             "standard_name": "std irradiance",
             "long_name": "standard deviation for downwelling irradiance",
             "units": "mW m^-2 nm^-1",
-            "unc_comps": [
-                "u_rel_random_irradiance",
-                "u_rel_systematic_indep_irradiance",
-                "u_rel_systematic_corr_rad_irr_irradiance",
-            ],
         },
     },
     "rhof": {
