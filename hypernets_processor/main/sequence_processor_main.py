@@ -68,7 +68,7 @@ def get_target_sequences(context, to_archive):
             for product in context.archive_db["products"].find(
                 site_id=context.get_config_value("site_id")
             )
-            #if "L2A" in product["product_level"] removed 2024-07-17 KGR to prevent infinite loop to reprocess when no L2A and no anomaly
+            if "L2A" in product["product_level"]
         ]
 
         failed_products = [
