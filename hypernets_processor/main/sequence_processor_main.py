@@ -43,6 +43,7 @@ def get_target_sequences(context, to_archive):
     # raw_data_directory may either be a sequence path or directory of sequence paths
 
     raw_paths = []
+    incomplete_downloads = []
 
     if parse_sequence_path(context.get_config_value("raw_data_directory")) is not None:
         raw_paths.append(context.get_config_value("raw_data_directory"))
@@ -60,14 +61,7 @@ def get_target_sequences(context, to_archive):
                 if os.path.exists(os.path.join(sequence_path, "metadata.txt")):
                     raw_paths.append(sequence_path)
                 else:
-                    context.set_config_value("time", parse_sequence_path(path)["datetime"])
-                    context.set_config_value("sequence_name", path)
-                    context.set_config_value("sequence_path", sequence_path)
-                    context.logger.error(
-                        "metadata.txt not found in directory %s, will try processing again later" % (sequence_path))
-                    # context.anomaly_handler.anomaly_db.add_anomaly("m")
-
-
+                    incomplete_downloads.append(sequence_path)
 
     # If adding to archive, remove previously processed paths from list by referencing
     # archive db
@@ -88,7 +82,9 @@ def get_target_sequences(context, to_archive):
             for anomaly in context.anomaly_db["anomalies"].find(
                 site_id=context.get_config_value("site_id")
             )
+            if anomaly["anomaly_id"] != "m"
         ]
+
         complete_products = processed_products + failed_products
 
         directory = os.path.dirname(raw_paths[0])
@@ -101,10 +97,29 @@ def get_target_sequences(context, to_archive):
 
         raw_paths = []
         for i in range(len(raw_products)):
-            if np.abs(raw_products_datetimes[i]-datetime.datetime.now())<datetime.timedelta(minutes=context.get_config_value("delay_min")):
-                print("%s is not processed yet due to not having reached required delay (%s minutes)"%(raw_products[i],context.get_config_value("delay_min")))
+            if context.get_config_value("delay_hours") is not None and np.abs(raw_products_datetimes[i]-datetime.datetime.now())<datetime.timedelta(hours=context.get_config_value("delay_hours")):
+                print("%s is not processed yet due to not having reached required delay (%s hours)"%(raw_products[i],context.get_config_value("delay_hours")))
             else:
                 raw_paths.append(os.path.join(directory, raw_products[i]))
+
+        #next, check if incompete downloads have already been added to anomaly db, and if not add them
+        incomplete_products = [
+            anomaly["sequence_name"]
+            for anomaly in context.anomaly_db["anomalies"].find(
+                site_id=context.get_config_value("site_id")
+            )
+            if anomaly["anomaly_id"] == "m"
+        ]
+
+        for incomplete_download_path in incomplete_downloads:
+            seq_id = os.path.basename(incomplete_download_path)
+            if not seq_id in incomplete_products:
+                context.set_config_value("time", parse_sequence_path(incomplete_download_path)["datetime"])
+                context.set_config_value("sequence_name", seq_id)
+                context.set_config_value("sequence_path", incomplete_download_path)
+                context.logger.error(
+                    "metadata.txt not found in directory %s, will try processing again later" % (incomplete_download_path))
+                context.anomaly_handler.anomaly_db.add_anomaly("m")
 
     return raw_paths
 
