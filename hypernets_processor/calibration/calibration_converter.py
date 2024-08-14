@@ -41,11 +41,44 @@ class CalibrationConverter:
         self.templ = DataTemplates(context)
         self.writer = HypernetsWriter(context)
         self.context = context
-        self.version = self.context.get_config_value("version")
-        if self.version == 0.0:
+        self.version = self.context.get_config_value("calibration_file_version")
+        if self.version is None or self.version == 0.0:
             self.version = input(
                 "Enter hypernets_processor version for which you are generating calib files:"
             )
+
+    def convert_coordinates_dt64(self,ds):
+        ds = ds.assign_coords(
+            calibrationdates=[datetime.strptime(date, "%y%m%dT%H%M%S") for date in
+                              ds["calibrationdates"].values])
+        ds = ds.assign_coords(
+            nonlineardates=[datetime.strptime(date, "%y%m%dT%H%M%S") for date in
+                            ds["nonlineardates"].values])
+        ds = ds.assign_coords(
+            wavdates=[datetime.strptime(date, "%y%m%dT%H%M%S") for date in
+                      ds["wavdates"].values])
+        return ds
+
+
+    def interpolate_calibration_ds(self,ds,sequence_dt64):
+        ds = self.convert_coordinates_dt64(ds)
+        for coord in ["calibrationdates","nonlineardates","wavdates"]:
+            dt64s=ds[coord].values
+            if self.context.get_config_value("calibration_interpolation_method")=="previous" or sequence_dt64>np.max(dt64s):
+                i = [
+                    x
+                    for x, date in enumerate(dt64s)
+                    if date < sequence_dt64
+                ][-1]
+                ds = ds.isel(
+                    indexers={coord: i}
+                )
+            elif sequence_dt64<=np.max(dt64s) and sequence_dt64>=np.min(dt64s):
+                ds = ds.interp(coords={coord:sequence_dt64},
+                               method=self.context.get_config_value("calibration_interpolation_method"))
+            else:
+                raise NotImplementedError
+        return ds
 
     def read_calib_files(self, sequence_path):
 
@@ -93,98 +126,18 @@ class CalibrationConverter:
                 os.path.join(hypstar_path, name) + " calibration file does not exist"
             )
 
-        sequence_datetime = parse_sequence_path(sequence_path)["datetime"]
+        sequence_dt64 = np.datetime64(parse_sequence_path(sequence_path)["datetime"])
 
-        calibration_data_times = calibration_data_rad["calibrationdates"].values
-        nonlin_times = calibration_data_rad["nonlineardates"].values
-        wav_times = calibration_data_rad["wavdates"].values
-
-        # print(nonlin_times)
-        #
-        #
-        # calib_i=[x for x, date in enumerate(calibration_data_times)
-        #            if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
-        #
-        # if len(nonlin_times)==1:
-        #     nlin_i=0
-        # else:
-        #     nlin_i=[x for x, date in enumerate(nonlin_times) if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
-
-        calib_i = [
-            x
-            for x, date in enumerate(calibration_data_times)
-            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
-        ][-1]
-        if len(nonlin_times) == 1:
-            nlin_i = 0
-        else:
-            nlin_i = [
-                x
-                for x, date in enumerate(nonlin_times)
-                if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
-            ][-1]
-
-        wav_i = [
-            x
-            for x, date in enumerate(wav_times)
-            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
-        ][-1]
-
-        calibration_data_rad = calibration_data_rad.sel(
-            calibrationdates=calibration_data_times[calib_i]
-        )
-        calibration_data_rad = calibration_data_rad.sel(
-            nonlineardates=nonlin_times[nlin_i]
-        )
-        calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[wav_i])
-
-        calibration_data_times_irr = calibration_data_irr["calibrationdates"].values
-        nonlin_times_irr = calibration_data_irr["nonlineardates"].values
-        wav_times_irr = calibration_data_irr["wavdates"].values
-
-        calib_i_irr = [
-            x
-            for x, date in enumerate(calibration_data_times_irr)
-            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
-        ][-1]
-
-        # if len(nonlin_times)==1:
-        #     nlin_i_irr=0
-        # else:
-        #     nlin_i_irr=[x for x, date in enumerate(nonlin_times) if datetime.strptime(date,"%y%m%dT%H%M%S") < sequence_datetime][-1]
-        #
-        if len(nonlin_times) == 1:
-            nlin_i_irr = 0
-        else:
-            nlin_i_irr = [
-                x
-                for x, date in enumerate(nonlin_times_irr)
-                if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
-            ][-1]
-
-        wav_i_irr = [
-            x
-            for x, date in enumerate(wav_times_irr)
-            if datetime.strptime(date, "%y%m%dT%H%M%S") < sequence_datetime
-        ][-1]
-
-        calibration_data_irr = calibration_data_irr.sel(
-            calibrationdates=calibration_data_times_irr[calib_i_irr]
-        )
-        calibration_data_irr = calibration_data_irr.sel(
-            nonlineardates=nonlin_times_irr[nlin_i_irr]
-        )
-        calibration_data_irr = calibration_data_irr.sel(
-            wavdates=wav_times_irr[wav_i_irr]
-        )
+        calibration_data_rad = self.interpolate_calibration_ds(calibration_data_rad,sequence_dt64)
+        calibration_data_irr = self.interpolate_calibration_ds(calibration_data_irr,sequence_dt64)
 
         if self.context.get_config_value("network") == "l":
             name = (
-                "HYPERNETS_CAL_"
-                + hypstar.upper()
-                + "_RAD_SWIR_v"
-                + str(self.version)
-                + ".nc"
+                    "HYPERNETS_CAL_"
+                    + hypstar.upper()
+                    + "_RAD_SWIR_v"
+                    + str(self.version)
+                    + ".nc"
             )
             if os.path.exists(os.path.join(hypstar_path, name)):
                 calibration_data_rad_swir = xarray.open_dataset(
@@ -197,11 +150,11 @@ class CalibrationConverter:
                 )
 
             name = (
-                "HYPERNETS_CAL_"
-                + hypstar.upper()
-                + "_IRR_SWIR_v"
-                + str(self.version)
-                + ".nc"
+                    "HYPERNETS_CAL_"
+                    + hypstar.upper()
+                    + "_IRR_SWIR_v"
+                    + str(self.version)
+                    + ".nc"
             )
             if os.path.exists(os.path.join(hypstar_path, name)):
                 calibration_data_irr_swir = xarray.open_dataset(
@@ -213,29 +166,136 @@ class CalibrationConverter:
                     + " calibration file does not exist"
                 )
 
-            calibration_data_times = calibration_data_rad_swir[
-                "calibrationdates"
-            ].values
-            nonlin_times = calibration_data_rad_swir["nonlineardates"].values
-            calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                calibrationdates=calibration_data_times[calib_i]
-            )
-            calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                nonlineardates=nonlin_times[nlin_i]
-            )
-            calibration_data_rad_swir = calibration_data_rad_swir.sel(
-                wavdates=wav_times[wav_i]
-            )
-            calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                calibrationdates=calibration_data_times_irr[calib_i_irr]
-            )
-            calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                nonlineardates=nonlin_times_irr[nlin_i_irr]
-            )
-            calibration_data_irr_swir = calibration_data_irr_swir.sel(
-                wavdates=wav_times_irr[wav_i_irr]
-            )
+            calibration_data_rad_swir = self.interpolate_calibration_ds(calibration_data_rad_swir,sequence_dt64)
+            calibration_data_irr_swir = self.interpolate_calibration_ds(calibration_data_irr_swir,sequence_dt64)
 
+        #
+        # if self.context.get_config_value("calibration_interpolation_method")=="previous" or sequence_datetime>np.max(calibration_data_times):
+        #     calib_i = [
+        #         x
+        #         for x, date in enumerate(calibration_data_times)
+        #         if date < sequence_datetime
+        #     ][-1]
+        #     if len(nonlin_times) == 1:
+        #         nlin_i = 0
+        #     else:
+        #         nlin_i = [
+        #             x
+        #             for x, date in enumerate(nonlin_times)
+        #             if date < sequence_datetime
+        #         ][-1]
+        #
+        #     wav_i = [
+        #         x
+        #         for x, date in enumerate(wav_times)
+        #         if date < sequence_datetime
+        #     ][-1]
+        #
+        #     calibration_data_rad = calibration_data_rad.sel(
+        #         calibrationdates=calibration_data_times[calib_i]
+        #     )
+        #     calibration_data_rad = calibration_data_rad.sel(
+        #         nonlineardates=nonlin_times[nlin_i]
+        #     )
+        #     calibration_data_rad = calibration_data_rad.sel(wavdates=wav_times[wav_i])
+        #
+        #
+        #
+        #     calib_i_irr = [
+        #         x
+        #         for x, date in enumerate(calibration_data_times_irr)
+        #         if date < sequence_datetime
+        #     ][-1]
+        #
+        #     if len(nonlin_times) == 1:
+        #         nlin_i_irr = 0
+        #     else:
+        #         nlin_i_irr = [
+        #             x
+        #             for x, date in enumerate(nonlin_times_irr)
+        #             if date < sequence_datetime
+        #         ][-1]
+        #
+        #     wav_i_irr = [
+        #         x
+        #         for x, date in enumerate(wav_times_irr)
+        #         if date < sequence_datetime
+        #     ][-1]
+        #
+        #     calibration_data_irr = calibration_data_irr.sel(
+        #         calibrationdates=calibration_data_times_irr[calib_i_irr]
+        #     )
+        #     calibration_data_irr = calibration_data_irr.sel(
+        #         nonlineardates=nonlin_times_irr[nlin_i_irr]
+        #     )
+        #     calibration_data_irr = calibration_data_irr.sel(
+        #         wavdates=wav_times_irr[wav_i_irr]
+        #     )
+        #
+        #     if self.context.get_config_value("network") == "l":
+        #
+        #         calibration_data_rad_swir = calibration_data_rad_swir.sel(
+        #             calibrationdates=calibration_data_times_swir[calib_i]
+        #         )
+        #         calibration_data_rad_swir = calibration_data_rad_swir.sel(
+        #             nonlineardates=nonlin_times_swir[nlin_i]
+        #         )
+        #         calibration_data_rad_swir = calibration_data_rad_swir.sel(
+        #             wavdates=wav_times_swir[wav_i]
+        #         )
+        #         calibration_data_irr_swir = calibration_data_irr_swir.sel(
+        #             calibrationdates=calibration_data_times_irr_swir[calib_i_irr]
+        #         )
+        #         calibration_data_irr_swir = calibration_data_irr_swir.sel(
+        #             nonlineardates=nonlin_times_irr_swir[nlin_i_irr]
+        #         )
+        #         calibration_data_irr_swir = calibration_data_irr_swir.sel(
+        #             wavdates=wav_times_irr_swir[wav_i_irr]
+        #         )
+        #
+        # else:
+        #     calibration_data_rad = calibration_data_rad.interp(calibrationdates=[sequence_datetime],
+        #                                                        method=self.context.get_config_value(
+        #                                                            "calibration_interpolation_method"))
+        #     calibration_data_rad = calibration_data_rad.interp(nonlineardates=[sequence_datetime],
+        #                                                        method=self.context.get_config_value(
+        #                                                            "calibration_interpolation_method"))
+        #     calibration_data_rad = calibration_data_rad.interp(wavdates=[sequence_datetime],
+        #                                                        method=self.context.get_config_value(
+        #                                                            "calibration_interpolation_method"))
+        #
+        #     calibration_data_irr = calibration_data_irr.interp(calibrationdates=[sequence_datetime],
+        #                                                        method=self.context.get_config_value(
+        #                                                            "calibration_interpolation_method"))
+        #     calibration_data_irr = calibration_data_irr.interp(nonlineardates=[sequence_datetime],
+        #                                                        method=self.context.get_config_value(
+        #                                                            "calibration_interpolation_method"))
+        #     calibration_data_irr = calibration_data_irr.interp(wavdates=[sequence_datetime],
+        #                                                        method=self.context.get_config_value(
+        #                                                            "calibration_interpolation_method"))
+        #     if self.context.get_config_value("network") == "l":
+        #
+        #         calibration_data_rad_swir = calibration_data_rad_swir.interp(calibrationdates=[sequence_datetime],
+        #                                                            method=self.context.get_config_value(
+        #                                                                "calibration_interpolation_method"))
+        #         calibration_data_rad_swir = calibration_data_rad_swir.interp(nonlineardates=[sequence_datetime],
+        #                                                            method=self.context.get_config_value(
+        #                                                                "calibration_interpolation_method"))
+        #         calibration_data_rad_swir = calibration_data_rad_swir.interp(wavdates=[sequence_datetime],
+        #                                                            method=self.context.get_config_value(
+        #                                                                "calibration_interpolation_method"))
+        #
+        #         calibration_data_irr_swir = calibration_data_irr_swir.interp(calibrationdates=[sequence_datetime],
+        #                                                            method=self.context.get_config_value(
+        #                                                                "calibration_interpolation_method"))
+        #         calibration_data_irr_swir = calibration_data_irr_swir.interp(nonlineardates=[sequence_datetime],
+        #                                                            method=self.context.get_config_value(
+        #                                                                "calibration_interpolation_method"))
+        #         calibration_data_irr_swir = calibration_data_irr_swir.interp(wavdates=[sequence_datetime],
+        #                                                            method=self.context.get_config_value(
+        #                                                                "calibration_interpolation_method"))
+
+        if self.context.get_config_value("network") == "l":
             return (
                 calibration_data_rad,
                 calibration_data_irr,
