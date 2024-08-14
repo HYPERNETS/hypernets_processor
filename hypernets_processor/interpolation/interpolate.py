@@ -203,14 +203,15 @@ class Interpolate:
         # Interpolate in time to radiance times
         acqui_rad = dataset_l1c["acquisition_time"].values
         output_sza = dataset_l1c["solar_zenith_angle"].values
-        input_sza = dataset_l1b_irr["solar_zenith_angle"].values
+
+        acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
+        input_sza = dataset_l1b_irr["solar_zenith_angle"].values[mask_notflagged]
 
         if self.context.get_config_value("network") == "w":
             dataset_l1c_temp = dataset_l1c_temp.isel(scan=mask_notflagged)
-            acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
+
         else:
             dataset_l1c_temp = dataset_l1c_temp.isel(series=mask_notflagged)
-            acqui_irr = dataset_l1b_irr["acquisition_time"].values[mask_notflagged]
 
         if self.context.get_config_value("mcsteps") > 0:
             dataset_l1c = interpolation_function_time.propagate_ds_specific(
