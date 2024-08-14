@@ -150,26 +150,32 @@ class HypernetsDSBuilder:
 
             if ds_format in ["L_L1A_RAD", "W_L1A_RAD", "L_L1B_RAD"]:
                 metadata["instrument_calibration_file_rad"] = (
-                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(version) + ".nc"
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v"
+                    + str(self.context.get_config_value("calibration_file_version")) + ".nc"
                 )
             if ds_format in ["L_L1A_IRR", "W_L1A_IRR", "L_L1B_IRR"]:
                 metadata["instrument_calibration_file_irr"] = (
-                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v"
+                    + str(self.context.get_config_value("calibration_file_version")) + ".nc"
                 )
             if ds_format in ["W_L1B", "L_L1C", "L_L2A"]:
                 metadata["instrument_calibration_file_irr"] = (
-                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v"
+                    + str(self.context.get_config_value("calibration_file_version")) + ".nc"
                 )
                 metadata["instrument_calibration_file_rad"] = (
-                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(version) + ".nc"
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v"
+                    + str(self.context.get_config_value("calibration_file_version")) + ".nc"
                 )
             if ds_format in ["W_L1C", "W_L2A"]:
                 # W_L1C
                 metadata["instrument_calibration_file_rad"] = (
-                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(version) + ".nc"
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v"
+                    + str(self.context.get_config_value("calibration_file_version")) + ".nc"
                 )
                 metadata["instrument_calibration_file_irr"] = (
-                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v" + str(version) + ".nc"
+                    "HYPERNETS_CAL_" + hypstar.upper() + "_IRR_v"
+                    + str(self.context.get_config_value("calibration_file_version")) + ".nc"
                 )
                 metadata["rhof_option"] = self.context.get_config_value("rhof_option")
 

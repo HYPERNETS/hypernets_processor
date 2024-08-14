@@ -91,6 +91,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - bad_wavelength_ranges
      - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
      - Default: 757.5-767.5, 1350-1390
+   * - delay_hours
+     - minimum delay between sequence aquisition and processing (e.g. to allow time for ancillary data download)
+     - Default: 48
    * - verbose
      - printing warnings and errors in terminal
      - Default: False
@@ -217,6 +220,12 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - measurement_function_calibrate
      - measurement function used for the calibration of the radiance and irradiance scans
      - e.g. StandardMeasurementFunction
+   * - calibration_interpolation_method
+     - interpolation method for interpolating between pre-deployment and post-deployment calibration
+     - e.g. previous or linear
+   * - calibration_file_version
+     - version of the calibration file to be used
+     - e.g. 2.1
 
 **Table 8: Interpolate**
 
