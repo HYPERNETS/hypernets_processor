@@ -1,6 +1,8 @@
 """
 Module of helper functions for configfile operations
 """
+import warnings
+
 import numpy as np
 from hypernets_processor.version import __version__
 from hypernets_processor.utils.paths import relative_path
@@ -29,8 +31,9 @@ if os.path.exists(WORKING_DIRECTORY_FILE_PATH):
     SCHEDULER_CONFIG_PATH = os.path.join(working_directory, "scheduler.config")
     JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
 else:
-    print(
-        "working_directory.txt does not exist so some of the paths for automated processing could not be correctly set up."
+    warnings.warn(
+        "working_directory.txt does not exist so some of the paths for automated processing could not "
+        "be correctly set up. You can ignore this warning if only processing data ad-hoc using hypernets_sequence_processor command."
     )
     PROCESSOR_CONFIG_PATH = None
     SCHEDULER_CONFIG_PATH = None

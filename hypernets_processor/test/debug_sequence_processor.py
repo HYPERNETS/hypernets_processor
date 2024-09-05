@@ -48,8 +48,10 @@ def process_sequence():
     # Read config file
     job_config = read_config_file([job_config_path, processor_defaults])
 
-    #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20230707T120104"
-    job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20231102T090040"
+    #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20231011T144127"
+    #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20221104T080729"
+    job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\SEQ20240813T140042"
+
 
     # job_config["Input"][
     #     "raw_data_directory"

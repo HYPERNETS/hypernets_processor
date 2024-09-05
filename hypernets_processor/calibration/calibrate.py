@@ -92,9 +92,9 @@ class Calibrate:
                 store_unc_percent=True,
             )
 
-            if self.context.get_config_value("bad_wavelenth_ranges"):
+            if self.context.get_config_value("bad_wavelength_ranges"):
                 for maskrange in self.context.get_config_value(
-                    "bad_wavelenth_ranges"
+                    "bad_wavelength_ranges"
                 ).split(","):
                     start_mask = float(maskrange.split("-")[0])
                     end_mask = float(maskrange.split("-")[1])
@@ -109,16 +109,6 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
             dataset_l1a[measurandstring].values = measurand
-            dataset_l1a[measurandstring].attrs["unc_comps"] = []
-            dataset_l1a = dataset_l1a.drop(
-                [
-                    "u_rel_random_" + measurandstring,
-                    "u_rel_systematic_indep_" + measurandstring,
-                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "err_corr_systematic_indep_" + measurandstring,
-                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
-            )
 
         if self.context.get_config_value("write_l1a"):
             self.writer.write(
@@ -178,24 +168,13 @@ class Calibrate:
         else:
             measurand = calibrate_function.run(dataset_l0b, calibration_data)
             dataset_l1b[measurandstring].values = measurand
-            dataset_l1b[measurandstring].attrs["unc_comps"] = []
-            dataset_l1b = dataset_l1b.drop(
-                [
-                    "u_rel_random_" + measurandstring,
-                    "u_rel_systematic_indep_" + measurandstring,
-                    "u_rel_systematic_corr_rad_irr_" + measurandstring,
-                    "err_corr_systematic_indep_" + measurandstring,
-                    "err_corr_systematic_corr_rad_irr_" + measurandstring,
-                ]
-            )
-
 
         if self.context.get_config_value("mcsteps") > 0:
             self.qual.perform_quality_check_rand_unc(dataset_l1b, measurandstring)
 
-            if self.context.get_config_value("bad_wavelenth_ranges"):
+            if self.context.get_config_value("bad_wavelength_ranges"):
                 for maskrange in self.context.get_config_value(
-                    "bad_wavelenth_ranges"
+                    "bad_wavelength_ranges"
                 ).split(","):
                     start_mask = float(maskrange.split("-")[0])
                     end_mask = float(maskrange.split("-")[1])

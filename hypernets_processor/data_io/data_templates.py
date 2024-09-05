@@ -37,6 +37,7 @@ class DataTemplates:
 
         cal_dim_sizes_dict = {
             "wavelength": len(wavs),
+            "wavelength'": len(wavs),
             "nonlinearcoef": 13,
             "wavcoef": len(wavcoef),
             "calibrationdates": len(caldates),
