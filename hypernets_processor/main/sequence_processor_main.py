@@ -87,20 +87,21 @@ def get_target_sequences(context, to_archive):
 
         complete_products = processed_products + failed_products
 
-        directory = os.path.dirname(raw_paths[0])
-
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
         raw_products = list(set(raw_products) - set(complete_products))
 
-        raw_products_datetimes = [parse_sequence_path(raw_product)["datetime"] for raw_product in raw_products
-        ]
-
-        raw_paths = []
-        for i in range(len(raw_products)):
-            if context.get_config_value("delay_hours") is not None and np.abs(raw_products_datetimes[i]-datetime.datetime.now())<datetime.timedelta(hours=context.get_config_value("delay_hours")):
-                print("%s is not processed yet due to not having reached required delay (%s hours)"%(raw_products[i],context.get_config_value("delay_hours")))
-            else:
-                raw_paths.append(os.path.join(directory, raw_products[i]))
+        paths_to_process = []
+        for i in range(len(raw_paths)):
+            raw_product = os.path.basename(raw_paths[i])
+            raw_product_datetime = parse_sequence_path(raw_product)["datetime"]
+            if raw_product in raw_products:
+                if context.get_config_value("delay_hours") is not None and np.abs(
+                        raw_product_datetime - datetime.datetime.now()) < datetime.timedelta(
+                        hours=context.get_config_value("delay_hours")):
+                    print("%s is not processed yet due to not having reached required delay (%s hours)" % (
+                    raw_product, context.get_config_value("delay_hours")))
+                else:
+                    paths_to_process.append(raw_paths[i])
 
         #next, check if incompete downloads have already been added to anomaly db, and if not add them
         incomplete_products = [
@@ -121,7 +122,7 @@ def get_target_sequences(context, to_archive):
                     "metadata.txt not found in directory %s, will try processing again later" % (incomplete_download_path))
                 context.anomaly_handler.anomaly_db.add_anomaly("m")
 
-    return raw_paths
+    return paths_to_process
 
 
 def run_sequence(inputs):
