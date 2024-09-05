@@ -122,8 +122,9 @@ def get_target_sequences(context, to_archive):
                     "metadata.txt not found in directory %s, will try processing again later" % (incomplete_download_path))
                 context.anomaly_handler.anomaly_db.add_anomaly("m")
 
-    return paths_to_process
-
+        return paths_to_process
+    else:
+        return raw_paths
 
 def run_sequence(inputs):
     target_sequence, context, logger = inputs
