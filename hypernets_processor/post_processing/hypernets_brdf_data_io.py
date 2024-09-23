@@ -97,8 +97,8 @@ def read_data_hypernets(
                     ]
                 )
                 meas.add_measurement(
-                    ds_HYP["acquisition_time"].values,
                     geometries,
+                    ds_HYP["acquisition_time"].values,
                     reflectance,
                     u_rand_reflectance=u_rand_refl,
                     u_syst_reflectance=u_syst_refl,
