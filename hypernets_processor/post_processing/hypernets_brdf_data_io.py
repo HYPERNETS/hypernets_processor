@@ -6,7 +6,7 @@ __author__ = [
 ]
 __all__ = []
 
-from brdf_model import BRDFMeasurements
+from brdf_model import BRDFMeasurementsSpectra
 import glob
 import os
 import xarray as xr
@@ -30,7 +30,7 @@ def read_data_hypernets(
     vza=None,
     vaa=None,
     filter_flags=True
-) -> BRDFMeasurements:
+) -> BRDFMeasurementsSpectra:
     """
     Function to read full HYPERNETS dataset
 
@@ -63,10 +63,10 @@ def read_data_hypernets(
     )
     corr_reflectances_wav = np.mean([ds_HYP.unc["reflectance"][:, i].total_err_corr_matrix() for i in range(len(ds_HYP["solar_zenith_angle"].values))], axis=0)
 
-    meas = BRDFMeasurements(
+    meas = BRDFMeasurementsSpectra(
         ds_HYP["wavelength"].values,
-        ds_HYP["acquisition_time"].values,
         geometries,
+        ds_HYP["acquisition_time"].values,
         reflectance,
         u_rand_refl,
         u_syst_refl,
@@ -259,7 +259,7 @@ def read_data_hypernets_sequence(self, path):
     pass
 
 
-def read_data_CIMEL(self, path, start_time, stop_time) -> BRDFMeasurements:
+def read_data_CIMEL(self, path, start_time, stop_time) -> BRDFMeasurementsSpectra:
     """
     Function to read CIMEL dataset
 
