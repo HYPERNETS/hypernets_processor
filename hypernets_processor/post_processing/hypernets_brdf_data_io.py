@@ -7,6 +7,7 @@ __author__ = [
 __all__ = []
 
 from brdf_model import BRDFMeasurementsSpectra
+
 import glob
 import os
 import xarray as xr
@@ -31,6 +32,7 @@ def read_data_hypernets(
     vaa=None,
     filter_flags=True
 ) -> BRDFMeasurementsSpectra:
+
     """
     Function to read full HYPERNETS dataset
 
