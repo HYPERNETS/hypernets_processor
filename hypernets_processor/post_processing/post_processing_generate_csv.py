@@ -5,8 +5,15 @@ import glob
 import matplotlib.pyplot as plt
 
 # set appropriate folders (different for linux or windows) and settings
-data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+
+#for windows:
+# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+
+# for eoserver:
+data_path = r"/mnt/t/data/insitu/hypernets/archive"
+results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+
 site = "GHNA"
 
 # results_path = os.path.join(results_path,brdf_model)
