@@ -179,16 +179,16 @@ def mask_HYPERNETS_BRDF(ds_HYP):
 
 
     # mask feet and mast here using bitwise operators such as: | for or , & for and
-    mask_shadow = np.where(
-        ~(
-            (
-                (ds_HYP["viewing_azimuth_angle"].values > 225)
-                | (ds_HYP["viewing_azimuth_angle"].values < 90)
-            )
-            & (ds_HYP["viewing_zenith_angle"].values < 15)
-        )
-    )[0]
-    ds_HYP = ds_HYP.isel(series=mask_shadow)
+    # mask_shadow = np.where(
+    #     ~(
+    #         (
+    #             (ds_HYP["viewing_azimuth_angle"].values > 225)
+    #             | (ds_HYP["viewing_azimuth_angle"].values < 90)
+    #         )
+    #         & (ds_HYP["viewing_zenith_angle"].values < 15)
+    #     )
+    # )[0]
+    # ds_HYP = ds_HYP.isel(series=mask_shadow)
 
     mask_shadow = np.where(
         ~(
@@ -222,28 +222,28 @@ def mask_HYPERNETS_BRDF(ds_HYP):
     ds_HYP = ds_HYP.isel(series=mask_shadow)
 
     #additional mask for specific additional mast anomalies (AM)
-    mask_shadow = np.where(
-       ~(
-            (
-                (ds_HYP["viewing_azimuth_angle"].values > 15)
-                & (ds_HYP["viewing_azimuth_angle"].values < 30)
-            )
-            & (ds_HYP["viewing_zenith_angle"].values < 30)
-       )
-    )[0]
-    ds_HYP = ds_HYP.isel(series=mask_shadow)
-
-    #additional mask for single additional high anomaly (PM)
-    mask_shadow = np.where(
-       ~(
-            (
-                (ds_HYP["viewing_azimuth_angle"].values > 285)
-                & (ds_HYP["viewing_azimuth_angle"].values < 300)
-            )
-            & (ds_HYP["viewing_zenith_angle"].values < 15)
-       )
-    )[0]
-    ds_HYP = ds_HYP.isel(series=mask_shadow)
+    # mask_shadow = np.where(
+    #    ~(
+    #         (
+    #             (ds_HYP["viewing_azimuth_angle"].values > 15)
+    #             & (ds_HYP["viewing_azimuth_angle"].values < 30)
+    #         )
+    #         & (ds_HYP["viewing_zenith_angle"].values < 30)
+    #    )
+    # )[0]
+    # ds_HYP = ds_HYP.isel(series=mask_shadow)
+    #
+    # #additional mask for single additional high anomaly (PM)
+    # mask_shadow = np.where(
+    #    ~(
+    #         (
+    #             (ds_HYP["viewing_azimuth_angle"].values > 285)
+    #             & (ds_HYP["viewing_azimuth_angle"].values < 300)
+    #         )
+    #         & (ds_HYP["viewing_zenith_angle"].values < 15)
+    #    )
+    # )[0]
+    # ds_HYP = ds_HYP.isel(series=mask_shadow)
 
     return ds_HYP
 
