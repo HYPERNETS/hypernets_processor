@@ -24,6 +24,8 @@ start_times = ["20220101T0700","20230101T0000","20240101T0000"]
 stop_times = ["20230101T0000","20240101T0000","20250101T0000"]
 
 wavelength = [415, 490, 550, 675, 740, 765, 870, 1020, 1640]
+plot_wavelength = 550
+
 
 # start_tod = ["0900","0930","1000","1030","1100"]
 # stop_tod = ["0930","1000","1030","1100","1130"]
@@ -61,10 +63,10 @@ for i in range(len(tags)):
                 HCRFmeas.export_csv(os.path.join(results_path,"%s_%s_%s_%s_%s.csv"%(tag,vza,vaa,start_tod[ii],stop_tod[ii])),wavelength)
 
                 fig1,ax1=plt.subplots()
-                ax1.plot(HCRFmeas.get_datetimes(), HCRFmeas.get_reflectance(wavelength), "o", label="before")
+                ax1.plot(HCRFmeas.get_datetimes(), HCRFmeas.get_reflectance(plot_wavelength), "o", label="before")
                 ax1.set_xlabel("datetime")
                 ax1.set_ylabel("reflectance")
                 ax1.legend(ncol=2)
                 ax1.set_ylim([vmin,vmax])
-                fig1.savefig(os.path.join(results_path,"refl_calibration_diff_%s_%s_%s_%s.png"%(vza,vaa,start_tod[ii],stop_tod[ii])))
+                fig1.savefig(os.path.join(results_path,"refl_calibration_diff_%s_%s_%s_%s_%s.png"%(vza,vaa,start_tod[ii],stop_tod[ii],plot_wavelength)))
                 plt.clf()
