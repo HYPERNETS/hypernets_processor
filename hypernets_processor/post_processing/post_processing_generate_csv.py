@@ -7,21 +7,22 @@ import matplotlib.pyplot as plt
 # set appropriate folders (different for linux or windows) and settings
 
 #for windows:
-data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
 
 # for eoserver:
 data_path = r"/mnt/t/data/insitu/hypernets/archive"
 results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
-tags = ["GHNA_v1", "GHNA_v3"]
-sites = ["GHNA","GHNA"]
-
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
-start_times = ["20220101T0700","20230101T0000","20240101T0000"]
-stop_times = ["20230101T0000","20240101T0000","20250101T0000"]
+
+tags = ["JSIT","GHNA_v1", "GHNA_v3"]
+sites = ["JSIT","GHNA","GHNA"]
+
+start_times = ["20240409T0000","20220517T0000","20231026T0000"]
+stop_times = ["20250101T0000","20231018T0000","20250101T0000"]
 
 wavelength = [415, 490, 550, 675, 740, 765, 870, 1020, 1640]
 plot_wavelength = 550
