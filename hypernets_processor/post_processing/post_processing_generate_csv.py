@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 # set appropriate folders (different for linux or windows) and settings
 data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
 results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
-site = "GHNA"
+site = "WWUK"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
-start_time = "20220201T0700"
-stop_time = "20221210T0700"
+start_time = "20211117T0000"
+stop_time = "20240116T0000"
 wavelength = [415, 490, 550, 675, 740, 765, 870, 1020, 1640]
 
 # start_tod = ["0900","0930","1000","1030","1100"]
@@ -32,7 +32,7 @@ vmax=0.28
 vzas=None
 vaas=None
 
-files = glob.glob(os.path.join(data_path, "GHNA", "*", "*", "*", "*", "*L2A*.nc"))
+files = glob.glob(os.path.join(data_path, "WWUK", "*", "*", "*", "*", "*L2A*.nc"))
 
 for ii in range(len(start_tod)):
     files = data_io.filter_files_start_stop(files, start_time, stop_time, tod_start=start_tod[ii], tod_stop=stop_tod[ii])
@@ -44,7 +44,7 @@ for ii in range(len(start_tod)):
             files, i=None, vza=vzas, vaa=vaas,
         )
 
-        HCRFmeas.export_csv(os.path.join(results_path,"GHNA_refl_2022_%s_%s_%s_%s.csv"%(vzas,vaas,start_tod[ii],stop_tod[ii])),wavelength)
+        HCRFmeas.export_csv(os.path.join(results_path,"WWUKv1_refl_%s_%s_%s_%s.csv"%(vzas,vaas,start_tod[ii],stop_tod[ii])),wavelength)
 
     else:
 

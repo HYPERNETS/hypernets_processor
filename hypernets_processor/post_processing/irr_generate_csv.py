@@ -16,8 +16,8 @@ site = "GHNA"
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
-start_time = "20220107T0700"
-stop_time = "20221120T0700"
+start_time = "20231026T0000"
+stop_time = "20250101T0000"
 wavelength = 550
 
 # start_tod = ["0900","0930","1000","1030","1100"]
@@ -42,7 +42,7 @@ def find_nearest_to_wav(array, wv, value):
     idx = (np.abs(wv - value)).argmin()
     return array[idx]
 
-data_clear = xr.open_dataset(r"T:\ECO\EOServer\data\insitu\hypernets\archive\GHNA\2022\07\09\SEQ20220709T083129\HYPERNETS_L_GHNA_L1B_IRR_20220709T0831_20231226T2014_v2.0.nc")
+data_clear = xr.open_dataset(r"T:\ECO\EOServer\data\insitu\hypernets\archive\GHNA\2024\05\13\SEQ20240513T080034\HYPERNETS_L_GHNA_L1B_IRR_20240513T0800_20240520T1359_v2.0.nc")
 wav_ori = data_clear.wavelength.values
 
 print('Got wavelengths')
@@ -101,7 +101,7 @@ def make_irrs(file_list, wav_val):
             irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
             irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
 
-    irrs.to_csv(results_path + '\joe_irradiance_2022.csv', index=False)
+    irrs.to_csv(results_path + '\GHNAv3_irradiance.csv', index=False)
     return irrs
 
 ##running

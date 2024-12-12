@@ -19,7 +19,7 @@ windows_results_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_q
 linux_data_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 windows_data_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-data = pd.read_csv(windows_data_path + r"/GHNA_refl_2022_None_None_None_None.csv")
+data = pd.read_csv(windows_data_path + r"/JSIT_None_None_None_None.csv")
 
 
 
@@ -242,13 +242,16 @@ def plot_data(filename, x, y, x_label = None, y_label = None, title = None):
 #more_wav_data = pd.read_csv(windows_data_path + r'/GHNA_refl_2022_None_None_None_None.csv')
 data = get_dates_times(data)
 get_raa(data)
-clean = run_checks(data, maintenance = True, bad_dates = maintenance_dates,
-                   sza = True, sza_limit = 70, sza_cut_type = 'above')
+clean = run_checks(data, maintenance = False, bad_dates = maintenance_dates,
+                   sza = False, sza_limit = 70, sza_cut_type = 'above')
 
 more_wav_raa = cutter(cutter(clean, 'raa', 'below', 10), 'raa', 'above', 350)
 print(len(clean), len(data))
 
-write_csv(clean, '/GHNA_2022_prelim_and_raa10.csv')
+o, g = get_outliers(clean, 3)
+print(len(o), len(g))
+
+#write_csv(clean, '/JSIT_dates_times_raa.csv')
 '''
 write_csv(clean_more_wav, '/more_wav_prelim_checks_2024_GHNA.csv')
 '''
@@ -285,11 +288,11 @@ print(len(clean), len(clean_raa))
 #cut_and_plot_2d(outliers, good_data, 'raa', 'below', (0,20), 'raa', 'above', (340,360), 'RAA Cut Above', 'RAA Cut Below')
 '''
 
-outliers = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_outliers.csv')
-good_data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_good.csv')
+#outliers = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_outliers.csv')
+#good_data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_good.csv')
 
 
-
+'''
 saa_and_sza_good = good_data[(good_data[' saa'] > 70)
                     & (good_data[' saa'] < 85)
                     & (good_data[' vaa'] > 260)
@@ -307,6 +310,7 @@ saa_and_sza_out = outliers[(outliers[' saa'] > 70)
                     & (outliers[' sza'] < 70)]
 
 print(len(outliers), len(saa_and_sza_out))
+'''
 '''
 saa_and_sza_good = good_data[(good_data[' saa'] > 255)
                     & (good_data[' saa'] < 265)
