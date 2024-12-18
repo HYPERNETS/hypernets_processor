@@ -1,3 +1,5 @@
+import datetime
+
 import numpy as np
 import hypernets_brdf_data_io as data_io
 import os
@@ -64,6 +66,9 @@ for site in SITE_PERIODS.keys():
         tag="%s_%s_%s"%(site,period["start_date"],period["stop_date"])
         start_time=period["start_date"]
         stop_time=period["stop_date"]
+        if stop_time=="present":
+            stop_time=datetime.datetime.now()
+
         files = glob.glob(os.path.join(data_path, site, "*", "*", "*", "*", "*L2A*.nc"))
 
         for ii in range(len(start_tod)):
