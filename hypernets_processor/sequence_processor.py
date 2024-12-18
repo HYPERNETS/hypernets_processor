@@ -17,6 +17,7 @@ from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.calibration.calibration_converter import CalibrationConverter
 from obsarray.templater.dataset_util import DatasetUtil as du
 from hypernets_processor.data_utils.quality_checks import QualityChecks
+from hypernets_processor.data_utils.site_specific_quality_checks import SiteSpecificQualityChecks
 
 import warnings
 import os
@@ -62,6 +63,7 @@ class SequenceProcessor:
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
         qc = QualityChecks(self.context)
+        ssqc = SiteSpecificQualityChecks(self.context)
         avg = Average(
             self.context,
         )
@@ -308,6 +310,10 @@ class SequenceProcessor:
                 else:
                     self.context.logger.info("Not a standard sequence")
                     self.context.anomaly_handler.add_anomaly("ms")
+
+                if L2a:
+                    L2b = ssqc.apply_site_specific_QC(L2a)
+
 
             else:
                 raise NameError(
