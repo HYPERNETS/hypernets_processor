@@ -42,8 +42,8 @@ start_tod = [None]
 stop_tod = [None]
 
 # #set minimum and maximum reflectance for colourbar plots (Set to None to let it work it out automatically)
-vmin=0.18
-vmax=0.28
+vmin=None#0.18
+vmax=None#0.28
 
 vzas=[None] #[20,30,40]
 vaas=[None] #[83,98,113,263,278,298]
@@ -52,13 +52,13 @@ SITE_PERIODS = {
     # "ATGE": [{"start_date": "2022-10-16" , "stop_date": "2024-05-02" ,"HYPSTAR_SN": 221231, "comments": ""}],
     # "BASP": [{"start_date": "2022-07-18" , "stop_date": "2022-07-22" ,"HYPSTAR_SN": 221233, "comments": "v2 instrument"}],
     # "DEGE": [{"start_date": "2021-07-29" , "stop_date": "2023-10-24" ,"HYPSTAR_SN": 220241, "comments": ""}],
-    # "GHNA": [{"start_date": "2022-05-17" , "stop_date": "2023-10-17" ,"HYPSTAR_SN": 220261, "comments": "v1 instrument"},{"start_date": "2023-10-26" , "stop_date": "present" ,"HYPSTAR_SN": 222316, "comments": "v3 instrument"}],
+    "GHNA": [{"start_date": "2022-05-17" , "stop_date": "2023-10-17" ,"HYPSTAR_SN": 220261, "comments": "v1 instrument"},{"start_date": "2023-10-26" , "stop_date": "present" ,"HYPSTAR_SN": 222316, "comments": "v3 instrument"}],
     # "IFAR": [{"start_date": "2022-06-17", "stop_date": "2022-10-12" ,"HYPSTAR_SN": 221211, "comments": ""},{"start_date": "2023-08-04" , "stop_date": "2024-08-03" ,"HYPSTAR_SN": 221211, "comments": "Calibration E: 2023-01-25, L: 2023-01-27"}],
-    # "JAES": [{"start_date": "2023-04-14", "stop_date": "2024-05-09" ,"HYPSTAR_SN": 221461, "comments": "2023-05-20 leaves on (subjective judgement); 2023-09-19 cleaned optics; 2023-10-18 first snow, leaves off"},{"start_date": "2024-06-05", "stop_date": "2024-11-13" ,"HYPSTAR_SN": 221461, "comments": ""}, {"start_date": "2024-11-13", "stop_date": "present" ,"HYPSTAR_SN": 222317, "comments": ""}],
+    "JAES": [{"start_date": "2023-04-14", "stop_date": "2024-05-09" ,"HYPSTAR_SN": 221461, "comments": "2023-05-20 leaves on (subjective judgement); 2023-09-19 cleaned optics; 2023-10-18 first snow, leaves off"},{"start_date": "2024-06-05", "stop_date": "2024-11-13" ,"HYPSTAR_SN": 221461, "comments": ""}, {"start_date": "2024-11-13", "stop_date": "present" ,"HYPSTAR_SN": 222317, "comments": ""}],
     "JSIT": [{"start_date": "2024-04-09", "stop_date": "present" ,"HYPSTAR_SN": 222315, "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat"}],
-    # "LOBE": [{"start_date": "2023-05-31", "stop_date": "2023-08-11", "lat": 50.55149, "lon": 4.74591, "HYPSTAR_SN": 222312, "comments": "Potato crop, furrowed ground; Non-standard sequence used, all data has quality flag `vza_irradiance' raised"}, {"start_date": "2024-05-17", "stop_date": "2024-07-17", "lat": 50.55151 , "lon": 4.74601,"HYPSTAR_SN": 222312, "comments": "Winter Wheat crop, Flat soil surface"}],
+    "LOBE": [{"start_date": "2023-05-31", "stop_date": "2023-08-11", "lat": 50.55149, "lon": 4.74591, "HYPSTAR_SN": 222312, "comments": "Potato crop, furrowed ground; Non-standard sequence used, all data has quality flag `vza_irradiance' raised"}, {"start_date": "2024-05-17", "stop_date": "2024-07-17", "lat": 50.55151 , "lon": 4.74601,"HYPSTAR_SN": 222312, "comments": "Winter Wheat crop, Flat soil surface"}],
     # "PEAN": [],
-    # "WWUK": [{"start_date": "2021-11-18" , "stop_date": "2024-01-16" ,"HYPSTAR_SN": 220251, "comments": "v1 instrument"} , {"start_date": "2024-06-26" , "stop_date": "present" ,"HYPSTAR_SN": 222314, "comments": "v3 instrument"}],
+    "WWUK": [{"start_date": "2021-11-18" , "stop_date": "2024-01-16" ,"HYPSTAR_SN": 220251, "comments": "v1 instrument"} , {"start_date": "2024-06-26" , "stop_date": "present" ,"HYPSTAR_SN": 222314, "comments": "v3 instrument"}],
 }
 
 for site in SITE_PERIODS.keys():
