@@ -97,7 +97,7 @@ start_time = "20220101T0000"
 stop_time = "20230101T0000"
 
 def combine_direct_to_diffuse_ratio_sza(site, aod, irr_files_path=None):
-    files = glob.glob(os.path.join(irr_files_path,"irr_clear_%s*.nc"%site))
+    files = glob.glob(os.path.join(irr_files_path,"irr_clear_sky_%s*.nc"%site))
     files.sort()
     direct_to_diffuse_all = [xr.open_dataset(file) for file in files]
     direct_to_diffuse_subset = [direct_to_diffuse for direct_to_diffuse in direct_to_diffuse_all if direct_to_diffuse.attrs["aod"]==aod]
