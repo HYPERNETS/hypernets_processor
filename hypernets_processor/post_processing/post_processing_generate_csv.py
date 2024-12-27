@@ -89,5 +89,5 @@ for site in SITE_PERIODS.keys():
                     ax1.set_ylabel("reflectance")
                     ax1.legend(ncol=2)
                     ax1.set_ylim([vmin,vmax])
-                    fig1.savefig(os.path.join(results_path,"refl_calibration_diff_%s_%s_%s_%s_%s.png"%(vza,vaa,start_tod[ii],stop_tod[ii],plot_wavelength)))
+                    fig1.savefig(os.path.join(results_path,"refl_calibration_diff_%s_%s_%s_%s_%s_%s.png"%(tag,vza,vaa,start_tod[ii],stop_tod[ii],plot_wavelength)))
                     plt.clf()

@@ -10,6 +10,7 @@ from hypernets_processor.utils.logging import configure_logging
 from hypernets_processor.utils.config import (
     PROCESSOR_CONFIG_PATH,
     JOB_CONFIG_TEMPLATE_PATH,
+    PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
 )
 from hypernets_processor.utils.paths import relative_path
 import datetime
@@ -132,7 +133,7 @@ def setup_test_processor_config(
     :rtype: configparser.RawConfigParser
     """
 
-    processor_config = read_config_file(PROCESSOR_CONFIG_PATH)
+    processor_config = read_config_file(PROCESSOR_LAND_DEFAULTS_CONFIG_PATH)
 
     processor_config["Processor"]["version"] = "0.0"
 
