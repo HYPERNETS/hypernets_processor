@@ -48,7 +48,7 @@ SITE_LOCATIONS = {
 }
 
 SITE_ALTITUDE = {
-    "GHNA": 510,
+    "GHNA": 0.510,
     "JSIT": 0,
 }
 
