@@ -28,8 +28,8 @@ data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
 results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance"
 
 # for eoserver:
-# data_path = r"/mnt/t/data/insitu/hypernets/archive"
-# results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/irradiance"
+data_path = r"/mnt/t/data/insitu/hypernets/archive"
+results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/irradiance"
 
 if not os.path.exists(results_path):
     os.mkdir(results_path)
@@ -45,6 +45,10 @@ SITE_LOCATIONS = {
     "LOBE": [50.551493, 4.745911],
     "PEAN": [-71.940128, 23.305260],
     "WWUK": [51.777206,-1.338494],
+}
+
+SITE_LOCATIONS = {
+    "JSIT": [44.874305, 11.979201],
 }
 
 SITE_ALTITUDE = {
