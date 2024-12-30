@@ -24,27 +24,27 @@ from scrappi.interface import (
 from scrappi.utils.download_utils import (download_and_read_ERA5, download_and_read_CAMS)
 
 #for windows:
-# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance"
+data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance"
 
 # for eoserver:
-data_path = r"/mnt/t/data/insitu/hypernets/archive"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/irradiance"
+# data_path = r"/mnt/t/data/insitu/hypernets/archive"
+# results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/irradiance"
 
 if not os.path.exists(results_path):
     os.mkdir(results_path)
 
 SITE_LOCATIONS = {
-    # "ATGE": [52.466778, 12.959778],
-    # "BASP": [39.049139, -2.075917],
-    # "DEGE": [53.868278, 13.268556],
+    "ATGE": [52.466778, 12.959778],
+    "BASP": [39.049139, -2.075917],
+    "DEGE": [53.868278, 13.268556],
     "GHNA": [-23.60153, 15.12589],
-    # "IFAR": [-34.592322, -58.479017],
-    # "JAES": [58.281975, 27.312959],
+    "IFAR": [-34.592322, -58.479017],
+    "JAES": [58.281975, 27.312959],
     "JSIT": [44.874305, 11.979201],
-    # "LOBE": [50.551493, 4.745911],
-    # "PEAN": [-71.940128, 23.305260],
-    # "WWUK": [51.777206,-1.338494],
+    "LOBE": [50.551493, 4.745911],
+    "PEAN": [-71.940128, 23.305260],
+    "WWUK": [51.777206,-1.338494],
 }
 
 SITE_ALTITUDE = {
@@ -96,6 +96,8 @@ file_paths = {
 start_time = "20220101T0000"
 stop_time = "20230101T0000"
 
+run_RT=True
+
 def combine_direct_to_diffuse_ratio_sza(site, aod, irr_files_path=None):
     files = glob.glob(os.path.join(irr_files_path,"irr_clear_sky_%s*.nc"%site))
     files.sort()
@@ -119,17 +121,6 @@ def interpolate_irradiance_sza(sza,ds_irr):
 
 
 for site in SITE_LOCATIONS.keys():
-    atmosphere_ex = {}
-    atmosphere_ex["shape"] = None
-    atmosphere_ex["atmosphere_type"] = atmosphere_type[site]
-    atmosphere_ex["aerosol_type"] = aerosol_type[site]  # by default aerosol type is urban
-    atmosphere_ex["AOD"] = -99  # by default aerosol type is urban
-    atmosphere_ex["H2O"] = -99  # by default aerosol type is urban
-    atmosphere_ex["O3"] = -99  # by default aerosol type is urban
-    atmosphere_ex["CH4"] = -99  # by default aerosol type is urban
-    atmosphere_ex["CO2"] = -99  # by default aerosol type is urban
-    atmosphere_ex["P"] = -99  # by default aerosol type is urban
-
     lat , lon = SITE_LOCATIONS[site]
 
     # query = {
@@ -153,8 +144,6 @@ for site in SITE_LOCATIONS.keys():
     # )
     # print(path)
 
-    alt=SITE_ALTITUDE[site]
-
     path_era5=os.path.join(results_path, "ds_era5_%s_%s_%s.nc"%(site,start_time,stop_time))
     if os.path.exists(path_era5):
         ds_era5=xr.open_dataset(path_era5)
@@ -171,37 +160,53 @@ for site in SITE_LOCATIONS.keys():
                                          config_path=os.path.join(results_path, "eodag.yml"))
         ds_cams.to_netcdf(path_cams)
 
-    ds_HYP = data_io.read_hypernets_file(file_paths[site],
-        vza=20,
-    )
-    ds_HYP = ds_HYP.mean(dim="series")
 
-    forts_prod = ProduceExample1D(resolution="coarse", atmosphere=atmosphere_ex)
 
-    for szai in np.arange(0, 90, 10):
-        for aod in [0.0,0.1,0.2,0.3]:
-            if os.path.exists(os.path.join(results_path, "irr_clear_sky_%s_%s_%s.nc" % (site,aod,szai))):
-                continue
-            else:
-                ds_irr = forts_prod.produce_solar_irradiance_hypernets(
-                    ds_HYP,
-                    szai,
-                    aod=aod,
-                    h2o=ds_era5.tcwv.values.mean(),
-                    O3=ds_era5.tco3.values.mean()/(2.1415*10**(-5)),
-                    P=ds_era5.sp.values.mean()/100,
-                    altitude=alt,
-                )
-                ds_irr.attrs["h2o"] = ds_era5.tcwv.values.mean()
-                ds_irr.attrs["O3"] = ds_era5.tco3.values.mean()/(2.1415*10**(-5))
-                ds_irr.attrs["P"] = ds_era5.sp.values.mean()/100
-                ds_irr.attrs["aod"] = aod
-                ds_irr.attrs["sza"] = szai
-                ds_irr.attrs["altitude"] = alt
+    if run_RT:
 
-                ds_irr.to_netcdf(os.path.join(results_path, "irr_clear_sky_%s_%s_%s.nc" % (site,aod,szai)))
+        ds_HYP = data_io.read_hypernets_file(file_paths[site],
+                                             vza=20,
+                                             )
+        ds_HYP = ds_HYP.mean(dim="series")
 
-    for aod in [0.0, 0.1, 0.2, 0.3]:
-        comb_irr_ds = combine_direct_to_diffuse_ratio_sza(site,aod,results_path)
-        interpolate_irradiance_sza(13.5,comb_irr_ds)
+        atmosphere_ex = {}
+        atmosphere_ex["shape"] = None
+        atmosphere_ex["atmosphere_type"] = atmosphere_type[site]
+        atmosphere_ex["aerosol_type"] = aerosol_type[site]  # by default aerosol type is urban
+        atmosphere_ex["AOD"] = -99  # by default aerosol type is urban
+        atmosphere_ex["H2O"] = -99  # by default aerosol type is urban
+        atmosphere_ex["O3"] = -99  # by default aerosol type is urban
+        atmosphere_ex["CH4"] = -99  # by default aerosol type is urban
+        atmosphere_ex["CO2"] = -99  # by default aerosol type is urban
+        atmosphere_ex["P"] = -99  # by default aerosol type is urban
+
+        alt = SITE_ALTITUDE[site]
+
+        for szai in np.arange(0, 90, 10):
+            for aod in [0.0,0.1,0.2,0.3]:
+                if os.path.exists(os.path.join(results_path, "irr_clear_sky_%s_%s_%s.nc" % (site,aod,szai))):
+                    continue
+                else:
+                    forts_prod = ProduceExample1D(resolution="coarse", atmosphere=atmosphere_ex)
+                    ds_irr = forts_prod.produce_solar_irradiance_hypernets(
+                        ds_HYP,
+                        szai,
+                        aod=aod,
+                        h2o=ds_era5.tcwv.values.mean(),
+                        O3=ds_era5.tco3.values.mean()/(2.1415*10**(-5)),
+                        P=ds_era5.sp.values.mean()/100,
+                        altitude=alt,
+                    )
+                    ds_irr.attrs["h2o"] = ds_era5.tcwv.values.mean()
+                    ds_irr.attrs["O3"] = ds_era5.tco3.values.mean()/(2.1415*10**(-5))
+                    ds_irr.attrs["P"] = ds_era5.sp.values.mean()/100
+                    ds_irr.attrs["aod"] = aod
+                    ds_irr.attrs["sza"] = szai
+                    ds_irr.attrs["altitude"] = alt
+
+                    ds_irr.to_netcdf(os.path.join(results_path, "irr_clear_sky_%s_%s_%s.nc" % (site,aod,szai)))
+
+        for aod in [0.0, 0.1, 0.2, 0.3]:
+            comb_irr_ds = combine_direct_to_diffuse_ratio_sza(site,aod,results_path)
+            interpolate_irradiance_sza(13.5,comb_irr_ds)
 
