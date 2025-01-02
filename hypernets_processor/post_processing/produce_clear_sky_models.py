@@ -24,8 +24,8 @@ from scrappi.interface import (
 from scrappi.utils.download_utils import (download_and_read_ERA5, download_and_read_CAMS)
 
 #for windows:
-data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance"
+# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance"
 
 # for eoserver:
 data_path = r"/mnt/t/data/insitu/hypernets/archive"
@@ -36,7 +36,7 @@ if not os.path.exists(results_path):
 
 SITE_LOCATIONS = {
     "ATGE": [52.466778, 12.959778],
-    "BASP": [39.049139, -2.075917],
+    # "BASP": [39.049139, -2.075917],
     "DEGE": [53.868278, 13.268556],
     "GHNA": [-23.60153, 15.12589],
     "IFAR": [-34.592322, -58.479017],
@@ -48,38 +48,54 @@ SITE_LOCATIONS = {
 }
 
 SITE_LOCATIONS = {
+    # "ATGE": [52.466778, 12.959778],
+    # # "BASP": [39.049139, -2.075917],
+    # "DEGE": [53.868278, 13.268556],
+    # "GHNA": [-23.60153, 15.12589],
+    # "IFAR": [-34.592322, -58.479017],
+    "JAES": [58.281975, 27.312959],
     "JSIT": [44.874305, 11.979201],
+    # "LOBE": [50.551493, 4.745911],
+    # "PEAN": [-71.940128, 23.305260],
+    # "WWUK": [51.777206,-1.338494],
 }
 
 SITE_ALTITUDE = {
+    "ATGE": 0.045,
+    "DEGE": 0.022,
     "GHNA": 0.510,
     "JSIT": 0,
+    "JAES": 0.045,
+    "IFAR": 0.021,
+    "LOBE": 0.168,
+    "PEAN": 1.297,
+    "WWUK": 0.125,
 }
 
 atmosphere_type = {
-    # "ATGE": "midlatitude_summer",
-    # "BASP": "midlatitude_summer",
-    # "DEGE": "midlatitude_summer",
+    "ATGE": "midlatitude_summer",
+    "BASP": "midlatitude_summer",
+    "DEGE": "midlatitude_summer",
     "GHNA": "midlatitude_summer",
     "IFAR": "midlatitude_summer",
-    # "JAES": "midlatitude_summer",
+    "JAES": "midlatitude_summer",
     "JSIT": "midlatitude_summer",
-    # "LOBE": "midlatitude_summer",
-    # "PEAN": "midlatitude_summer",
-    # "WWUK": "midlatitude_summer",
+    "LOBE": "midlatitude_summer",
+    "PEAN": "midlatitude_summer",
+    "WWUK": "midlatitude_summer",
 }
 
 aerosol_type = {
-    # "ATGE": "desert",
-    # "BASP": "desert",
-    # "DEGE": "desert",
+    "ATGE": "continental_average",
+    "BASP": "continental_average",
+    "DEGE": "continental_average",
     "GHNA": "desert",
-    "JSIT": "urban",
-    # "JAES": "desert",
-    # "IFAR": "desert",
-    # "LOBE": "desert",
-    # "PEAN": "desert",
-    # "WWUK": "desert",
+    "JSIT": "continental_average",
+    "JAES": "continental_average",
+    # "IFAR": "continental_average",
+    "LOBE": "continental_average",
+    "PEAN": "antarctic",
+    "WWUK": "continental_average",
 }
 
 file_paths = {
@@ -89,7 +105,8 @@ file_paths = {
     "GHNA": os.path.join(data_path, "GHNA", "2023", "10", "28", "SEQ20231028T090128",
                      "HYPERNETS_L_GHNA_L2A_REF_20231028T0901_20240124T1403_v2.0.nc"),
     # "IFAR": [-34.592322, -58.479017],
-    # "JAES": [58.281975, 27.312959],
+    "JAES": os.path.join(data_path, "JAES", "2024", "08", "08", "SEQ20240808T090049",
+                     "HYPERNETS_L_JAES_L2A_REF_20240808T0900_20240906T0650_v2.1.nc"),
     "JSIT": os.path.join(data_path, "JSIT", "2024", "08", "07", "SEQ20240807T090056",
                      "HYPERNETS_L_JSIT_L2A_REF_20240807T0900_20240807T1054_v2.0.nc"),
     # "LOBE": [50.551493, 4.745911],
