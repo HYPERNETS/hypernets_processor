@@ -131,7 +131,7 @@ def combine_direct_to_diffuse_ratio_sza(site, aod, irr_files_path=None,median_ao
     comb_ds=xr.concat(direct_to_diffuse_subset,pd.Index(szas, name="sza"))
     comb_ds.attrs["aod"]=aod
     if median_aod:
-        comb_ds.to_netcdf(os.path.join(irr_files_path,"%s_clear_sky_medianaod.nc"%(site,aod)))
+        comb_ds.to_netcdf(os.path.join(irr_files_path,"%s_clear_sky_medianaod.nc"%(site)))
     else:
         comb_ds.to_netcdf(os.path.join(irr_files_path,"%s_clear_sky_aod%s.nc"%(site,aod)))
     return comb_ds
