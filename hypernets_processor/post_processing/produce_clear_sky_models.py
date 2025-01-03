@@ -122,14 +122,18 @@ stop_time = "20230101T0000"
 
 run_RT=True
 
-def combine_direct_to_diffuse_ratio_sza(site, aod, irr_files_path=None):
+def combine_direct_to_diffuse_ratio_sza(site, aod, irr_files_path=None,median_aod=False):
     files = glob.glob(os.path.join(irr_files_path,"irr_clear_sky_%s*.nc"%site))
     files.sort()
     direct_to_diffuse_all = [xr.open_dataset(file) for file in files]
     direct_to_diffuse_subset = [direct_to_diffuse for direct_to_diffuse in direct_to_diffuse_all if direct_to_diffuse.attrs["aod"]==aod]
     szas = [direct_to_diffuse.attrs["sza"] for direct_to_diffuse in direct_to_diffuse_subset]
     comb_ds=xr.concat(direct_to_diffuse_subset,pd.Index(szas, name="sza"))
-    comb_ds.to_netcdf(os.path.join(irr_files_path,"%s_clear_sky_aod%s.nc"%(site,aod)))
+    comb_ds.attrs["aod"]=aod
+    if median_aod:
+        comb_ds.to_netcdf(os.path.join(irr_files_path,"%s_clear_sky_medianaod.nc"%(site,aod)))
+    else:
+        comb_ds.to_netcdf(os.path.join(irr_files_path,"%s_clear_sky_aod%s.nc"%(site,aod)))
     return comb_ds
 
 def interpolate_irradiance_sza(sza,ds_irr):
@@ -185,7 +189,6 @@ for site in SITE_LOCATIONS.keys():
         ds_cams.to_netcdf(path_cams)
 
 
-
     if run_RT:
 
         ds_HYP = data_io.read_hypernets_file(file_paths[site],
@@ -206,8 +209,10 @@ for site in SITE_LOCATIONS.keys():
 
         alt = SITE_ALTITUDE[site]
 
-        for szai in np.arange(0, 90, 10):
-            for aod in [0.0,0.1,0.2,0.3]:
+        median_aod = ds_cams.aod550.values.median()
+
+        for aod in [0.0, 0.1, 0.2, 0.3, median_aod]:
+            for szai in np.arange(0, 90, 10):
                 if os.path.exists(os.path.join(results_path, "irr_clear_sky_%s_%s_%s.nc" % (site,aod,szai))):
                     continue
                 else:
@@ -230,7 +235,9 @@ for site in SITE_LOCATIONS.keys():
 
                     ds_irr.to_netcdf(os.path.join(results_path, "irr_clear_sky_%s_%s_%s.nc" % (site,aod,szai)))
 
-        for aod in [0.0, 0.1, 0.2, 0.3]:
-            comb_irr_ds = combine_direct_to_diffuse_ratio_sza(site,aod,results_path)
+            if aod==median_aod:
+                comb_irr_ds = combine_direct_to_diffuse_ratio_sza(site,aod,results_path,median_aod=True)
+            else:
+                comb_irr_ds = combine_direct_to_diffuse_ratio_sza(site,aod,results_path)
             interpolate_irradiance_sza(13.5,comb_irr_ds)
 
