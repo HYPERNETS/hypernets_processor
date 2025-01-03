@@ -209,7 +209,7 @@ for site in SITE_LOCATIONS.keys():
 
         alt = SITE_ALTITUDE[site]
 
-        median_aod = ds_cams.aod550.values.median()
+        median_aod = np.median(ds_cams.aod550.values)
 
         for aod in [0.0, 0.1, 0.2, 0.3, median_aod]:
             for szai in np.arange(0, 90, 10):
