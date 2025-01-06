@@ -4,19 +4,39 @@ import xarray as xr
 import numpy as np
 from obsarray.templater.dataset_util import DatasetUtil
 
-bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
-           "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
-           "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR", "single_irradiance_used"]
+bad_flags = [
+    "pt_ref_invalid",
+    "half_of_scans_masked",
+    "not_enough_dark_scans",
+    "not_enough_rad_scans",
+    "not_enough_irr_scans",
+    "no_clear_sky_irradiance",
+    "variable_irradiance",
+    "half_of_uncertainties_too_big",
+    "discontinuity_VNIR_SWIR",
+    "single_irradiance_used",
+]
+
 
 def read_db_hypernets(
-    hypernets_path_db, hypernets_path, site, start_date, end_date, overwrite_product_path=True, only_passed_qc=False,
+    hypernets_path_db,
+    hypernets_path,
+    site,
+    start_date,
+    end_date,
+    overwrite_product_path=True,
+    only_passed_qc=False,
 ):
     archive_folder = os.path.abspath(hypernets_path_db)
     dbpath = os.path.join(archive_folder, "archive.db")
     engine = sqlite3.connect(dbpath)
     cursor = engine.cursor()
     query = make_query_hypernets(
-        site_id=site, date_start=start_date, date_end=end_date, product_level="L_L2A", only_passed_qc=only_passed_qc
+        site_id=site,
+        date_start=start_date,
+        date_end=end_date,
+        product_level="L_L2A",
+        only_passed_qc=only_passed_qc,
     )
     print(query)
     cursor.execute(query)
@@ -37,7 +57,11 @@ def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags
     if filter_flags:
         flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], bad_flags)
         id_series = np.where(~flagged)[0]
-        print(len(id_series), " series selected on quality flag (out of %s total)"%len(ds.series.values))
+        print(
+            len(id_series),
+            " series selected on quality flag (out of %s total)"
+            % len(ds.series.values),
+        )
         ds = ds.isel(series=id_series)
 
         if len(id_series) == 0:
@@ -70,7 +94,16 @@ def read_hypernets_file(filepath, vza=None, vaa=None, nearest=True, filter_flags
         id_series = ds.series.values
 
     ds = ds.isel(series=id_series)
-    print(len(id_series), " series selected on angle (vza=%s, vaa=%s requested, vza=%s, vaa=%s found)"%(vza,vaa,ds["viewing_zenith_angle"].values,ds["viewing_azimuth_angle"].values))
+    print(
+        len(id_series),
+        " series selected on angle (vza=%s, vaa=%s requested, vza=%s, vaa=%s found)"
+        % (
+            vza,
+            vaa,
+            ds["viewing_zenith_angle"].values,
+            ds["viewing_azimuth_angle"].values,
+        ),
+    )
     return ds
 
 
@@ -83,7 +116,7 @@ def make_query_hypernets(
     site_id=None,
     system_id=None,
     product_level=None,
-    only_passed_qc=False
+    only_passed_qc=False,
 ):
     if sequence_id:
         cond = "sequence_name = '%s'"

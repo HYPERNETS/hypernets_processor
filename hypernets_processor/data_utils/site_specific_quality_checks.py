@@ -5,7 +5,7 @@ from hypernets_processor.version import __version__
 from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
-
+from hypernets_processor.utils.utils import convert_datetime
 import numpy as np
 import warnings
 import os
@@ -31,36 +31,102 @@ dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__fi
 refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
 postprocessing_path = os.path.join(dir_path, "data", "postprocessing")
 
+
 class SiteSpecificQualityChecks:
     def __init__(self, context):
         self.context = context
         self.plot = Plotting(context)
         self.writer = HypernetsWriter(context)
 
-    def apply_site_specific_QC(self,dataset_l2a):
+    def apply_site_specific_QC(self, dataset_l2a):
 
-        # first, we check if this data is within the deployment ranges, and matched the hypstar_id:
-        deploy_periods=ast.literal_eval(self.context.get_config_value("deployment_periods"))
+        # we loop through each of the different deployment periods
+        deploy_periods = ast.literal_eval(
+            self.context.get_config_value("deployment_periods")
+        )
+        bad_sequences_period = ast.literal_eval(
+            self.context.get_config_value("bad_sequences_period")
+        )
+        bad_angles_period = ast.literal_eval(
+            self.context.get_config_value("bad_angles_period")
+        )
+        bad_wavelengths_period = ast.literal_eval(
+            self.context.get_config_value("bad_wavelengths_period")
+        )
+        postprocessing_qc_file_period = ast.literal_eval(
+            self.context.get_config_value("postprocessing_qc_file_period")
+        )
 
+        seq_within_period = False
+        i_dep_save = None
         for i_dep in range(len(deploy_periods)):
-            print(deploy_periods["start_date"],deploy_periods["stop_date"], deploy_periods)
+            # first, we check if this data is within the deployment ranges:
+            if convert_datetime(
+                dataset_l2a.acquisition_time.values.min()
+            ) > convert_datetime(
+                deploy_periods[i_dep]["start_date"]
+            ) and convert_datetime(
+                dataset_l2a.acquisition_time.values.max()
+            ) < convert_datetime(
+                deploy_periods[i_dep]["stop_date"]
+            ):
+                seq_within_period = True
+                i_dep_save = i_dep
 
-        # second, remove data for which any of the bad flags was set in previous QC
-        bad_flags = ["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
-                     "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
-                     "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR", "single_irradiance_used"]
-        flagged = DatasetUtil.get_flags_mask_or(dataset_l2a["quality_flag"],
-                                                bad_flags)  # bools for each series if any bad flag is set
+        # anomaly is raised if data has not been found within deployment periods
+        if not seq_within_period:
+            self.context.anomaly_handler.add_anomaly("p")
+
+        # anomaly is raised if system id does not match hypstar SN in deployment period
+        if (
+            not dataset_l2a.attrs["system_id"]
+            == "HYPSTAR_" + str(deploy_periods[i_dep_save]["HYPSTAR_SN"])
+        ):
+            self.context.anomaly_handler.add_anomaly("hsn")
+
+        # bad sequences that were manually specified are removed
+        if dataset_l2a.attrs["sequence_id"] in bad_sequences_period[i_dep_save]:
+            return None
+
+        # Next, remove data for which any of the bad flags was set in previous QC
+        bad_flags = [
+            "pt_ref_invalid",
+            "half_of_scans_masked",
+            "not_enough_dark_scans",
+            "not_enough_rad_scans",
+            "not_enough_irr_scans",
+            "no_clear_sky_irradiance",
+            "variable_irradiance",
+            "half_of_uncertainties_too_big",
+            "discontinuity_VNIR_SWIR",
+            "single_irradiance_used",
+        ]
+        flagged = DatasetUtil.get_flags_mask_or(
+            dataset_l2a["quality_flag"], bad_flags
+        )  # bools for each series if any bad flag is set
         id_series_valid = np.where(~flagged)[0]  # select indexes for which no bad flags are set
-        dataset_l2b = dataset_l2a.isel(
-            series=id_series_valid)
-        dataset_l2b.attrs["product_name"]=dataset_l2b.attrs["product_name"].replace("L2A","L2B")
+        dataset_l2b = dataset_l2a.isel(series=id_series_valid)
+        dataset_l2b.attrs["product_name"] = dataset_l2b.attrs["product_name"].replace(
+            "L2A", "L2B"
+        )
+
         # next, remove angles for which we know the data is not reliable
+        ang_tol = self.context.get_config_value("angle_tolerance")
+        for angle_tup in bad_angles_period[i_dep_save]:
+            bad_vza, bad_vaa = angle_tup
+            if bad_vza=="*":
+                id_series_valid = np.where(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol)[0]
+            elif bad_vaa=="*":
+                id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)[0]
+            else:
+                id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)|(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol))[0]
+            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
 
-
-        #
-
-
+        # Then, bad wavelength ranges are omited
+        for bad_wav in bad_wavelengths_period[i_dep_save]:
+            id_wav_valid = np.where((dataset_l2b.wavelength.values < bad_wav[0]) | (
+                        dataset_l2b.wavelength.values > bad_wav[1]))[0]
+            dataset_l2b = dataset_l2b.isel(wavelength=id_wav_valid)
 
         # finally, make plots and write file
 
@@ -73,9 +139,7 @@ class SiteSpecificQualityChecks:
                     dataset_l2b, self.context.get_config_value("plot_polar_wav")
                 )
         if self.context.get_config_value("plot_uncertainty"):
-            self.plot.plot_relative_uncertainty(
-                "reflectance", dataset_l2b, refl=True
-            )
+            self.plot.plot_relative_uncertainty("reflectance", dataset_l2b, refl=True)
 
         if self.context.get_config_value("plot_correlation"):
             self.plot.plot_correlation("reflectance", dataset_l2b, refl=True)
@@ -90,7 +154,6 @@ class SiteSpecificQualityChecks:
             )
 
         return dataset_l2b
-
 
     def perform_quality_check_angles(
         self, datasetl0, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
@@ -243,7 +306,7 @@ class SiteSpecificQualityChecks:
     def perform_quality_check_rand_unc(self, dataset, measurandstring):
 
         if np.count_nonzero(dataset["u_rel_random_" + measurandstring].values < 0) > 0:
-            self.context.anomaly_handler.add_anomaly("u") #, dataset)
+            self.context.anomaly_handler.add_anomaly("u")  # , dataset)
 
         if (
             np.count_nonzero(dataset["u_rel_random_" + measurandstring].values > 100)
@@ -252,7 +315,7 @@ class SiteSpecificQualityChecks:
             dataset["quality_flag"][:] = DatasetUtil.set_flag(
                 dataset["quality_flag"][:], "half_of_uncertainties_too_big"
             )
-            self.context.anomaly_handler.add_anomaly("o") #, dataset)
+            self.context.anomaly_handler.add_anomaly("o")  # , dataset)
 
     def perform_quality_check_comb(
         self, dataset_l1b, dataset_l1b_swir, measurandstring
