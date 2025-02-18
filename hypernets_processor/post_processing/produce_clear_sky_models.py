@@ -176,11 +176,12 @@ stop_time = "20230101T0000"
 run_RT = True
 
 tag = "irrwav"
+tag = "_"+tag
 
 def combine_direct_to_diffuse_ratio_sza(
     site, aod, irr_files_path=None, median_aod=False, tag="",
 ):
-    files = glob.glob(os.path.join(irr_files_path, "irr_clear_sky_%s*_%s.nc" %(site,tag)))
+    files = glob.glob(os.path.join(irr_files_path, "irr_clear_sky_%s*%s.nc" %(site,tag)))
     files.sort()
     direct_to_diffuse_all = [xr.open_dataset(file) for file in files]
     direct_to_diffuse_subset = [
@@ -195,11 +196,11 @@ def combine_direct_to_diffuse_ratio_sza(
     comb_ds.attrs["aod"] = aod
     if median_aod:
         comb_ds.to_netcdf(
-            os.path.join(irr_files_path, "%s_clear_sky_medianaod_%s.nc" % (site, tag))
+            os.path.join(irr_files_path, "%s_clear_sky_medianaod%s.nc" % (site, tag))
         )
     else:
         comb_ds.to_netcdf(
-            os.path.join(irr_files_path, "%s_clear_sky_aod%s_%s.nc" % (site, aod, tag))
+            os.path.join(irr_files_path, "%s_clear_sky_aod%s%s.nc" % (site, aod, tag))
         )
     return comb_ds
 
@@ -306,7 +307,7 @@ for site in SITE_LOCATIONS.keys():
             for szai in np.arange(0, 90, 10):
                 if os.path.exists(
                     os.path.join(
-                        results_path, "irr_clear_sky_%s_%s_%s_%s.nc" % (site, aod, szai, tag)
+                        results_path, "irr_clear_sky_%s_%s_%s%s.nc" % (site, aod, szai, tag)
                     )
                 ):
                     continue
@@ -336,7 +337,7 @@ for site in SITE_LOCATIONS.keys():
 
                     ds_irr.to_netcdf(
                         os.path.join(
-                            results_path, "irr_clear_sky_%s_%s_%s_%s.nc" % (site, aod, szai, tag)
+                            results_path, "irr_clear_sky_%s_%s_%s%s.nc" % (site, aod, szai, tag)
                         )
                     )
 
