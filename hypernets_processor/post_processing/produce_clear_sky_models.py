@@ -195,11 +195,11 @@ def combine_direct_to_diffuse_ratio_sza(
     comb_ds.attrs["aod"] = aod
     if median_aod:
         comb_ds.to_netcdf(
-            os.path.join(irr_files_path, "%s_clear_sky_medianaod.nc" % (site))
+            os.path.join(irr_files_path, "%s_clear_sky_medianaod_%s.nc" % (site, tag))
         )
     else:
         comb_ds.to_netcdf(
-            os.path.join(irr_files_path, "%s_clear_sky_aod%s.nc" % (site, aod))
+            os.path.join(irr_files_path, "%s_clear_sky_aod%s_%s.nc" % (site, aod, tag))
         )
     return comb_ds
 
@@ -342,10 +342,10 @@ for site in SITE_LOCATIONS.keys():
 
             if aod == median_aod:
                 comb_irr_ds = combine_direct_to_diffuse_ratio_sza(
-                    site, aod, results_path, median_aod=True
+                    site, aod, results_path, median_aod=True, tag=tag
                 )
             else:
                 comb_irr_ds = combine_direct_to_diffuse_ratio_sza(
-                    site, aod, results_path
+                    site, aod, results_path, tag=tag
                 )
             interpolate_irradiance_sza(13.5, comb_irr_ds)
