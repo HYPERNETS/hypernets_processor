@@ -182,6 +182,7 @@ def combine_direct_to_diffuse_ratio_sza(
     site, aod, irr_files_path=None, median_aod=False, tag="",
 ):
     files = glob.glob(os.path.join(irr_files_path, "irr_clear_sky_%s*%s.nc" %(site,tag)))
+    print("irr_clear_sky_%s*%s.nc" %(site,tag),files)
     files.sort()
     direct_to_diffuse_all = [xr.open_dataset(file) for file in files]
     direct_to_diffuse_subset = [
