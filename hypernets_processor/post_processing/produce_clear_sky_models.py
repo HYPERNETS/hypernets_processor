@@ -128,7 +128,7 @@ file_paths = {
         "08",
         "07",
         "SEQ20240807T090056",
-        "HYPERNETS_L_JSIT_L1B_IRR_20240807T0900_20240807T1054_v2.0.nc",
+        "HYPERNETS_L_JSIT_L2A_REF_20240807T0900_20240807T1054_v2.0.nc",
     ),
     "LOBE": os.path.join(
         data_path,
@@ -159,6 +159,17 @@ file_paths = {
     ),
 }
 
+file_paths_irr = {
+    "JSIT": os.path.join(
+        data_path,
+        "JSIT",
+        "2024",
+        "08",
+        "07",
+        "SEQ20240807T090056",
+        "HYPERNETS_L_JSIT_L1B_IRR_20240807T0900_20240807T1054_v2.0.nc",
+    ),
+}
 start_time = "20220101T0000"
 stop_time = "20230101T0000"
 
@@ -269,6 +280,11 @@ for site in SITE_LOCATIONS.keys():
         )
         ds_HYP = ds_HYP.mean(dim="series")
 
+        ds_HYP_irr = data_io.read_hypernets_file(
+            file_paths_irr[site],
+        )
+        ds_HYP_irr = ds_HYP_irr.mean(dim="series")
+
         atmosphere_ex = {}
         atmosphere_ex["shape"] = None
         atmosphere_ex["atmosphere_type"] = atmosphere_type[site]
@@ -306,6 +322,7 @@ for site in SITE_LOCATIONS.keys():
                         O3=ds_era5.tco3.values.mean() / (2.1415 * 10 ** (-5)),
                         P=ds_era5.sp.values.mean() / 100,
                         altitude=alt,
+                        band_centres=ds_HYP_irr.wavelength.values
                     )
                     ds_irr.attrs["h2o"] = ds_era5.tcwv.values.mean()
                     ds_irr.attrs["O3"] = ds_era5.tco3.values.mean() / (
