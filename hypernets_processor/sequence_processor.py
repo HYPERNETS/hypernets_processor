@@ -21,7 +21,7 @@ from hypernets_processor.data_utils.site_specific_quality_checks import SiteSpec
 
 import warnings
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -74,7 +74,7 @@ class SequenceProcessor:
             if not self.context.get_config_value("verbose"):
                 warnings.simplefilter("ignore")
 
-            tstart = datetime.now()
+            tstart = datetime.now(timezone.utc)
             self.context.set_config_value("start_time_processing_sequence", tstart)
             if self.context.get_config_value("network") == "w":
                 calibration_data_rad, calibration_data_irr = calcon.read_calib_files(
@@ -319,7 +319,7 @@ class SequenceProcessor:
                 raise NameError(
                     "Invalid network: " + self.context.get_config_value("network")
                 )
-        tend = datetime.now()
+        tend = datetime.now(timezone.utc)
         print(
             "time for computation of one seq (min, sec):{}".format(
                 divmod((tend - tstart).total_seconds(), 60)

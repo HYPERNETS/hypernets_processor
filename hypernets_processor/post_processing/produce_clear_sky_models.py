@@ -51,13 +51,13 @@ SITE_LOCATIONS = {
     # "ATGE": [52.466778, 12.959778],
     # # "BASP": [39.049139, -2.075917],
     # "DEGE": [53.868278, 13.268556],
-    "GHNA": [-23.60153, 15.12589],
-    # "IFAR": [-34.592322, -58.479017],
-    "JAES": [58.281975, 27.312959],
+    # "GHNA": [-23.60153, 15.12589],
+    # # "IFAR": [-34.592322, -58.479017],
+    # "JAES": [58.281975, 27.312959],
     "JSIT": [44.874305, 11.979201],
-    "LOBE": [50.551493, 4.745911],
-    "PEAN": [-71.940128, 23.305260],
-    "WWUK": [51.777206, -1.338494],
+    # "LOBE": [50.551493, 4.745911],
+    # "PEAN": [-71.940128, 23.305260],
+    # "WWUK": [51.777206, -1.338494],
 }
 
 SITE_ALTITUDE = {
@@ -128,7 +128,7 @@ file_paths = {
         "08",
         "07",
         "SEQ20240807T090056",
-        "HYPERNETS_L_JSIT_L2A_REF_20240807T0900_20240807T1054_v2.0.nc",
+        "HYPERNETS_L_JSIT_L1B_IRR_20240807T0900_20240807T1054_v2.0.nc",
     ),
     "LOBE": os.path.join(
         data_path,
@@ -164,6 +164,7 @@ stop_time = "20230101T0000"
 
 run_RT = True
 
+tag = "irrwav"
 
 def combine_direct_to_diffuse_ratio_sza(
     site, aod, irr_files_path=None, median_aod=False
@@ -289,7 +290,7 @@ for site in SITE_LOCATIONS.keys():
             for szai in np.arange(0, 90, 10):
                 if os.path.exists(
                     os.path.join(
-                        results_path, "irr_clear_sky_%s_%s_%s.nc" % (site, aod, szai)
+                        results_path, "irr_clear_sky_%s_%s_%s_%s.nc" % (site, aod, szai, tag)
                     )
                 ):
                     continue
@@ -317,8 +318,7 @@ for site in SITE_LOCATIONS.keys():
 
                     ds_irr.to_netcdf(
                         os.path.join(
-                            results_path,
-                            "irr_clear_sky_%s_%s_%s.nc" % (site, aod, szai),
+                            results_path, "irr_clear_sky_%s_%s_%s_%s.nc" % (site, aod, szai, tag)
                         )
                     )
 
