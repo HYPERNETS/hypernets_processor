@@ -314,6 +314,7 @@ for site in SITE_LOCATIONS.keys():
                     forts_prod = ProduceExample1D(
                         resolution="coarse", atmosphere=atmosphere_ex
                     )
+                    print(ds_HYP_irr.wavelength.values)
                     ds_irr = forts_prod.produce_solar_irradiance_hypernets(
                         ds_HYP,
                         szai,
