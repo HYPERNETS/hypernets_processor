@@ -435,6 +435,7 @@ class CalibrationConverter:
             for path in glob.glob(
                 os.path.join(directory, "hypstar_" + str(hypstar), "linearity", "*")
             )
+            if ".pdf" not in path
         ]
 
         if len(lincaldatepaths) == 0:
@@ -525,12 +526,15 @@ class CalibrationConverter:
         i_nonlin = 0
         # todo remove [-1] and use all calibrations and interpolate?
         for lincaldatepath in lincaldatepaths:
-            nonlinpath = glob.glob(
+            try:
+                nonlinpath = glob.glob(
                 os.path.join(
                     lincaldatepath,
                     "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
                 )
-            )[0]
+                )[0]
+            except:
+                stop
             if os.path.exists(nonlinpath):
                 if swir:
                     non_linear_cals = np.genfromtxt(nonlinpath)[:, 1]

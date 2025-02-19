@@ -17,10 +17,11 @@ from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.calibration.calibration_converter import CalibrationConverter
 from obsarray.templater.dataset_util import DatasetUtil as du
 from hypernets_processor.data_utils.quality_checks import QualityChecks
+from hypernets_processor.data_utils.site_specific_quality_checks import SiteSpecificQualityChecks
 
 import warnings
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -62,6 +63,7 @@ class SequenceProcessor:
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
         qc = QualityChecks(self.context)
+        ssqc = SiteSpecificQualityChecks(self.context)
         avg = Average(
             self.context,
         )
@@ -72,7 +74,7 @@ class SequenceProcessor:
             if not self.context.get_config_value("verbose"):
                 warnings.simplefilter("ignore")
 
-            tstart = datetime.now()
+            tstart = datetime.now(timezone.utc)
             self.context.set_config_value("start_time_processing_sequence", tstart)
             if self.context.get_config_value("network") == "w":
                 calibration_data_rad, calibration_data_irr = calcon.read_calib_files(
@@ -309,11 +311,15 @@ class SequenceProcessor:
                     self.context.logger.info("Not a standard sequence")
                     self.context.anomaly_handler.add_anomaly("ms")
 
+                if L2a:
+                    L2b = ssqc.apply_site_specific_QC(L2a)
+
+
             else:
                 raise NameError(
                     "Invalid network: " + self.context.get_config_value("network")
                 )
-        tend = datetime.now()
+        tend = datetime.now(timezone.utc)
         print(
             "time for computation of one seq (min, sec):{}".format(
                 divmod((tend - tstart).total_seconds(), 60)

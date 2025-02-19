@@ -6,6 +6,7 @@ import warnings
 import os
 import xarray as xr
 import matplotlib as mpl
+
 mpl.use("Agg")
 import sqlite3
 import matplotlib.pyplot as plt
@@ -31,26 +32,57 @@ out_path = r"/home/data/insitu/hypernets/archive_qc_Jan2024/best_files"
 plot_path = r"/home/data/insitu/hypernets/archive_qc_Jan2024/qc_plots"
 plotter = Plotting("", plot_path, ".png")
 
-bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
-           "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
-           "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR", "single_irradiance_used"]
+bad_flags = [
+    "pt_ref_invalid",
+    "half_of_scans_masked",
+    "not_enough_dark_scans",
+    "not_enough_rad_scans",
+    "not_enough_irr_scans",
+    "no_clear_sky_irradiance",
+    "variable_irradiance",
+    "half_of_uncertainties_too_big",
+    "discontinuity_VNIR_SWIR",
+    "single_irradiance_used",
+]
 check_flags = ["single_irradiance_used"]
 
-colors = ["magenta", "yellow", "cyan", "red", "green", "blue", "black", "orange", "navy", "gray", "brown",
-          "greenyellow", "purple"]
-
+colors = [
+    "magenta",
+    "yellow",
+    "cyan",
+    "red",
+    "green",
+    "blue",
+    "black",
+    "orange",
+    "navy",
+    "gray",
+    "brown",
+    "greenyellow",
+    "purple",
+]
 
 
 def read_db_hypernets(
-    hypernets_path_db, hypernets_path, site, start_date, end_date, overwrite_product_path=True, only_passed_qc=False,
+    hypernets_path_db,
+    hypernets_path,
+    site,
+    start_date,
+    end_date,
+    overwrite_product_path=True,
+    only_passed_qc=False,
 ):
     archive_folder = os.path.abspath(hypernets_path_db)
     dbpath = os.path.join(archive_folder, "archive.db")
-    print("dbpath:",dbpath)
+    print("dbpath:", dbpath)
     engine = sqlite3.connect(dbpath)
     cursor = engine.cursor()
     query = make_query_hypernets(
-        site_id=site, date_start=start_date, date_end=end_date, product_level="L_L2A", only_passed_qc=only_passed_qc
+        site_id=site,
+        date_start=start_date,
+        date_end=end_date,
+        product_level="L_L2A",
+        only_passed_qc=only_passed_qc,
     )
     print(query)
     cursor.execute(query)
@@ -64,6 +96,7 @@ def read_db_hypernets(
             data[i] = list(data[i])
             data[i][-1] = os.path.join(hypernets_path, data[i][-2], data[i][-3] + ".nc")
     return np.array(data, dtype=object)
+
 
 def read_hypernets_file(
     filepath,
@@ -119,6 +152,7 @@ def read_hypernets_file(
     # print(len(id_series), " series selected on angle (vza=%s, vaa=%s requested, vza=%s, vaa=%s found)"%(vza,vaa,ds["viewing_zenith_angle"].values,ds["viewing_azimuth_angle"].values))
     return ds
 
+
 if __name__ == "__main__":
     sites = [
         "GHNA",
@@ -132,7 +166,7 @@ if __name__ == "__main__":
         "PEAN",
         # "DEGE",
         "IFAR",
-        "JAES"
+        "JAES",
     ]
     hypernets_path_db = r"/home/data/calvalresults/v2"
     hypernets_path = r"/home/data/insitu/hypernets/archive"
@@ -171,28 +205,26 @@ if __name__ == "__main__":
     # engine3.close()
 
     for isite in range(len(sites)):
-        query = "select * FROM products WHERE site_id='%s'"%(sites[isite])
+        query = "select * FROM products WHERE site_id='%s'" % (sites[isite])
         print(query)
         cursor.execute(query)
         data = cursor.fetchall()
         print(len(data))
         for i in range(len(data)):
-            if i%100==0:
-                print(sites[isite],i*100/len(data),"% complete")
-            row=data[i]
-            path=row[8]
-            product=row[1]
-            #print(os.path.join(hypernets_path,path,product))
-            if os.path.exists(os.path.join(hypernets_path,path,product+".nc")):
+            if i % 100 == 0:
+                print(sites[isite], i * 100 / len(data), "% complete")
+            row = data[i]
+            path = row[8]
+            product = row[1]
+            # print(os.path.join(hypernets_path,path,product))
+            if os.path.exists(os.path.join(hypernets_path, path, product + ".nc")):
                 # ds = xr.open_dataset(os.path.join(hypernets_path,path,product+".nc"))
                 # #print(min(ds.acquisition_time.values),max(ds.acquisition_time.values))
                 # query = "update products set datetime_start = '%s', datetime_end = '%s' WHERE product_name='%s'" % (dt.fromtimestamp(np.nanmin(ds["acquisition_time"].values)),dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values)),product)
                 # cursor.execute(query)
                 continue
             else:
-                query = "delete FROM products WHERE product_name='%s'"%(product)
+                query = "delete FROM products WHERE product_name='%s'" % (product)
                 cursor.execute(query)
         engine.commit()
     engine.close()
-
-

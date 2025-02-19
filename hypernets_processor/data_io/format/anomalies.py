@@ -97,4 +97,14 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "Invalid sequence,files mentioned in metadatafile are missing in DATA directory",
     },
+    "p": {
+        "description": "sequence not within deployment periods",
+        "error": ValueError,
+        "error_msg": "sequence not within deployment periods",
+    },
+    "hsn": {
+        "description": "HYPSTAR_SN does not match deployment periods",
+        "error": ValueError,
+        "error_msg": "HYPSTAR_SN does not match deployment periods",
+    },
 }

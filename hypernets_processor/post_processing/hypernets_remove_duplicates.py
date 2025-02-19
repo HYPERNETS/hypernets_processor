@@ -29,13 +29,14 @@ files_metadata = [
     "metadata_WWUK.db",
 ]
 
+
 def remove_files(archive_path, file, table_name):
     db_b = sqlite3.connect(os.path.join(archive_path, file))
     cursor_b = db_b.cursor()
     for i, row in enumerate(cursor_b.execute("SELECT * FROM " + table_name)):
         row = ["none" if (is_invalid(v)) else v for v in row]
         row = tuple(row)
-        date=row[1][39:52]
+        date = row[1][39:52]
         try:
             os.remove(row[7])
         except:
@@ -65,6 +66,7 @@ def remove_files(archive_path, file, table_name):
             os.remove(row[7])
         except:
             print(row[7], "file does not exist")
+
 
 def is_invalid(v):
     if v is None:

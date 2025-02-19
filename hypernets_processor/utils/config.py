@@ -18,6 +18,9 @@ __maintainer__ = "Sam Hunt"
 __email__ = "sam.hunt@npl.co.uk"
 __status__ = "Development"
 
+PROCESSOR_CONFIG_PATH = None
+SCHEDULER_CONFIG_PATH = None
+JOBS_FILE_PATH = None
 
 this_directory = os.path.dirname(__file__)
 etc_directory = os.path.join(os.path.dirname(this_directory), "etc")
@@ -27,17 +30,16 @@ if os.path.exists(WORKING_DIRECTORY_FILE_PATH):
         str(np.genfromtxt(WORKING_DIRECTORY_FILE_PATH, dtype=str))
     )
 
-    PROCESSOR_CONFIG_PATH = os.path.join(working_directory, "processor.config")
-    SCHEDULER_CONFIG_PATH = os.path.join(working_directory, "scheduler.config")
-    JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
+    if os.path.exists(working_directory):
+        PROCESSOR_CONFIG_PATH = os.path.join(working_directory, "processor.config")
+        SCHEDULER_CONFIG_PATH = os.path.join(working_directory, "scheduler.config")
+        JOBS_FILE_PATH = os.path.join(working_directory, "jobs.txt")
 else:
     warnings.warn(
         "working_directory.txt does not exist so some of the paths for automated processing could not "
         "be correctly set up. You can ignore this warning if only processing data ad-hoc using hypernets_sequence_processor command."
     )
-    PROCESSOR_CONFIG_PATH = None
-    SCHEDULER_CONFIG_PATH = None
-    JOBS_FILE_PATH = None
+
 
 PROCESSOR_DEFAULT_CONFIG_PATH = os.path.join(etc_directory, "processor.config")
 PROCESSOR_LAND_DEFAULTS_CONFIG_PATH = os.path.join(
