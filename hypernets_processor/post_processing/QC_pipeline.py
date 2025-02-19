@@ -3,6 +3,9 @@ import pandas as pd
 import xarray as xr
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
+import os
+from scipy.stats import binned_statistic_2d
+import glob
 from seaborn.external.docscrape import header
 
 wav_df = xr.open_dataset(r'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc')
@@ -14,17 +17,74 @@ def find_nearest_to_wav(array, wv, value):
     mean = np.mean([array[idx-2], array[idx-1], array[idx], array[idx+1], array[idx+2]])
     return mean
 
-def interpolate_irradiance_sza(sza,ds_irr):
+def interpolate_irradiance_sza(sza,ds_irr,variable):
     ds_irr_temp = ds_irr.copy()
-    ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp["solar_irradiance_BOA"].values / np.cos(ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
+    ds_irr_temp[variable].values = ds_irr_temp[variable].values / np.cos(np.float64(ds_irr_temp["sza"].values) / 180 * np.pi)[:, None]
     ds_irr_temp = ds_irr_temp.interp(sza=sza, wavelength = wav, method="linear")
-    ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp["solar_irradiance_BOA"].values * np.cos(ds_irr_temp["sza"].values / 180 * np.pi)
-    return ds_irr_temp["solar_irradiance_BOA"].values
+    ds_irr_temp[variable].values = ds_irr_temp[variable].values * np.cos(np.float64(ds_irr_temp["sza"].values) / 180 * np.pi)
+    return ds_irr_temp[variable].values
 
-def modelled_data_read_and_interp(sza, mod_data):
+def modelled_data_read_and_interp(sza, mod_data, variable):
     sza = float(sza)
-    interp_mod_data = interpolate_irradiance_sza(sza, mod_data)
+    interp_mod_data = interpolate_irradiance_sza(sza, mod_data, variable)
     return interp_mod_data
+
+def percentile95(array):
+    return np.nanpercentile(array, 95)
+
+def percentile5(array):
+    return np.nanpercentile(array, 5)
+
+def percentile2_5(array):
+    return np.nanpercentile(array, 2.5)
+
+def percentile97_5(array):
+    return np.nanpercentile(array, 97.5)
+
+def percentile1(array):
+    return np.nanpercentile(array, 1)
+
+def percentile99(array):
+    return np.nanpercentile(array, 99)
+
+def sza_vza_bin_and_calc(data, stat):
+    sza = data[' sza'].values
+    vza = data[' vza'].values
+    refl = data[' refl_550nm'].values
+
+    bins = [0, 2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5]
+    bin_centers = [(bins[i] + bins[i+1])/2 for i in range(len(bins) - 1)]
+
+    if stat == 'median':
+        binned_data,x ,y ,b = binned_statistic_2d(sza, vza, refl, 'median', bins)
+    elif stat == '95th':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile95, bins)
+    elif stat == '5th':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile5, bins)
+    elif stat == '2.5th':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile2_5, bins)
+    elif stat == '97.5th':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile97_5, bins)
+    elif stat == '1st':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile1, bins)
+    elif stat == '99th':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile99, bins)
+    else:
+        print('stat not supported')
+        binned_data = None
+
+    refl_output = []
+    sza_output = []
+    vza_output = []
+
+    for i in range(len(bin_centers)):
+        for j in range(len(bin_centers)):
+            if not np.isnan(binned_data[i][j]):
+                refl_output.append(binned_data[i][j])
+                sza_output.append(bin_centers[i])
+                vza_output.append(bin_centers[j])
+
+    return refl_output, sza_output, vza_output
 
 def raa_binning(data, raa_limits):
 
@@ -61,9 +121,24 @@ def plane_fit_and_plot(data, data_setting, stds):
 
     return outliers, good_data
 
+def new_plane_fit(input_sza, input_vza, input_refl):
+    x = input_sza
+    y = input_vza
+    z = input_refl
+
+    popt, pcov = curve_fit(quad_plane, (x, y), z, nan_policy = 'omit')
+
+    return popt, pcov
+
+def compile_irradiance_list(irr_folder, site):
+    files = [f for f in os.listdir(irr_folder) if f'{site}_clear_sky' in f]
+
+    return files
+
+
 class PostProcessingDataset:
 
-    def __init__(self, rad_path, irr_path):
+    def __init__(self, rad_path, irr_path, clear_sky_path, site, clear_sky_aod = None):
 
         #read in radiance
         data = pd.read_csv(rad_path)
@@ -85,12 +160,28 @@ class PostProcessingDataset:
         #read in irradiance
         self.irradiance = pd.read_csv(irr_path)
         #define other features
+        self.site = site
         self.cc_radiance = None
         self.radiance_good = None
         self.radiance_outliers = None
         self.cloud_passes = None
         self.cloud_check_tol = None
-        self.clear_sky_model = xr.open_dataset(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance_Gobabeb\Gobabeb_clear_sky_aod{}.nc'.format(0.1))
+        self.clear_sky_path = clear_sky_path
+        self.plane_iteration = 0
+        if clear_sky_aod is None:
+            self.clear_sky_list = compile_irradiance_list(clear_sky_path, site)
+            self.clear_sky_aod = None
+            self.clear_sky_model = None
+        else:
+            self.clear_sky_list = None
+            self.clear_sky_aod = clear_sky_aod
+            self.clear_sky_model = xr.open_dataset("T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_aod{}.nc".format(site, clear_sky_aod))
+
+    def choose_clear_sky_model(self, aod):
+        if self.clear_sky_list is not None:
+            model = [f for f in self.clear_sky_list if aod in f]
+            self.clear_sky_aod = aod
+            self.clear_sky_model = xr.open_dataset(self.clear_sky_path + str(model[0]))
 
     def size(self, var):
         if var == 'radiance':
@@ -114,6 +205,7 @@ class PostProcessingDataset:
             quit()
 
         data.to_csv(filepath, index = False)
+
 
     def basic_outlier_definition(self):
         mean = self.radiance[' refl_550nm'].mean()
@@ -219,21 +311,28 @@ class PostProcessingDataset:
     def cloud_check(self, tolerance, wavelength, rewrite, rewrite_var = None):
         szas = self.irradiance ['SZA']
         IDs = self.irradiance['ID']
+        saas = self.irradiance['SAA']
 
         if self.cloud_passes is None:
-            data = np.zeros((self.irradiance.shape[0], len(self.irradiance.columns) - 5))
+            data = np.zeros((self.irradiance.shape[0], len(self.irradiance.columns) - 6))
 
             for j in range(self.irradiance.shape[0]):
-                for i in range(len(self.irradiance.columns) - 5):
+                for i in range(len(self.irradiance.columns) - 6):
                     data[j, i] = self.irradiance['{}'.format(i)][j]
 
             passes = np.zeros(self.irradiance.shape[0])
             values = np.zeros(self.irradiance.shape[0])
+            abs_diff = np.zeros(self.irradiance.shape[0])
+            model = np.zeros(self.irradiance.shape[0])
+            observ = np.zeros(self.irradiance.shape[0])
 
             for i in range(data.shape[0]):
-                aod_1 = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model), wav, wavelength)
+                aod_1 = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'solar_irradiance_BOA'), wav, wavelength)
                 meas = find_nearest_to_wav(data[i, :], wav, wavelength)
                 values[i] = aod_1 * tolerance - meas
+                abs_diff[i] = aod_1 - meas
+                model[i] = aod_1
+                observ[i] = meas
 
                 if values[i] > 0:
                     passes[i] = 1  # cloudy
@@ -244,6 +343,8 @@ class PostProcessingDataset:
 
             #save passes
             self.cloud_passes = passes
+            output_data = np.array([IDs,szas, saas ,model, observ, abs_diff, [x[12:16] for x in IDs], [x[3:11] for x in IDs], self.irradiance['Flag']]).T
+            np.savetxt(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v1_diffs.csv',output_data, fmt = '%s',delimiter=',')
 
         cut_IDs = IDs[self.cloud_passes == 1]
 
@@ -278,7 +379,37 @@ class PostProcessingDataset:
             print('radiances not filtered by cloud check')
             self.cc_radiance = new
 
+    def write_irr_analysis_files(self, filename, wavelengths):
+        szas = self.irradiance['SZA']
+        IDs = self.irradiance['ID']
+        saas = self.irradiance['SAA']
 
+        data = np.zeros((self.irradiance.shape[0], len(self.irradiance.columns) - 6))
+        for j in range(self.irradiance.shape[0]):
+            for i in range(len(self.irradiance.columns) - 6):
+                data[j, i] = self.irradiance['{}'.format(i)][j]
+
+        output_data = pd.DataFrame({'IDs': IDs, 'SZA': szas, 'SAA': saas,
+                                    'Time': [x[12:16] for x in IDs],'Date': [x[3:11] for x in IDs],
+                                    'Flag': self.irradiance['Flag']})
+
+        for wv in wavelengths:
+            model = np.zeros(self.irradiance.shape[0])
+            observ = np.zeros(self.irradiance.shape[0])
+            dir_to_diff = np.zeros(self.irradiance.shape[0])
+
+            for i in range(data.shape[0]):
+                model[i] = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'solar_irradiance_BOA'),
+                                               wav, wv)
+                observ[i] = find_nearest_to_wav(data[i, :], wav, wv)
+                dir_to_diff[i] = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'direct_to_diffuse_irradiance_ratio'),
+                                                     wav, wv)
+
+            output_data[f'model_{wv}nm'] = model
+            output_data[f'obs_{wv}nm'] = observ
+            output_data[f'dir_diff_ratio_{wv}nm'] = dir_to_diff
+
+        output_data.to_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\{}.csv'.format(filename))
 
     def plane_fitter(self, labelled = False):
 
@@ -323,6 +454,111 @@ class PostProcessingDataset:
         else:
             self.radiance_good = good
             self.radiance_outliers = outs
+
+        #make this general so fitted variables and binned variables can be changed
+
+    def new_plane_fitter(self, labelled = False, first_iteration = True, plot = False):
+
+        self.plane_iteration += 1
+
+        if self.cc_radiance is None:
+            self.cc_radiance = self.radiance
+
+        if not first_iteration:
+            data = self.radiance_good
+        else:
+            data = self.cc_radiance
+
+        if labelled:
+            data_unmasked = self.labelled_radiance
+        else:
+            data_unmasked = self.radiance
+
+        raa_limits_list = ['(30,90)', '(90,150)', '(150,210)', '(210,270)', '(270,330)', '(330,30)']
+
+        data_30_90 = raa_binning(data, (30, 90))
+        data_90_150 = raa_binning(data, (90, 150))
+        data_150_210 = raa_binning(data, (150, 210))
+        data_210_270 = raa_binning(data, (210, 270))
+        data_270_330 = raa_binning(data, (270, 330))
+        data_330_30 = raa_binning(data, (330, 30))
+
+        data_list = [data_30_90, data_90_150, data_150_210, data_210_270, data_270_330, data_330_30]
+
+        data_unmasked_30_90 = raa_binning(data_unmasked, (30, 90))
+        data_unmasked_90_150 = raa_binning(data_unmasked, (90, 150))
+        data_unmasked_150_210 = raa_binning(data_unmasked, (150, 210))
+        data_unmasked_210_270 = raa_binning(data_unmasked, (210, 270))
+        data_unmasked_270_330 = raa_binning(data_unmasked, (270, 330))
+        data_unmasked_330_30 = raa_binning(data_unmasked, (330, 30))
+
+        data_unmasked_list = [data_unmasked_30_90, data_unmasked_90_150, data_unmasked_150_210, data_unmasked_210_270,
+                              data_unmasked_270_330, data_unmasked_330_30]
+
+        for i in range(len(data_list)):
+            binned95, bin_centers_sza, bin_centers_vza = sza_vza_bin_and_calc(data_list[i], '99th')
+            binned5, bin_centers_sza, bin_centers_vza = sza_vza_bin_and_calc(data_list[i], '1st')
+
+            below, below_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned5)
+            above, above_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned95)
+
+            data_cutting = data_unmasked_list[i]
+
+            z_lower = quad_plane((data_cutting[' sza'].values, data_cutting[' vza'].values),
+                                 *below)
+            z_upper = quad_plane((data_cutting[' sza'].values, data_cutting[' vza'].values),
+                                 *above)
+
+            outliers = data_cutting[(data_cutting[' refl_550nm'] > z_upper) |
+                                    (data_cutting[' refl_550nm'] < z_lower)]
+            good_data = data_cutting[(data_cutting[' refl_550nm'] < z_upper) &
+                                    (data_cutting[' refl_550nm'] > z_lower)]
+
+            good_data.reset_index(drop=True, inplace=True)
+            outliers.reset_index(drop=True, inplace=True)
+
+            if plot:
+                x_range = np.arange(0, 65, 5)
+                fig, axs = plt.subplots(1, 3, figsize=(6, 4), sharey=True)
+                for j in range(3):
+                    axs[j].plot(x_range, quad_plane(((j + 1) * 20, x_range), *below), color='black')
+                    axs[j].plot(x_range, quad_plane(((j + 1) * 20, x_range), *above), color='black')
+                    axs[j].set_title(f'SZA = {(j + 1) * 20}')
+                    axs[j].scatter(
+                        outliers[outliers[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vza'].values,
+                        outliers[outliers[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' refl_550nm'].values,
+                        color='red', s=5)
+                    axs[j].scatter(
+                        good_data[good_data[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vza'].values,
+                        good_data[good_data[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' refl_550nm'].values,
+                        color='green', s=5)
+                    axs[j].set_xlabel('VZA')
+                    axs[0].set_ylabel('Reflectance')
+                    fig.suptitle('RAA {}'.format(raa_limits_list[i]))
+                    fig.savefig(r'T:/ECO/EOServer/joe/hypernets_plots/plane_models/' +
+                                'sza_slices_1_{}_{}.png'.format(raa_limits_list[i], self.plane_iteration))
+                plt.show()
+
+            if ('outs' and 'good') not in locals():
+                outs = outliers
+                good = good_data
+
+            else:
+                outs = pd.concat([outs, outliers], ignore_index=True)
+                good = pd.concat([good, good_data], ignore_index=True)
+
+        if labelled:
+            for y in self.labelled_radiance['post_processing_flags'][self.labelled_radiance.apply(tuple, axis = 1).isin([tuple(x) for x in outs.values])]:
+                y.append(5)
+        else:
+            self.radiance_good = good
+            self.radiance_outliers = outs
+
+
+
+        del outs
+        del good
+
 
     def tol_optimiser(self, tol_start, tol_stop, tol_step, wavelength, good_limit,
                       plot = False):
@@ -465,14 +701,84 @@ def tolerance_analysis(dataset : PostProcessingDataset, maintenance, sza_limit, 
     dataset.size('good')
     dataset.size('outliers')
 
+def JSIT_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit):
+    print('Initial', len(dataset.radiance))
+    dataset.maintenance_check(maintenance)
+    print('Maintenance', len(dataset.radiance))
+    dataset.sza_check(sza_limit)
+    print('SZA', len(dataset.radiance))
+    dataset.raa_cut(raa_limit)
+    print('RAA', len(dataset.radiance))
+    dataset.clean_irr()
+    print('IRR Flags', len(dataset.radiance))
 
-QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v1_None_None_None_None.csv',
-                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv1_irradiance.csv')
+    dataset.cloud_check(0.9, 550, True, 'radiance')
+    dataset.save('radiance', r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\JSIT_initial_cc9.csv')
+
+def multi_aod_tolerance_analysis(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit):
+    #inital checks
+    dataset.maintenance_check(maintenance)
+    dataset.sza_check(sza_limit)
+    dataset.raa_cut(raa_limit)
+    dataset.clean_irr()
+
+def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit):
+    print('Initial', len(dataset.radiance))
+    dataset.maintenance_check(maintenance)
+    print('Maintenance', len(dataset.radiance))
+    dataset.sza_check(sza_limit)
+    print('SZA', len(dataset.radiance))
+    dataset.raa_cut(raa_limit)
+    print('RAA', len(dataset.radiance))
+    dataset.clean_irr()
+    print('IRR Flags', len(dataset.radiance))
+    dataset.cloud_check(0.9, 550, None)
+    print('Cloud Check', len(dataset.cc_radiance))
+    dataset.new_plane_fitter(plot = True)
+    print('1st Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False)
+    print('2nd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False, plot = True)
+    print('3rd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+
+def irradiance_analysis_writer(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs):
+    print('Initial', len(dataset.radiance))
+    dataset.maintenance_check(maintenance)
+    print('Maintenance', len(dataset.radiance))
+    dataset.sza_check(sza_limit)
+    print('SZA', len(dataset.radiance))
+    dataset.raa_cut(raa_limit)
+    print('RAA', len(dataset.radiance))
+    dataset.clean_irr()
+    print('IRR Flags', len(dataset.radiance))
+    dataset.write_irr_analysis_files(filename, wvs)
+    print('File Written')
+
+
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_None_None_None_None.csv',
+                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
+                           'GHNA',
+                           '0.1')
+
 
 GHNA_maintenance_dates = ['20231016','20231017','20231018','20231019','20231020','20231021','20231022','20231023',
                           '20231024','20231025','20240513','20240514','20240515','20240516','20240517','20240518',
                           '20240519','20240520']
 
-tolerance_analysis(QC, GHNA_maintenance_dates, 70, 10)
+JSIT_maintenance_dates = []
 
-#pipeline(QC, GHNA_maintenance_dates, 70, 10)
+#tolerance_analysis(QC, JSIT_maintenance_dates, 70, 10)
+
+
+irradiance_analysis_writer(QC, GHNA_maintenance_dates, 70, 10,
+                           'irradiance_GHNA_v3_analysis',
+                           [415,490,550,675,740,765,870,1020,1640])
+
+

@@ -16,8 +16,8 @@ site = "GHNA"
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
-start_time = "20231026T0000"
-stop_time = "20250101T0000"
+start_time = "20220517T0000"
+stop_time = "20231018T0000"
 wavelength = 550
 
 # start_tod = ["0900","0930","1000","1030","1100"]
@@ -42,7 +42,7 @@ def find_nearest_to_wav(array, wv, value):
     idx = (np.abs(wv - value)).argmin()
     return array[idx]
 
-data_clear = xr.open_dataset(r"T:\ECO\EOServer\data\insitu\hypernets\archive\GHNA\2024\05\13\SEQ20240513T080034\HYPERNETS_L_GHNA_L1B_IRR_20240513T0800_20240520T1359_v2.0.nc")
+data_clear = xr.open_dataset(r"T:\ECO\EOServer\data\insitu\hypernets\archive\GHNA\2022\07\08\SEQ20220708T143039\HYPERNETS_L_GHNA_L1B_IRR_20220708T1430_20231227T1224_v2.0.nc")
 wav_ori = data_clear.wavelength.values
 
 print('Got wavelengths')
@@ -52,17 +52,20 @@ def get_irr(data, wav_val):
     wav = data.wavelength.values
     irr = data.irradiance.to_pandas()
     szas = data.solar_zenith_angle.values
+    saas = data.solar_azimuth_angle.values
     if wav_val is None:
         if irr.shape[1] != 2 or szas.shape[0] != 2:
             irr1 = np.zeros(len(wav))
             irr2 = np.zeros(len(wav))
             qual = [999, 999]
             sza = [999,999]
+            saa = [999,999]
         else:
             irr1 = np.array(irr.iloc[:,0].values)
             irr2 = np.array(irr.iloc[:,1].values)
             qual = data.quality_flag.values
             sza = szas
+            saa = saas
     else:
         if irr.shape[1] != 2 or szas.shape[0] != 2:
             irr1 = 0
@@ -75,17 +78,17 @@ def get_irr(data, wav_val):
             qual = data.quality_flag.values
             sza = szas
 
-    return irr1, irr2, wav, qual, sza
+    return irr1, irr2, wav, qual, sza, saa
 
 
 def make_irrs(file_list, wav_val):
     if wav_val is None:
-        irrs = pd.DataFrame(columns=['ID', 'Flag', 'SZA'])
+        irrs = pd.DataFrame(columns=['ID', 'Flag', 'SZA', 'SAA'])
         refl = np.zeros((len(file_list)*2, len(wav_ori)))
         for j in range(len(file_list)):
-            irr1, irr2, wav, qual, sza = get_irr(file_list[j], wav_val = wav_val)
-            new_row1 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[0], 'SZA': sza[0]})
-            new_row2 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[1], 'SZA': sza[1]})
+            irr1, irr2, wav, qual, sza, saa = get_irr(file_list[j], wav_val = wav_val)
+            new_row1 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[0], 'SZA': sza[0], 'SAA': saa[0]})
+            new_row2 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[1], 'SZA': sza[1], 'SAA': saa[1]})
             irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
             irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
             refl[2*j, :] = irr1
@@ -101,7 +104,7 @@ def make_irrs(file_list, wav_val):
             irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
             irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
 
-    irrs.to_csv(results_path + '\GHNAv3_irradiance.csv', index=False)
+    irrs.to_csv(results_path + '\GHNAv1_irradiance.csv', index=False)
     return irrs
 
 ##running

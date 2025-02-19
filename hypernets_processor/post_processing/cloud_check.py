@@ -14,8 +14,8 @@ windows_results_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_q
 linux_data_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 windows_data_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-dataframe = pd.read_csv(windows_data_path + r"/joe_irradiance_2022.csv")
-wav_df = xr.open_dataset(r"T:\ECO\EOServer\data\insitu\hypernets\archive\GHNA\2022\07\09\SEQ20220709T083129\HYPERNETS_L_GHNA_L1B_IRR_20220709T0831_20231226T2014_v2.0.nc")
+dataframe = pd.read_csv(windows_data_path + r"/JSIT_irradiance.csv")
+wav_df = xr.open_dataset(r"T:\ECO\EOServer\data\insitu\hypernets\archive\JSIT\2024\08\04\SEQ20240804T080045\HYPERNETS_L_JSIT_L1B_IRR_20240804T0800_20240804T0936_v2.0.nc")
 wav = wav_df.wavelength.values
 
 def find_nearest_to_wav(array, wv, value):
@@ -91,26 +91,24 @@ good_IDs = good_data['# id']
 is_outlier = IDs.isin(outliers_IDs)
 print(len(is_outlier))
 
-'''
+
 #plotting
-aod_0_data = modelled_data_read_and_interp(szas[1535], 0.0)
-aod_1_data = modelled_data_read_and_interp(szas[1535], 0.1)
-aod_2_data = modelled_data_read_and_interp(szas[1535], 0.2)
-aod_3_data = modelled_data_read_and_interp(szas[1535], 0.3)
+print(len(szas))
+print(np.argwhere(IDs == 'SEQ20240802T070046'))
+aod_1_data = modelled_data_read_and_interp(szas[3244], 0.1)
 
+plt.plot(wav, (aod_1_data - data[3244, :])*100/aod_1_data)
+plt.axis([300,1800,-100,100])
+plt.show()
 
-plt.plot(wav, (aod_0_data - data[1535, :])*100/aod_0_data, label = 'AOD = 0.0')
-plt.plot(wav, (aod_1_data - data[1535, :])*100/aod_1_data, label = 'AOD = 0.1')
-plt.plot(wav, (aod_2_data - data[1535, :])*100/aod_2_data, label = 'AOD = 0.2')
-plt.plot(wav, (aod_3_data - data[1535, :])*100/aod_3_data, label = 'AOD = 0.3')
-#plt.plot(wav, data[1535,:], label = 'Measured Data')
+plt.plot(wav, data[3244,:], label = 'Measured Data')
+plt.plot(wav, aod_1_data, label = 'Model')
 
-plt.axis([300,1800,0,100])
-plt.ylabel('Relative Change in Irradiance (%)')
+plt.ylabel('Irradiance')
 plt.xlabel('Wavelength (nm)')
 plt.legend()
 plt.show()
-'''
+
 
 def check(data, tolerance, wavelength):
     passes = np.zeros((data.shape[0], 4))
@@ -245,14 +243,18 @@ def make_new_csvs(data_refl, passes, filepath = None):
     if filepath is not None:
         new.to_csv(filepath, index = False)
 
-
+'''
 
 refl_data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_prelim_and_raa10.csv')
-'''
+
 val_0_875, pass_0_875 = check(data, 0.875, 550)
 make_new_csvs(refl_data, pass_0_875[:,0], r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\prelim_cc0875.csv')
-'''
+
 val_1_9, pass_1_9 = check(data, 0.9, 550)
 make_new_csvs(good_data, pass_1_9[:,1], r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_cc_good.csv')
 make_new_csvs(outliers, pass_1_9[:, 1], r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_cc_outliers.csv')
 
+'''
+
+JSIT = xr.open_dataset(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\irr_clear_sky_JSIT_0.0_10.nc')
+print(JSIT)

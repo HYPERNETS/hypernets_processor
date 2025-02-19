@@ -48,4 +48,3 @@ ax.set_title('Cloud Check Tolerance Analysis for 550nm')
 
 plt.legend()
 plt.show()
-

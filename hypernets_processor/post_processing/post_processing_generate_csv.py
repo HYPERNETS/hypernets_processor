@@ -7,22 +7,22 @@ import matplotlib.pyplot as plt
 # set appropriate folders (different for linux or windows) and settings
 
 #for windows:
-# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
 
 # for eoserver:
-data_path = r"/mnt/t/data/insitu/hypernets/archive"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+#data_path = r"/mnt/t/data/insitu/hypernets/archive"
+#results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
 
-tags = ["JSIT","GHNA_v1", "GHNA_v3"]
-sites = ["JSIT","GHNA","GHNA"]
+tags = ["JSIT","GHNA_v1", "GHNA_v3", 'WWUK_2024']
+sites = ["JSIT","GHNA","GHNA", 'WWUK']
 
-start_times = ["20240409T0000","20220517T0000","20231026T0000"]
-stop_times = ["20250101T0000","20231018T0000","20250101T0000"]
+start_times = ["20240409T0000","20220517T0000","20231026T0000", '20240101T0000']
+stop_times = ["20250101T0000","20231018T0000","20250101T0000", '20250101T0000']
 
 wavelength = [415, 490, 550, 675, 740, 765, 870, 1020, 1640]
 plot_wavelength = 550
@@ -45,11 +45,13 @@ vzas=[None] #[20,30,40]
 vaas=[None] #[83,98,113,263,278,298]
 
 for i in range(len(tags)):
+    i = 3
     tag=tags[i]
     start_time=start_times[i]
     stop_time=stop_times[i]
     site=sites[i]
     files = glob.glob(os.path.join(data_path, site, "*", "*", "*", "*", "*L2A*.nc"))
+    print('Files in')
 
     for ii in range(len(start_tod)):
         files = data_io.filter_files_start_stop(files, start_time, stop_time, tod_start=start_tod[ii], tod_stop=stop_tod[ii])
@@ -71,3 +73,5 @@ for i in range(len(tags)):
                 ax1.set_ylim([vmin,vmax])
                 fig1.savefig(os.path.join(results_path,"refl_calibration_diff_%s_%s_%s_%s_%s.png"%(vza,vaa,start_tod[ii],stop_tod[ii],plot_wavelength)))
                 plt.clf()
+
+    print('Done')
