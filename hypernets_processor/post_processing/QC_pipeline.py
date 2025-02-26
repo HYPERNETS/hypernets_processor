@@ -928,6 +928,6 @@ JSIT_maintenance_dates = []
 
 irradiance_analysis_writer(QC, GHNA_maintenance_dates, 70, 10,
                            'irradiance_GHNA_v3_analysis',
-                           [415,490,550,675,740,765,870,1020,1640])
+                           [415,490,550,675,740,765,870,1020,1230,1640])
 
 
