@@ -893,10 +893,10 @@ def irradiance_analysis_writer(dataset: PostProcessingDataset, maintenance, sza_
     print('File Written')
 
 
-QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_None_None_None_None.csv',
-                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/JSIT_None_None_None_None.csv',
+                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/JSIT_irradiance.csv',
                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
-                           'GHNA',
+                           'JSIT',
                            '0.1')
 
 
@@ -926,8 +926,8 @@ JSIT_maintenance_dates = []
 #tolerance_analysis(QC, JSIT_maintenance_dates, 70, 10)
 
 
-irradiance_analysis_writer(QC, GHNA_maintenance_dates, 70, 10,
-                           'irradiance_GHNA_v3_analysis',
+irradiance_analysis_writer(QC, JSIT_maintenance_dates, 70, 10,
+                           'irradiance_JSIT_analysis',
                            [415,490,550,675,740,765,870,1020,1230,1640])
 
 

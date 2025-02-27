@@ -14,7 +14,7 @@ matplotlib.use('Qt5Agg')
 
 results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment"
 #read in data
-data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv', delimiter = ',')
+data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_JSIT_analysis.csv', delimiter = ',')
 data.drop('Unnamed: 0', axis = 'columns')
 
 #cloud check and flag removal
@@ -236,7 +236,7 @@ def chi_square_minimiser_MCMC(sza, saa, dir_diff_ratio, measured_ratio, plot_nam
         measured_ratio,
         rand_uncertainty=0.05,
         syst_uncertainty=0.03,
-        initial_guess=[2,-40,0.01],
+        initial_guess=[3,60,0.0001],
         downlims=[-90,-180,-1],
         uplims=[90,180,1],
         n_input=3,
@@ -306,7 +306,7 @@ def plot_misalign_change(dataset, wav):
 def plot_misalign_sza(dataset, wav, ret = False):
     ma_dict = {'vza': {}, 'unc_vza': {}, 'vaa': {}, 'ratio': {},'unc_ratio': {}, 'unc_vaa': {}, 'num': {}, 'sza': {}, 'saa': {}, 'obs_ratio': {}}
     #sza_bounds = [0,7.5,12.5,17.5,22.5,27.5,32.5,37.5,42.5,47.5,52.5,57.5,62.5,67.5]
-    val, bins = pd.qcut(dataset.sza, 10, retbins = True)
+    val, bins = pd.qcut(dataset.sza, 15, retbins = True)
     bins.round(1)
     bins[0] = 0
     sza_bounds = bins
@@ -377,7 +377,7 @@ def plot_misalign_sza(dataset, wav, ret = False):
     axs[3].set_ylabel('Number of \nMeasurements')
     fig.suptitle(wav)
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'sza_plot_{wav}_after.png'))
+    fig.savefig(os.path.join(results_path , f'JSIT_sza_plot_{wav}.png'))
 
     if ret:
         return ma_dict
@@ -524,7 +524,7 @@ def find_misalignment_angles(dataset, ratio_thresh):
     axs[1].set_ylabel('VAA')
 
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path, f'retrieval_plot_after.png'))
+    fig.savefig(os.path.join(results_path, f'JSIT_retrieval_plot.png'))
 
 def wav_separated_misalignment_calculator(dataset, wavelength):
     ma_dict = {'vza': {}, 'unc_vza': {}, 'vaa': {}, 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': {},
@@ -606,8 +606,8 @@ plt.show()
 #plot_misalign_sza_all_wavs(data_before_may24)
 
 #find_misalignment_angles(data_after_may24, 0.02)
-#plot_misalign_sza(data,  '1640')
-wav_separated_misalignment_calculator(data, wavelengths)
+plot_misalign_sza(data,  '550')
+#wav_separated_misalignment_calculator(data, wavelengths)
 '''
 corrected_measurements = measurements * ratio_calculator(sza_measured, saa_measured, 1.7, 95)
 corrected_perc = (clear_sky_model - corrected_measurements) / corrected_measurements * 100
