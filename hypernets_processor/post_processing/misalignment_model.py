@@ -14,7 +14,7 @@ matplotlib.use('Qt5Agg')
 
 results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment"
 #read in data
-data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_JSIT_analysis.csv', delimiter = ',')
+data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv', delimiter = ',')
 data.drop('Unnamed: 0', axis = 'columns')
 
 #cloud check and flag removal
@@ -74,6 +74,21 @@ def ratio_calculator(vza, vaa, offset, sza, saa, direct_to_diffuse=1000):
     new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
     new_direct_to_diffuse=direct_to_diffuse*np.cos(new_sza)/np.cos(sza)
     return (new_direct_to_diffuse+1) / (direct_to_diffuse+1) + offset
+
+def ratio_calculator_10offsets(vza, vaa, offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10, sza, saa, direct_to_diffuse=1000):
+    if vza < 0:
+        vza = -vza
+        vaa += -180
+
+    sza = np.radians(sza)
+    saa = np.radians(saa)
+    vza = np.radians(vza)
+    vaa = np.radians(vaa)
+    #new_sza = np.cos(sza + vza*np.cos((saa - vaa + 360) % 360))
+    new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
+    new_direct_to_diffuse=direct_to_diffuse*np.cos(new_sza)/np.cos(sza)
+    offsets=np.array([offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10])
+    return (new_direct_to_diffuse+1) / (direct_to_diffuse+1) + offsets[:,None]
 
 def ratio_uncertainty_calculator(vza, vaa, sza, saa, u_vza, u_vaa):
     if vza < 0:
@@ -236,7 +251,7 @@ def chi_square_minimiser_MCMC(sza, saa, dir_diff_ratio, measured_ratio, plot_nam
         measured_ratio,
         rand_uncertainty=0.05,
         syst_uncertainty=0.03,
-        initial_guess=[3,60,0.0001],
+        initial_guess=[2,-40,0.01],
         downlims=[-90,-180,-1],
         uplims=[90,180,1],
         n_input=3,
@@ -260,6 +275,43 @@ def chi_square_minimiser_MCMC(sza, saa, dir_diff_ratio, measured_ratio, plot_nam
     plot_trace(
          samples,
          labels=['vza', 'vaa', 'offset'],
+         path=results_path,
+        tag = plot_name
+     )
+
+    return mean, unc
+
+
+def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio, plot_name = ''):
+    mcmc = MCMCRetrieval(
+        ratio_calculator_10offsets,
+        measured_ratio,
+        rand_uncertainty=0.05,
+        syst_uncertainty=0.03,
+        initial_guess=[2,-40,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01],
+        downlims=[-90,-180,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+        uplims=[90,180,1,1,1,1,1,1,1,1,1,1],
+        n_input=12,
+        b=[sza, saa, dir_diff_ratio],
+        u_b=[0, 0, 0],
+        b_iter=1,
+        circular = True
+    )
+    mean, unc, corr, samples = mcmc.run_retrieval(
+        1000, 1000, 100, return_corr=True, return_samples=True
+    )
+    chisq = mcmc.find_chisum(mean)
+    print(len(sza), chisq)
+    print(mean, unc)
+
+    plot_corner(
+         samples,
+         os.path.join(results_path, "plot_corner_%s.png" % plot_name),
+         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
+     )
+    plot_trace(
+         samples,
+         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
          path=results_path,
         tag = plot_name
      )
@@ -306,7 +358,7 @@ def plot_misalign_change(dataset, wav):
 def plot_misalign_sza(dataset, wav, ret = False):
     ma_dict = {'vza': {}, 'unc_vza': {}, 'vaa': {}, 'ratio': {},'unc_ratio': {}, 'unc_vaa': {}, 'num': {}, 'sza': {}, 'saa': {}, 'obs_ratio': {}}
     #sza_bounds = [0,7.5,12.5,17.5,22.5,27.5,32.5,37.5,42.5,47.5,52.5,57.5,62.5,67.5]
-    val, bins = pd.qcut(dataset.sza, 15, retbins = True)
+    val, bins = pd.qcut(dataset.sza, 10, retbins = True)
     bins.round(1)
     bins[0] = 0
     sza_bounds = bins
@@ -377,7 +429,7 @@ def plot_misalign_sza(dataset, wav, ret = False):
     axs[3].set_ylabel('Number of \nMeasurements')
     fig.suptitle(wav)
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'JSIT_sza_plot_{wav}.png'))
+    fig.savefig(os.path.join(results_path , f'sza_plot_{wav}_after.png'))
 
     if ret:
         return ma_dict
@@ -524,7 +576,7 @@ def find_misalignment_angles(dataset, ratio_thresh):
     axs[1].set_ylabel('VAA')
 
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path, f'JSIT_retrieval_plot.png'))
+    fig.savefig(os.path.join(results_path, f'retrieval_plot_after.png'))
 
 def wav_separated_misalignment_calculator(dataset, wavelength):
     ma_dict = {'vza': {}, 'unc_vza': {}, 'vaa': {}, 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': {},
@@ -590,6 +642,77 @@ def wav_separated_misalignment_calculator(dataset, wavelength):
     fig.tight_layout()
     fig.savefig(os.path.join(results_path , f'retrieval_plot.png'))
 
+
+def wav_together_misalignment_calculator(dataset, wavelength):
+    ma_dict = {'vza': {}, 'unc_vza': {}, 'vaa': {}, 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': {},
+               'obs_ratio': {}}
+
+
+    ds = dataset.set_coords('sza').where(dataset.sza > 0)
+    ds = ds.dropna(dim = 'date')
+
+    mean, unc = chi_square_minimiser_MCMC_10offsets(ds.sza.values, ds.saa.values,
+                                          ds.dir_diff_ratio.values,
+                                          np.array(list(ds.ratio.values)),
+                                                    plot_name="combined")
+
+    print(mean)
+    mean = list(mean)
+    unc = list(unc)
+
+    if mean[0] < 0:
+        mean[0] = -mean[0]
+        mean[1] += -180
+
+    for iwav, wav in enumerate(wavelength):
+        ds = dataset.loc[dict(wv=wav)].set_coords('sza').where(dataset.sza > 0)
+        ds = ds.dropna(dim='date')
+        try:
+            ma_dict['vza'][f'{wav}'] = mean[0]
+            ma_dict['unc_vza'][f'{wav}'] = unc[0]
+            ma_dict['vaa'][f'{wav}'] = mean[1]
+            ma_dict['unc_vaa'][f'{wav}'] = unc[1]
+            ma_dict['num'][f'{wav}'] = len(ds.sza.values)
+
+            ratio_grid = ratio_calculator(mean[0], mean[1], mean[iwav+2],
+                                          ds.sza.values, ds.saa.values,
+                                          ds.dir_diff_ratio.values)
+            ratio_unc = ratio_uncertainty_calculator(mean[0], mean[1],
+                                                     ds.sza.values, ds.saa.values,
+                                                     unc[0], unc[1]) * ratio_grid / 100
+
+            ma_dict['ratio'][f'{wav}'] = np.mean(ratio_grid)
+            ma_dict['unc_ratio'][f'{wav}'] = np.sqrt(
+                (np.std(ratio_grid) ** 2 + np.sum(ratio_unc ** 2) / len(ratio_unc) ** 2))
+            ma_dict['obs_ratio'][f'{wav}'] = np.mean(np.array(list(ds.ratio.values)))
+
+        except:
+            ma_dict[f'{wav}'] = np.nan
+
+    fig, axs = plt.subplots(4,1, sharex = True)
+    axs[0].errorbar(ma_dict['vza'].keys(), list(ma_dict['vza'].values()), yerr = list(ma_dict['unc_vza'].values()),
+                 marker = '', linestyle = '', capsize = 5)
+    axs[1].errorbar(ma_dict['vza'].keys(), list(ma_dict['vaa'].values()), yerr=list(ma_dict['unc_vaa'].values()),
+                    marker='', linestyle='', capsize=5)
+    axs[2].errorbar(ma_dict['vza'].keys(), list(ma_dict['ratio'].values()), yerr=list(ma_dict['unc_ratio'].values()),
+                    marker='x', linestyle='', capsize=5)
+    axs[2].scatter(ma_dict['vza'].keys(), list(ma_dict['obs_ratio'].values()),
+                    marker='o')
+    axs[3].bar(ma_dict['vza'].keys(), list(ma_dict['num'].values()))
+
+    axs[0].grid(color = 'black', alpha = 0.5, axis = 'y')
+    axs[1].grid(color = 'black', alpha = 0.5, axis = 'y')
+    axs[2].grid(color = 'black', alpha = 0.5, axis = 'y')
+
+    axs[2].set_ylim(0.9,1.1)
+
+    axs[0].set_ylabel('VZA')
+    axs[1].set_ylabel('VAA')
+    axs[2].set_ylabel('Ratio')
+    axs[3].set_ylabel('Number of \nMeasurements')
+    fig.tight_layout()
+    fig.savefig(os.path.join(results_path , f'retrieval_plot_combined.png'))
+
 '''
 ma_dict = {'mean': {}, 'unc': {}}
 for wv in ratio_dict.keys():
@@ -606,8 +729,9 @@ plt.show()
 #plot_misalign_sza_all_wavs(data_before_may24)
 
 #find_misalignment_angles(data_after_may24, 0.02)
-plot_misalign_sza(data,  '550')
+#plot_misalign_sza(data,  '1640')
 #wav_separated_misalignment_calculator(data, wavelengths)
+wav_together_misalignment_calculator(data, wavelengths)
 '''
 corrected_measurements = measurements * ratio_calculator(sza_measured, saa_measured, 1.7, 95)
 corrected_perc = (clear_sky_model - corrected_measurements) / corrected_measurements * 100
