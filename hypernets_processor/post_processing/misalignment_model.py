@@ -51,7 +51,8 @@ data = xr.Dataset(data_vars = dict(
     sza = (['date'], sza_measured),
     saa = (['date'], saa_measured),
     dir_diff_ratio = (['wv','date'], list(dir_diff_dict.values())),
-    ratio = (['wv', 'date'], list(ratio_dict.values()))),
+    ratio = (['wv', 'date'], list(ratio_dict.values())),
+    time = (['date'], [str(x).zfill(4) for x in data['Time']])),
 
     coords = dict(
         date = ('date', [datetime.datetime.strptime(str(x), '%Y%m%d') for x in data['Date']]),
@@ -301,20 +302,20 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
         1000, 1000, 100, return_corr=True, return_samples=True
     )
     chisq = mcmc.find_chisum(mean)
-    print(len(sza), chisq)
-    print(mean, unc)
+    print('CHI',len(sza), chisq)
 
-    plot_corner(
-         samples,
-         os.path.join(results_path, "plot_corner_%s.png" % plot_name),
-         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
-     )
-    plot_trace(
-         samples,
-         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
-         path=results_path,
-        tag = plot_name
-     )
+
+#    plot_corner(
+ #        samples,
+  #       os.path.join(results_path, "plot_corner_%s.png" % plot_name),
+   #      labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
+    # )
+#    plot_trace(
+ #        samples,
+  #       labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
+   #      path=results_path,
+    #    tag = plot_name
+     #)
 
     return mean, unc
 
@@ -643,9 +644,9 @@ def wav_separated_misalignment_calculator(dataset, wavelength):
     fig.savefig(os.path.join(results_path , f'retrieval_plot.png'))
 
 
-def wav_together_misalignment_calculator(dataset, wavelength):
-    ma_dict = {'vza': {}, 'unc_vza': {}, 'vaa': {}, 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': {},
-               'obs_ratio': {}}
+def wav_together_misalignment_calculator(dataset, wavelength, site):
+    ma_dict = {'vza': [], 'unc_vza': [], 'vaa': [], 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': [],
+               'obs_ratio': {}, 'offset': {}, 'ratio_grid': {}, 'obs_grid': {}, 'time': {}}
 
 
     ds = dataset.set_coords('sza').where(dataset.sza > 0)
@@ -654,9 +655,10 @@ def wav_together_misalignment_calculator(dataset, wavelength):
     mean, unc = chi_square_minimiser_MCMC_10offsets(ds.sza.values, ds.saa.values,
                                           ds.dir_diff_ratio.values,
                                           np.array(list(ds.ratio.values)),
-                                                    plot_name="combined")
+                                                    plot_name=site)
 
-    print(mean)
+    print('VZA', mean[0], unc[0])
+    print('VAA', mean[1], unc[1])
     mean = list(mean)
     unc = list(unc)
 
@@ -664,15 +666,16 @@ def wav_together_misalignment_calculator(dataset, wavelength):
         mean[0] = -mean[0]
         mean[1] += -180
 
+    ma_dict['vza'] = mean[0]
+    ma_dict['unc_vza'] = unc[0]
+    ma_dict['vaa'] = mean[1]
+    ma_dict['unc_vaa'] = unc[1]
+    ma_dict['num'] = len(ds.sza.values)
+
     for iwav, wav in enumerate(wavelength):
         ds = dataset.loc[dict(wv=wav)].set_coords('sza').where(dataset.sza > 0)
         ds = ds.dropna(dim='date')
         try:
-            ma_dict['vza'][f'{wav}'] = mean[0]
-            ma_dict['unc_vza'][f'{wav}'] = unc[0]
-            ma_dict['vaa'][f'{wav}'] = mean[1]
-            ma_dict['unc_vaa'][f'{wav}'] = unc[1]
-            ma_dict['num'][f'{wav}'] = len(ds.sza.values)
 
             ratio_grid = ratio_calculator(mean[0], mean[1], mean[iwav+2],
                                           ds.sza.values, ds.saa.values,
@@ -685,33 +688,34 @@ def wav_together_misalignment_calculator(dataset, wavelength):
             ma_dict['unc_ratio'][f'{wav}'] = np.sqrt(
                 (np.std(ratio_grid) ** 2 + np.sum(ratio_unc ** 2) / len(ratio_unc) ** 2))
             ma_dict['obs_ratio'][f'{wav}'] = np.mean(np.array(list(ds.ratio.values)))
+            ma_dict['offset'][f'{wav}'] = mean[iwav + 2]
+            ma_dict['obs_grid'][f'{wav}'] = np.array(list(ds.ratio.values))
+            ma_dict['ratio_grid'][f'{wav}'] = ratio_grid
+            ma_dict['time'][f'{wav}'] = np.array(list(ds.time.values))
 
         except:
             ma_dict[f'{wav}'] = np.nan
 
-    fig, axs = plt.subplots(4,1, sharex = True)
-    axs[0].errorbar(ma_dict['vza'].keys(), list(ma_dict['vza'].values()), yerr = list(ma_dict['unc_vza'].values()),
-                 marker = '', linestyle = '', capsize = 5)
-    axs[1].errorbar(ma_dict['vza'].keys(), list(ma_dict['vaa'].values()), yerr=list(ma_dict['unc_vaa'].values()),
-                    marker='', linestyle='', capsize=5)
-    axs[2].errorbar(ma_dict['vza'].keys(), list(ma_dict['ratio'].values()), yerr=list(ma_dict['unc_ratio'].values()),
+    fig = plt.figure()
+    ax = fig.add_subplot(projection = 'polar')
+    ax.set_theta_zero_location('N')
+    ax.set_theta_direction(-1)
+    ax.errorbar(np.radians(ma_dict['vaa']), ma_dict['vza'], xerr = np.radians(ma_dict['unc_vaa']), yerr = ma_dict['unc_vza'], capsize = 5)
+    ax.set_ylim([0, 5])
+    fig.savefig(os.path.join(results_path, f'{site}_retrieval_plot_combined.png'))
+
+    fig, ax = plt.subplots(1,1, sharex = True)
+    ax.errorbar(ma_dict['ratio'].keys(), [ma_dict['ratio'][k] - ma_dict['offset'][k] for k in ma_dict['ratio'].keys()],
+                yerr=list(ma_dict['unc_ratio'].values()),
                     marker='x', linestyle='', capsize=5)
-    axs[2].scatter(ma_dict['vza'].keys(), list(ma_dict['obs_ratio'].values()),
-                    marker='o')
-    axs[3].bar(ma_dict['vza'].keys(), list(ma_dict['num'].values()))
 
-    axs[0].grid(color = 'black', alpha = 0.5, axis = 'y')
-    axs[1].grid(color = 'black', alpha = 0.5, axis = 'y')
-    axs[2].grid(color = 'black', alpha = 0.5, axis = 'y')
-
-    axs[2].set_ylim(0.9,1.1)
-
-    axs[0].set_ylabel('VZA')
-    axs[1].set_ylabel('VAA')
-    axs[2].set_ylabel('Ratio')
-    axs[3].set_ylabel('Number of \nMeasurements')
+    ax.grid(color = 'black', alpha = 0.5, axis = 'y')
+    ax.set_ylabel('Ratio')
+    ax.set_xlabel('Wavelength')
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'retrieval_plot_combined.png'))
+    fig.savefig(os.path.join(results_path , f'{site}_ratio_plot_combined.png'))
+
+    return ma_dict
 
 '''
 ma_dict = {'mean': {}, 'unc': {}}
@@ -731,8 +735,82 @@ plt.show()
 #find_misalignment_angles(data_after_may24, 0.02)
 #plot_misalign_sza(data,  '1640')
 #wav_separated_misalignment_calculator(data, wavelengths)
-wav_together_misalignment_calculator(data, wavelengths)
-'''
+bins = [630, 715, 745, 815, 845, 915, 945, 1015, 1045, 1115, 1145, 1315, 1345, 1415, 1445, 1515, 1545]
+time = ['0700', '0730', '0800', '0830', '0900', '0930', '1000', '1030', '1100', '1130', '1300', '1330', '1400', '1430',
+        '1500', '1530']
+
+before_dict = wav_together_misalignment_calculator(data_before_may24, wavelengths, 'GHNAv3_before')
+after_dict = wav_together_misalignment_calculator(data_after_may24, wavelengths, 'GHNAv3_after')
+all_dict = wav_together_misalignment_calculator(data, wavelengths, 'GHNAv3')
+
+
+
+for wav in wavelengths:
+
+    fig, axs = plt.subplots(3, 1, sharex=True)
+
+    before_dict['time'][f'{wav}'] = [int(x) for x in before_dict['time'][f'{wav}']]
+    after_dict['time'][f'{wav}'] = [int(x) for x in after_dict['time'][f'{wav}']]
+    all_dict['time'][f'{wav}'] = [int(x) for x in all_dict['time'][f'{wav}']]
+
+    before_medians, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'median', bins = bins)
+    before_std, be, bn  = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
+
+    after_medians, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']), list(after_dict['ratio_grid'][f'{wav}']), statistic = 'median', bins = bins)
+    after_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']), list(after_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
+
+    all_medians, bin_edges, binnumber = binned_statistic(list(all_dict['time'][f'{wav}']), list(all_dict['ratio_grid'][f'{wav}']), statistic = 'median', bins = bins)
+    all_std, bin_edge, binnumbe = binned_statistic(list(all_dict['time'][f'{wav}']), list(all_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
+
+    before_obs_medians, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+                                              list(before_dict['obs_grid'][f'{wav}']), statistic='median', bins=bins)
+    before_obs_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+                                          list(before_dict['obs_grid'][f'{wav}']), statistic='std', bins=bins)
+
+    after_obs_medians, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
+                                                           list(after_dict['obs_grid'][f'{wav}']), statistic='median',
+                                                           bins=bins)
+    after_obs_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
+                                                     list(after_dict['obs_grid'][f'{wav}']), statistic='std',
+                                                     bins=bins)
+
+    all_obs_medians, bin_edges, binnumber = binned_statistic(list(all_dict['time'][f'{wav}']),
+                                                         list(all_dict['obs_grid'][f'{wav}']), statistic='median',
+                                                         bins=bins)
+    all_obs_std, bin_edge, binnumbe = binned_statistic(list(all_dict['time'][f'{wav}']),
+                                                   list(all_dict['obs_grid'][f'{wav}']), statistic='std', bins=bins)
+
+    axs[0].errorbar(time, before_medians, yerr=before_std, linestyle='', marker='x', capsize=5, color = 'red', label = 'before')
+    axs[0].errorbar(time, after_medians, yerr=after_std, linestyle='', marker='x', capsize=5, color = 'green', label = 'after')
+    axs[0].errorbar(time, all_medians, yerr=all_std, linestyle='', marker='x', capsize=5, color = 'blue', label = 'all')
+
+    axs[1].errorbar(time, before_obs_medians, yerr=before_obs_std, linestyle='', marker='x', capsize=5, color='red',
+                    label='before')
+    axs[1].errorbar(time, after_obs_medians, yerr=after_obs_std, linestyle='', marker='x', capsize=5, color='green',
+                    label='after')
+    axs[1].errorbar(time, all_obs_medians, yerr=all_obs_std, linestyle='', marker='x', capsize=5, color='blue', label='all')
+
+    axs[2].scatter(time, before_medians - before_obs_medians, linestyle = '', marker = 'x', color = 'red')
+    axs[2].scatter(time, after_medians - after_obs_medians, linestyle='', marker='x', color='green')
+    axs[2].scatter(time, all_medians - all_obs_medians, linestyle='', marker='x', color='blue')
+
+    axs[0].set_ylabel('Modelled Ratio')
+    axs[1].set_ylabel('Observed Ratio')
+    axs[2].set_ylabel('Modelled - Observed')
+    axs[1].set_xlabel('Time of Day')
+
+    axs[0].legend()
+    axs[0].grid(color = 'black', alpha = 0.5, axis = 'y')
+    axs[1].grid(color = 'black', alpha = 0.5, axis = 'y')
+    axs[2].grid(color='black', alpha=0.5, axis='y')
+
+    fig.suptitle(f'{wav}')
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(results_path , f'GHNAv3_ratio_tod_plot_{wav}.png'))
+
+''' 
+
 corrected_measurements = measurements * ratio_calculator(sza_measured, saa_measured, 1.7, 95)
 corrected_perc = (clear_sky_model - corrected_measurements) / corrected_measurements * 100
 perc = (clear_sky_model - measurements) / measurements * 100
