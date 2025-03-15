@@ -147,9 +147,9 @@ class SiteSpecificQualityChecks:
         ang_tol = self.context.get_config_value("angle_tolerance")
         for angle_tup in bad_angles_period[i_dep_save]:
             bad_vza, bad_vaa = angle_tup
-            if bad_vza=="*":
+            if bad_vza=="all":
                 id_series_valid = np.where(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol)[0]
-            elif bad_vaa=="*":
+            elif bad_vaa=="all":
                 id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)[0]
             else:
                 id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)|(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol))[0]
