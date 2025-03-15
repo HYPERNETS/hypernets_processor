@@ -32,5 +32,5 @@ def convert_datetime(
             return parse(date_time, fuzzy=False)
         except ValueError:
             raise ValueError(
-                "Unable to discern datetime requested: '{}'".format(date_time)
+                "Unable to discern datetime requested: '{}' ({})".format(date_time,type(date_time))
             )
