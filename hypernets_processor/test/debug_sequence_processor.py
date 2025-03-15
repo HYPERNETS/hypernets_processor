@@ -59,9 +59,7 @@ def process_sequence():
 
     job_config["Output"]["archive_directory"] = r"C:\Users\pdv\data\insitu\hypernets\archive_test"
 
-    job_config["Processor"]["max_level"] = "L2A"
-
-    no_unc = True
+    no_unc = False
 
     if no_unc:
         job_config["Processor"]["mcsteps"] = "0"
