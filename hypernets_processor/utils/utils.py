@@ -26,11 +26,11 @@ def convert_datetime(
     elif isinstance(date_time, (float, int, np.uint)):
         return datetime.datetime.utcfromtimestamp(date_time)
     else:
-        if date_time[-1] == "Z":
+        if isinstance(date_time, str) and date_time[-1] == "Z":
             date_time = date_time[:-1]
         try:
             return parse(date_time, fuzzy=False)
         except ValueError:
             raise ValueError(
-                "Unable to discern datetime requested: '{}'".format(date_time)
+                "Unable to discern datetime requested: '{}' ({})".format(date_time,type(date_time))
             )

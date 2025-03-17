@@ -265,9 +265,11 @@ class HypernetsWriter:
         comp = dict(zlib=True, complevel=compression_level)
 
         encoding = dict()
+        encoding_keys = ("_FillValue", "dtype", "scale_factor", "add_offset", "grid_mapping")
         for var_name in ds.data_vars:
             var_encoding = dict(comp)
-            var_encoding.update(ds[var_name].encoding)
+            ds_var_encoding = {encoding_key: ds[var_name].encoding[encoding_key] for encoding_key in encoding_keys if encoding_key in ds[var_name].encoding}
+            var_encoding.update(ds_var_encoding)
             if ds[var_name].values.dtype == np.float64 and encodefloat32:
                 var_encoding["dtype"] = np.float32
             if "dtype" in var_encoding.keys():

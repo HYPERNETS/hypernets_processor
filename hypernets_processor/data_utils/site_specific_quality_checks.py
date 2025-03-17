@@ -6,6 +6,8 @@ from hypernets_processor.data_io.data_templates import DataTemplates
 from hypernets_processor.plotting.plotting import Plotting
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.utils import convert_datetime
+from hypernets_processor.data_io.product_name_util import ProductNameUtil
+
 import numpy as np
 import warnings
 import os
@@ -13,6 +15,7 @@ import xarray as xr
 import datetime
 import math
 from scipy.optimize import curve_fit
+import scipy
 import ast
 
 import punpy
@@ -28,7 +31,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-refdat_path = os.path.join(dir_path, "data", "quality_comparison_data")
+irradiance_path = os.path.join(dir_path, "data", "postprocessing","irradiance_data")
 postprocessing_path = os.path.join(dir_path, "data", "postprocessing")
 
 
@@ -37,8 +40,12 @@ class SiteSpecificQualityChecks:
         self.context = context
         self.plot = Plotting(context)
         self.writer = HypernetsWriter(context)
+        self.pu = ProductNameUtil(context=self.context)
+        self.prop = punpy.MCPropagation(
+            self.context.get_config_value("mcsteps"), dtype="float32"#, MCdimlast=True
+        )
 
-    def apply_site_specific_QC(self, dataset_l2a):
+    def apply_site_specific_QC(self, dataset_l2a, dataset_l1b_rad, dataset_l1b_irr):
 
         # we loop through each of the different deployment periods
         deploy_periods = ast.literal_eval(
@@ -55,6 +62,20 @@ class SiteSpecificQualityChecks:
         )
         postprocessing_qc_file_period = ast.literal_eval(
             self.context.get_config_value("postprocessing_qc_file_period")
+        )
+
+        misalignment_vza = ast.literal_eval(
+            self.context.get_config_value("misalignment_vza")
+        )
+        misalignment_vaa = ast.literal_eval(
+            self.context.get_config_value("misalignment_vaa")
+        )
+
+        misalignment_vza_unc = ast.literal_eval(
+            self.context.get_config_value("misalignment_vza_unc")
+        )
+        misalignment_vaa_unc = ast.literal_eval(
+            self.context.get_config_value("misalignment_vaa_unc")
         )
 
         seq_within_period = False
@@ -86,7 +107,7 @@ class SiteSpecificQualityChecks:
 
         # bad sequences that were manually specified are removed
         if dataset_l2a.attrs["sequence_id"] in bad_sequences_period[i_dep_save]:
-            return None
+            return None, None, None
 
         # Next, remove data for which any of the bad flags was set in previous QC
         bad_flags = [
@@ -106,17 +127,29 @@ class SiteSpecificQualityChecks:
         )  # bools for each series if any bad flag is set
         id_series_valid = np.where(~flagged)[0]  # select indexes for which no bad flags are set
         dataset_l2b = dataset_l2a.isel(series=id_series_valid)
-        dataset_l2b.attrs["product_name"] = dataset_l2b.attrs["product_name"].replace(
-            "L2A", "L2B"
-        )
+        dataset_l2b.attrs["product_name"] = self.pu.create_product_name("L_L2B")
+
+        flagged_l1b_rad = DatasetUtil.get_flags_mask_or(
+            dataset_l1b_rad["quality_flag"], bad_flags
+        )  # bools for each series if any bad flag is set
+        id_series_valid_l1b_rad = np.where(~flagged_l1b_rad)[0]  # select indexes for which no bad flags are set
+        dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid_l1b_rad)
+        dataset_l1d_rad.attrs["product_name"] = self.pu.create_product_name("L_L1D_RAD")
+
+        flagged_l1b_irr = DatasetUtil.get_flags_mask_or(
+            dataset_l1b_irr["quality_flag"], bad_flags
+        )  # bools for each series if any bad flag is set
+        id_series_valid_l1b_irr = np.where(~flagged_l1b_irr)[0]  # select indexes for which no bad flags are set
+        dataset_l1d_irr = dataset_l1b_irr.isel(series=id_series_valid_l1b_irr)
+        dataset_l1d_irr.attrs["product_name"] = self.pu.create_product_name("L_L1D_IRR")
 
         # next, remove angles for which we know the data is not reliable
         ang_tol = self.context.get_config_value("angle_tolerance")
         for angle_tup in bad_angles_period[i_dep_save]:
             bad_vza, bad_vaa = angle_tup
-            if bad_vza=="*":
+            if bad_vza=="all":
                 id_series_valid = np.where(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol)[0]
-            elif bad_vaa=="*":
+            elif bad_vaa=="all":
                 id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)[0]
             else:
                 id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)|(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol))[0]
@@ -128,22 +161,86 @@ class SiteSpecificQualityChecks:
                         dataset_l2b.wavelength.values > bad_wav[1]))[0]
             dataset_l2b = dataset_l2b.isel(wavelength=id_wav_valid)
 
+        irr_model_irrwav = xr.open_dataset(
+            os.path.join(
+                irradiance_path,
+                "%s_clear_sky_medianaod_irrwav.nc"
+                % (self.context.get_config_value("site_id")),
+            )
+        )
+
+        irr_model_irrwav_noaer = xr.open_dataset(
+            os.path.join(
+                irradiance_path,
+                "%s_clear_sky_aod0.0_irrwav.nc"
+                % (self.context.get_config_value("site_id")),
+            )
+        )
+
+        i_wav_550_data = np.argmin(np.abs(dataset_l1b_irr.wavelength.values - 550))
+        i_wav_550_model = np.argmin(np.abs(irr_model_irrwav.wavelength.values - 550))
+        i_wav_550_model_noaer = np.argmin(np.abs(irr_model_irrwav_noaer.wavelength.values - 550))
+
+        for i_series in range(len(dataset_l1b_irr.series.values)):
+            sza = dataset_l1b_irr.solar_zenith_angle.values[i_series]
+            saa = dataset_l1b_irr.solar_azimuth_angle.values[i_series]
+            irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(sza, irr_model_irrwav)
+            irradiance_noaer, _ = self.interpolate_irradiance_sza(sza, irr_model_irrwav_noaer)
+            dir_dif_intfunc = scipy.interpolate.interp1d(
+                irr_model_irrwav.wavelength.values, dir_dif_ratio, fill_value="extrapolate"
+            )
+            dir_dif_ratio = dir_dif_intfunc(dataset_l1b_irr.wavelength.values)
+            # Perform correction for misalignment
+            ratio = self.misalignment_ratio_calculator(misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
+                                                       sza,
+                                                       saa,
+                                                       dir_dif_ratio)
+            ratio_unc = self.prop.propagate_systematic(self.misalignment_ratio_calculator, [misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
+                                                       sza,
+                                                       saa,
+                                                       dir_dif_ratio],
+                                                     [misalignment_vza_unc[i_dep_save], misalignment_vaa_unc[i_dep_save], None,
+                                                       None,
+                                                       None,
+                                                       None])
+            dataset_l1b_irr.irradiance.values[:, i_series] *= ratio
+            dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series] = (dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series]**2+(ratio_unc/ratio/100)**2)**0.5
+
+            if (dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series] < 0.9 * irradiance[i_wav_550_model]) or (
+                dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series] > 1.1 * irradiance[i_wav_550_model_noaer]
+            ):
+                self.context.anomaly_handler.add_anomaly("scl")
+
+        for i_series in range(len(dataset_l2b.series.values)):
+            sza = dataset_l2b.solar_zenith_angle.values[i_series]
+            saa = dataset_l2b.solar_azimuth_angle.values[i_series]
+            irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(sza, irr_model_irrwav)
+            dir_dif_intfunc = scipy.interpolate.interp1d(
+                irr_model_irrwav.wavelength.values, dir_dif_ratio, fill_value="extrapolate"
+            )
+            dir_dif_ratio = dir_dif_intfunc(dataset_l2b.wavelength.values)
+
+            # Perform correction for misalignment
+            ratio = self.misalignment_ratio_calculator(misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
+                                                       sza,
+                                                       saa,
+                                                       dir_dif_ratio)
+            ratio_unc = self.prop.propagate_systematic(self.misalignment_ratio_calculator,
+                                                       [misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
+                                                        sza,
+                                                        saa,
+                                                        dir_dif_ratio],
+                                                       [misalignment_vza_unc[i_dep_save], misalignment_vaa_unc[i_dep_save],
+                                                        None,
+                                                        None,
+                                                        None,
+                                                        None])
+            dataset_l2b.reflectance.values[:, i_series] /= ratio
+            dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] = (dataset_l2b.u_rel_systematic_reflectance.values[
+                                                                                                :, i_series] ** 2 + (
+                                                                                                            ratio_unc / ratio / 100) ** 2) ** 0.5
+
         # finally, make plots and write file
-
-        if self.context.get_config_value("plot_l2b"):
-            self.plot.plot_series_in_sequence("reflectance", dataset_l2b)
-            self.plot.plot_series_in_sequence_vaa("reflectance", dataset_l2b, 98)
-            self.plot.plot_series_in_sequence_vza("reflectance", dataset_l2b, 30)
-            if self.context.get_config_value("plot_polar_wav") is not None:
-                self.plot.plot_polar_reflectance(
-                    dataset_l2b, self.context.get_config_value("plot_polar_wav")
-                )
-        if self.context.get_config_value("plot_uncertainty"):
-            self.plot.plot_relative_uncertainty("reflectance", dataset_l2b, refl=True)
-
-        if self.context.get_config_value("plot_correlation"):
-            self.plot.plot_correlation("reflectance", dataset_l2b, refl=True)
-
         if self.context.get_config_value("write_l2b"):
             self.writer.write(
                 dataset_l2b,
@@ -153,7 +250,69 @@ class SiteSpecificQualityChecks:
                 ),
             )
 
-        return dataset_l2b
+        if self.context.get_config_value("write_l1d"):
+            self.writer.write(
+                dataset_l1d_rad,
+                overwrite=True,
+                remove_vars_strings=self.context.get_config_value(
+                    "remove_vars_strings"
+                ),
+            )
+            self.writer.write(
+                dataset_l1d_irr,
+                overwrite=True,
+                remove_vars_strings=self.context.get_config_value(
+                    "remove_vars_strings"
+                ),
+            )
+
+        if self.context.get_config_value("plot_l2b"):
+            self.plot.plot_series_in_sequence("reflectance", dataset_l2b)
+            self.plot.plot_series_in_sequence_vaa("reflectance", dataset_l2b, 98)
+            self.plot.plot_series_in_sequence_vza("reflectance", dataset_l2b, 30)
+            if self.context.get_config_value("plot_polar_wav") is not None:
+                self.plot.plot_polar_reflectance(
+                    dataset_l2b, self.context.get_config_value("plot_polar_wav")
+                )
+            if self.context.get_config_value("plot_uncertainty"):
+                self.plot.plot_relative_uncertainty("reflectance", dataset_l2b, refl=True)
+
+            if self.context.get_config_value("plot_correlation"):
+                self.plot.plot_correlation("reflectance", dataset_l2b, refl=True)
+
+        if self.context.get_config_value("plot_l1d"):
+            self.plot.plot_series_in_sequence("radiance", dataset_l1d_rad)
+            self.plot.plot_series_in_sequence("irradiance", dataset_l1d_irr)
+            self.plot.plot_series_in_sequence_vaa(
+                    "radiance", dataset_l1d_rad, 98
+                )
+            self.plot.plot_series_in_sequence_vza(
+                    "radiance", dataset_l1d_rad, 30
+                )
+
+            if self.context.get_config_value("plot_uncertainty"):
+                self.plot.plot_relative_uncertainty("radiance", dataset_l1d_rad)
+                self.plot.plot_relative_uncertainty("irradiance", dataset_l1d_irr)
+
+            if self.context.get_config_value("plot_correlation"):
+                self.plot.plot_correlation("radiance", dataset_l1d_rad)
+                self.plot.plot_correlation("irradiance", dataset_l1d_irr)
+
+
+        return dataset_l2b, dataset_l1d_rad, dataset_l1d_irr
+
+    def interpolate_irradiance_sza(self, sza, ds_irr):
+        ds_irr_temp = ds_irr.copy()
+        ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp["solar_irradiance_BOA"].values / np.cos(
+            ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
+        ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values = ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values / np.cos(
+            ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
+        ds_irr_temp = ds_irr_temp.interp(sza=sza, method="linear")
+        ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp["solar_irradiance_BOA"].values * np.cos(
+            ds_irr_temp["sza"].values / 180 * np.pi)
+        ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values = ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values * np.cos(
+            ds_irr_temp["sza"].values / 180 * np.pi)
+        return ds_irr_temp["solar_irradiance_BOA"].values, ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values
 
     def perform_quality_check_angles(
         self, datasetl0, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
@@ -375,305 +534,6 @@ class SiteSpecificQualityChecks:
                 )
         return dataset_l1b, dataset_l1b_swir
 
-    def perform_quality_irradiance(self, dataset_l1b_irr):
-        # todo add further checks
-        vzas = dataset_l1b_irr["viewing_zenith_angle"].values
-        szas = dataset_l1b_irr["solar_zenith_angle"].values
-
-        print("Check if vza=180")
-        for i, vza in enumerate(vzas):
-            if np.abs(vza - 180) > self.context.get_config_value(
-                "irradiance_zenith_treshold"
-            ):
-                self.context.logger.warning(
-                    "One of the irradiance measurements did not have vza=180 (tolerance of %s), so has been masked"
-                    % self.context.get_config_value("irradiance_zenith_treshold")
-                )
-                dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l1b_irr["quality_flag"][i], "vza_irradiance"
-                )  # for i in range(len(mask))]
-
-        if self.context.get_config_value("clear_sky_check"):
-            print("Clearsky check")
-            # could also be done by: https://pvlib-python.readthedocs.io/en/stable/auto_examples/plot_spectrl2_fig51A.html
-            ref_szas = [0, 10, 20, 40, 60, 70, 80]
-            ref_sza = ref_szas[np.argmin(np.abs(ref_szas - np.mean(szas)))]
-
-            t1 = datetime.datetime.now()
-            ref_data = xr.open_dataset(
-                os.path.join(
-                    refdat_path,
-                    "solar_irradiance_hypernets_sza%s_highres_%s.nc"
-                    % (ref_sza, self.context.get_config_value("network")),
-                )
-            )
-
-            band_centres = dataset_l1b_irr["wavelength"].values
-            bandwidth = dataset_l1b_irr["bandwidth"].values
-
-            ref_data_irr = bi.pixel_int(
-                d=ref_data["solar_irradiance_BOA"].values,
-                x=ref_data["wavelength"].values,
-                x_pixel=band_centres,
-                width_pixel=bandwidth,
-                d_axis_x=0,
-                band_shape="gaussian",
-            )
-
-            self.context.logger.debug(
-                "band integration took:", datetime.datetime.now() - t1
-            )
-
-            irr_scaled = np.zeros_like(dataset_l1b_irr["irradiance"].values)
-            for i, vza in enumerate(vzas):
-
-                # irrtot=pysolar.radiation.get_radiation_direct(datetime.datetime.fromtimestamp(dataset_l1b_irr["acquisition_time"][i]),90-dataset_l1b_irr["solar_zenith_angle"].values[i])
-                irr_scaled[:, i] = (
-                    dataset_l1b_irr["irradiance"].values[:, i]
-                    / np.cos(
-                        np.pi / 180.0 * dataset_l1b_irr["solar_zenith_angle"].values[i]
-                    )
-                    * np.cos(np.pi / 180.0 * ref_sza)
-                )
-                if np.count_nonzero(irr_scaled[:, i] < 0.5 * ref_data_irr) > 0.1 * len(
-                    irr_scaled[:, i]
-                ):
-                    dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
-                        dataset_l1b_irr["quality_flag"][i], "no_clear_sky_irradiance"
-                    )
-
-            if self.context.get_config_value("plot_clear_sky_check"):
-                self.plot.plot_quality_irradiance(
-                    dataset_l1b_irr,
-                    irr_scaled,
-                    ref_data_irr,
-                    ref_sza,
-                )
-
-        flags = ["vza_irradiance"]
-        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
-        mask_notflagged = np.where(flagged == False)[0]
-        print("Check variable illumination in irradiance")
-        if (
-            self.qc_illumination(
-                dataset_l1b_irr.isel(series=mask_notflagged), "irradiance"
-            )
-            > self.context.get_config_value("irr_variability_percent") / 100 / 2
-        ):  # /2 is to account for difference between calculating relative std and %  (for 2 values)
-            for i in range(len(dataset_l1b_irr["quality_flag"].values)):
-                dataset_l1b_irr["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l1b_irr["quality_flag"][i], "variable_irradiance"
-                )
-
-        return dataset_l1b_irr
-
-    def check_overcast(self, dataset_l1c, dataset_l1b_irr):
-        flags = [
-            "no_clear_sky_irradiance",
-            "vza_irradiance",
-            "not_enough_dark_scans",
-            "not_enough_irr_scans",
-        ]
-        flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
-        mask_notflagged = np.where(flagged == False)[0]
-        if len(mask_notflagged) == 0:
-            self.context.anomaly_handler.add_anomaly("cl")  # , dataset_l1b_irr)
-            dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
-                dataset_l1c["quality_flag"], "no_clear_sky_sequence"
-            )
-        return dataset_l1c
-
-    def check_valid_darks(self, dataset_l0b, n_valid, n_total):
-        for i in range(len(n_valid)):
-            if n_valid[i] < self.context.get_config_value("n_valid_dark"):
-                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l0b["quality_flag"][i], "not_enough_dark_scans"
-                )
-                if self.context.logger is not None:
-                    self.context.logger.warning(
-                        "Not enough dark scans for sequence {}".format(
-                            dataset_l0b.attrs["sequence_id"]
-                        )
-                    )
-                self.context.anomaly_handler.add_anomaly("nld")
-            # if n_valid[i] < 0.5*n_total[i]:
-            #     dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
-            #         dataset_l0b["quality_flag"][i], "half_of_scans_masked"
-            #     )
-        return dataset_l0b
-
-    def check_valid_scans(self, dataset_l0b, n_valid, n_total, measurandstring):
-        for i in range(len(n_valid)):
-            if (measurandstring == "radiance") and (
-                n_valid[i] < self.context.get_config_value("n_valid_rad")
-            ):
-                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l0b["quality_flag"][i], "not_enough_rad_scans"
-                )
-                self.context.anomaly_handler.add_anomaly("nlu")
-
-            if (measurandstring == "irradiance") and (
-                n_valid[i] < self.context.get_config_value("n_valid_irr")
-            ):
-                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l0b["quality_flag"][i], "not_enough_irr_scans"
-                )
-                self.context.anomaly_handler.add_anomaly("ned")
-
-            if n_valid[i] < 0.5 * n_total[i]:
-                dataset_l0b["quality_flag"][i] = DatasetUtil.set_flag(
-                    dataset_l0b["quality_flag"][i], "half_of_scans_masked"
-                )
-        return dataset_l0b
-
-    def check_valid_irradiance(self, ds_irr):
-        if any(
-            DatasetUtil.get_flags_mask_or(
-                ds_irr["quality_flag"], ["variable_irradiance"]
-            )
-        ):
-            self.context.anomaly_handler.add_anomaly("nu")
-
-        flags = ["not_enough_dark_scans", "not_enough_irr_scans", "vza_irradiance"]
-
-        flagged_irr = DatasetUtil.get_flags_mask_or(ds_irr["quality_flag"], flags)
-        mask_notflagged_irr = np.where(flagged_irr == False)[0]
-        if len(ds_irr.series[mask_notflagged_irr]) == 0:
-            self.context.anomaly_handler.add_anomaly("in")
-
-    def check_valid_sequence_land(self, ds_rad, ds_irr):
-        self.check_valid_irradiance(ds_irr)
-
-        flags = ["not_enough_dark_scans", "not_enough_rad_scans"]
-
-        flagged_rad = DatasetUtil.get_flags_mask_or(ds_rad["quality_flag"], flags)
-        mask_notflagged_rad = np.where(flagged_rad == False)[0]
-        if len(ds_rad.series[mask_notflagged_rad]) == 0:
-            self.context.anomaly_handler.add_anomaly("in")
-
-    def check_valid_sequence_water(self, ds_rad, ds_irr):
-        flags = [
-            "not_enough_dark_scans",
-            "not_enough_rad_scans",
-            "not_enough_irr_scans",
-        ]
-        flagged = DatasetUtil.get_flags_mask_or(ds_rad["quality_flag"], flags)
-        mask_notflagged = np.where(flagged == False)[0]
-
-    def check_standard_sequence_L1B(self, ds, measurand, network):
-        flags = [
-            "not_enough_dark_scans",
-            "not_enough_rad_scans",
-            "not_enough_irr_scans",
-            "vza_irradiance",
-        ]
-        flagged = DatasetUtil.get_flags_mask_or(ds["quality_flag"], flags)
-        mask_notflagged = np.where(flagged == False)[0]
-
-        if measurand == "irradiance":
-            if len(ds["series_id"][mask_notflagged]) < 2:
-                ds["quality_flag"] = DatasetUtil.set_flag(
-                    ds["quality_flag"], "series_missing"
-                )
-                self.context.anomaly_handler.add_anomaly("ms")
-
-        elif network == "land" and measurand == "radiance":
-            geometries = [
-                (
-                    ds["viewing_zenith_angle"].values[i],
-                    ds["viewing_azimuth_angle"].values[i],
-                )
-                for i in range(len(ds["viewing_zenith_angle"].values))
-                if i in mask_notflagged
-            ]
-            if np.all(
-                ds["viewing_zenith_angle"].values
-                > self.context.get_config_value("bad_pointing_threshold_zenith")
-            ):  # check if there are any nadir measurements
-                ds["quality_flag"][:] = DatasetUtil.set_flag(
-                    ds["quality_flag"][:], "series_missing"
-                )
-                self.context.anomaly_handler.add_anomaly("ms")
-
-            vza_standard = [5, 10, 20, 30]
-            vaa_standard = [83, 98, 113, 263, 278, 293]
-            geometries_standard = np.meshgrid(vza_standard, vaa_standard)
-            for geom in zip(
-                geometries_standard[0].flatten(), geometries_standard[1].flatten()
-            ):
-                dist = np.array(
-                    [
-                        (geom[0] - geom2[0]) ** 2 + (geom[1] - geom2[1]) ** 2
-                        for geom2 in geometries
-                    ]
-                )
-                if np.all(
-                    dist
-                    > (
-                        self.context.get_config_value("bad_pointing_threshold_zenith")
-                        ** 2
-                        + self.context.get_config_value(
-                            "bad_pointing_threshold_azimuth"
-                        )
-                        ** 2
-                    )
-                    ** 0.5
-                ):
-                    ds["quality_flag"][:] = DatasetUtil.set_flag(
-                        ds["quality_flag"][:], "series_missing"
-                    )
-                    self.context.logger.warning(
-                        "There is a missing geometry (vza=%s,vaa=%s,paa=%s) for the land standard sequence."
-                        % (geom[0], geom[1], (geom[1] - 180) % 360)
-                    )
-                    self.context.anomaly_handler.add_anomaly("ms")
-
-        elif network == "water" and measurand == "downwelling_radiance":
-            if len(ds["series_id"][mask_notflagged]) < 2:
-                ds["quality_flag"] = DatasetUtil.set_flag(
-                    ds["quality_flag"], "series_missing"
-                )
-                self.context.anomaly_handler.add_anomaly("ms")
-
-    def qc_illumination(self, dataset, measurand):
-        wv = dataset["wavelength"].values
-        wav_idx = np.argmin(np.abs(wv - 550))
-        if measurand == "irradiance":
-            if len(dataset.irradiance.values[wav_idx, :]) == 1:
-                self.context.logger.warning(
-                    "There is only one irradiance being considered when doing qc_illumination and thus no variability of irradiance is checked."
-                )
-                return 0
-            else:
-                covvar = np.std(
-                    dataset.irradiance.values[wav_idx, :]
-                    / np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values)
-                ) / np.mean(
-                    dataset.irradiance.values[wav_idx, :]
-                    / np.cos(np.pi / 180.0 * dataset["solar_zenith_angle"].values)
-                )
-                self.context.logger.debug(
-                    "Coefficient of variation irradiance: {}".format(covvar)
-                )
-        elif measurand == "radiance":
-            if len(dataset.radiance.values[wav_idx, :]) == 1:
-                self.context.logger.warning(
-                    "There is only one radiance being considered when doing qc_illumination and thus no variability of radiance is checked."
-                )
-                return 0
-            else:
-                covvar = np.std(dataset.radiance.values[wav_idx, :]) / np.mean(
-                    dataset.radiance.values[wav_idx, :]
-                )
-
-            self.context.logger.debug(
-                "Coefficient of variation radiance: {}".format(covvar)
-            )
-        return covvar
-
-    def perform_quality_check_L2a(self, dataset):
-        # todo add these checks
-        return dataset
 
     def outlier_checks(self, data_subset, k_unc=3):
         intsig = np.nanmean(data_subset, axis=0)
@@ -928,3 +788,20 @@ class SiteSpecificQualityChecks:
                 id += 1
 
             return dataset_l1b, flags
+
+    def misalignment_ratio_calculator(self, vza, vaa, offset, sza, saa, direct_to_diffuse=1000):
+        if isinstance(vza,np.ndarray):
+            vaa[vza < 0] += -180
+            vza[vza<0] = -vza[vza<0]
+
+        elif vza < 0:
+            vza = -vza
+            vaa += -180
+
+        sza = np.radians(sza)
+        saa = np.radians(saa)
+        vza = np.radians(vza)
+        vaa = np.radians(vaa)
+        new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
+        new_direct_to_diffuse = direct_to_diffuse * np.cos(new_sza) / np.cos(sza)
+        return (new_direct_to_diffuse + 1) / (direct_to_diffuse + 1) + offset

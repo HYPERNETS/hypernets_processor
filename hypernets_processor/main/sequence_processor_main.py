@@ -74,7 +74,7 @@ def get_target_sequences(context, to_archive):
             for product in context.archive_db["products"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if "L2A" in product["product_level"]
+            if context.get_config_value("max_level") in product["product_level"]
         ]
 
         failed_products = [
@@ -86,7 +86,8 @@ def get_target_sequences(context, to_archive):
         ]
 
         complete_products = processed_products + failed_products
-
+        print("proc",processed_products)
+        print("fail",failed_products)
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
         raw_products = list(set(raw_products) - set(complete_products))
 

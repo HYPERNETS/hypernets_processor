@@ -107,4 +107,9 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "HYPSTAR_SN does not match deployment periods",
     },
+    "scl": {
+        "description": "site-specific clear sky check has failed",
+        "error": ValueError,
+        "error_msg": "site-specific clear sky check has failed",
+    },
 }
