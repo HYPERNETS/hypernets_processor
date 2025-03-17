@@ -112,4 +112,9 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "site-specific clear sky check has failed",
     },
+    "npr": {
+        "description": "no pre-existing files available, while config is set up to reprocess from pre-existing files",
+        "error": ValueError,
+        "error_msg": "no pre-existing files available, while config is set up to reprocess from pre-existing files",
+    },
 }
