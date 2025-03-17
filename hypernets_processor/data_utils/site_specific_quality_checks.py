@@ -128,6 +128,7 @@ class SiteSpecificQualityChecks:
         id_series_valid = np.where(~flagged)[0]  # select indexes for which no bad flags are set
         dataset_l2b = dataset_l2a.isel(series=id_series_valid)
         dataset_l2b.attrs["product_name"] = self.pu.create_product_name("L_L2B")
+        dataset_l2b.attrs["product_level"] = "L_L2B"
 
         flagged_l1b_rad = DatasetUtil.get_flags_mask_or(
             dataset_l1b_rad["quality_flag"], bad_flags
@@ -135,6 +136,7 @@ class SiteSpecificQualityChecks:
         id_series_valid_l1b_rad = np.where(~flagged_l1b_rad)[0]  # select indexes for which no bad flags are set
         dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid_l1b_rad)
         dataset_l1d_rad.attrs["product_name"] = self.pu.create_product_name("L_L1D_RAD")
+        dataset_l1d_rad.attrs["product_level"] = "L_L1D_RAD"
 
         flagged_l1b_irr = DatasetUtil.get_flags_mask_or(
             dataset_l1b_irr["quality_flag"], bad_flags
@@ -142,6 +144,7 @@ class SiteSpecificQualityChecks:
         id_series_valid_l1b_irr = np.where(~flagged_l1b_irr)[0]  # select indexes for which no bad flags are set
         dataset_l1d_irr = dataset_l1b_irr.isel(series=id_series_valid_l1b_irr)
         dataset_l1d_irr.attrs["product_name"] = self.pu.create_product_name("L_L1D_IRR")
+        dataset_l1d_irr.attrs["product_level"] = "L_L1D_IRR"
 
         # next, remove angles for which we know the data is not reliable
         ang_tol = self.context.get_config_value("angle_tolerance")
