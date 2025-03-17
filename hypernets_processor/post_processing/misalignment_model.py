@@ -289,7 +289,7 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
         measured_ratio,
         rand_uncertainty=0.05,
         syst_uncertainty=0.03,
-        initial_guess=[2,-40,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01],
+        initial_guess=[2,20,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01],
         downlims=[-90,-180,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
         uplims=[90,180,1,1,1,1,1,1,1,1,1,1],
         n_input=12,
@@ -302,14 +302,14 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
         1000, 1000, 100, return_corr=True, return_samples=True
     )
     chisq = mcmc.find_chisum(mean)
-    print('CHI',len(sza), chisq)
+    print('CHI',len(sza) - 12, chisq, chisq/(len(sza) - 12))
 
 
-#    plot_corner(
- #        samples,
-  #       os.path.join(results_path, "plot_corner_%s.png" % plot_name),
-   #      labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
-    # )
+    plot_corner(
+         samples,
+         os.path.join(results_path, "plot_corner_%s.png" % plot_name),
+         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
+     )
 #    plot_trace(
  #        samples,
   #       labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
@@ -319,7 +319,7 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
 
     return mean, unc
 
-def plot_misalign_change(dataset, wav):
+def plot_misalign_change(dataset):
     ma_dict = {'vza': {}, 'unc_vza': {}, 'num': {}, 'sza': {}, 'saa': {}}
     earliest = min(dataset.date.values)
     recent = max(dataset.date.values)
@@ -329,8 +329,8 @@ def plot_misalign_change(dataset, wav):
         for m in range(0,12):
             m = str(m).zfill(2)
             try:
-                ds_month = dataset.loc[dict(wv = wav, date = f'{y}-{m}')]
-                mean, unc = chi_square_minimiser_MCMC(ds_month.sza.values, ds_month.saa.values,
+                ds_month = dataset.loc[dict(date = f'{y}-{m}')]
+                mean, unc = chi_square_minimiser_MCMC_10offsets(ds_month.sza.values, ds_month.saa.values,
                                                       ds_month.dir_diff_ratio.values,
                                                       np.array(list(ds_month.ratio.values)))
                 #comparison_plotter(ds_month.sza.values, ds_month.saa.values, vza, vaa, list(ds_month.ratio.values))
@@ -579,9 +579,11 @@ def find_misalignment_angles(dataset, ratio_thresh):
     fig.tight_layout()
     fig.savefig(os.path.join(results_path, f'retrieval_plot_after.png'))
 
-def wav_separated_misalignment_calculator(dataset, wavelength):
+def wav_separated_misalignment_calculator(dataset, wavelength, site):
     ma_dict = {'vza': {}, 'unc_vza': {}, 'vaa': {}, 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': {},
-               'obs_ratio': {}}
+               'obs_ratio': {}, 'offset': {}, 'obs_grid': {}, 'ratio_grid': {}, 'time': {}, 'unc_grid': {}}
+
+    residuals = []
 
     for wav in wavelength:
         ds = dataset.loc[dict(wv = wav)].set_coords('sza').where(dataset.sza > 0)
@@ -598,12 +600,23 @@ def wav_separated_misalignment_calculator(dataset, wavelength):
                 mean[0] = -mean[0]
                 mean[1] += -180
 
+            ratio_grid = ratio_calculator(mean[0], mean[1], mean[2],
+                                          ds.sza.values, ds.saa.values,
+                                          ds.dir_diff_ratio.values)
+            ratio_unc = ratio_uncertainty_calculator(mean[0], mean[1],
+                                                     ds.sza.values, ds.saa.values,
+                                                     unc[0], unc[1]) * ratio_grid / 100
             ma_dict['vza'][f'{wav}'] = mean[0]
             ma_dict['unc_vza'][f'{wav}'] = unc[0]
             ma_dict['vaa'][f'{wav}'] = mean[1]
             ma_dict['unc_vaa'][f'{wav}'] = unc[1]
             ma_dict['num'][f'{wav}'] = len(ds.sza.values)
-
+            ma_dict['offset'][f'{wav}'] = mean[2]
+            ma_dict['obs_grid'][f'{wav}'] = np.array(list(ds.ratio.values))
+            ma_dict['ratio_grid'][f'{wav}'] = ratio_grid
+            ma_dict['time'][f'{wav}'] = np.array(list(ds.time.values))
+            ma_dict['unc_grid'][f'{wav}'] = ratio_unc
+            residuals += [float(x) for x in list((np.array(list(ds.ratio.values)) - ratio_grid) / ratio_unc)]
 
             ratio_grid = ratio_calculator(mean[0], mean[1], mean[2],
                                           ds.sza.values, ds.saa.values,
@@ -641,13 +654,16 @@ def wav_separated_misalignment_calculator(dataset, wavelength):
     axs[2].set_ylabel('Ratio')
     axs[3].set_ylabel('Number of \nMeasurements')
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'retrieval_plot.png'))
+    fig.savefig(os.path.join(results_path , f'{site}_retrieval_plot.png'))
+
+    return ma_dict
 
 
 def wav_together_misalignment_calculator(dataset, wavelength, site):
     ma_dict = {'vza': [], 'unc_vza': [], 'vaa': [], 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': [],
-               'obs_ratio': {}, 'offset': {}, 'ratio_grid': {}, 'obs_grid': {}, 'time': {}}
+               'obs_ratio': {}, 'offset': {}, 'ratio_grid': {}, 'obs_grid': {}, 'time': {}, 'unc_grid': {}}
 
+    residuals = []
 
     ds = dataset.set_coords('sza').where(dataset.sza > 0)
     ds = ds.dropna(dim = 'date')
@@ -692,9 +708,16 @@ def wav_together_misalignment_calculator(dataset, wavelength, site):
             ma_dict['obs_grid'][f'{wav}'] = np.array(list(ds.ratio.values))
             ma_dict['ratio_grid'][f'{wav}'] = ratio_grid
             ma_dict['time'][f'{wav}'] = np.array(list(ds.time.values))
+            ma_dict['unc_grid'][f'{wav}'] = ratio_unc
+            residuals += [float(x) for x in list((np.array(list(ds.ratio.values)) - ratio_grid)/ratio_unc)]
 
         except:
             ma_dict[f'{wav}'] = np.nan
+
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    ax.hist(residuals, 50, density = True, edgecolor = 'black', align = 'mid')
+    fig.savefig(os.path.join(results_path, f'{site}_residuals_hist.png'))
 
     fig = plt.figure()
     ax = fig.add_subplot(projection = 'polar')
@@ -735,23 +758,36 @@ plt.show()
 #find_misalignment_angles(data_after_may24, 0.02)
 #plot_misalign_sza(data,  '1640')
 #wav_separated_misalignment_calculator(data, wavelengths)
+
+#wav_together_misalignment_calculator(data, wavelengths, 'GHNAv3')
+
+
+##GHNA TOD PLOTS
 bins = [630, 715, 745, 815, 845, 915, 945, 1015, 1045, 1115, 1145, 1315, 1345, 1415, 1445, 1515, 1545]
 time = ['0700', '0730', '0800', '0830', '0900', '0930', '1000', '1030', '1100', '1130', '1300', '1330', '1400', '1430',
         '1500', '1530']
 
-before_dict = wav_together_misalignment_calculator(data_before_may24, wavelengths, 'GHNAv3_before')
-after_dict = wav_together_misalignment_calculator(data_after_may24, wavelengths, 'GHNAv3_after')
-all_dict = wav_together_misalignment_calculator(data, wavelengths, 'GHNAv3')
+before_dict = wav_separated_misalignment_calculator(data_before_may24, wavelengths, 'GHNAv3_before')
+after_dict = wav_separated_misalignment_calculator(data_after_may24, wavelengths, 'GHNAv3_after')
+all_dict = wav_separated_misalignment_calculator(data, wavelengths, 'GHNAv3')
 
 
 
 for wav in wavelengths:
 
-    fig, axs = plt.subplots(3, 1, sharex=True)
+    fig, axs = plt.subplots(4, 1, sharex=True)
 
     before_dict['time'][f'{wav}'] = [int(x) for x in before_dict['time'][f'{wav}']]
     after_dict['time'][f'{wav}'] = [int(x) for x in after_dict['time'][f'{wav}']]
     all_dict['time'][f'{wav}'] = [int(x) for x in all_dict['time'][f'{wav}']]
+
+#    before_dict['ratio_grid'][f'{wav}'] = ratio_calculator(all_dict['vza'], all_dict['vza'], before_dict['offset'][f'{wav}'],
+ #                                                           data_before_may24.sza.values, data_before_may24.saa.values,
+  #                                                          data_before_may24.dir_diff_ratio.loc[dict(wv=wav)].values)
+
+#    after_dict['ratio_grid'][f'{wav}'] = ratio_calculator(all_dict['vza'], all_dict['vza'], after_dict['offset'][f'{wav}'],
+ #                                                           data_after_may24.sza.values, data_after_may24.saa.values,
+  #                                                          data_after_may24.dir_diff_ratio.loc[dict(wv=wav)].values)
 
     before_medians, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'median', bins = bins)
     before_std, be, bn  = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
@@ -780,6 +816,24 @@ for wav in wavelengths:
     all_obs_std, bin_edge, binnumbe = binned_statistic(list(all_dict['time'][f'{wav}']),
                                                    list(all_dict['obs_grid'][f'{wav}']), statistic='std', bins=bins)
 
+    before_sza, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+                                              data_before_may24.sza.values, statistic='median', bins=bins)
+    before_sza_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+                                         data_before_may24.sza.values, statistic='std', bins=bins)
+
+    after_sza, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
+                                                           data_after_may24.sza.values, statistic='median',
+                                                           bins=bins)
+    after_sza_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
+                                                     data_after_may24.sza.values, statistic='std',
+                                                     bins=bins)
+
+    all_sza, bin_edges, binnumber = binned_statistic(list(all_dict['time'][f'{wav}']),
+                                                         data.sza.values, statistic='median',
+                                                         bins=bins)
+    all_sza_std, bin_edge, binnumbe = binned_statistic(list(all_dict['time'][f'{wav}']),
+                                                   data.sza.values, statistic='std', bins=bins)
+
     axs[0].errorbar(time, before_medians, yerr=before_std, linestyle='', marker='x', capsize=5, color = 'red', label = 'before')
     axs[0].errorbar(time, after_medians, yerr=after_std, linestyle='', marker='x', capsize=5, color = 'green', label = 'after')
     axs[0].errorbar(time, all_medians, yerr=all_std, linestyle='', marker='x', capsize=5, color = 'blue', label = 'all')
@@ -794,23 +848,34 @@ for wav in wavelengths:
     axs[2].scatter(time, after_medians - after_obs_medians, linestyle='', marker='x', color='green')
     axs[2].scatter(time, all_medians - all_obs_medians, linestyle='', marker='x', color='blue')
 
+    axs[3].errorbar(time, before_sza, yerr=before_sza_std, linestyle='', marker='x', capsize=5, color='red',
+                    label='before')
+    axs[3].errorbar(time, after_sza, yerr=after_sza_std, linestyle='', marker='x', capsize=5, color='green',
+                    label='after')
+    axs[3].errorbar(time, all_sza, yerr=all_sza_std, linestyle='', marker='x', capsize=5, color='blue',
+                    label='all')
+
     axs[0].set_ylabel('Modelled Ratio')
     axs[1].set_ylabel('Observed Ratio')
     axs[2].set_ylabel('Modelled - Observed')
+    axs[3].set_ylabel('SZA')
     axs[1].set_xlabel('Time of Day')
 
     axs[0].legend()
     axs[0].grid(color = 'black', alpha = 0.5, axis = 'y')
     axs[1].grid(color = 'black', alpha = 0.5, axis = 'y')
     axs[2].grid(color='black', alpha=0.5, axis='y')
+    axs[3].grid(color='black', alpha=0.5, axis='y')
 
     fig.suptitle(f'{wav}')
 
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'GHNAv3_ratio_tod_plot_{wav}.png'))
+    fig.savefig(os.path.join(results_path , f'GHNA_ratio_tod_plot_{wav}.png'))
 
-''' 
 
+
+
+'''
 corrected_measurements = measurements * ratio_calculator(sza_measured, saa_measured, 1.7, 95)
 corrected_perc = (clear_sky_model - corrected_measurements) / corrected_measurements * 100
 perc = (clear_sky_model - measurements) / measurements * 100
