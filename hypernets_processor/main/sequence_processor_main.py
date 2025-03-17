@@ -86,8 +86,7 @@ def get_target_sequences(context, to_archive):
         ]
 
         complete_products = processed_products + failed_products
-        print("proc",processed_products)
-        print("fail",failed_products)
+
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
         raw_products = list(set(raw_products) - set(complete_products))
 
