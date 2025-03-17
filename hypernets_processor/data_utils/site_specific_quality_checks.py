@@ -96,7 +96,7 @@ class SiteSpecificQualityChecks:
 
         # anomaly is raised if data has not been found within deployment periods
         if not seq_within_period:
-            self.context.anomaly_handler.add_anomaly("p")
+            self.context.anomaly_handler.add_anomaly("per")
 
         # anomaly is raised if system id does not match hypstar SN in deployment period
         if (
@@ -107,7 +107,7 @@ class SiteSpecificQualityChecks:
 
         # bad sequences that were manually specified are removed
         if dataset_l2a.attrs["sequence_id"] in bad_sequences_period[i_dep_save]:
-            return None, None, None
+            self.context.anomaly_handler.add_anomaly("man")
 
         # Next, remove data for which any of the bad flags was set in previous QC
         bad_flags = [
