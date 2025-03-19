@@ -97,7 +97,7 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "Invalid sequence,files mentioned in metadatafile are missing in DATA directory",
     },
-    "p": {
+    "per": {
         "description": "sequence not within deployment periods",
         "error": ValueError,
         "error_msg": "sequence not within deployment periods",
@@ -111,5 +111,15 @@ ANOMALIES_DICT = {
         "description": "site-specific clear sky check has failed",
         "error": ValueError,
         "error_msg": "site-specific clear sky check has failed",
+    },
+    "npr": {
+        "description": "no pre-existing files available, while config is set up to reprocess from pre-existing files",
+        "error": ValueError,
+        "error_msg": "no pre-existing files available, while config is set up to reprocess from pre-existing files",
+    },
+    "man": {
+        "description": "this sequences was manually discarded as unreliable in the config file",
+        "error": ValueError,
+        "error_msg": "this sequences was manually discarded as unreliable in the config file",
     },
 }

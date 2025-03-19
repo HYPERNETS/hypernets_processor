@@ -23,7 +23,7 @@ def convert_datetime(
         one_second = np.timedelta64(1, "s")
         seconds_since_epoch = (date_time - unix_epoch) / one_second
         return datetime.datetime.utcfromtimestamp(seconds_since_epoch)
-    elif isinstance(date_time, (float, int, np.uint)):
+    elif isinstance(date_time, (float, int, np.integer)):
         return datetime.datetime.utcfromtimestamp(date_time)
     else:
         if isinstance(date_time, str) and date_time[-1] == "Z":

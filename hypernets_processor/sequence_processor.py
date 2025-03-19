@@ -376,6 +376,7 @@ class SequenceProcessor:
 
         elif len(files) == 0:
             self.context.logger.info("no %s file found for this sequence"%level)
+            self.context.anomaly_handler.add_anomaly("npr")
             return None
 
         file = files[-1]
