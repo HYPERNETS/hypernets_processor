@@ -596,7 +596,8 @@ class PostProcessingDataset:
 
         #make this general so fitted variables and binned variables can be changed
 
-    def new_plane_fitter(self, labelled = False, first_iteration = True, plot = False, method = 'plane_fit'):
+    def new_plane_fitter(self, labelled = False, first_iteration = True,
+                         plot = False, method = 'plane_fit', save_bounds = False, nc_path = None):
 
         self.plane_iteration += 1
 
@@ -613,7 +614,7 @@ class PostProcessingDataset:
         else:
             data_unmasked = self.radiance
 
-        raa_limits_list = ['(30,90)', '(90,150)', '(150,210)', '(210,270)', '(270,330)', '(330,30)']
+        raa_limits_list = ['30_90', '90_150', '150_210', '210_270', '270_330', '330_30']
 
         data_30_90 = raa_binning(data, (30, 90))
         data_90_150 = raa_binning(data, (90, 150))
@@ -633,7 +634,7 @@ class PostProcessingDataset:
 
         data_unmasked_list = [data_unmasked_30_90, data_unmasked_90_150, data_unmasked_150_210, data_unmasked_210_270,
                               data_unmasked_270_330, data_unmasked_330_30]
-
+        ds_dict = {}
         for i in range(len(data_list)):
             data_cutting = data_unmasked_list[i]
             binned95, bin_centers_sza, bin_centers_vza, upper_passes = sza_vza_bin_and_calc(data_list[i],data_cutting, '3sigma_max', 'upper')
@@ -652,14 +653,22 @@ class PostProcessingDataset:
             z_upper = quad_plane((data_cutting[' sza'].values, data_cutting[' vza'].values),
                                  *above)
 
+            bins = [0, 2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5]
+            bin_cents = [(bins[i] + bins[i + 1]) / 2 for i in range(len(bins) - 1)]
+
             if method == 'plane_fit':
                 outliers = data_cutting[(data_cutting[' refl_550nm'] > z_upper) |
                                         (data_cutting[' refl_550nm'] < z_lower)]
                 good_data = data_cutting[(data_cutting[' refl_550nm'] < z_upper) &
                                         (data_cutting[' refl_550nm'] > z_lower)]
             if method == 'bounds':
-                good_data = data_cutting[(upper_passes and lower_passes)]
-                outliers = data_cutting[not (upper_passes and lower_passes)]
+                passes = [True if v is True and lower_passes[i] is True else False for i, v in enumerate(upper_passes)]
+                good_data = data_cutting[passes]
+                outliers = data_cutting[[not el for el in passes]]
+                if save_bounds:
+                    df_both = df_below.rename(columns={'refl': 'lower_bound'})
+                    df_both = df_below.assign(upper_bound = df_above['refl'].values)
+                    ds_dict[f'{raa_limits_list[i]}'] = df_both
             else:
                 print('invalid_method')
                 exit()
@@ -707,6 +716,9 @@ class PostProcessingDataset:
                 outs = pd.concat([outs, outliers], ignore_index=True)
                 good = pd.concat([good, good_data], ignore_index=True)
 
+        if nc_path is not None:
+            for i, key in enumerate(ds_dict.keys()):
+                xr.Dataset.from_dataframe(ds_dict[key]).to_netcdf(nc_path + raa_limits_list[i])
         if labelled:
             for y in self.labelled_radiance['post_processing_flags'][self.labelled_radiance.apply(tuple, axis = 1).isin([tuple(x) for x in outs.values])]:
                 y.append(5)
@@ -966,7 +978,9 @@ def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, r
     print('2nd Iteration')
     dataset.size('good')
     dataset.size('outliers')
-    dataset.new_plane_fitter(first_iteration = False, plot = True, method = fit_method)
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = fit_method,
+                             save_bounds = True,
+                             nc_path = 'rT:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/bounds/GHNAv3_3sig_bounds_')
     print('3rd Iteration')
     dataset.size('good')
     dataset.size('outliers')
