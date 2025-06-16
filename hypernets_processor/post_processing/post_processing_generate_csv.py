@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 # set appropriate folders (different for linux or windows) and settings
 
 # for windows:
-# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
 
 # for eoserver:
-data_path = r"/mnt/t/data/insitu/hypernets/archive"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+#data_path = r"/mnt/t/data/insitu/hypernets/archive"
+# = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
@@ -26,7 +26,7 @@ sites = ["JSIT","GHNA","GHNA", 'WWUK']
 start_times = ["20240409T0000","20220517T0000","20231026T0000", '20240101T0000']
 stop_times = ["20250101T0000","20231018T0000","20250101T0000", '20250101T0000']
 
-wavelength = [415, 490, 550, 675, 740, 765, 870, 1020, 1640]
+wavelength = [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640]
 plot_wavelength = 550
 
 
@@ -130,6 +130,11 @@ SITE_PERIODS = {
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
+        if site != 'WWUK':
+            continue
+        if period['stop_date'] == 'present':
+            continue
+        print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
         start_time = period["start_date"]
         stop_time = period["stop_date"]

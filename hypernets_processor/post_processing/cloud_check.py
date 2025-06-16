@@ -14,9 +14,9 @@ windows_results_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_q
 linux_data_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 windows_data_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-dataframe = pd.read_csv(windows_data_path + r"/joe_irradiance_2022.csv")
+dataframe = pd.read_csv(windows_data_path + r"/JSIT_irradiance.csv")
 wav_df = xr.open_dataset(
-    r"T:\ECO\EOServer\data\insitu\hypernets\archive\GHNA\2022\07\09\SEQ20220709T083129\HYPERNETS_L_GHNA_L1B_IRR_20220709T0831_20231226T2014_v2.0.nc"
+    "T:/ECO/EOServer/data/insitu/hypernets/archive/JSIT/2024/04/09/SEQ20240409T131202/HYPERNETS_L_JSIT_L1B_IRR_20240409T1312_20240409T1637_v2.0.nc"
 )
 wav = wav_df.wavelength.values
 
@@ -45,7 +45,7 @@ def interpolate_irradiance_sza(sza, ds_irr):
 
 def modelled_data_read_and_interp(sza, aod):
     mod_data = xr.open_dataset(
-        r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance_Gobabeb\Gobabeb_clear_sky_aod{}.nc".format(
+        r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\JSIT_clear_sky_medianaod.nc".format(
             aod
         )
     )
@@ -94,17 +94,17 @@ szas = df_clean["SZA"]
 
 
 def read_irr(df):
-    data = np.zeros((df.shape[0], len(df.columns) - 5))
+    data = np.zeros((df.shape[0], len(df.columns) - 7))
 
     for j in range(df.shape[0]):
-        for i in range(len(df.columns) - 5):
+        for i in range(len(df.columns) - 7):
             data[j, i] = df["{}".format(i)][j]
 
     return data
 
 
 data = read_irr(df_clean)
-
+'''
 outliers = pd.read_csv(
     r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_outliers.csv"
 )
@@ -117,25 +117,25 @@ good_IDs = good_data["# id"]
 
 is_outlier = IDs.isin(outliers_IDs)
 print(len(is_outlier))
-
 '''
+
 #plotting
 print(len(szas))
-print(np.argwhere(IDs == 'SEQ20240802T070046'))
-aod_1_data = modelled_data_read_and_interp(szas[3244], 0.1)
+print(np.argwhere(IDs == 'SEQ20240409T131202'))
+aod_1_data = modelled_data_read_and_interp(szas[1], 0.1)
 
-plt.plot(wav, (aod_1_data - data[3244, :])*100/aod_1_data)
+plt.plot(wav[1:], (aod_1_data[1:] - data[1, :])*100/aod_1_data[1:])
 plt.axis([300,1800,-100,100])
 plt.show()
 
-plt.plot(wav, data[3244,:], label = 'Measured Data')
-plt.plot(wav, aod_1_data, label = 'Model')
+plt.plot(wav[1:], data[1,:], label = 'Measured Data')
+plt.plot(wav[1:], aod_1_data[1:], label = 'Model')
 
 plt.ylabel('Irradiance')
 plt.xlabel('Wavelength (nm)')
 plt.legend()
 plt.show()
-'''
+
 
 def check(data, tolerance, wavelength):
     passes = np.zeros((data.shape[0], 4))

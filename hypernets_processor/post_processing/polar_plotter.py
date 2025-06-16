@@ -22,6 +22,9 @@ data_JSIT = pd.read_csv(
     r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/joe/JSIT_dates_times_raa.csv"
 )
 
+data_WWUKv3 = pd.read_csv(
+    r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/WWUKv3_QC_good.csv"
+)
 
 def get_month(data):
     months = []
@@ -35,6 +38,7 @@ def get_month(data):
 data_19 = get_month(data_19)
 data_0875 = get_month(data_0875)
 data_JSIT = get_month(data_JSIT)
+data_WWUKv3 = get_month(data_WWUKv3)
 
 
 def plot_polar_reflectance(
@@ -45,8 +49,9 @@ def plot_polar_reflectance(
 
     vaa = vaa % 360
     saa = saa % 360
+    raa = (saa - vaa + 360) % 360
 
-    vaa_grid = np.arange(8, 368, 15)
+    vaa_grid = np.arange(5, 365, 10)
     vza_grid = np.array([0, 5, 10, 20, 30, 40, 50, 60])
 
     vaa_mesh, vza_mesh = np.meshgrid(np.radians(vaa_grid), vza_grid)
@@ -57,7 +62,7 @@ def plot_polar_reflectance(
     for i in range(len(vaa_grid)):
         for j in range(len(vza_grid)):
             id_series = np.where(
-                (np.abs(vaa - vaa_grid[i]) < vaa_tol)
+                (np.abs(raa - vaa_grid[i]) < vaa_tol)
                 & (np.abs(vza - vza_grid[j]) < vza_tol)
             )[0]
             if len(id_series) == 1:
@@ -214,5 +219,19 @@ def monthly_plotter(data, name):
 
 # plot_polar_reflectance_std(results_path + 'test.png', data_subset[' vza'].values, data_subset[' vaa'].values, data_subset[' refl_550nm'].values, 550)
 # monthly_plotter(data_19, '1_9')
-# monthly_plotter(data_0875, '0_875')
-monthly_plotter(data_JSIT, "JSIT")
+#monthly_plotter(data_WWUKv3, 'WWUKv3')
+aug = data_WWUKv3[data_WWUKv3['month'] == '08']
+sep = data_WWUKv3[data_WWUKv3['month'] == '09']
+
+def plot_month(data, plotname):
+    plot_polar_reflectance(results_path + plotname,
+                        data[' vza'].values,
+                        data[' vaa'].values,
+                        data[' sza'].values,
+                        data[' saa'].values,
+                        data[' refl_550nm'].values,
+                       550)
+
+plot_month(aug, 'WWUKv3_aug.png')
+plot_month(sep, 'WWUKv3_sep.png')
+
