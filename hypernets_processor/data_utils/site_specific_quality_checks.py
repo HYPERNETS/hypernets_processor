@@ -64,6 +64,9 @@ class SiteSpecificQualityChecks:
         bad_sequences_period = ast.literal_eval(
             self.context.get_config_value("bad_sequences_period")
         )
+        limit_tod_period = ast.literal_eval(
+            self.context.get_config_value("limit_tod_period")
+        )
         bad_viewing_angles_period = ast.literal_eval(
             self.context.get_config_value("bad_viewing_angles_period")
         )
@@ -114,6 +117,15 @@ class SiteSpecificQualityChecks:
         # anomaly is raised if data has not been found within deployment periods
         if not seq_within_period:
             self.context.anomaly_handler.add_anomaly("per")
+
+        # anomaly is raised if data is outside time of day limits
+        if limit_tod_period[i_dep_save] is not None and ((convert_datetime(
+                dataset_l2a.acquisition_time.values.max()
+            ).time() < datetime.time.fromisoformat(limit_tod_period[i_dep_save][0])) or (convert_datetime(
+                dataset_l2a.acquisition_time.values.min()
+            ).time() > datetime.time.fromisoformat(limit_tod_period[i_dep_save][1]))):
+            self.context.anomaly_handler.add_anomaly("tod")
+
 
         # anomaly is raised if system id does not match hypstar SN in deployment period
         if (
@@ -310,7 +322,6 @@ class SiteSpecificQualityChecks:
         vaa = dataset_l2b.viewing_azimuth_angle.values
 
         bounds_down, bounds_up = self.calculate_bounds(ds_bounds,sza,saa,vza,vaa)
-        print(bounds_up, bounds_down, dataset_l2b.reflectance.values[i_550, :],dataset_l2a.reflectance.values[i_550, :], (vaa-saa)%360, vza, sza )
         id_series_valid = np.where((dataset_l2b.reflectance.values[i_550, :] < bounds_up) & (dataset_l2b.reflectance.values[i_550, :] > bounds_down))[0]
         dataset_l2b = dataset_l2b.isel(series=id_series_valid)
 
@@ -350,6 +361,10 @@ class SiteSpecificQualityChecks:
             if self.context.get_config_value("plot_polar_wav") is not None:
                 self.plot.plot_polar_reflectance(
                     dataset_l2b, self.context.get_config_value("plot_polar_wav")
+                )
+            if self.context.get_config_value("plot_polar_ndvi"):
+                self.plot.plot_polar_reflectance(
+                    dataset_l2b, "ndvi"
                 )
             if self.context.get_config_value("plot_uncertainty"):
                 self.plot.plot_relative_uncertainty("reflectance", dataset_l2b, refl=True)

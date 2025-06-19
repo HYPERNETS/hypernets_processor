@@ -249,6 +249,10 @@ class SurfaceReflectance:
                     self.plot.plot_polar_reflectance(
                         dataset_l2a, self.context.get_config_value("plot_polar_wav")
                     )
+                if self.context.get_config_value("plot_polar_ndvi") is not None:
+                    self.plot.plot_polar_reflectance(
+                        dataset_l2a, "ndvi"
+                    )
             if self.context.get_config_value("plot_uncertainty"):
                 self.plot.plot_relative_uncertainty(
                     "reflectance", dataset_l2a, refl=True

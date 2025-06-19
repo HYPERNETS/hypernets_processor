@@ -50,7 +50,7 @@ def process_sequence():
 
     #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20231011T144127"
     #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20240920T113036"
-    job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20240920T110130"
+    job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20231025T130126"
     #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\SEQ20240813T140042"
 
 

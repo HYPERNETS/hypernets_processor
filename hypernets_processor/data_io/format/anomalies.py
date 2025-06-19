@@ -102,6 +102,11 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "sequence not within deployment periods",
     },
+    "tod": {
+        "description": "sequence not within selected time of day",
+        "error": ValueError,
+        "error_msg": "sequence not within selected time of day",
+    },
     "hsn": {
         "description": "HYPSTAR_SN does not match deployment periods",
         "error": ValueError,
