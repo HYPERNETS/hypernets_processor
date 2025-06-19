@@ -84,7 +84,8 @@ def get_target_sequences(context, to_archive):
             )
             if anomaly["anomaly_id"] != "m"
         ]
-
+        print(processed_products)
+        print(failed_products)
         complete_products = processed_products + failed_products
 
         raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
