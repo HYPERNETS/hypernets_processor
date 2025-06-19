@@ -907,11 +907,11 @@ class SiteSpecificQualityChecks:
             lower_bounds = refl_bounds_ds.lower_bound.values.flatten()
             upper_bounds = refl_bounds_ds.upper_bound.values.flatten()
             id_360 = np.where(raa_bounds==360)[0]
-            sza_bounds = np.concat([sza_bounds[id_360],sza_bounds])
-            vza_bounds = np.concat([vza_bounds[id_360],vza_bounds])
-            raa_bounds = np.concat([np.zeros_like(raa_bounds[id_360]),raa_bounds])
-            lower_bounds = np.concat([lower_bounds[id_360],lower_bounds])
-            upper_bounds = np.concat([upper_bounds[id_360],upper_bounds])
+            sza_bounds = np.concatenate([sza_bounds[id_360],sza_bounds])
+            vza_bounds = np.concatenate([vza_bounds[id_360],vza_bounds])
+            raa_bounds = np.concatenate([np.zeros_like(raa_bounds[id_360]),raa_bounds])
+            lower_bounds = np.concatenate([lower_bounds[id_360],lower_bounds])
+            upper_bounds = np.concatenate([upper_bounds[id_360],upper_bounds])
             id_valid = np.where(np.isfinite(lower_bounds))[0]
             # id_valid = np.where((np.isfinite(lower_bounds)) & (sza_bounds < 30) & (vza_bounds < 15))[0]
 

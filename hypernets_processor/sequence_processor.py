@@ -105,9 +105,9 @@ class SequenceProcessor:
         if self.context.get_config_value("reprocess_from"):
             directory=writer.return_directory()
             if self.context.get_config_value("reprocess_from").upper() == "L2A":
-                L2a = self.find_preexisting_file(directory, "L2A")
                 L1b_rad = self.find_preexisting_file(directory, "L1B_RAD")
                 L1b_irr = self.find_preexisting_file(directory, "L1B_IRR")
+                L2a = self.find_preexisting_file(directory, "L2A")
             elif self.context.get_config_value("reprocess_from").upper()=="L1B":
                 L1b_rad = self.find_preexisting_file(directory,"L1B_RAD")
                 L1b_irr = self.find_preexisting_file(directory,"L1B_IRR")
