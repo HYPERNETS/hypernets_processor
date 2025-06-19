@@ -17,7 +17,7 @@ results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment"
 data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv', delimiter = ',')
 data.drop('Unnamed: 0', axis = 'columns')
 
-data_v1 = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v1_analysis.csv', delimiter = ',')
+data_v1 = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_JAESv3_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
 
@@ -68,7 +68,7 @@ data_after_may24 = data.sel(date = slice('2024-05-24', '2025-01-01'))
 
 #cloud check and flag removal
 data_v1 = data_v1[data_v1['model_550nm']*0.9 < data_v1['obs_550nm']]
-data_v1 = data_v1[data_v1['model_550nm']*1.1 > data_v1['obs_550nm']]
+data_v1 = data_v1[data_v1['model_550nm']*1.2 > data_v1['obs_550nm']]
 data_v1 = data_v1[data_v1['Flag'] == 0]
 
 #format data_v1
@@ -144,7 +144,7 @@ def ratio_calculator_offset(vza, vaa, offset, sza, saa, direct_to_diffuse=1000):
     new_direct_to_diffuse=direct_to_diffuse*np.cos(new_sza)/np.cos(sza)
     return (new_direct_to_diffuse+1) / (direct_to_diffuse+1) + offset
 
-def ratio_calculator_10offsets(vza, vaa, offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10, sza, saa, direct_to_diffuse=1000):
+def ratio_calculator_10offsets(vza, vaa, offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10, offset11, offset12, sza, saa, direct_to_diffuse=1000):
     if vza < 0:
         vza = -vza
         vaa += -180
@@ -156,7 +156,7 @@ def ratio_calculator_10offsets(vza, vaa, offset, offset2, offset3, offset4, offs
     #new_sza = np.cos(sza + vza*np.cos((saa - vaa + 360) % 360))
     new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
     new_direct_to_diffuse=direct_to_diffuse*np.cos(new_sza)/np.cos(sza)
-    offsets=np.array([offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10])
+    offsets=np.array([offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10, offset11, offset12])
     return (new_direct_to_diffuse+1) / (direct_to_diffuse+1) + offsets[:,None]
 
 def ratio_uncertainty_calculator(vza, vaa, sza, saa, u_vza, u_vaa):
@@ -392,13 +392,13 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
         measured_ratio,
         rand_uncertainty=0.05,
         syst_uncertainty=0.05,
-        initial_guess=[2, -40, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
-        downlims=[-90, -180, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-        uplims=[90, 180, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        initial_guess=[2, -40, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+        downlims=[-90, -360, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 , -1],
+        uplims=[90, 360, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         # initial_guess=[2, -40,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         # downlims=[-90, -180, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
         # uplims=[90, 180, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-        n_input=12,
+        n_input=14,
         b=[sza, saa, dir_diff_ratio],
         u_b=[0, 0, 0],
         b_iter=1,
@@ -408,13 +408,13 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
         100, 10000, 1000, return_corr=True, return_samples=True
     )
     chisq = mcmc.find_chisum(mean)
-    print('CHI',len(sza) - 12, chisq, chisq/(len(sza) - 12))
+    print('CHI',len(sza) - 14, chisq, chisq/(len(sza) - 14))
 
 
     plot_corner(
          samples,
          os.path.join(results_path, "plot_corner_%s.png" % plot_name),
-         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
+         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10', 'offset11', 'offset12'],
      )
 #    plot_trace(
  #        samples,
@@ -931,6 +931,8 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
 
     return ma_dict
 
+#wav_together_misalignment_calculator_offset(data_v1, wavelengths, 'JSIT')
+
 '''
 ma_dict = {'mean': {}, 'unc': {}}
 for wv in ratio_dict.keys():
@@ -954,7 +956,7 @@ time = ['0700', '0730', '0800', '0830', '0900', '0930', '1000', '1030', '1100', 
         '1500', '1530']
 # wavelengths = ["550"]
 
-
+'''
 times=np.array([int(x) for x in data_before_may24.time.values])
 i_time_val=np.where((times>800))[0]
 data_before_may24=data_before_may24.isel(date=i_time_val)
@@ -970,39 +972,39 @@ data_v1=data_v1.isel(date=i_time_val)
 # before_dict = wav_separated_misalignment_calculator(data_before_may24, wavelengths)
 # after_dict = wav_separated_misalignment_calculator(data_after_may24, wavelengths)
 # all_dict = wav_separated_misalignment_calculator(data, wavelengths)
+'''
 
-
-before_dict = wav_together_misalignment_calculator_offset(data_before_may24, wavelengths, 'GHNAv3_before')
-after_dict = wav_together_misalignment_calculator_offset(data_after_may24, wavelengths, 'GHNAv3_after')
-v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, 'GHNAv1')
+#before_dict = wav_together_misalignment_calculator_offset(data_before_may24, wavelengths, 'GHNAv3_before')
+#after_dict = wav_together_misalignment_calculator_offset(data_after_may24, wavelengths, 'GHNAv3_after')
+v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, 'JAESv3')
 
 for wav in wavelengths:
     fig, axs = plt.subplots(5, 1, sharex=True, figsize = (6,10))
 
-    before_dict['time'][f'{wav}'] = [int(x) for x in before_dict['time'][f'{wav}']]
-    after_dict['time'][f'{wav}'] = [int(x) for x in after_dict['time'][f'{wav}']]
+    #before_dict['time'][f'{wav}'] = [int(x) for x in before_dict['time'][f'{wav}']]
+    #after_dict['time'][f'{wav}'] = [int(x) for x in after_dict['time'][f'{wav}']]
     v1_dict['time'][f'{wav}'] = [int(x) for x in v1_dict['time'][f'{wav}']]
 
-    before_means, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'mean', bins = bins)
-    before_std, be, bn  = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
+    #before_means, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'mean', bins = bins)
+    #before_std, be, bn  = binned_statistic(list(before_dict['time'][f'{wav}']), list(before_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
 
-    after_means, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']), list(after_dict['ratio_grid'][f'{wav}']), statistic = 'mean', bins = bins)
-    after_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']), list(after_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
+    #after_means, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']), list(after_dict['ratio_grid'][f'{wav}']), statistic = 'mean', bins = bins)
+    #after_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']), list(after_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
 
     v1_means, bin_edges, binnumber = binned_statistic(list(v1_dict['time'][f'{wav}']), list(v1_dict['ratio_grid'][f'{wav}']), statistic = 'mean', bins = bins)
     v1_std, bin_edge, binnumbe = binned_statistic(list(v1_dict['time'][f'{wav}']), list(v1_dict['ratio_grid'][f'{wav}']), statistic = 'std', bins = bins)
 
-    before_obs_means, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
-                                                list(before_dict['obs_grid'][f'{wav}']), statistic='mean', bins=bins)
-    before_obs_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
-                                              list(before_dict['obs_grid'][f'{wav}']), statistic='std', bins=bins)
+    #before_obs_means, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+     #                                           list(before_dict['obs_grid'][f'{wav}']), statistic='mean', bins=bins)
+    #before_obs_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+     #                                         list(before_dict['obs_grid'][f'{wav}']), statistic='std', bins=bins)
 
-    after_obs_means, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
-                                                             list(after_dict['obs_grid'][f'{wav}']), statistic='mean',
-                                                             bins=bins)
-    after_obs_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
-                                                         list(after_dict['obs_grid'][f'{wav}']), statistic='std',
-                                                         bins=bins)
+    #after_obs_means, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
+     #                                                        list(after_dict['obs_grid'][f'{wav}']), statistic='mean',
+      #                                                       bins=bins)
+    #after_obs_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
+     #                                                    list(after_dict['obs_grid'][f'{wav}']), statistic='std',
+      #                                                   bins=bins)
 
     v1_obs_means, bin_edges, binnumber = binned_statistic(list(v1_dict['time'][f'{wav}']),
                                                            list(v1_dict['obs_grid'][f'{wav}']), statistic='mean',
@@ -1010,17 +1012,17 @@ for wav in wavelengths:
     v1_obs_std, bin_edge, binnumbe = binned_statistic(list(v1_dict['time'][f'{wav}']),
                                                        list(v1_dict['obs_grid'][f'{wav}']), statistic='std', bins=bins)
 
-    before_corr_means, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
-                                                list(before_dict['corr_grid'][f'{wav}']), statistic='mean', bins=bins)
-    before_corr_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
-                                              list(before_dict['corr_grid'][f'{wav}']), statistic='std', bins=bins)
+    #before_corr_means, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+     #                                           list(before_dict['corr_grid'][f'{wav}']), statistic='mean', bins=bins)
+    #before_corr_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+     #                                         list(before_dict['corr_grid'][f'{wav}']), statistic='std', bins=bins)
 
-    after_corr_means, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
-                                                             list(after_dict['corr_grid'][f'{wav}']), statistic='mean',
-                                                             bins=bins)
-    after_corr_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
-                                                         list(after_dict['corr_grid'][f'{wav}']), statistic='std',
-                                                         bins=bins)
+    #after_corr_means, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
+     #                                                        list(after_dict['corr_grid'][f'{wav}']), statistic='mean',
+      #                                                       bins=bins)
+    #after_corr_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
+     #                                                    list(after_dict['corr_grid'][f'{wav}']), statistic='std',
+      #                                                   bins=bins)
 
     v1_corr_means, bin_edges, binnumber = binned_statistic(list(v1_dict['time'][f'{wav}']),
                                                            list(v1_dict['corr_grid'][f'{wav}']), statistic='mean',
@@ -1028,17 +1030,17 @@ for wav in wavelengths:
     v1_corr_std, bin_edge, binnumbe = binned_statistic(list(v1_dict['time'][f'{wav}']),
                                                        list(v1_dict['corr_grid'][f'{wav}']), statistic='std', bins=bins)
 
-    before_sza, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
-                                              data_before_may24.sza.values, statistic='median', bins=bins)
-    before_sza_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
-                                         data_before_may24.sza.values, statistic='std', bins=bins)
+    #before_sza, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+     #                                         data_before_may24.sza.values, statistic='median', bins=bins)
+    #before_sza_std, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
+     #                                    data_before_may24.sza.values, statistic='std', bins=bins)
 
-    after_sza, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
-                                                           data_after_may24.sza.values, statistic='median',
-                                                           bins=bins)
-    after_sza_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
-                                                     data_after_may24.sza.values, statistic='std',
-                                                     bins=bins)
+    #after_sza, bin_edges, binnumber = binned_statistic(list(after_dict['time'][f'{wav}']),
+        #                                                   data_after_may24.sza.values, statistic='median',
+           #                                                bins=bins)
+    #after_sza_std, bin_edge, binnumbe = binned_statistic(list(after_dict['time'][f'{wav}']),
+         #                                            data_after_may24.sza.values, statistic='std',
+      #                                               bins=bins)
 
     v1_sza, bin_edges, binnumber = binned_statistic(list(v1_dict['time'][f'{wav}']),
                                                          data_v1.sza.values, statistic='median',
@@ -1046,36 +1048,34 @@ for wav in wavelengths:
     v1_sza_std, bin_edge, binnumbe = binned_statistic(list(v1_dict['time'][f'{wav}']),
                                                    data_v1.sza.values, statistic='std', bins=bins)
 
-    axs[1].errorbar(time, before_means, yerr=before_std, linestyle='', marker='x', capsize=5, color='red',
-                    label='2023-10-26 - 2024-05-23')
-    axs[1].errorbar(time, after_means, yerr=after_std, linestyle='', marker='x', capsize=5, color='green',
-                    label='2024-05-24 - present')
-    axs[1].errorbar(time, v1_means, yerr=v1_std, linestyle='', marker='x', capsize=5, color='blue',
-                    label="2022-05-17 - 2023-10-17")
+    #axs[1].errorbar(time, before_means, yerr=before_std, linestyle='', marker='x', capsize=5, color='red',
+      #              label='2023-10-26 - 2024-05-23')
+    #axs[1].errorbar(time, after_means, yerr=after_std, linestyle='', marker='x', capsize=5, color='green',
+             #       label='2024-05-24 - present')
+    axs[1].errorbar(time, v1_means, yerr=v1_std, linestyle='', marker='x', capsize=5, color='blue')
 
-    axs[0].errorbar(time, before_obs_means, yerr=before_obs_std, linestyle='', marker='x', capsize=5, color='red',
-                    label='2023-10-26 - 2024-05-23')
-    axs[0].errorbar(time, after_obs_means, yerr=after_obs_std, linestyle='', marker='x', capsize=5, color='green',
-                    label='2024-05-24 - present')
-    axs[0].errorbar(time, v1_obs_means, yerr=v1_obs_std, linestyle='', marker='x', capsize=5, color='blue',
-                    label="2022-05-17 - 2023-10-17")
+    #axs[0].errorbar(time, before_obs_means, yerr=before_obs_std, linestyle='', marker='x', capsize=5, color='red',
+              #      label='2023-10-26 - 2024-05-23')
+    #axs[0].errorbar(time, after_obs_means, yerr=after_obs_std, linestyle='', marker='x', capsize=5, color='green',
+               #     label='2024-05-24 - present')
+    axs[0].errorbar(time, v1_obs_means, yerr=v1_obs_std, linestyle='', marker='x', capsize=5, color='blue')
 
-    axs[2].scatter(time, before_obs_means-before_means, linestyle = '', marker = 'x', color = 'red')
-    axs[2].scatter(time, after_obs_means-after_means, linestyle='', marker='x', color='green')
+    #axs[2].scatter(time, before_obs_means-before_means, linestyle = '', marker = 'x', color = 'red')
+    #axs[2].scatter(time, after_obs_means-after_means, linestyle='', marker='x', color='green')
     axs[2].scatter(time, v1_obs_means-v1_means , linestyle='', marker='x', color='blue')
 
 
-    axs[3].errorbar(time, before_corr_means, yerr=before_corr_std, linestyle='', marker='x', capsize=5, color='red',
-                    label='before')
-    axs[3].errorbar(time, after_corr_means, yerr=after_corr_std, linestyle='', marker='x', capsize=5, color='green',
-                    label='after')
+    #axs[3].errorbar(time, before_corr_means, yerr=before_corr_std, linestyle='', marker='x', capsize=5, color='red',
+          #          label='before')
+    #axs[3].errorbar(time, after_corr_means, yerr=after_corr_std, linestyle='', marker='x', capsize=5, color='green',
+        #            label='after')
     axs[3].errorbar(time, v1_corr_means, yerr=v1_corr_std, linestyle='', marker='x', capsize=5, color='blue',
                     label='v1')
 
-    axs[4].errorbar(time, before_sza, yerr=before_sza_std, linestyle='', marker='x', capsize=5, color='red',
-                    label='before')
-    axs[4].errorbar(time, after_sza, yerr=after_sza_std, linestyle='', marker='x', capsize=5, color='green',
-                    label='after')
+    #axs[4].errorbar(time, before_sza, yerr=before_sza_std, linestyle='', marker='x', capsize=5, color='red',
+         #           label='before')
+    #axs[4].errorbar(time, after_sza, yerr=after_sza_std, linestyle='', marker='x', capsize=5, color='green',
+       #             label='after')
     axs[4].errorbar(time, v1_sza, yerr=v1_sza_std, linestyle='', marker='x', capsize=5, color='blue',
                     label='v1')
 
@@ -1099,7 +1099,7 @@ for wav in wavelengths:
     fig.suptitle(f'{wav}')
 
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'GHNA_ratio_tod_plot_{wav}.png'))
+    fig.savefig(os.path.join(results_path , f'JAESv3_ratio_tod_plot_{wav}.png'))
 
 
 

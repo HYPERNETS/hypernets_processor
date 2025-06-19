@@ -12,13 +12,13 @@ import pandas as pd
 # set appropriate folders (different for linux or windows) and settings
 data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
 results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
-site = "JSIT"
+site = "JAES"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
-start_time = "20240409T0000"
-stop_time = "20250101T0000"
+start_time = "20230414T0000"
+stop_time = "20240509T0000"
 wavelength = 550
 
 # start_tod = ["0900","0930","1000","1030","1100"]
@@ -46,8 +46,7 @@ def find_nearest_to_wav(array, wv, value):
 
 
 data_clear = xr.open_dataset(
-    r"T:\ECO\EOServer\data\insitu\hypernets\archive\JSIT\2024\08\06\SEQ20240806T083043\HYPERNETS_L_JSIT_L1B_IRR_20240806T0830_20240806T1018_v2.0.nc"
-)
+    "T:/ECO/EOServer/data/insitu/hypernets/archive/JAES/2023/10/03/SEQ20231003T083048/HYPERNETS_L_JAES_L1B_IRR_20231003T0830_20240110T1315_v2.0.nc")
 wav_ori = data_clear.wavelength.values
 
 print("Got wavelengths")
@@ -92,13 +91,18 @@ def make_irrs(file_list, wav_val):
         irrs = pd.DataFrame(columns=['ID', 'Flag', 'SZA', 'SAA'])
         refl = np.zeros((len(file_list)*2, len(wav_ori)))
         for j in range(len(file_list)):
-            irr1, irr2, wav, qual, sza, saa = get_irr(file_list[j], wav_val = wav_val)
-            new_row1 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[0], 'SZA': sza[0], 'SAA': saa[0]})
-            new_row2 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[1], 'SZA': sza[1], 'SAA': saa[1]})
-            irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
-            irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
-            refl[2 * j, :] = irr1
-            refl[2 * j + 1, :] = irr2
+            try:
+                irr1, irr2, wav, qual, sza, saa = get_irr(file_list[j], wav_val = wav_val)
+                new_row1 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[0], 'SZA': sza[0], 'SAA': saa[0]})
+                new_row2 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[1], 'SZA': sza[1], 'SAA': saa[1]})
+                irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
+                irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
+                refl[2 * j, :] = irr1
+                refl[2 * j + 1, :] = irr2
+            except Exception as e:
+                print('failed due to', e)
+                refl[2 * j, :] = np.ones(len(wav_ori)) * -999
+                refl[2 * j + 1, :] = np.ones(len(wav_ori)) * -999
         for k in range(len(wav_ori)):
             irrs.insert(len(irrs.columns), "{}".format(k), refl[:, k])
     else:
@@ -124,13 +128,13 @@ def make_irrs(file_list, wav_val):
             irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
             irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
 
-    irrs.to_csv(results_path + '\JSIT_irradiance.csv', index=False)
+    irrs.to_csv(results_path + '\JAESv1_irradiance.csv', index=False)
     return irrs
 
 
 ##running
 
-files = glob.glob(os.path.join(data_path, "JSIT", "*", "*", "*", "*", "*L1B_IRR*.nc"))
+files = glob.glob(os.path.join(data_path, "JAES", "*", "*", "*", "*", "*L1B_IRR*.nc"))
 
 print("Files In")
 

@@ -5,6 +5,11 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import os
 from scipy.stats import binned_statistic_2d
+from scipy.ndimage import gaussian_filter
+from scipy.interpolate import CloughTocher2DInterpolator, LinearNDInterpolator
+import math
+import datetime
+import matplotlib
 import glob
 from seaborn.external.docscrape import header
 
@@ -58,11 +63,11 @@ def percentile_3sigma_min(array):
 def percentile_3sigma_max(array):
     return np.nanpercentile(array, 99.7)
 
-def sza_vza_bin_and_calc(data,cutting_data, stat, bound):
+def sza_vza_bin_and_calc(data,cutting_data, stat, bound, input_data = None, input_wav = '550'):
     sza = data[' sza'].values
     vza = data[' vza'].values
-    refl = data[' refl_550nm'].values
-    cutting_refl = cutting_data[' refl_550nm'].values
+    refl = data[f' refl_{input_wav}nm'].values
+    cutting_refl = cutting_data[f' refl_{input_wav}nm'].values
     cutting_sza = cutting_data[' sza'].values
     cutting_vza = cutting_data[' vza'].values
 
@@ -97,9 +102,24 @@ def sza_vza_bin_and_calc(data,cutting_data, stat, bound):
         binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile_3sigma_min, bins, expand_binnumbers=True)
     elif stat == '3sigma_max':
         binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, percentile_3sigma_max, bins, expand_binnumbers=True)
+    elif stat == 'count':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, 'count', bins, expand_binnumbers=True)
+    elif stat == 'std':
+        binned_data, x, y, b = binned_statistic_2d(sza, vza, refl, 'std', bins, expand_binnumbers=True)
+    elif stat == 'median_plus_3std':
+        binned_std, x, y, b = binned_statistic_2d(sza, vza, refl, 'std', bins, expand_binnumbers=True)
+        binned_median, x, y, b = binned_statistic_2d(sza, vza, refl, 'median', bins, expand_binnumbers=True)
+        binned_data = binned_median + 3*binned_std
+    elif stat == 'median_minus_3std':
+        binned_std, x, y, b = binned_statistic_2d(sza, vza, refl, 'std', bins, expand_binnumbers=True)
+        binned_median, x, y, b = binned_statistic_2d(sza, vza, refl, 'median', bins, expand_binnumbers=True)
+        binned_data = binned_median - 3*binned_std
     else:
         print('stat not supported')
         binned_data, x, y, b = None, None, None, None
+
+    if input_data is not None:
+        binned_data = input_data
 
     refl_output = []
     sza_output = []
@@ -120,7 +140,7 @@ def sza_vza_bin_and_calc(data,cutting_data, stat, bound):
                 sza_output.append(bin_centers[i])
                 vza_output.append(bin_centers[j])
 
-    return refl_output, sza_output, vza_output, bound_passes
+    return refl_output, sza_output, vza_output, bound_passes, binned_data
 
 def raa_binning(data, raa_limits):
 
@@ -139,11 +159,19 @@ def quad_plane(xy, a, b, c, d, e, f):
     x, y = xy
     return a + b * x + c * y + d * x**2 + e * y**2 + f * x * y
 
+def linear_plane(xy, a, b, c):
+    x, y = xy
+    return a + b*x + c*y
 
-def plane_fit_and_plot(data, data_setting, stds):
+def cubic_plane(xy, a, b, c, d, e, f, g, h, i, j):
+    x, y = xy
+    return a + b*x + c*y + d*x**2 + e*y**2 + f*x*y + g*x**3 + h*y**3 + i*x*y**2 + j*y*x**2
+
+
+def plane_fit_and_plot(data, data_setting, stds, plot = True, raa_bin = None, iteration = 0, input_wav = '550'):
     x = data[" sza"].values
     y = data[" vza"].values
-    z = data[" refl_550nm"].values
+    z = data[f' refl_{input_wav}nm'].values
 
     popt, pcov = curve_fit(quad_plane, (x, y), z)
     below = popt - stds * np.sqrt(np.diag(pcov))
@@ -151,32 +179,115 @@ def plane_fit_and_plot(data, data_setting, stds):
 
     z_below = (
         quad_plane((data_setting[" sza"].values, data_setting[" vza"].values), *below)
-        - data_setting[" refl_550nm"].values * 0.05
+        #- data_setting[" refl_550nm"].values * 0.05
     )
     z_above = (
         quad_plane((data_setting[" sza"].values, data_setting[" vza"].values), *above)
-        + data_setting[" refl_550nm"].values * 0.05
+        #+ data_setting[" refl_550nm"].values * 0.05
     )
 
     outliers = data_setting[
-        (data_setting[" refl_550nm"] > z_above)
-        | (data_setting[" refl_550nm"] < z_below)
+        (data_setting[f' refl_{input_wav}nm'] > z_above)
+        | (data_setting[f' refl_{input_wav}nm'] < z_below)
     ]
     good_data = data_setting[
-        (data_setting[" refl_550nm"] < z_above)
-        & (data_setting[" refl_550nm"] > z_below)
+        (data_setting[f' refl_{input_wav}nm'] < z_above)
+        & (data_setting[f' refl_{input_wav}nm'] > z_below)
     ]
     good_data.reset_index(drop=True, inplace=True)
     outliers.reset_index(drop=True, inplace=True)
 
+    if plot:
+        x_range = np.linspace(0, 61, 1000)
+        y_range = np.linspace(0, 61, 1000)
+        X, Y = np.meshgrid(x_range, y_range)
+        '''
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+
+        ax.scatter(
+            data_setting[" sza"].values,
+            data_setting[" vza"].values,
+            data_setting[" refl_550nm"].values,
+        )
+
+       
+
+        
+        Z = quad_plane((X, Y), *popt)
+        Z_below = quad_plane((X, Y), *below)
+        Z_above = quad_plane((X, Y), *above)
+
+        ax.plot_surface(X, Y, Z, alpha=0.5)
+        ax.plot_surface(X, Y, Z_above, alpha=0.5)
+        ax.plot_surface(X, Y, Z_below, alpha=0.5)
+
+        ax.set_xlabel("SZA")
+        ax.set_ylabel("VZA")
+        ax.set_zlabel("Reflectance")
+        # fig.savefig(results_path + title)
+        plt.show()
+        '''
+
+        fig, axs = plt.subplots(1, 3, figsize=(6, 4), sharey=True)
+        for i in range(3):
+            axs[i].plot(Y, quad_plane(((i + 1) * 20, Y), *popt), color="black", alpha = 0.1)
+            axs[i].plot(
+                Y, quad_plane(((i + 1) * 20, Y), *below), color="black"
+            )
+            axs[i].plot(
+                Y, quad_plane(((i + 1) * 20, Y), *above), color="black"
+            )
+            axs[i].set_title(f"SZA = {(i+1)*20}")
+            axs[i].scatter(
+                data_setting[
+                    data_setting[" sza"].between((i + 1) * 20 - 1, (i + 1) * 20 + 1)
+                ][" vza"].values,
+                data_setting[
+                    data_setting[" sza"].between((i + 1) * 20 - 1, (i + 1) * 20 + 1)
+                ][f' refl_{input_wav}nm'].values,
+                color="black",
+                s=5,
+            )
+            axs[i].scatter(
+                good_data[
+                    good_data[" sza"].between((i + 1) * 20 - 1, (i + 1) * 20 + 1)
+                ][" vza"].values,
+                good_data[
+                    good_data[" sza"].between((i + 1) * 20 - 1, (i + 1) * 20 + 1)
+                ][f' refl_{input_wav}nm'].values,
+                color="green",
+                s=5,
+            )
+            axs[i].scatter(
+                outliers[
+                    outliers[" sza"].between((i + 1) * 20 - 1, (i + 1) * 20 + 1)
+                ][" vza"].values,
+                outliers[
+                    outliers[" sza"].between((i + 1) * 20 - 1, (i + 1) * 20 + 1)
+                ][f' refl_{input_wav}nm'].values,
+                color="red",
+                s=5,
+            )
+            axs[i].set_xlabel("VZA")
+            axs[0].set_ylabel("Reflectance")
+            fig.suptitle(raa_bin)
+            fig.savefig(r'T:/ECO/EOServer/joe/hypernets_plots/plane_models/' + f'sza_slices_plane_{raa_bin}_{iteration}.png')
+            plt.close()
+
     return outliers, good_data
 
-def new_plane_fit(input_sza, input_vza, input_refl):
+def new_plane_fit(input_sza, input_vza, input_refl, plane_type = 'quad', count = None):
     x = input_sza
     y = input_vza
     z = input_refl
 
-    popt, pcov = curve_fit(quad_plane, (x, y), z, nan_policy = 'omit')
+    if plane_type == 'quad':
+        popt, pcov = curve_fit(quad_plane, (x, y), z, nan_policy = 'omit', sigma = count)
+    elif plane_type == 'linear':
+        popt, pcov = curve_fit(linear_plane, (x, y), z, nan_policy='omit', sigma=count)
+    elif plane_type == 'cubic':
+        popt, pcov = curve_fit(cubic_plane, (x, y), z, nan_policy='omit', sigma = count)
 
     return popt, pcov
 
@@ -193,12 +304,12 @@ def ratio_calculator(vza, vaa, sza, saa, direct_to_diffuse):
     #new_sza = np.cos(sza + vza*np.cos((saa - vaa + 360) % 360))
     new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
     new_direct_to_diffuse=direct_to_diffuse*np.cos(new_sza)/np.cos(sza)
-    return (new_direct_to_diffuse+1) / (direct_to_diffuse+1)
+    return (direct_to_diffuse+1) / (new_direct_to_diffuse+1)
 
 
 class PostProcessingDataset:
 
-    def __init__(self, rad_path, irr_path, clear_sky_path, site, clear_sky_aod = None):
+    def __init__(self, rad_path, irr_path, clear_sky_path, site, period_name = None, clear_sky_aod = None, input_wav = '550'):
 
         # read in radiance
         data = pd.read_csv(rad_path)
@@ -223,13 +334,19 @@ class PostProcessingDataset:
         self.irradiance = pd.read_csv(irr_path)
         #define other features
         self.site = site
+        if period_name is None:
+            self.period_name = site
+        else:
+            self.period_name = period_name
         self.cc_radiance = None
         self.radiance_good = None
         self.radiance_outliers = None
         self.cloud_passes = None
         self.cloud_check_tol = None
         self.clear_sky_path = clear_sky_path
+        self.bound_iteration = 0
         self.plane_iteration = 0
+        self.input_wav = input_wav
         if clear_sky_aod is None:
             self.clear_sky_list = compile_irradiance_list(clear_sky_path, site)
             self.clear_sky_aod = None
@@ -268,19 +385,53 @@ class PostProcessingDataset:
 
         data.to_csv(filepath, index=False)
 
+    def calculate_ndvi(self):
+        self.radiance['ndvi'] = ((self.radiance[' refl_842nm'] - self.radiance[' refl_665nm'])/
+                                 (self.radiance[' refl_842nm'] + self.radiance[' refl_665nm']))
+
+    def calculate_savi(self):
+        self.radiance['savi'] = ((self.radiance[' refl_842nm'] - self.radiance[' refl_665nm']) /
+                                 (self.radiance[' refl_842nm'] + self.radiance[' refl_665nm'] + 0.5)) * 1.5
+
+    def calculate_s2tci(self):
+        self.radiance['s2tci'] = ((self.radiance[' refl_740nm'] - self.radiance[' refl_705nm']) /
+                                 (self.radiance[' refl_705nm'] - self.radiance[' refl_665nm']))
+
+    def split_by_date(self, start_date, end_date):
+        self.radiance['datetime'] = [datetime.datetime.strptime(x, '%Y%m%d') for x in self.radiance.date]
+        self.radiance = self.radiance[
+            ((self.radiance.datetime < pd.Timestamp(end_date)) &
+             (self.radiance.datetime >= pd.Timestamp(start_date)))]
+
+    def count_by_bin(self):
+        bins = [0, 2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5]
+        bin_centers = [(bins[i] + bins[i + 1]) / 2 for i in range(len(bins) - 1)]
+
+        good_count, sza, vza, b, n = sza_vza_bin_and_calc(self.radiance_good, self.radiance_good, 'count', 'na', input_wav = self.input_wav)
+        out_count, out_sza, out_vza, out_b, out_n = sza_vza_bin_and_calc(self.radiance_outliers, self.radiance_outliers, 'count', 'na', input_wav = self.input_wav)
+        percentage_removed = np.true_divide(np.array(out_count),(np.array(out_count) + np.array(good_count))) * 100
+
+        fig, ax = plt.subplots(1, 1, figsize=(5, 6))
+        img = ax.imshow(percentage_removed.reshape(15,15), origin = 'lower', extent = [0,75,0,75])
+        ax.set_xticks(bin_centers)
+        ax.set_yticks(bin_centers)
+        ax.set_ylabel('SZA')
+        ax.set_xlabel('VZA')
+        fig.colorbar(img)
+        #plt.show()
 
     def basic_outlier_definition(self):
-        mean = self.radiance[" refl_550nm"].mean()
-        stde = self.radiance[" refl_550nm"].std()
+        mean = self.radiance[f' refl_{self.input_wav}nm'].mean()
+        stde = self.radiance[f' refl_{self.input_wav}nm'].std()
         max_range = mean + (stde * 3)
         min_range = mean - (stde * 3)
         outliers = self.radiance[
-            (self.radiance[" refl_550nm"] > max_range)
-            | (self.radiance[" refl_550nm"] < min_range)
+            (self.radiance[f' refl_{self.input_wav}nm'] > max_range)
+            | (self.radiance[f' refl_{self.input_wav}nm'] < min_range)
         ]
         good_data = self.radiance[
-            (self.radiance[" refl_550nm"] < max_range)
-            & (self.radiance[" refl_550nm"] > min_range)
+            (self.radiance[f' refl_{self.input_wav}nm'] < max_range)
+            & (self.radiance[f' refl_{self.input_wav}nm'] > min_range)
         ]
         good_data.reset_index(drop=True, inplace=True)
         outliers.reset_index(drop=True, inplace=True)
@@ -330,6 +481,25 @@ class PostProcessingDataset:
         ]:
             x.append(2)
 
+    def vza_check(self, vza_limit):
+        bad_inds = []
+        for i in range(len(self.radiance)):
+            vza = self.radiance[" vza"][i]
+            if vza < vza_limit:
+                bad_index = i
+                bad_inds.append(bad_index)
+            else:
+                continue
+
+        cleaned_data = self.radiance.drop(bad_inds)
+        cleaned_data.reset_index(drop=True, inplace=True)
+        self.radiance = cleaned_data
+
+        for x in self.labelled_radiance["post_processing_flags"].loc[
+            self.labelled_radiance[" vza"] < vza_limit
+        ]:
+            x.append(999)
+
     def raa_cut(self, raa_limit):
         bad_inds = []
         for i in range(len(self.radiance)):
@@ -359,7 +529,7 @@ class PostProcessingDataset:
         bad_IDs = []
         # find flags in irr data
         for i in range(len(flags)):
-            if flags.values[i] != 0:
+            if (flags.values[i] & 773892) != 0:
                 bad_inds.append(i)
                 bad_flags.append(flags.values[i])
                 bad_IDs.append(IDs[i])
@@ -394,7 +564,7 @@ class PostProcessingDataset:
         for wv in wav_list:
             dir_to_diff = np.zeros(self.radiance.shape[0])
 
-            for i in range(data.shape[0]):
+            for i in range(dir_to_diff.shape[0]):
                 dir_to_diff[i] = find_nearest_to_wav(
                     modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'direct_to_diffuse_irradiance_ratio'),
                     wav, wv)
@@ -449,7 +619,7 @@ class PostProcessingDataset:
             # save passes
             self.cloud_passes = passes
             output_data = np.array([IDs,szas, saas ,model, observ, abs_diff, [x[12:16] for x in IDs], [x[3:11] for x in IDs], self.irradiance['Flag']]).T
-            np.savetxt(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v1_diffs.csv',output_data, fmt = '%s',delimiter=',')
+            #np.savetxt(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v1_diffs.csv',output_data, fmt = '%s',delimiter=',')
 
         cut_IDs = IDs[self.cloud_passes == 1]
 
@@ -485,6 +655,7 @@ class PostProcessingDataset:
             print("radiances not filtered by cloud check")
             self.cc_radiance = new
 
+
     def write_irr_analysis_files(self, filename, wavelengths):
         szas = self.irradiance['SZA']
         IDs = self.irradiance['ID']
@@ -499,12 +670,14 @@ class PostProcessingDataset:
                                     'Time': [x[12:16] for x in IDs],'Date': [x[3:11] for x in IDs],
                                     'Flag': self.irradiance['Flag']})
 
-        for wv in wavelengths:
-            model = np.zeros(self.irradiance.shape[0])
-            observ = np.zeros(self.irradiance.shape[0])
-            dir_to_diff = np.zeros(self.irradiance.shape[0])
+        output_data = output_data[output_data['IDs'].isin(self.radiance['# id'])]
 
-            for i in range(data.shape[0]):
+        for wv in wavelengths:
+            model = np.zeros(output_data.shape[0])
+            observ = np.zeros(output_data.shape[0])
+            dir_to_diff = np.zeros(output_data.shape[0])
+
+            for i in range(output_data.shape[0]):
                 model[i] = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'solar_irradiance_BOA'),
                                                wav, wv)
                 observ[i] = find_nearest_to_wav(data[i, :], wav, wv)
@@ -514,16 +687,19 @@ class PostProcessingDataset:
             output_data[f'model_{wv}nm'] = model
             output_data[f'obs_{wv}nm'] = observ
             output_data[f'dir_diff_ratio_{wv}nm'] = dir_to_diff
+            output_data[f'ratio_{wv}nm'] = model/observ
 
         output_data.to_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\{}.csv'.format(filename))
 
-    def plane_fitter(self, labelled = False):
+    def plane_fitter(self, labelled = False, plot = False):
 
         if self.cc_radiance is None:
             self.cc_radiance = self.radiance
 
         # define datasets
-        data = self.cc_radiance
+        #data = self.cc_radiance
+        data = self.radiance_good
+        self.plane_iteration += 1
 
         if labelled:
             data_unmasked = self.labelled_radiance
@@ -561,13 +737,14 @@ class PostProcessingDataset:
             data_unmasked_270_330,
             data_unmasked_330_30,
         ]
+        raa_limits_list = ['30_90', '90_150', '150_210', '210_270', '270_330', '330_30']
 
-        outs, good = plane_fit_and_plot(data_list[0], data_unmasked_list[0], 3)
+        outs, good = plane_fit_and_plot(data_list[0], data_unmasked_list[0], 3, plot, raa_limits_list[0], self.plane_iteration)
         for i in range(len(data_list) - 1):
             outs = pd.concat(
                 [
                     outs,
-                    plane_fit_and_plot(data_list[i + 1], data_unmasked_list[i + 1], 3)[
+                    plane_fit_and_plot(data_list[i + 1], data_unmasked_list[i + 1], 3, plot, raa_limits_list[i+1], self.plane_iteration)[
                         0
                     ],
                 ],
@@ -576,7 +753,7 @@ class PostProcessingDataset:
             good = pd.concat(
                 [
                     good,
-                    plane_fit_and_plot(data_list[i + 1], data_unmasked_list[i + 1], 3)[
+                    plane_fit_and_plot(data_list[i + 1], data_unmasked_list[i + 1], 3, plot, raa_limits_list[i+1], self.plane_iteration)[
                         1
                     ],
                 ],
@@ -597,9 +774,10 @@ class PostProcessingDataset:
         #make this general so fitted variables and binned variables can be changed
 
     def new_plane_fitter(self, labelled = False, first_iteration = True,
-                         plot = False, method = 'plane_fit', save_bounds = False, nc_path = None):
+                         plot = False, method = 'plane_fit', save_bounds = False, nc_path = None,
+                         last_iteration = False):
 
-        self.plane_iteration += 1
+
 
         if self.cc_radiance is None:
             self.cc_radiance = self.radiance
@@ -637,37 +815,190 @@ class PostProcessingDataset:
         ds_dict = {}
         for i in range(len(data_list)):
             data_cutting = data_unmasked_list[i]
-            binned95, bin_centers_sza, bin_centers_vza, upper_passes = sza_vza_bin_and_calc(data_list[i],data_cutting, '3sigma_max', 'upper')
-            binned5, bin_centers_sza, bin_centers_vza, lower_passes = sza_vza_bin_and_calc(data_list[i],data_cutting, '3sigma_min', 'lower')
 
-            below, below_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned5)
-            above, above_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned95)
-
-            df_below = pd.DataFrame({'refl': binned5, 'vza': bin_centers_vza, 'sza': bin_centers_sza})
-            df_above = pd.DataFrame({'refl': binned95, 'vza': bin_centers_vza, 'sza': bin_centers_sza})
-
-
-
-            z_lower = quad_plane((data_cutting[' sza'].values, data_cutting[' vza'].values),
-                                 *below)
-            z_upper = quad_plane((data_cutting[' sza'].values, data_cutting[' vza'].values),
-                                 *above)
+            if len(data_list[i]) == 0:
+                continue
 
             bins = [0, 2.5, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5]
             bin_cents = [(bins[i] + bins[i + 1]) / 2 for i in range(len(bins) - 1)]
 
             if method == 'plane_fit':
-                outliers = data_cutting[(data_cutting[' refl_550nm'] > z_upper) |
-                                        (data_cutting[' refl_550nm'] < z_lower)]
-                good_data = data_cutting[(data_cutting[' refl_550nm'] < z_upper) &
-                                        (data_cutting[' refl_550nm'] > z_lower)]
-            if method == 'bounds':
+
+                binned95, bin_centers_sza, bin_centers_vza, upper_passes, da = sza_vza_bin_and_calc(data_list[i],
+                                                                                                    data_cutting,
+                                                                                                    '3sigma_max',
+                                                                                                    'upper',
+                                                                                                    input_wav = self.input_wav)
+                binned5, bin_centers_sza, bin_centers_vza, lower_passes, da = sza_vza_bin_and_calc(data_list[i],
+                                                                                                   data_cutting,
+                                                                                                   '3sigma_min',
+                                                                                                   'lower',
+                                                                                                   input_wav = self.input_wav)
+
+                below, below_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned5)
+                above, above_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned95)
+                z_lower = quad_plane((data_cutting[' sza'].values, data_cutting[' vza'].values),
+                                     *below)
+                z_upper = quad_plane((data_cutting[' sza'].values, data_cutting[' vza'].values),
+                                     *above)
+
+                outliers = data_cutting[(data_cutting[f' refl_{self.input_wav}nm'] > z_upper) |
+                                        (data_cutting[f' refl_{self.input_wav}nm'] < z_lower)]
+                good_data = data_cutting[(data_cutting[f' refl_{self.input_wav}nm'] < z_upper) &
+                                        (data_cutting[f' refl_{self.input_wav}nm'] > z_lower)]
+
+            elif method == 'bounds':
+                if i == 0:
+                    self.bound_iteration += 1
+                    iter_num = self.bound_iteration
+
+
+                binned95, bin_centers_sza, bin_centers_vza, upper_passes, da = sza_vza_bin_and_calc(data_list[i],
+                                                                                                    data_cutting,
+                                                                                                    'median_plus_3std',
+                                                                                                    'upper',
+                                                                                                    input_wav = self.input_wav)
+                binned5, bin_centers_sza, bin_centers_vza, lower_passes, da = sza_vza_bin_and_calc(data_list[i],
+                                                                                                   data_cutting,
+                                                                                                   'median_minus_3std',
+                                                                                                   'lower',
+                                                                                                   input_wav = self.input_wav)
+
+
+
+
+                below, below_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned5)
+                above, above_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned95)
+
+                df_below = pd.DataFrame({'refl': binned5, 'vza': bin_centers_vza, 'sza': bin_centers_sza})
+                df_above = pd.DataFrame({'refl': binned95, 'vza': bin_centers_vza, 'sza': bin_centers_sza})
+
                 passes = [True if v is True and lower_passes[i] is True else False for i, v in enumerate(upper_passes)]
                 good_data = data_cutting[passes]
                 outliers = data_cutting[[not el for el in passes]]
                 if save_bounds:
                     df_both = df_below.rename(columns={'refl': 'lower_bound'})
                     df_both = df_below.assign(upper_bound = df_above['refl'].values)
+                    ds_dict[f'{raa_limits_list[i]}'] = df_both
+
+            elif method =='plane_std_fit':
+                if i == 0:
+                    self.plane_iteration += 1
+                    iter_num = self.plane_iteration
+                std_flat, bin_centers_sza, bin_centers_vza, lower_passes, stds = sza_vza_bin_and_calc(data_list[i],
+                                                                                               data_cutting,
+                                                                                               'std', 'na',
+                                                                                                      input_wav = self.input_wav)
+
+                med_flat, bin_centers_sza, bin_centers_vza, lower_passes, medians = sza_vza_bin_and_calc(data_list[i],
+                                                                                                         data_cutting,
+                                                                                                         'median', 'na',
+                                                                                                         input_wav = self.input_wav)
+
+                count_flat, bin_centers_sza, bin_centers_vza, lower_passes, counts = sza_vza_bin_and_calc(data_list[i],
+                                                                                                          data_cutting,
+                                                                                                          'count', 'na',
+                                                                                                          input_wav = self.input_wav)
+
+                sza_fit = []
+                vza_fit = []
+                std_fit = []
+                med_fit = []
+                cnt_fit = []
+
+                for j, cn in enumerate(count_flat):
+                    if ((bin_centers_vza[j] <= 5 and cn < 50) or
+                            math.isnan(medians.flatten()[j]) or
+                            (bin_centers_vza[j] >= 55 and cn < 50) or
+                            (math.isnan(stds.flatten()[j])) or
+                            cn < 3):
+                        continue
+                    else:
+                        sza_fit.append(bin_centers_sza[j])
+                        vza_fit.append(bin_centers_vza[j])
+                        std_fit.append(stds.flatten()[j])
+                        med_fit.append(medians.flatten()[j])
+                        cnt_fit.append(1/counts.flatten()[j])
+
+                if len(med_fit) < 6:
+                    print('Too few points to fit use bounds only')
+                    continue
+
+                max_sza = np.ceil(max(data_cutting[' sza'].values))
+                max_vza = np.ceil(max(data_cutting[' vza'].values))
+                max_sza_idx = np.abs(bin_cents - max_sza).argmin() + 1
+                max_vza_idx = np.abs(bin_cents - max_vza).argmin() + 1
+
+                min_sza = np.floor(min(data_cutting[' sza'].values))
+                min_vza = np.floor(min(data_cutting[' vza'].values))
+                min_sza_idx = np.abs(bin_cents - min_sza).argmin()
+                min_vza_idx = np.abs(bin_cents - min_vza).argmin()
+
+                if self.site == 'GHNA':
+                    std_coeffs, std_cov = new_plane_fit(sza_fit, vza_fit, std_fit, plane_type = 'quad', )#count = cnt_fit)
+                    sza, vza = np.meshgrid(bin_cents[min_sza_idx:max_sza_idx], bin_cents[min_vza_idx:max_vza_idx])
+                    plane_std = quad_plane((sza, vza), *std_coeffs)
+                    med_coeffs, med_cov = new_plane_fit(sza_fit, vza_fit, med_fit, )  # count = cnt_fit)
+                    plane_med = quad_plane((sza, vza), *med_coeffs)
+                elif self.period_name == 'WWUKv3':
+                    std_coeffs, std_cov = new_plane_fit(sza_fit, vza_fit, std_fit, plane_type='quad')#, count = cnt_fit)
+                    sza, vza = np.meshgrid(bin_cents[min_sza_idx:max_sza_idx], bin_cents[min_vza_idx:max_vza_idx])
+                    plane_std = quad_plane((sza, vza), *std_coeffs)
+                    med_coeffs, med_cov = new_plane_fit(sza_fit, vza_fit, med_fit, plane_type = 'quad')#, count = cnt_fit)
+                    plane_med = quad_plane((sza, vza), *med_coeffs)
+                else:
+                    std_coeffs, std_cov = new_plane_fit(sza_fit, vza_fit, std_fit, plane_type='quad',)# count = cnt_fit)
+                    sza, vza = np.meshgrid(bin_cents[min_sza_idx:max_sza_idx], bin_cents[min_vza_idx:max_vza_idx])
+                    plane_std = quad_plane((sza, vza), *std_coeffs)
+                    med_coeffs, med_cov = new_plane_fit(sza_fit, vza_fit, med_fit, )  # count = cnt_fit)
+                    plane_med = quad_plane((sza, vza), *med_coeffs)
+
+                plane_std[plane_std < 0] = 0
+                plane_med[plane_med < 0] = 0
+                plane_std = np.where(plane_std < 0.03*plane_med, 0.03*plane_med, plane_std)
+                plane_std[plane_std <= 0] = gaussian_filter(plane_std, 1)[plane_std <= 0]
+
+                upper_bounds = plane_med + 3*plane_std
+                lower_bounds = plane_med - 3*plane_std
+
+
+                sza = np.pad(sza, 1, 'edge')
+                sza[:,0] = 0
+                sza[:,-1] = sza[:,-2] + 5
+
+                vza = np.pad(vza, 1, 'edge')
+                vza[0, :] = 0
+                vza[-1, :] = vza[-2, :] + 5
+
+                upper_bounds = np.pad(upper_bounds, 1, 'edge')
+                lower_bounds = np.pad(lower_bounds, 1, 'edge')
+
+                upper_bounds = upper_bounds.flatten()[~np.isnan(upper_bounds.flatten())]
+                lower_bounds = lower_bounds.flatten()[~np.isnan(lower_bounds.flatten())]
+
+                lower_bounds[lower_bounds < 0] = 0
+                upper_bounds = np.where(lower_bounds >= upper_bounds,
+                                        lower_bounds + 0.03*np.mean(plane_med),
+                                        upper_bounds)
+
+                df_below = pd.DataFrame({'refl': lower_bounds, 'vza': vza.flatten(), 'sza': sza.flatten()})
+                df_above = pd.DataFrame({'refl': upper_bounds, 'vza': vza.flatten(), 'sza': sza.flatten()})
+
+                lower_interp = LinearNDInterpolator((sza.flatten(), vza.flatten()), lower_bounds)
+                lower_passes = [True if v > lower_interp(data_cutting[' sza'], data_cutting[' vza'])[i] else False for i, v in
+                                enumerate(data_cutting[f' refl_{self.input_wav}nm'])]
+
+                upper_interp = LinearNDInterpolator((sza.flatten(), vza.flatten()), upper_bounds)
+                upper_passes = [True if v < upper_interp(data_cutting[' sza'], data_cutting[' vza'])[i] else False for
+                                i, v in
+                                enumerate(data_cutting[f' refl_{self.input_wav}nm'])]
+
+                passes = [True if v is True and lower_passes[i] is True else False for i, v in enumerate(upper_passes)]
+                good_data = data_cutting[passes]
+                outliers = data_cutting[[not el for el in passes]]
+                if save_bounds:
+                    df_both = df_below.rename(columns={'refl': 'lower_bound'})
+                    df_both = df_below.assign(upper_bound=df_above['refl'].values)
                     ds_dict[f'{raa_limits_list[i]}'] = df_both
             else:
                 print('invalid_method')
@@ -680,17 +1011,16 @@ class PostProcessingDataset:
                 x_range = np.arange(0, 65, 5)
                 fig, axs = plt.subplots(1, 3, figsize=(6, 4), sharey=True)
                 for j in range(3):
-                    axs[j].plot(x_range, quad_plane(((j + 1) * 20, x_range), *below), color='black')
-                    axs[j].plot(x_range, quad_plane(((j + 1) * 20, x_range), *above), color='black')
                     axs[j].set_title(f'SZA = {(j + 1) * 20}')
                     axs[j].scatter(
                         outliers[outliers[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vza'].values,
-                        outliers[outliers[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' refl_550nm'].values,
+                        outliers[outliers[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][f' refl_{self.input_wav}nm'].values,
                         color='red', s=5)
                     axs[j].scatter(
                         good_data[good_data[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vza'].values,
-                        good_data[good_data[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' refl_550nm'].values,
+                        good_data[good_data[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][f' refl_{self.input_wav}nm'].values,
                         color='green', s=5)
+
                     axs[j].scatter(
                         df_below.loc[(df_below['sza'] > (j + 1)*20 -1) & (df_below['sza'] < (j+1) *20 + 1)]['vza'].values,
                         df_below.loc[(df_below['sza'] > (j + 1)*20 -1) & (df_below['sza'] < (j+1) *20 + 1)]['refl'].values,
@@ -701,12 +1031,37 @@ class PostProcessingDataset:
                         df_above.loc[(df_above['sza'] > (j + 1) * 20 - 1) & (df_above['sza'] < (j + 1) * 20 + 1)][
                             'refl'].values,
                         color='blue', s=20, marker = '^')
+                    '''
+                    axs[1, j].scatter(
+                        df_below.loc[(df_below['sza'] > (j + 1) * 20 - 1) & (df_below['sza'] < (j + 1) * 20 + 1)][
+                            'vza'].values,
+                        df_below.loc[(df_below['sza'] > (j + 1) * 20 - 1) & (df_below['sza'] < (j + 1) * 20 + 1)][
+                            'refl'].values,
+                        color='blue', s=20, marker='v')
+                    axs[1, j].scatter(
+                        df_above.loc[(df_above['sza'] > (j + 1) * 20 - 1) & (df_above['sza'] < (j + 1) * 20 + 1)][
+                            'vza'].values,
+                        df_above.loc[(df_above['sza'] > (j + 1) * 20 - 1) & (df_above['sza'] < (j + 1) * 20 + 1)][
+                            'refl'].values,
+                        color='blue', s=20, marker='^')
+
+                    #norm = matplotlib.colors.CenteredNorm()
+                    im = axs[1, j].scatter(
+                        data_cutting[data_cutting[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vza'].values,
+                        data_cutting[data_cutting[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' refl_550nm'].values,
+                        c = data_cutting[data_cutting[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vaa'].values,
+                        s=5, cmap = 'hsv')
+                    cbar = fig.colorbar(im, ax=axs[1,2])
+                    cbar.set_label(label='VAA', fontsize=16)
+
+                    '''
                     axs[j].set_xlabel('VZA')
                     axs[0].set_ylabel('Reflectance')
-                    fig.suptitle('RAA {}'.format(raa_limits_list[i]))
-                    fig.savefig(r'T:/ECO/EOServer/joe/hypernets_plots/plane_models/' +
-                                'sza_slices_3sig_{}_{}_{}.png'.format(raa_limits_list[i], self.plane_iteration, method))
-                plt.show()
+                fig.suptitle('RAA {}'.format(raa_limits_list[i]))
+                fig.savefig(r'T:/ECO/EOServer/joe/hypernets_plots/plane_models/' +
+                            'sza_slices_3sig_{}_{}_{}_{}.png'.format(raa_limits_list[i], iter_num, method, self.period_name))
+                plt.close()
+                #plt.show()
 
             if ('outs' and 'good') not in locals():
                 outs = outliers
@@ -717,8 +1072,21 @@ class PostProcessingDataset:
                 good = pd.concat([good, good_data], ignore_index=True)
 
         if nc_path is not None:
+            ds_raa_list = []
+            ds_raa_keys_list = []
             for i, key in enumerate(ds_dict.keys()):
-                xr.Dataset.from_dataframe(ds_dict[key]).to_netcdf(nc_path + raa_limits_list[i])
+                ds_raa_list.append(xr.Dataset.from_dataframe(ds_dict[key]))
+                ds_raa_keys_list.append(key)
+                ds_raa_vals_list = [np.mean([float(x) for x in ds_raa_keys_list[i].split('_')]) for i in range(len(ds_raa_keys_list))]
+                if '330_30' in ds_raa_keys_list:
+                    ds_raa_vals_list[ds_raa_keys_list.index('330_30')] = 0
+
+            comb_ds = xr.concat(ds_raa_list, pd.Index(ds_raa_keys_list, name = 'raa'))
+            comb_ds = comb_ds.rename_vars({'refl': 'lower_bound'})
+            comb_ds.set_coords(('vza', 'sza'))
+
+            comb_ds.to_netcdf(nc_path)
+
         if labelled:
             for y in self.labelled_radiance['post_processing_flags'][self.labelled_radiance.apply(tuple, axis = 1).isin([tuple(x) for x in outs.values])]:
                 y.append(5)
@@ -726,10 +1094,12 @@ class PostProcessingDataset:
             self.radiance_good = good
             self.radiance_outliers = outs
 
-
+        if last_iteration:
+            self.radiance = good
 
         del outs
         del good
+
 
 
     def tol_optimiser(self, tol_start, tol_stop, tol_step, wavelength, good_limit,
@@ -906,7 +1276,7 @@ def tolerance_analysis(
     dataset.raa_cut(raa_limit)
     dataset.clean_irr()
     # inital outlier definition
-    dataset.plane_fitter()
+    dataset.new_plane_fitter(plot = True, method = 'bounds')
     # sparse tolerance analysis
     dataset.tol_optimiser(0.4, 1.1, 0.1, 550, 100, True)
     # use best tolerance to define planes
@@ -957,7 +1327,8 @@ def multi_aod_tolerance_analysis(dataset: PostProcessingDataset, maintenance, sz
     dataset.clean_irr()
 
 def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, misalign_vza, misalign_vaa,
-                       multiple_periods = False, period_date = None, fit_method = 'plane_fit'):
+                       multiple_periods = False, period_date = None, fit_method = 'plane_fit',
+                       split_by_date = False, start = None, end = None):
     print('Initial', len(dataset.radiance))
     dataset.maintenance_check(maintenance)
     print('Maintenance', len(dataset.radiance))
@@ -965,11 +1336,23 @@ def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, r
     print('SZA', len(dataset.radiance))
     dataset.raa_cut(raa_limit)
     print('RAA', len(dataset.radiance))
+    if dataset.site == 'JSIT':
+        dataset.vza_check(7)
+        print('VZA', len(dataset.radiance))
     dataset.clean_irr()
     print('IRR Flags', len(dataset.radiance))
-    dataset.misalignment_correction(misalign_vza, misalign_vaa, multiple_periods, period_date)
-    dataset.cloud_check(0.9, 550, None)
-    print('Cloud Check', len(dataset.cc_radiance))
+    dataset.calculate_ndvi()
+    dataset.calculate_savi()
+    dataset.calculate_s2tci()
+    #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/WWUK_initalQC.csv')
+    if misalign_vza != 0 and misalign_vaa != 0:
+        dataset.misalignment_correction(misalign_vza, misalign_vaa, multiple_periods, period_date)
+    #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_misalignment_corrected.csv')
+    dataset.cloud_check(0.9, 550, True, rewrite_var = 'radiance')
+    dataset.save('radiance', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_CC.csv')
+    print('Cloud Check', len(dataset.radiance))
+    if split_by_date is True:
+        dataset.split_by_date(start, end)
     dataset.new_plane_fitter(plot = True, method = fit_method)
     print('1st Iteration')
     dataset.size('good')
@@ -978,12 +1361,31 @@ def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, r
     print('2nd Iteration')
     dataset.size('good')
     dataset.size('outliers')
-    dataset.new_plane_fitter(first_iteration = False, plot = True, method = fit_method,
-                             save_bounds = True,
-                             nc_path = 'rT:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/bounds/GHNAv3_3sig_bounds_')
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = fit_method, last_iteration = True)
     print('3rd Iteration')
     dataset.size('good')
     dataset.size('outliers')
+    dataset.save('good', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_bounds_good.csv')
+    dataset.save('outliers', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_bounds_out.csv')
+
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = 'plane_std_fit')
+    print('Plane Fit 1st Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = 'plane_std_fit')
+    print('Plane Fit 2nd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = 'plane_std_fit', last_iteration = True,
+                             save_bounds=True,
+                             nc_path=f'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/bounds/{dataset.period_name}_bounds.nc'
+                             )
+    print('Plane Fit 3rd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    #dataset.count_by_bin()
+    dataset.save('good', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_QC_good.csv')
+    dataset.save('outliers', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_QC_out.csv')
 
 def irradiance_analysis_writer(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs):
     print('Initial', len(dataset.radiance))
@@ -998,13 +1400,35 @@ def irradiance_analysis_writer(dataset: PostProcessingDataset, maintenance, sza_
     dataset.write_irr_analysis_files(filename, wvs)
     print('File Written')
 
+def misalignment_correction_writer(dataset: PostProcessingDataset, vza, vaa,
+                                   multiple_periods = False, period_date = None):
+    dataset.misalignment_correction(vza, vaa, multiple_periods, period_date)
+    dataset.save('radiance',
+                 r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv')
 
-QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_None_None_None_None.csv',
-                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
-                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
-                           'GHNA',
-                           '0.1')
+JSIT_dict = {'NovDec24Jan25': ('2024-11-14', '2025-01-31'),
+             'FebApr25': ('2025-02-01', '2025-04-30')}
 
+JSIT_maintenance_dates = []
+'''
+for k, v in JSIT_dict.items():
+    QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/JSIT_2024-04-09_present_None_None_None_None_misalign_corrected.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/JSIT_irradiance.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
+                            'JSIT',
+                            f'JSIT_{k}',
+                            '0.1')
+
+    new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
+                     fit_method = 'bounds', split_by_date = True, start = v[0], end = v[1])
+'''
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
+                            'GHNA',
+                            f'GHNAv3_after_new',
+                            '0.1',
+                           '550')
 GHNA_maintenance_dates = [
     "20231016",
     "20231017",
@@ -1026,16 +1450,35 @@ GHNA_maintenance_dates = [
     "20240520",
 ]
 
-JSIT_maintenance_dates = []
+
+WWUK_maintenance_dates = []
+JAES_maintenance_dates = []
 
 
-
-new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10, (1.76, 1.59), (-80, -77),
-                   True, '20240521', 'bounds')
-
-
-#irradiance_analysis_writer(QC, GHNA_maintenance_dates, 70, 10,
-                           #'irradiance_GHNA_v1_analysis',
-                         #  [415,490,550,675,740,765,870,1020,1230,1640])
+misalignment_correction_writer(QC,  (1.76, 1.59), (-80, -77), True, '20240521')
+#new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10, 0, #(1.76,1.59),
+ #                  0,# (-80, -77),
+  #                 False,
+   #                split_by_date = True, start = '20240521', end = '20250501',
+    #               fit_method = 'bounds')
 
 
+#new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
+                 #  fit_method = 'bounds')
+
+#new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10,
+ #                  0, #0.69,
+  #                 0, #91,
+   #                False,
+    #               fit_method = 'bounds')
+
+#new_plane_pipeline(QC, WWUK_maintenance_dates, 70, 10, 0, 0, False,
+ #                  fit_method = 'bounds')
+
+#irradiance_analysis_writer(QC, JAES_maintenance_dates, 70, 10,
+ #                          'irradiance_JAESv1_analysis',
+  #                       [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
+
+
+#new_plane_pipeline(QC, JAES_maintenance_dates, 70, 10, 1.21, 8.6, False,
+ #                  fit_method = 'bounds')
