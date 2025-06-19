@@ -14,5 +14,10 @@ cl, no_clear_sky_sequence , L & W , L1C , If all irradiance series are flagged w
 d, discontinuity_VNIR_SWIR , L , L1B , Checks if the VNIR and SWIR are different by more than 25\%, False, 20
 nd, variable_radiance, W , L1C , More than 10\% difference between start and end $L_d$ at 550~nm, True ,
 l, ld_missing, W , L1C , Ld missing for sky reflectance correction, True,
+per, not_deploy_period, L , L2B , Sequence not within deployment periods, True,
+hsn, hypstar_not_deploy_period, L , L2B , HYPSTAR_SN does not match deployment periods, True,
+scl, no_clear_sky_site_specific, L , L2B , Site-specific clear sky check has failed (irr not within 10% of model), True,
+npr, no_pre_files, L , L2B , No pre-existing files available, while config is set up to reprocess from pre-existing files, True,
+man, manual_discard, L , L2B , This sequences was manually discarded as unreliable in the config file, True,
+nos, no_series_site_specific, L , L2B , No series was present in the sequences after applying all site-specific QC, True,
 x, unexpected_error, L & W , , unexpected error during processing; catches all errors, True,
-

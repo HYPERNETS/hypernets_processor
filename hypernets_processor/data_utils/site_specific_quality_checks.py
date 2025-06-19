@@ -15,6 +15,8 @@ import xarray as xr
 import datetime
 import math
 from scipy.optimize import curve_fit
+from scipy.interpolate import LinearNDInterpolator
+
 import scipy
 import ast
 
@@ -31,8 +33,9 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-irradiance_path = os.path.join(dir_path, "data", "postprocessing","irradiance_data")
 postprocessing_path = os.path.join(dir_path, "data", "postprocessing")
+irradiance_path = os.path.join(dir_path, "data", "postprocessing","irradiance_data")
+reflectance_bounds_path = os.path.join(dir_path, "data", "postprocessing","qc_reflectance_bounds")
 
 
 class SiteSpecificQualityChecks:
@@ -46,16 +49,29 @@ class SiteSpecificQualityChecks:
         )
 
     def apply_site_specific_QC(self, dataset_l2a, dataset_l1b_rad, dataset_l1b_irr):
+        """
 
-        # we loop through each of the different deployment periods
+        :param dataset_l2a:
+        :param dataset_l1b_rad:
+        :param dataset_l1b_irr:
+        :return:
+        """
+
+        #first, we extract all the relevant config values
         deploy_periods = ast.literal_eval(
             self.context.get_config_value("deployment_periods")
         )
         bad_sequences_period = ast.literal_eval(
             self.context.get_config_value("bad_sequences_period")
         )
-        bad_angles_period = ast.literal_eval(
-            self.context.get_config_value("bad_angles_period")
+        bad_viewing_angles_period = ast.literal_eval(
+            self.context.get_config_value("bad_viewing_angles_period")
+        )
+        bad_solar_angles_period = ast.literal_eval(
+            self.context.get_config_value("bad_solar_angles_period")
+        )
+        bad_relative_angles_period = ast.literal_eval(
+            self.context.get_config_value("bad_viewing_angles_period")
         )
         bad_wavelengths_period = ast.literal_eval(
             self.context.get_config_value("bad_wavelengths_period")
@@ -78,6 +94,7 @@ class SiteSpecificQualityChecks:
             self.context.get_config_value("misalignment_vaa_unc")
         )
 
+        # we loop through each of the different deployment periods and identify the applicable one for this sequence
         seq_within_period = False
         i_dep_save = None
         for i_dep in range(len(deploy_periods)):
@@ -148,14 +165,42 @@ class SiteSpecificQualityChecks:
 
         # next, remove angles for which we know the data is not reliable
         ang_tol = self.context.get_config_value("angle_tolerance")
-        for angle_tup in bad_angles_period[i_dep_save]:
+        for angle_tup in bad_viewing_angles_period[i_dep_save]:
             bad_vza, bad_vaa = angle_tup
-            if bad_vza=="all":
-                id_series_valid = np.where(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol)[0]
-            elif bad_vaa=="all":
-                id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)[0]
+            if bad_vza == "all":
+                id_series_valid = np.where(np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa)%360 > ang_tol)[0]
+            elif bad_vaa == "all":
+                id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol)[0]
             else:
-                id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values-bad_vza)>ang_tol)|(np.abs(dataset_l2b.viewing_azimuth_angle.values-bad_vaa)>ang_tol))[0]
+                id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol) | (
+                            np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa)%360 > ang_tol))[0]
+            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+
+        for angle_tup in bad_solar_angles_period[i_dep_save]:
+            bad_sza, bad_saa = angle_tup
+            if bad_vza=="all":
+                id_series_valid = np.where(np.abs(dataset_l2b.solar_azimuth_angle.values-bad_saa)%360>ang_tol)[0]
+            elif bad_vaa=="all":
+                id_series_valid = np.where(np.abs(dataset_l2b.solar_zenith_angle.values-bad_sza)>ang_tol)[0]
+            else:
+                id_series_valid = np.where((np.abs(dataset_l2b.solar_zenith_angle.values-bad_sza)>ang_tol) | (
+                        np.abs(dataset_l2b.solar_azimuth_angle.values-bad_saa)%360>ang_tol))[0]
+            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+
+        raa_ang_tol = self.context.get_config_value("raa_angle_tolerance")
+        for angle_tup in bad_relative_angles_period[i_dep_save]:
+            bad_vza, bad_raa = angle_tup
+            raa=(dataset_l2b.viewing_azimuth_angle.values - dataset_l2b.solar_azimuth_angle.values)%360
+            if bad_vza == "all":
+                id_series_valid = np.where(np.abs(raa - bad_raa)%360 > raa_ang_tol)[0]
+            elif bad_vaa == "all":
+                id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol)[0]
+            elif bad_vza == "sza":
+                id_series_valid = np.where((dataset_l2b.viewing_zenith_angle.values > (dataset_l2b.solar_zenith_angle.values + ang_tol)) | (
+                        np.abs(raa - bad_raa)%360 > raa_ang_tol))[0]
+            else:
+                id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol) | (
+                        np.abs(raa - bad_raa)%360 > raa_ang_tol))[0]
             dataset_l2b = dataset_l2b.isel(series=id_series_valid)
 
         # Then, bad wavelength ranges are omited
@@ -164,6 +209,7 @@ class SiteSpecificQualityChecks:
                         dataset_l2b.wavelength.values > bad_wav[1]))[0]
             dataset_l2b = dataset_l2b.isel(wavelength=id_wav_valid)
 
+        # Next, the site-specific clear sky check is applied
         irr_model_irrwav = xr.open_dataset(
             os.path.join(
                 irradiance_path,
@@ -193,7 +239,7 @@ class SiteSpecificQualityChecks:
                 irr_model_irrwav.wavelength.values, dir_dif_ratio, fill_value="extrapolate"
             )
             dir_dif_ratio = dir_dif_intfunc(dataset_l1b_irr.wavelength.values)
-            # Perform correction for misalignment
+            # before performing the clear sky check, we perform correction for misalignment
             ratio = self.misalignment_ratio_calculator(misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
                                                        sza,
                                                        saa,
@@ -209,11 +255,14 @@ class SiteSpecificQualityChecks:
             dataset_l1b_irr.irradiance.values[:, i_series] *= ratio
             dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series] = (dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series]**2+(ratio_unc/ratio/100)**2)**0.5
 
+            #clear sky check is performed
             if (dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series] < 0.9 * irradiance[i_wav_550_model]) or (
                 dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series] > 1.1 * irradiance[i_wav_550_model_noaer]
             ):
                 self.context.anomaly_handler.add_anomaly("scl")
 
+
+        #performn correction for reflectance (to account for change in irradiance)
         for i_series in range(len(dataset_l2b.series.values)):
             sza = dataset_l2b.solar_zenith_angle.values[i_series]
             saa = dataset_l2b.solar_azimuth_angle.values[i_series]
@@ -233,15 +282,40 @@ class SiteSpecificQualityChecks:
                                                         sza,
                                                         saa,
                                                         dir_dif_ratio],
-                                                       [misalignment_vza_unc[i_dep_save], misalignment_vaa_unc[i_dep_save],
+                                                       [misalignment_vza_unc[i_dep_save],
+                                                        misalignment_vaa_unc[i_dep_save],
                                                         None,
                                                         None,
                                                         None,
                                                         None])
             dataset_l2b.reflectance.values[:, i_series] /= ratio
-            dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] = (dataset_l2b.u_rel_systematic_reflectance.values[
-                                                                                                :, i_series] ** 2 + (
-                                                                                                            ratio_unc / ratio / 100) ** 2) ** 0.5
+            dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] = (
+                                                                                       dataset_l2b.u_rel_systematic_reflectance.values[
+                                                                                       :, i_series] ** 2 + (
+                                                                                               ratio_unc / ratio / 100) ** 2) ** 0.5
+
+        #next, we check if the reflectances are within the bounds
+        if postprocessing_qc_file_period[i_dep_save] is None:
+            ds_bounds=None
+        else:
+            ds_bounds = xr.open_dataset(os.path.join(reflectance_bounds_path, postprocessing_qc_file_period[i_dep_save]))
+            raas = [np.array(string.split("_")).astype(float).mean() for string in ds_bounds.raa.values]
+            raas[-1] = 360
+            ds_bounds = ds_bounds.assign_coords(raa=raas)
+        i_550 = np.argmin(np.abs(dataset_l2b.wavelength.values - 550))
+
+        sza = dataset_l2b.solar_zenith_angle.values
+        saa = dataset_l2b.solar_azimuth_angle.values
+        vza = dataset_l2b.viewing_zenith_angle.values
+        vaa = dataset_l2b.viewing_azimuth_angle.values
+
+        bounds_down, bounds_up = self.calculate_bounds(ds_bounds,sza,saa,vza,vaa)
+        print(bounds_up, bounds_down, dataset_l2b.reflectance.values[i_550, :],dataset_l2a.reflectance.values[i_550, :], (vaa-saa)%360, vza, sza )
+        id_series_valid = np.where((dataset_l2b.reflectance.values[i_550, :] < bounds_up) & (dataset_l2b.reflectance.values[i_550, :] > bounds_down))[0]
+        dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+
+        if len(dataset_l2b.series.values)==0:
+            self.context.anomaly_handler.add_anomaly("nos")
 
         # finally, make plots and write file
         if self.context.get_config_value("write_l2b"):
@@ -808,3 +882,28 @@ class SiteSpecificQualityChecks:
         new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
         new_direct_to_diffuse = direct_to_diffuse * np.cos(new_sza) / np.cos(sza)
         return (new_direct_to_diffuse + 1) / (direct_to_diffuse + 1) + offset
+
+    def calculate_bounds(self,refl_bounds_ds,sza,saa,vza,vaa):
+        if refl_bounds_ds is not None:
+            raa=(vaa-saa)%360
+            sza_bounds = refl_bounds_ds.sza.values.flatten()
+            vza_bounds = refl_bounds_ds.vza.values.flatten()
+            raa_bounds =  np.repeat(refl_bounds_ds.raa.values,refl_bounds_ds.sza.values.shape[1])
+            lower_bounds = refl_bounds_ds.lower_bound.values.flatten()
+            upper_bounds = refl_bounds_ds.upper_bound.values.flatten()
+            id_360 = np.where(raa_bounds==360)[0]
+            sza_bounds = np.concat([sza_bounds[id_360],sza_bounds])
+            vza_bounds = np.concat([vza_bounds[id_360],vza_bounds])
+            raa_bounds = np.concat([np.zeros_like(raa_bounds[id_360]),raa_bounds])
+            lower_bounds = np.concat([lower_bounds[id_360],lower_bounds])
+            upper_bounds = np.concat([upper_bounds[id_360],upper_bounds])
+            id_valid = np.where(np.isfinite(lower_bounds))[0]
+            # id_valid = np.where((np.isfinite(lower_bounds)) & (sza_bounds < 30) & (vza_bounds < 15))[0]
+
+            lower_interp = LinearNDInterpolator(list(zip(sza_bounds[id_valid], vza_bounds[id_valid], raa_bounds[id_valid])), lower_bounds[id_valid])
+            upper_interp = LinearNDInterpolator(list(zip(sza_bounds[id_valid], vza_bounds[id_valid], raa_bounds[id_valid])), upper_bounds[id_valid])
+            # print(sza[20],vza[20],raa[20], lower_interp(sza[20],vza[20],raa[20]), lower_bounds[id_valid])
+
+            return lower_interp(sza,vza,raa),upper_interp(sza,vza,raa)
+        else:
+            return 0.0, 1.1

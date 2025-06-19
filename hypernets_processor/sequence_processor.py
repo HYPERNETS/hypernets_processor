@@ -346,9 +346,9 @@ class SequenceProcessor:
 
                 if L2a:
                     if self.context.get_config_value("max_level").upper() in ["L2B",]:
+                        self.context.logger.info("Processing to L2B...")
                         L2b = ssqc.apply_site_specific_QC(L2a, L1b_rad, L1b_irr)
-
-
+                        self.context.logger.info("Done")
             else:
                 raise NameError(
                     "Invalid network: " + self.context.get_config_value("network")

@@ -122,4 +122,9 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "this sequences was manually discarded as unreliable in the config file",
     },
+    "nos": {
+        "description": "No series was present in the sequences after applying all site-specific QC",
+        "error": ValueError,
+        "error_msg": "No series was present in the sequences after applying all site-specific QC",
+    },
 }
