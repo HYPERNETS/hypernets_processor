@@ -44,25 +44,25 @@ data_WWUKv3 = get_month(data_WWUKv3)
 def plot_polar_reflectance(
     plotpath, vza, vaa, sza, saa, refl, wavelength, vmin=None, vmax=None, label=None
 ):
-    vaa_tol = 2
-    vza_tol = 2
+    raa_tol = 2.5
+    vza_tol = 5
 
     vaa = vaa % 360
     saa = saa % 360
     raa = (saa - vaa + 360) % 360
 
-    vaa_grid = np.arange(5, 365, 10)
-    vza_grid = np.array([0, 5, 10, 20, 30, 40, 50, 60])
+    raa_grid = np.arange(0, 360, 5)
+    vza_grid = np.array([0, 10, 20, 30, 40, 50, 60])
 
-    vaa_mesh, vza_mesh = np.meshgrid(np.radians(vaa_grid), vza_grid)
+    vaa_mesh, vza_mesh = np.meshgrid(np.radians(raa_grid), vza_grid)
 
-    refl_2d = np.zeros((len(vaa_grid), len(vza_grid)))
+    refl_2d = np.zeros((len(raa_grid), len(vza_grid)))
     sza_list = []
     saa_list = []
-    for i in range(len(vaa_grid)):
+    for i in range(len(raa_grid)):
         for j in range(len(vza_grid)):
             id_series = np.where(
-                (np.abs(raa - vaa_grid[i]) < vaa_tol)
+                (np.abs(raa - raa_grid[i]) < raa_tol)
                 & (np.abs(vza - vza_grid[j]) < vza_tol)
             )[0]
             if len(id_series) == 1:
@@ -92,7 +92,7 @@ def plot_polar_reflectance(
         vmin=vmin,
         vmax=vmax,
     )
-    ax.scatter(saa_list, sza_list, color="black", marker="o")
+    #ax.scatter(saa_list, sza_list, color="black", marker="o")
 
     cbar = fig.colorbar(im)
 
