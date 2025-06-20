@@ -82,7 +82,7 @@ def get_target_sequences(context, to_archive):
             for anomaly in context.anomaly_db["anomalies"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if anomaly["anomaly_id"] != "m"
+            if anomaly["anomaly_id"] != "m" and not context.get_config_value("reprocess_anomalies")
         ]
         print(processed_products)
         print(failed_products)
