@@ -104,8 +104,7 @@ if __name__ == "__main__":
     #     for table_name in table_names:
     #         remove_files(archive_path, file, table_name)
 
-    files = ["HYPERNETS_L_GHNA_L2B_REF_20231026T0652_20250620T2014_v2.2",
-             "HYPERNETS_L_GHNA_L2B_REF_20231026T0652_20250620T2025_v2.2",
+    files = ["HYPERNETS_L_GHNA_L2B_REF_20231026T0652_20250620T2025_v2.2",
              "HYPERNETS_L_GHNA_L2B_REF_20231026T0730_20250620T2025_v2.2",
              "HYPERNETS_L_GHNA_L2B_REF_20231026T0801_20250620T2025_v2.2",
              "HYPERNETS_L_GHNA_L2B_REF_20231026T0831_20250620T2026_v2.2",
@@ -131,4 +130,4 @@ if __name__ == "__main__":
              "HYPERNETS_L_GHNA_L2B_REF_20231028T1100_20250620T2028_v2.2"]
     for file in files:
         file_b = glob.glob("/home/data/insitu/hypernets/archive/GHNA/2023/10/*/*/%s*" % file)
-        print(file_b)
+        os.remove(file_b[0])
