@@ -64,11 +64,7 @@ class SequenceProcessor:
         calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
-        qc = QualityChecks(self.context)
         ssqc = SiteSpecificQualityChecks(self.context)
-        avg = Average(
-            self.context,
-        )
         rhymer = RhymerHypstar(self.context)
         writer = HypernetsWriter(self.context)
 

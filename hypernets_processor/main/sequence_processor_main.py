@@ -85,8 +85,6 @@ def get_target_sequences(context, to_archive):
             if anomaly["anomaly_id"] != "m" and not context.get_config_value("reprocess_anomalies")
         ]
 
-        print(processed_products)
-        print(failed_products)
         complete_products = processed_products + failed_products
 
         if context.get_config_value("max_level")=="L2B":
