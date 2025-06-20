@@ -87,18 +87,18 @@ def get_target_sequences(context, to_archive):
 
         complete_products = processed_products + failed_products
 
-        if context.get_config_value("max_level")=="L2B":
+        if context.get_config_value("reprocess_from"):
             raw_products = [
                 product["sequence_name"]
                 for product in context.archive_db["products"].find(
                     site_id=context.get_config_value("site_id")
                 )
-                if "L2A" in product["product_level"]
+                if context.get_config_value("reprocess_from") in product["product_level"]
             ]
         else:
             raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
 
-        raw_products = list(set(raw_products) - set(complete_products))
+            raw_products = list(set(raw_products) - set(complete_products))
 
         paths_to_process = []
         for i in range(len(raw_paths)):
@@ -114,23 +114,24 @@ def get_target_sequences(context, to_archive):
                     paths_to_process.append(raw_paths[i])
 
         #next, check if incompete downloads have already been added to anomaly db, and if not add them
-        incomplete_products = [
-            anomaly["sequence_name"]
-            for anomaly in context.anomaly_db["anomalies"].find(
-                site_id=context.get_config_value("site_id")
-            )
-            if anomaly["anomaly_id"] == "m"
-        ]
+        if not context.get_config_value("max_level")=="L2B":
+            incomplete_products = [
+                anomaly["sequence_name"]
+                for anomaly in context.anomaly_db["anomalies"].find(
+                    site_id=context.get_config_value("site_id")
+                )
+                if anomaly["anomaly_id"] == "m"
+            ]
 
-        for incomplete_download_path in incomplete_downloads:
-            seq_id = os.path.basename(incomplete_download_path)
-            if not seq_id in incomplete_products:
-                context.set_config_value("time", parse_sequence_path(incomplete_download_path)["datetime"])
-                context.set_config_value("sequence_name", seq_id)
-                context.set_config_value("sequence_path", incomplete_download_path)
-                context.logger.error(
-                    "metadata.txt not found in directory %s, will try processing again later" % (incomplete_download_path))
-                context.anomaly_handler.anomaly_db.add_anomaly("m")
+            for incomplete_download_path in incomplete_downloads:
+                seq_id = os.path.basename(incomplete_download_path)
+                if not seq_id in incomplete_products:
+                    context.set_config_value("time", parse_sequence_path(incomplete_download_path)["datetime"])
+                    context.set_config_value("sequence_name", seq_id)
+                    context.set_config_value("sequence_path", incomplete_download_path)
+                    context.logger.error(
+                        "metadata.txt not found in directory %s, will try processing again later" % (incomplete_download_path))
+                    context.anomaly_handler.anomaly_db.add_anomaly("m")
 
         return paths_to_process
     else:
