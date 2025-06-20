@@ -14,20 +14,18 @@ __status__ = "Development"
 archive_path = r"/home/data/insitu/hypernets/archive"
 
 files_archive = [
-    "archive_ATGE.db",
-    "archive_BASP.db",
-    "archive_WWUK.db",
+    "archive.db",
 ]
-files_anomaly = [
-    "anomaly_ATGE.db",
-    "anomaly_BASP.db",
-    "anomaly_WWUK.db",
-]
-files_metadata = [
-    "metadata_ATGE.db",
-    "metadata_BASP.db",
-    "metadata_WWUK.db",
-]
+# files_anomaly = [
+#     "anomaly_ATGE.db",
+#     "anomaly_BASP.db",
+#     "anomaly_WWUK.db",
+# ]
+# files_metadata = [
+#     "metadata_ATGE.db",
+#     "metadata_BASP.db",
+#     "metadata_WWUK.db",
+# ]
 
 
 def remove_files(archive_path, file, table_name):
@@ -37,35 +35,36 @@ def remove_files(archive_path, file, table_name):
         row = ["none" if (is_invalid(v)) else v for v in row]
         row = tuple(row)
         date = row[1][39:52]
-        try:
-            os.remove(row[7])
-        except:
-            print(row[7], "file does not exist")
+        print(row[7])
+        # try:
+        #     os.remove(row[7])
+        # except:
+        #     print(row[7], "file does not exist")
 
-        dir_name = os.path.join(os.path.dirname(row[7]), "plots")
-        test = os.listdir(dir_name)
-
-        for item in test:
-            if date in item:
-                try:
-                    os.remove(os.path.join(dir_name, item))
-                except:
-                    print(os.path.join(dir_name, item), "file does not exist")
-
-        dir_name = os.path.join(os.path.dirname(row[7]), "image")
-        test = os.listdir(dir_name)
-
-        for item in test:
-            if date in item:
-                try:
-                    os.remove(os.path.join(dir_name, item))
-                except:
-                    print(os.path.join(dir_name, item), "file does not exist")
-
-        try:
-            os.remove(row[7])
-        except:
-            print(row[7], "file does not exist")
+        # dir_name = os.path.join(os.path.dirname(row[7]), "plots")
+        # test = os.listdir(dir_name)
+        #
+        # for item in test:
+        #     if date in item:
+        #         try:
+        #             os.remove(os.path.join(dir_name, item))
+        #         except:
+        #             print(os.path.join(dir_name, item), "file does not exist")
+        #
+        # dir_name = os.path.join(os.path.dirname(row[7]), "image")
+        # test = os.listdir(dir_name)
+        #
+        # for item in test:
+        #     if date in item:
+        #         try:
+        #             os.remove(os.path.join(dir_name, item))
+        #         except:
+        #             print(os.path.join(dir_name, item), "file does not exist")
+        #
+        # try:
+        #     os.remove(row[7])
+        # except:
+        #     print(row[7], "file does not exist")
 
 
 def is_invalid(v):
