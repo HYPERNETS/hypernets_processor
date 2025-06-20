@@ -98,7 +98,7 @@ def get_target_sequences(context, to_archive):
         else:
             raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
 
-            raw_products = list(set(raw_products) - set(complete_products))
+        raw_products = list(set(raw_products) - set(complete_products))
 
         paths_to_process = []
         for i in range(len(raw_paths)):
