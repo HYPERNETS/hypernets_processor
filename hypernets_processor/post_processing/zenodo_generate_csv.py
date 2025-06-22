@@ -40,7 +40,7 @@ SITE_PERIODS = {
     "GHNA": [{"start_date": "2022-05-17" , "stop_date": "2023-10-17" ,"HYPSTAR_SN": 220261, "comments": "deployment period 1: v1 instrument"},{"start_date": "2023-10-20" , "stop_date": "2024-05-23" ,"HYPSTAR_SN": 222316, "comments": "deployment period 2: v3 instrument"},{"start_date": "2024-05-24" , "stop_date": "present" ,"HYPSTAR_SN": 222316, "comments": "deployment period 3: v3 instrument cleaned and realigned but not replaced/calibrated"}]
 }
 with open(os.path.join(results_path,'Zenodo_L2B_sequences.csv'), 'w') as f:
-    f.write("#Sequence_ID,filename,start_acquisition_time,stop_acquisition_time,latitude,longitude\n")
+    f.write("#Sequence_ID,filename,start_acquisition_time,stop_acquisition_time,latitude,longitude,period comment\n")
     for site in SITE_PERIODS.keys():
         for period in SITE_PERIODS[site]:
             tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
@@ -54,5 +54,5 @@ with open(os.path.join(results_path,'Zenodo_L2B_sequences.csv'), 'w') as f:
                 dt_hyp_min = convert_datetime(ds_HYP.acquisition_time.values.min())
                 dt_hyp_max = convert_datetime(ds_HYP.acquisition_time.values.max())
                 if (dt_hyp_min > start_time) and (dt_hyp_max < stop_time):
-                    print(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"])
-                    f.write("%s,%s,%s,%s,%s,%s\n"%(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"]))
+                    print(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"], period["comment"])
+                    f.write("%s,%s,%s,%s,%s,%s,%s\n"%(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"], period["comment"]))
