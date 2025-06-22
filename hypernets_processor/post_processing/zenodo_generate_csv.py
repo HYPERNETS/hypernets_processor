@@ -9,12 +9,12 @@ from hypernets_processor.utils.utils import convert_datetime
 # set appropriate folders (different for linux or windows) and settings
 
 # for windows:
-data_path = r"\\eoserver\home\data\insitu\hypernets\archive"
-results_path = r"\\eoserver\home\data\insitu\hypernets\archive"
+# data_path = r"\\eoserver\home\data\insitu\hypernets\archive"
+# results_path = r"\\eoserver\home\data\insitu\hypernets\archive"
 
 # for eoserver:
-#data_path = r"/mnt/t/data/insitu/hypernets/archive"
-# = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+data_path = r"/mnt/t/data/insitu/hypernets/archive"
+results_path = r"/mnt/t/data/insitu/hypernets/archive"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
@@ -54,4 +54,5 @@ with open(os.path.join(results_path,'Zenodo_L2B_sequences.csv'), 'w') as f:
                 dt_hyp_min = convert_datetime(ds_HYP.acquisition_time.values.min())
                 dt_hyp_max = convert_datetime(ds_HYP.acquisition_time.values.max())
                 if (dt_hyp_min > start_time) and (dt_hyp_max < stop_time):
-                    print(ds_HYP.attrs["SEQUENCE_ID"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["latitude"], ds_HYP.attrs["longitude"])
+                    print(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"])
+                    f.write("%s,%s,%s,%s,%s,%s\n"%(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"]))
