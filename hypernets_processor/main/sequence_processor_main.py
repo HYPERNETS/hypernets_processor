@@ -87,16 +87,17 @@ def get_target_sequences(context, to_archive):
 
         complete_products = processed_products + failed_products
 
-        if context.get_config_value("reprocess_from"):
-            raw_products = [
-                product["sequence_name"]
-                for product in context.archive_db["products"].find(
-                    site_id=context.get_config_value("site_id")
-                )
-                if context.get_config_value("reprocess_from") in product["product_level"]
-            ]
-        else:
-            raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
+        # if context.get_config_value("reprocess_from"):
+        #     raw_products = [
+        #         product["sequence_name"]
+        #         for product in context.archive_db["products"].find(
+        #             site_id=context.get_config_value("site_id")
+        #         )
+        #         if context.get_config_value("reprocess_from") in product["product_level"]
+        #     ]
+        # else:
+        #
+        raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
 
         raw_products = list(set(raw_products) - set(complete_products))
 
