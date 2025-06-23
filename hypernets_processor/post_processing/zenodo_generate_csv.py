@@ -13,7 +13,7 @@ from hypernets_processor.utils.utils import convert_datetime
 # results_path = r"\\eoserver\home\data\insitu\hypernets\archive"
 
 # for eoserver:
-data_path = r"/mnt/t/data/insitu/hypernets/archive"
+data_path = r"/home/data/insitu/hypernets/archive"
 results_path = r"/mnt/t/data/insitu/hypernets/archive"
 
 # results_path = os.path.join(results_path,brdf_model)
@@ -48,7 +48,7 @@ with open(os.path.join(results_path,'Zenodo_L2B_sequences.csv'), 'w') as f:
             stop_time = convert_datetime(period["stop_date"])
 
             files = glob.glob(os.path.join(data_path, site, "*", "*", "*", "*", "*L2B*.nc"))
-
+            print(files)
             for file in files:
                 ds_HYP = xr.open_dataset(file)
                 dt_hyp_min = convert_datetime(ds_HYP.acquisition_time.values.min())
