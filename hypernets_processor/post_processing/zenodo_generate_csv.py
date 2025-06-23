@@ -53,6 +53,7 @@ with open(os.path.join(results_path,'Zenodo_L2B_sequences.csv'), 'w') as f:
                 ds_HYP = xr.open_dataset(file)
                 dt_hyp_min = convert_datetime(ds_HYP.acquisition_time.values.min())
                 dt_hyp_max = convert_datetime(ds_HYP.acquisition_time.values.max())
+                print(dt_hyp_min,dt_hyp_max,start_time,stop_time)
                 if (dt_hyp_min > start_time) and (dt_hyp_max < stop_time):
                     print(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"], period["comment"])
                     f.write("%s,%s,%s,%s,%s,%s,%s\n"%(ds_HYP.attrs["sequence_id"],os.path.basename(file),dt_hyp_min,dt_hyp_max, ds_HYP.attrs["site_latitude"], ds_HYP.attrs["site_longitude"], period["comment"]))
