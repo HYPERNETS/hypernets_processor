@@ -47,9 +47,6 @@ vzas = [None]  # [20,30,40]
 vaas = [None]  # [83,98,113,263,278,298]
 
 SITE_PERIODS = {
-    # "ATGE": [{"start_date": "2022-10-16" , "stop_date": "2024-05-02" ,"HYPSTAR_SN": 221231, "comments": ""}],
-    # "BASP": [{"start_date": "2022-07-18" , "stop_date": "2022-07-22" ,"HYPSTAR_SN": 221233, "comments": "v2 instrument"}],
-    # "DEGE": [{"start_date": "2021-07-29" , "stop_date": "2023-10-24" ,"HYPSTAR_SN": 220241, "comments": ""}],
     "GHNA": [
         {
             "start_date": "2022-05-17",

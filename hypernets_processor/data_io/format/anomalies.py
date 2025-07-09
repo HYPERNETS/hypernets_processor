@@ -102,6 +102,11 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "sequence not within deployment periods",
     },
+    "val": {
+        "description": "sequence within deployment periods that is not valid for satellite validation",
+        "error": ValueError,
+        "error_msg": "sequence within deployment periods that is not valid for satellite validation",
+    },
     "tod": {
         "description": "sequence not within selected time of day",
         "error": ValueError,
