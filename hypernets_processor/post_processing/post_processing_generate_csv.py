@@ -1,4 +1,4 @@
-import datetime
+k files selected for import datetime
 
 import numpy as np
 import hypernets_brdf_data_io as data_io
@@ -139,7 +139,7 @@ for site in SITE_PERIODS.keys():
             stop_time = datetime.datetime.now()
 
         files = glob.glob(os.path.join(data_path, site, "*", "*", "*", "*", "*L2A*.nc"))
-
+        print(files)
         for ii in range(len(start_tod)):
             files = data_io.filter_files_start_stop(
                 files,
@@ -148,7 +148,7 @@ for site in SITE_PERIODS.keys():
                 tod_start=start_tod[ii],
                 tod_stop=stop_tod[ii],
             )
-
+            print("selected", files)
             for vza in vzas:
                 for vaa in vaas:
                     # read in hypernets data (which returns object of brdf_model.BRDFMeasurements)
