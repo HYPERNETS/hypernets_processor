@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 # results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
 
 # for eoserver:
+os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
 data_path = r"/mnt/t/data/insitu/hypernets/archive"
 results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
