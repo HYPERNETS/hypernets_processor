@@ -127,10 +127,10 @@ SITE_PERIODS = {
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'WWUK':
+        if site != 'GHNA':
             continue
-        if period['stop_date'] == 'present':
-            continue
+        #if period['stop_date'] == 'present':
+         #   continue
         print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
         start_time = period["start_date"]
