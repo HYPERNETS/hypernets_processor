@@ -1,3 +1,5 @@
+import glob
+
 from hypernets_processor.version import __version__
 import sys, sqlite3
 import os
@@ -14,20 +16,18 @@ __status__ = "Development"
 archive_path = r"/home/data/insitu/hypernets/archive"
 
 files_archive = [
-    "archive_ATGE.db",
-    "archive_BASP.db",
-    "archive_WWUK.db",
+    "archive.db",
 ]
-files_anomaly = [
-    "anomaly_ATGE.db",
-    "anomaly_BASP.db",
-    "anomaly_WWUK.db",
-]
-files_metadata = [
-    "metadata_ATGE.db",
-    "metadata_BASP.db",
-    "metadata_WWUK.db",
-]
+# files_anomaly = [
+#     "anomaly_ATGE.db",
+#     "anomaly_BASP.db",
+#     "anomaly_WWUK.db",
+# ]
+# files_metadata = [
+#     "metadata_ATGE.db",
+#     "metadata_BASP.db",
+#     "metadata_WWUK.db",
+# ]
 
 
 def remove_files(archive_path, file, table_name):
@@ -37,35 +37,37 @@ def remove_files(archive_path, file, table_name):
         row = ["none" if (is_invalid(v)) else v for v in row]
         row = tuple(row)
         date = row[1][39:52]
-        try:
-            os.remove(row[7])
-        except:
-            print(row[7], "file does not exist")
+        print(row[7])
+        # try:
+        #     os.remove(row[7])
+        # except:
+        #     print(row[7], "file does not exist")
 
-        dir_name = os.path.join(os.path.dirname(row[7]), "plots")
-        test = os.listdir(dir_name)
+        # dir_name = os.path.join(os.path.dirname(row[7]), "plots")
+        # test = os.listdir(dir_name)
+        #
+        # for item in test:
+        #     if date in item:
+        #         try:
+        #             os.remove(os.path.join(dir_name, item))
+        #         except:
+        #             print(os.path.join(dir_name, item), "file does not exist")
+        #
+        # dir_name = os.path.join(os.path.dirname(row[7]), "image")
+        # test = os.listdir(dir_name)
+        #
+        # for item in test:
+        #     if date in item:
+        #         try:
+        #             os.remove(os.path.join(dir_name, item))
+        #         except:
+        #             print(os.path.join(dir_name, item), "file does not exist")
+        #
+        # try:
+        #     os.remove(row[7])
+        # except:
+        #     print(row[7], "file does not exist")
 
-        for item in test:
-            if date in item:
-                try:
-                    os.remove(os.path.join(dir_name, item))
-                except:
-                    print(os.path.join(dir_name, item), "file does not exist")
-
-        dir_name = os.path.join(os.path.dirname(row[7]), "image")
-        test = os.listdir(dir_name)
-
-        for item in test:
-            if date in item:
-                try:
-                    os.remove(os.path.join(dir_name, item))
-                except:
-                    print(os.path.join(dir_name, item), "file does not exist")
-
-        try:
-            os.remove(row[7])
-        except:
-            print(row[7], "file does not exist")
 
 
 def is_invalid(v):
@@ -92,12 +94,40 @@ def load_table_names(db_a):
 
 
 if __name__ == "__main__":
-    print(os.path.join(archive_path, files_archive[0]))
-    db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
-    table_names = load_table_names(db_a)
-    db_a.close()
-    print(table_names)
-    for file in files_archive:
-        print(file)
-        for table_name in table_names:
-            remove_files(archive_path, file, table_name)
+    # print(os.path.join(archive_path, files_archive[0]))
+    # db_a = sqlite3.connect(os.path.join(archive_path, files_archive[0]))
+    # table_names = load_table_names(db_a)
+    # db_a.close()
+    # print(table_names)
+    # for file in files_archive:
+    #     print(file)
+    #     for table_name in table_names:
+    #         remove_files(archive_path, file, table_name)
+
+    files = ["HYPERNETS_L_GHNA_L2B_REF_20231026T0652_20250620T2025_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T0730_20250620T2025_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T0801_20250620T2025_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T0831_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T0900_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1000_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1030_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1101_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1131_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1300_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1330_20250620T2026_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1400_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1430_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1500_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231026T1531_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T0701_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T0730_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T0801_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T0830_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T0901_20250620T2027_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T0930_20250620T2028_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T1000_20250620T2028_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T1031_20250620T2028_v2.2",
+             "HYPERNETS_L_GHNA_L2B_REF_20231028T1100_20250620T2028_v2.2"]
+    for file in files:
+        file_b = glob.glob("/home/data/insitu/hypernets/archive/GHNA/2023/10/*/*/%s*" % file)
+        os.remove(file_b[0])

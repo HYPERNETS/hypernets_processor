@@ -377,9 +377,9 @@ class Calibrate:
             datasetl0masked, series_ids
         )
         datasetl0masked["quality_flag"][
-            np.where(dark_outlier_rad == 1)
+            np.where(dark_outliers_radscans == 1)
         ] = DatasetUtil.set_flag(
-            datasetl0masked["quality_flag"][np.where(dark_outlier_rad == 1)],
+            datasetl0masked["quality_flag"][np.where(dark_outliers_radscans == 1)],
             "dark_masked",
         )  # for i in range(len(mask))]
 

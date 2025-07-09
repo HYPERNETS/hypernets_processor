@@ -102,6 +102,11 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "sequence not within deployment periods",
     },
+    "tod": {
+        "description": "sequence not within selected time of day",
+        "error": ValueError,
+        "error_msg": "sequence not within selected time of day",
+    },
     "hsn": {
         "description": "HYPSTAR_SN does not match deployment periods",
         "error": ValueError,
@@ -121,5 +126,10 @@ ANOMALIES_DICT = {
         "description": "this sequences was manually discarded as unreliable in the config file",
         "error": ValueError,
         "error_msg": "this sequences was manually discarded as unreliable in the config file",
+    },
+    "nos": {
+        "description": "No series was present in the sequences after applying all site-specific QC",
+        "error": ValueError,
+        "error_msg": "No series was present in the sequences after applying all site-specific QC",
     },
 }

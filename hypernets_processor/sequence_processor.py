@@ -64,11 +64,7 @@ class SequenceProcessor:
         calcon = CalibrationConverter(self.context)
         cal = Calibrate(self.context)
         surf = SurfaceReflectance(self.context)
-        qc = QualityChecks(self.context)
         ssqc = SiteSpecificQualityChecks(self.context)
-        avg = Average(
-            self.context,
-        )
         rhymer = RhymerHypstar(self.context)
         writer = HypernetsWriter(self.context)
 
@@ -105,9 +101,9 @@ class SequenceProcessor:
         if self.context.get_config_value("reprocess_from"):
             directory=writer.return_directory()
             if self.context.get_config_value("reprocess_from").upper() == "L2A":
-                L2a = self.find_preexisting_file(directory, "L2A")
                 L1b_rad = self.find_preexisting_file(directory, "L1B_RAD")
                 L1b_irr = self.find_preexisting_file(directory, "L1B_IRR")
+                L2a = self.find_preexisting_file(directory, "L2A")
             elif self.context.get_config_value("reprocess_from").upper()=="L1B":
                 L1b_rad = self.find_preexisting_file(directory,"L1B_RAD")
                 L1b_irr = self.find_preexisting_file(directory,"L1B_IRR")
@@ -346,9 +342,9 @@ class SequenceProcessor:
 
                 if L2a:
                     if self.context.get_config_value("max_level").upper() in ["L2B",]:
+                        self.context.logger.info("Processing to L2B...")
                         L2b = ssqc.apply_site_specific_QC(L2a, L1b_rad, L1b_irr)
-
-
+                        self.context.logger.info("Done")
             else:
                 raise NameError(
                     "Invalid network: " + self.context.get_config_value("network")
