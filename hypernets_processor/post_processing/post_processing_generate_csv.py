@@ -9,23 +9,29 @@ import matplotlib.pyplot as plt
 # set appropriate folders (different for linux or windows) and settings
 
 # for windows:
-# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
 
 # for eoserver:
-os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
-data_path = r"/mnt/t/data/insitu/hypernets/archive"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+# os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
+# data_path = r"/mnt/t/data/insitu/hypernets/archive"
+# results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
 
-tags = ["JSIT","GHNA_v1", "GHNA_v3", 'WWUK_2024']
-sites = ["JSIT","GHNA","GHNA", 'WWUK']
+# tags = ["JSIT","GHNA_v1", "GHNA_v3", 'WWUK_2024']
+# sites = ["JSIT","GHNA","GHNA", 'WWUK']
 
-start_times = ["20240409T0000","20220517T0000","20231026T0000", '20240101T0000']
-stop_times = ["20250101T0000","20231018T0000","20250101T0000", '20250101T0000']
+# start_times = ["20240409T0000","20220517T0000","20231026T0000", '20240101T0000']
+# stop_times = ["20250101T0000","20231018T0000","20250101T0000", '20250101T0000']
+
+tags = ["GHNA_v3", 'WWUK_2024']
+sites = ["GHNA", 'WWUK']
+
+start_times = ["20231026T0000", '20240101T0000']
+stop_times = ["20250101T0000", '20250101T0000']
 
 wavelength = [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640]
 plot_wavelength = 550
