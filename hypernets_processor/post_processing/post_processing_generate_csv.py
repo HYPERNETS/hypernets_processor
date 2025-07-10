@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 # set appropriate folders (different for linux or windows) and settings
 
 # for windows:
-data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+# data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
+# results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
 
 # for eoserver:
-# os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
-# data_path = r"/mnt/t/data/insitu/hypernets/archive"
-# results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
+data_path = r"/mnt/t/data/insitu/hypernets/archive"
+results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
