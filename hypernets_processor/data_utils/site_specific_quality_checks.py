@@ -118,6 +118,10 @@ class SiteSpecificQualityChecks:
         if not seq_within_period:
             self.context.anomaly_handler.add_anomaly("per")
 
+        # anomaly is raised if data is within deployment period that is not valid for satellite validation
+        if not deploy_periods[i_dep_save]["valid"]:
+            self.context.anomaly_handler.add_anomaly("val")
+
         # anomaly is raised if data is outside time of day limits
         if limit_tod_period[i_dep_save] is not None and ((convert_datetime(
                 dataset_l2a.acquisition_time.values.max()
