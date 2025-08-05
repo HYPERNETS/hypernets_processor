@@ -5,7 +5,7 @@ from numpy.random import normal
 from scipy.optimize import curve_fit
 import xarray as xr
 from scipy.stats import chisquare
-from scipy.stats import binned_statistic
+from scipy.stats import binned_statistic, binned_statistic_2d
 import datetime
 from curepy import MCMCRetrieval, plot_trace, plot_corner
 import os
@@ -17,9 +17,11 @@ results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment"
 data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv', delimiter = ',')
 data.drop('Unnamed: 0', axis = 'columns')
 
-data_v1 = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_JAESv3_analysis.csv', delimiter = ',')
+site = 'LOBEv4'
+data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site}_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
+data_v1 = data_v1.sort_values(by = 'Date')
 
 #cloud check and flag removal
 data = data[data['model_550nm']*0.9 < data['obs_550nm']]
@@ -66,10 +68,13 @@ data = xr.Dataset(data_vars = dict(
 data_before_may24 = data.sel(date = slice('2023-10-01', '2024-05-23'))
 data_after_may24 = data.sel(date = slice('2024-05-24', '2025-01-01'))
 
+
+
 #cloud check and flag removal
 data_v1 = data_v1[data_v1['model_550nm']*0.9 < data_v1['obs_550nm']]
 data_v1 = data_v1[data_v1['model_550nm']*1.2 > data_v1['obs_550nm']]
 data_v1 = data_v1[data_v1['Flag'] == 0]
+data_v1 = data_v1[data_v1['Time'] > 830]
 
 #format data_v1
 sza_measured_v1 = data_v1['SZA'].values
@@ -106,6 +111,9 @@ data_v1 = xr.Dataset(data_vars = dict(
         date = ('date', [datetime.datetime.strptime(str(x), '%Y%m%d') for x in data_v1['Date']]),
         wv = ('wv', list(ratio_dict.keys()))
     ))
+
+
+#data_v1 = data_v1.sel(date = slice('2024-05-24', '2025-01-01'))
 
 
 
@@ -158,6 +166,20 @@ def ratio_calculator_10offsets(vza, vaa, offset, offset2, offset3, offset4, offs
     new_direct_to_diffuse=direct_to_diffuse*np.cos(new_sza)/np.cos(sza)
     offsets=np.array([offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10, offset11, offset12])
     return (new_direct_to_diffuse+1) / (direct_to_diffuse+1) + offsets[:,None]
+
+
+def ratio_calculator_only_offsets(offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10, offset11, offset12, sza, saa, direct_to_diffuse):
+    vza = 0
+    vaa = 0
+    sza = np.radians(sza)
+    saa = np.radians(saa)
+
+    # new_sza = np.cos(sza + vza*np.cos((saa - vaa + 360) % 360))
+    new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
+    new_direct_to_diffuse = direct_to_diffuse * np.cos(new_sza) / np.cos(sza)
+    offsets = np.array(
+        [offset, offset2, offset3, offset4, offset5, offset6, offset7, offset8, offset9, offset10, offset11, offset12])
+    return (new_direct_to_diffuse + 1) / (direct_to_diffuse + 1) + offsets[:, None]
 
 def ratio_uncertainty_calculator(vza, vaa, sza, saa, u_vza, u_vaa):
     if vza < 0:
@@ -346,7 +368,7 @@ def chi_square_minimiser_MCMC(sza, saa, dir_diff_ratio, measured_ratio, plot_nam
         tag = plot_name
      )
 
-    return mean, unc
+    return mean, unc, chisq/(len(sza) - 2)
 
 def chi_square_minimiser_MCMC_offset(sza, saa, dir_diff_ratio, measured_ratio, plot_name = ''):
 
@@ -411,11 +433,11 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
     print('CHI',len(sza) - 14, chisq, chisq/(len(sza) - 14))
 
 
-    plot_corner(
-         samples,
-         os.path.join(results_path, "plot_corner_%s.png" % plot_name),
-         labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10', 'offset11', 'offset12'],
-     )
+    #plot_corner(
+     #    samples,
+      #   os.path.join(results_path, "plot_corner_%s.png" % plot_name),
+       #  labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10', 'offset11', 'offset12'],
+     #)
 #    plot_trace(
  #        samples,
   #       labels=['vza','vaa', 'offset', 'offset2', 'offset3', 'offset4', 'offset5', 'offset6', 'offset7', 'offset8', 'offset9', 'offset10'],
@@ -423,7 +445,33 @@ def chi_square_minimiser_MCMC_10offsets(sza, saa, dir_diff_ratio, measured_ratio
     #    tag = plot_name
      #)
 
-    return mean, unc
+    return mean, unc, chisq/(len(sza) - 14)
+
+def chi_square_minimiser_MCMC_only_offsets(sza, saa, dir_diff_ratio, measured_ratio, plot_name = ''):
+    mcmc = MCMCRetrieval(
+        ratio_calculator_only_offsets,
+        measured_ratio,
+        rand_uncertainty=0.05,
+        syst_uncertainty=0.05,
+        initial_guess=[0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+        downlims=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+        uplims=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        # initial_guess=[2, -40,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        # downlims=[-90, -180, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+        # uplims=[90, 180, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        n_input=12,
+        b=[sza, saa, dir_diff_ratio],
+        u_b=[0, 0, 0],
+        b_iter=1,
+        circular = True
+    )
+    mean, unc, corr, samples = mcmc.run_retrieval(
+        100, 10000, 1000, return_corr=True, return_samples=True
+    )
+    chisq = mcmc.find_chisum(mean)
+    print('Only Offsets CHI',len(sza) - 10, chisq, chisq/(len(sza) - 10))
+
+    return mean, unc, chisq/(len(sza) - 10)
 
 def plot_misalign_change(dataset):
     ma_dict = {'vza': {}, 'unc_vza': {}, 'num': {}, 'sza': {}, 'saa': {}}
@@ -774,7 +822,7 @@ def wav_together_misalignment_calculator(dataset, wavelength, site):
     #                                                 np.array(list(ds.ratio.values)),
     #                                                 plot_name=site)
 
-    mean, unc = chi_square_minimiser_MCMC(ds.sza.values, ds.saa.values,
+    mean, unc, chi  = chi_square_minimiser_MCMC(ds.sza.values, ds.saa.values,
                                                     ds.dir_diff_ratio.values,
                                                     np.array(list(ds.ratio.values)),
                                                     plot_name=site)
@@ -849,23 +897,34 @@ def wav_together_misalignment_calculator(dataset, wavelength, site):
 
 def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
     ma_dict = {'vza': [], 'unc_vza': [], 'vaa': [], 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': [],
-               'obs_ratio': {}, 'corr_grid': {}, 'offset': {}, 'ratio_grid': {}, 'obs_grid': {}, 'time': {}, 'unc_grid': {}}
+               'obs_ratio': {}, 'corr_grid': {}, 'offset': {}, 'ratio_grid': {}, 'obs_grid': {}, 'time': {},
+               'unc_grid': {}, 'offset_grid': {}, 'all_grid': {}}
 
     residuals = []
 
     ds = dataset.set_coords('sza').where(dataset.sza > 0)
     ds = ds.dropna(dim = 'date')
 
-    mean, unc = chi_square_minimiser_MCMC_10offsets(ds.sza.values, ds.saa.values,
+    mean, unc, chi = chi_square_minimiser_MCMC_10offsets(ds.sza.values, ds.saa.values,
                                           ds.dir_diff_ratio.values,
                                           np.array(list(ds.ratio.values)),
                                                     plot_name=site)
 
+    #mean, unc, chi = chi_square_minimiser_MCMC(ds.sza.values, ds.saa.values,
+     #                         ds.dir_diff_ratio.values,
+      #                        np.array(list(ds.ratio.values)),
+       #                       plot_name=site)
+
+    mean_only, unc_only, chi_only = chi_square_minimiser_MCMC_only_offsets(ds.sza.values, ds.saa.values,
+                                                                           ds.dir_diff_ratio.values,
+                                                                           np.array(list(ds.ratio.values)))
+    print(chi, chi_only)
     print('VZA', mean[0], unc[0])
     print('VAA', mean[1], unc[1])
     mean = list(mean)
     unc = list(unc)
 
+    #mean = [mean[0], mean[1], *mean_only]
     if mean[0] < 0:
         mean[0] = -mean[0]
         mean[1] += -180
@@ -877,6 +936,7 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
     ma_dict['num'] = len(ds.sza.values)
 
     for iwav, wav in enumerate(wavelength):
+        #mean[iwav+2] = 0
         ds = dataset.loc[dict(wv=wav)].set_coords('sza').where(dataset.sza > 0)
         ds = ds.dropna(dim='date')
         # try:
@@ -889,6 +949,9 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
         correction_grid = ratio_calculator(mean[0], mean[1],
                                            ds.sza.values, ds.saa.values,
                                            ds.dir_diff_ratio.values)
+        offset_grid = ratio_calculator_only_offsets(*mean_only,
+                                           ds.sza.values, ds.saa.values,
+                                           ds.dir_diff_ratio.values)
 
         ma_dict['ratio'][f'{wav}'] = np.mean(ratio_grid)
         ma_dict['unc_ratio'][f'{wav}'] = np.sqrt(
@@ -896,11 +959,30 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
         ma_dict['obs_ratio'][f'{wav}'] = np.mean(np.array(list(ds.ratio.values)))
         ma_dict['offset'][f'{wav}'] = mean[iwav + 2]
         ma_dict['obs_grid'][f'{wav}'] = np.array(list(ds.ratio.values))
+        ma_dict['offset_grid'][f'{wav}'] = ds.ratio.values / offset_grid[iwav,:]
         ma_dict['corr_grid'][f'{wav}'] = np.array(list(ds.ratio.values / correction_grid))
         ma_dict['ratio_grid'][f'{wav}'] = ratio_grid
+        ma_dict['all_grid'][f'{wav}'] = np.array(list(ds.ratio.values / ratio_grid))
         ma_dict['time'][f'{wav}'] = np.array(list(ds.time.values))
         ma_dict['unc_grid'][f'{wav}'] = ratio_unc
         residuals += [float(x) for x in list((np.array(list(ds.ratio.values)) - ratio_grid) / ratio_unc)]
+
+        fig, ax = plt.subplots(3, 1, sharex=True)
+        ax[0].scatter(ds.date.values, np.array(list(ds.ratio.values)),
+                       marker='x', alpha = 0.7)
+        ax[1].scatter(ds.date.values, np.array(list(ds.ratio.values / correction_grid)),
+                       marker='x', alpha = 0.7)
+        ax[2].scatter(ds.date.values, np.array(list(ds.ratio.values)) - np.array(list(ds.ratio.values / correction_grid)),
+                      marker='x', alpha=0.7)
+        ax[0].grid(color='black', alpha=0.5, axis='y')
+        ax[1].grid(color='black', alpha=0.5, axis='y')
+        ax[2].grid(color='black', alpha=0.5, axis='y')
+        ax[0].set_ylabel('Observed Ratio')
+        ax[1].set_ylabel('Corrected Ratio')
+        ax[2].set_ylabel('Observed - Corrected Ratio')
+        ax[2].set_xlabel('Date')
+        fig.tight_layout()
+        fig.savefig(os.path.join(results_path, f'{site}_temporal_ratio_{wav}.png'))
 
         # except:
         #     ma_dict[f'{wav}'] = np.nan
@@ -918,16 +1000,22 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
     ax.set_ylim([0, 5])
     fig.savefig(os.path.join(results_path, f'{site}_retrieval_plot_combined.png'))
 
-    fig, ax = plt.subplots(1,1, sharex = True)
-    ax.errorbar(ma_dict['ratio'].keys(), [ma_dict['ratio'][k] - ma_dict['offset'][k] for k in ma_dict['ratio'].keys()],
-                yerr=list(ma_dict['unc_ratio'].values()),
+    fig, ax = plt.subplots(2,1, sharex = True, sharey = True)
+    ax[0].errorbar([int(x) for x in wavelength], [ma_dict['obs_ratio'][k] for k in ma_dict['ratio'].keys()],
+                   yerr=np.std(list(ma_dict['obs_grid'].values())),
+                   marker='x', linestyle='', capsize=5)
+    ax[1].errorbar([int(x) for x in wavelength], [np.mean(ma_dict['corr_grid'][k]) for k in ma_dict['ratio'].keys()],
+                yerr=np.std(list(ma_dict['corr_grid'].values())),
                     marker='x', linestyle='', capsize=5)
-
-    ax.grid(color = 'black', alpha = 0.5, axis = 'y')
-    ax.set_ylabel('Ratio')
-    ax.set_xlabel('Wavelength')
+    ax[0].grid(color = 'black', alpha = 0.5, axis = 'y')
+    ax[1].grid(color='black', alpha=0.5, axis='y')
+    ax[0].set_ylabel('Observed Ratio')
+    ax[1].set_ylabel('Corrected Ratio')
+    ax[1].set_xlabel('Wavelength')
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'{site}_ratio_plot_combined.png'))
+    fig.savefig(os.path.join(results_path , f'{site}_spectral_ratio.png'))
+
+
 
     return ma_dict
 
@@ -976,9 +1064,12 @@ data_v1=data_v1.isel(date=i_time_val)
 
 #before_dict = wav_together_misalignment_calculator_offset(data_before_may24, wavelengths, 'GHNAv3_before')
 #after_dict = wav_together_misalignment_calculator_offset(data_after_may24, wavelengths, 'GHNAv3_after')
-v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, 'JAESv3')
+v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, site)
 
 for wav in wavelengths:
+
+
+
     fig, axs = plt.subplots(5, 1, sharex=True, figsize = (6,10))
 
     #before_dict['time'][f'{wav}'] = [int(x) for x in before_dict['time'][f'{wav}']]
@@ -1099,7 +1190,102 @@ for wav in wavelengths:
     fig.suptitle(f'{wav}')
 
     fig.tight_layout()
-    fig.savefig(os.path.join(results_path , f'JAESv3_ratio_tod_plot_{wav}.png'))
+    fig.savefig(os.path.join(results_path , f'{site}_ratio_tod_plot_{wav}.png'))
+    plt.close()
+
+    binned_data_obs = binned_statistic_2d(np.radians(data_v1.saa.values), data_v1.sza.values,
+                                          list(v1_dict['obs_grid'][f'{wav}']), bins = 10)
+    binned_data_corr = binned_statistic_2d(np.radians(data_v1.saa.values), data_v1.sza.values,
+                                          list(v1_dict['corr_grid'][f'{wav}']), bins = 10)
+    binned_data_offset = binned_statistic_2d(np.radians(data_v1.saa.values), data_v1.sza.values,
+                                           list(v1_dict['offset_grid'][f'{wav}']), bins=10)
+    binned_data_all = binned_statistic_2d(np.radians(data_v1.saa.values), data_v1.sza.values,
+                                           list(v1_dict['all_grid'][f'{wav}']), bins=10)
+
+    sza_mesh, saa_mesh = np.meshgrid(binned_data_corr.y_edge, binned_data_corr.x_edge)
+    saa_grid = binned_data_corr.x_edge
+    sza_grid = binned_data_corr.y_edge
+
+    refl_corr = np.zeros((len(saa_grid), len(sza_grid)))
+    refl_obs = np.zeros((len(saa_grid), len(sza_grid)))
+    refl_offset =  np.zeros((len(saa_grid), len(sza_grid)))
+    refl_all = np.zeros((len(saa_grid), len(sza_grid)))
+    for i in range(len(saa_grid) - 1):
+        for j in range(len(sza_grid) - 1):
+            id_series = np.where((data_v1.sza.values > sza_grid[j]) &
+                                 (data_v1.sza.values < sza_grid[j + 1]) &
+                                 (np.radians(data_v1.saa.values) > saa_grid[i]) &
+                                 (np.radians(data_v1.saa.values) < saa_grid[i + 1]))[0]
+            if len(id_series) == 1:
+                refl_corr[i, j] = list(v1_dict['corr_grid'][f'{wav}'])[id_series[0]]
+                refl_obs[i, j] = list(v1_dict['obs_grid'][f'{wav}'])[id_series[0]]
+                refl_offset[i, j] = list(v1_dict['offset_grid'][f'{wav}'])[id_series[0]]
+                refl_all[i, j] = list(v1_dict['all_grid'][f'{wav}'])[id_series[0]]
+
+            elif len(id_series) > 1:
+                refl_corr[i, j] = np.mean([list(v1_dict['corr_grid'][f'{wav}'])[k] for k in id_series])
+                refl_obs[i, j] = np.mean([list(v1_dict['obs_grid'][f'{wav}'])[k] for k in id_series])
+                refl_offset[i, j] = np.mean([list(v1_dict['offset_grid'][f'{wav}'])[k] for k in id_series])
+                refl_all[i, j] = np.mean([list(v1_dict['all_grid'][f'{wav}'])[k] for k in id_series])
+
+    refl_corr[refl_corr == 0] = np.nan
+    refl_obs[refl_obs == 0] = np.nan
+    refl_offset[refl_offset == 0] = np.nan
+    refl_all[refl_all == 0] = np.nan
+
+    fig, axs = plt.subplots(2, 2, figsize = (20,16), subplot_kw={'projection': 'polar'})
+    norm = matplotlib.colors.CenteredNorm(vcenter = 1, halfrange = 0.1)
+    for ax in axs[0]:
+        ax.set_theta_direction(-1)
+        ax.set_theta_offset(np.pi / 2.0)
+    for ax in axs[1]:
+        ax.set_theta_direction(-1)
+        ax.set_theta_offset(np.pi / 2.0)
+    im0 = axs[0,0].pcolormesh(
+        saa_mesh,
+        sza_mesh,
+        refl_obs,
+        shading="auto",
+        cmap='coolwarm',
+        norm = norm)
+
+    im1 = axs[0,1].pcolormesh(
+        saa_mesh,
+        sza_mesh,
+        refl_corr,
+        shading="auto",
+        cmap='coolwarm',
+        norm = norm)
+
+    im2 = axs[1,0].pcolormesh(
+        saa_mesh,
+        sza_mesh,
+        refl_offset,
+        shading="auto",
+        cmap='coolwarm',
+        norm=norm)
+
+    im3 = axs[1,1].pcolormesh(
+        saa_mesh,
+        sza_mesh,
+        refl_all,
+        shading="auto",
+        cmap='coolwarm',
+        norm=norm)
+
+    cbar0 = fig.colorbar(im0, ax = axs[0,0], fraction = 0.1, shrink = 0.8, pad = 0.2)
+    cbar1 = fig.colorbar(im1, ax = axs[0,1], fraction = 0.1, shrink = 0.8, pad = 0.2)
+    cbar2 = fig.colorbar(im2, ax = axs[1,0], fraction = 0.1, shrink = 0.8, pad = 0.2)
+    cbar3 = fig.colorbar(im3, ax=axs[1,1], fraction=0.1, shrink=0.8, pad=0.2)
+
+    axs[0,0].set_title('Observed Ratio')
+    axs[0,1].set_title('Corrected Ratio')
+    axs[1,0].set_title('Only Offsets Ratio')
+    axs[1,1].set_title('Corrected Ratio \nIncluding Offsets')
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(results_path , f'{site}_ratio_polar_plot_{wav}.png'))
+    plt.close()
 
 
 

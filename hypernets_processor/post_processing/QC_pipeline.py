@@ -18,7 +18,7 @@ wav_df = xr.open_dataset(
 )
 wav = wav_df.wavelength.values
 
-
+root = 'T:/ECO/EOServer/'
 def find_nearest_to_wav(array, wv, value):
     wv = np.asarray(wv)
     idx = (np.abs(wv - value)).argmin()
@@ -318,12 +318,14 @@ class PostProcessingDataset:
         # extract dates and times
         dates = []
         times = []
+        datetimes = []
         for i in range(len(data)):
             date = data["# id"][i][3:11]
             time = data["# id"][i][12:16]
             dates.append(date)
             times.append(time)
-        dt_data = data.assign(date=dates, time=times)
+            datetimes.append(datetime.datetime.strptime(date + ':' + time, '%Y%m%d:%H%M'))
+        dt_data = data.assign(date=dates, time=times, datetimes = datetimes)
         labelled_data = dt_data.assign(
             post_processing_flags=[[] for _ in range(len(data))]
         )
@@ -354,7 +356,12 @@ class PostProcessingDataset:
         else:
             self.clear_sky_list = None
             self.clear_sky_aod = clear_sky_aod
-            self.clear_sky_model = xr.open_dataset("T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_aod{}.nc".format(site, clear_sky_aod))
+            if self.clear_sky_aod == 'median':
+                self.clear_sky_model = xr.open_dataset(
+                    "T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_medianaod.nc".format(
+                        site, clear_sky_aod))
+            else:
+                self.clear_sky_model = xr.open_dataset("T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_aod{}.nc".format(site, clear_sky_aod))
 
     def choose_clear_sky_model(self, aod):
         if self.clear_sky_list is not None:
@@ -555,6 +562,30 @@ class PostProcessingDataset:
         ]:
             x.append(3)
 
+    def append_aod(self):
+        if self.site == 'GHNA':
+            aod_path = r'T:/ECO/EOServer/data/insitu/radcalnet/RadCalNet-All-Sites-Feb2025/GONA/'
+            dates = [x[3:11] for x in self.irradiance['ID'].values]
+            years = [x[0:4] for x in dates]
+            doy = [datetime.date(int(x[0:4]), int(x[4:6]), int(x[6:8])).timetuple().tm_yday for x in dates]
+            aod_files = [aod_path + f'GONA01_{years[i]}_{doy[i]}_v00.09.input' for i in range(len(dates))]
+            aods = []
+            for path in aod_files:
+                try:
+                    f = open(path, 'r')
+                    datafile = f.readlines()
+                    row = [i for i, s in enumerate(datafile) if "AOD:\t" in s][0]
+                    aod = np.mean([float(i.rstrip()) for i in datafile[row].split("\t")[1::] if i.rstrip() != ""])
+                    aods.append(aod)
+                except:
+                    aods.append(np.nan)
+
+            for i, v in enumerate(aods):
+                if aods[i] > 10:
+                    aods[i] = np.nan
+
+            self.irradiance['aod'] = aods
+
     def misalignment_correction(self, vza, vaa, multiple_periods = False, period_date = None):
         szas = self.radiance[' sza']
         saas = self.radiance[' saa']
@@ -656,7 +687,7 @@ class PostProcessingDataset:
             self.cc_radiance = new
 
 
-    def write_irr_analysis_files(self, filename, wavelengths):
+    def write_irr_analysis_files(self, filename, wavelengths, save = True, plot = False, interp = False):
         szas = self.irradiance['SZA']
         IDs = self.irradiance['ID']
         saas = self.irradiance['SAA']
@@ -669,8 +700,8 @@ class PostProcessingDataset:
         output_data = pd.DataFrame({'IDs': IDs, 'SZA': szas, 'SAA': saas,
                                     'Time': [x[12:16] for x in IDs],'Date': [x[3:11] for x in IDs],
                                     'Flag': self.irradiance['Flag']})
-
-        output_data = output_data[output_data['IDs'].isin(self.radiance['# id'])]
+        if interp:
+            output_data['AOD'] = self.irradiance['aod']
 
         for wv in wavelengths:
             model = np.zeros(output_data.shape[0])
@@ -678,8 +709,44 @@ class PostProcessingDataset:
             dir_to_diff = np.zeros(output_data.shape[0])
 
             for i in range(output_data.shape[0]):
-                model[i] = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'solar_irradiance_BOA'),
-                                               wav, wv)
+                if not interp:
+                    model[i] = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'solar_irradiance_BOA'),
+                                                   wav, wv)
+                else:
+                    aod_0 = find_nearest_to_wav(
+                        modelled_data_read_and_interp(szas[i],
+                                                      xr.open_dataset(
+                                                          "T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_aod{}.nc".format(
+                                                              self.site, '0.0')),
+                                                      'solar_irradiance_BOA'),
+                        wav, wv)
+                    aod_1 = find_nearest_to_wav(
+                        modelled_data_read_and_interp(szas[i],
+                                                      xr.open_dataset(
+                                                          "T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_aod{}.nc".format(
+                                                              self.site, '0.1')),
+                                                      'solar_irradiance_BOA'),
+                        wav, wv)
+                    aod_2 = find_nearest_to_wav(
+                        modelled_data_read_and_interp(szas[i],
+                                                      xr.open_dataset(
+                                                          "T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_aod{}.nc".format(
+                                                              self.site, '0.2')),
+                                                      'solar_irradiance_BOA'),
+                        wav, wv)
+                    aod_3 = find_nearest_to_wav(
+                        modelled_data_read_and_interp(szas[i],
+                                                      xr.open_dataset(
+                                                          "T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_aod{}.nc".format(
+                                                              self.site, '0.3')),
+                                                      'solar_irradiance_BOA'),
+                        wav, wv)
+
+                    mod_arr = [aod_0, aod_1, aod_2, aod_3]
+                    mod_aod = [0, 0.1, 0.2, 0.3]
+                    model[i] = np.interp(output_data['AOD'][i], mod_aod, mod_arr)
+
+
                 observ[i] = find_nearest_to_wav(data[i, :], wav, wv)
                 dir_to_diff[i] = find_nearest_to_wav(modelled_data_read_and_interp(szas[i], self.clear_sky_model, 'direct_to_diffuse_irradiance_ratio'),
                                                      wav, wv)
@@ -689,7 +756,15 @@ class PostProcessingDataset:
             output_data[f'dir_diff_ratio_{wv}nm'] = dir_to_diff
             output_data[f'ratio_{wv}nm'] = model/observ
 
-        output_data.to_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\{}.csv'.format(filename))
+            if plot:
+                fig, ax = plt.subplots(1, 1, )
+                ax.scatter(output_data['AOD'], model/observ)
+                fig.savefig(r'T:\ECO\EOServer\joe\hypernets_plots\aod_plots\{}_aod_ratio_interpolated_{}.png'.format(self.period_name, wv))
+
+
+        if save:
+            output_data = output_data[output_data['IDs'].isin(self.radiance['# id'])]
+            output_data.to_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\{}.csv'.format(filename))
 
     def plane_fitter(self, labelled = False, plot = False):
 
@@ -1238,6 +1313,48 @@ class PostProcessingDataset:
         else:
             print("data not masked")
 
+    def plot_ndvi_timeseries(self):
+        #mask = np.where((self.radiance[' vza'] > 8) &
+         #               (self.radiance[' vza'] < 12) &
+          #              (self.radiance[' vaa'] < 115) &
+           #             (self.radiance[' vaa'] > 96))[0]
+        #self.radiance = self.radiance.drop(mask)
+        #self.radiance.reset_index(drop = True, inplace = True)
+        x = self.radiance.datetimes.values
+        y = self.radiance.ndvi.values
+        dates = self.radiance['date']
+        #summer_dates = [dat for dat in dates if dat[4:6] == '06' or dat[4:6] == '07' or dat[4:6] == '08']
+        #summer_y = [v for i, v in enumerate(y) if dates[i] in summer_dates]
+        #y_mean = np.nanmean(summer_y)
+        #y_std = np.nanstd(summer_y)
+        ys = pd.Series(y)
+        rolling_mean = ys.rolling(100).mean()
+        rolling_std = ys.rolling(100).std()
+
+        fig, ax = plt.subplots(2, 1, figsize = (20, 14))
+        ax[0].scatter(x, y, color='g', s=2, alpha=0.7)
+        ax[0].plot(x, rolling_mean, color = 'b')
+        ax[0].fill_between(x, rolling_mean - rolling_std, rolling_mean + rolling_std, color = 'blue', alpha = 0.2)
+        #ax[0].axhline(y_mean, color = 'black')
+        #ax[0].axhline(y_mean + y_std, color='red')
+        #ax[0].axhline(y_mean - y_std, color='red')
+        #ax[0].axhline(y_mean + 2*y_std, color='orange')
+        #ax[0].axhline(y_mean - 2*y_std, color='orange')
+        #ax[0].axhline(y_mean + 3*y_std, color='yellow')
+        #ax[0].axhline(y_mean - 3*y_std, color='yellow')
+
+        ax[1].plot(x, rolling_std)
+        #ax[1].axhline(y_std, color='red')
+        #ax[1].axhline(2 * y_std, color='orange')
+        #ax[1].axhline(3 * y_std, color='yellow')
+
+        ax[0].set_ylabel('NDVI')
+        ax[1].set_ylabel('NDVI StD')
+        ax[1].set_xlabel('Date')
+        ax[0].set_title(f'{self.period_name} NDVI Timeseries')
+        plt.gcf().autofmt_xdate()
+        fig.savefig(root + f'/joe/hypernets_plots/QC_pipeline_plots/{self.period_name}_ndvi_timeseries')
+
 
 def pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit):
     print("Initial", len(dataset.radiance))
@@ -1400,6 +1517,33 @@ def irradiance_analysis_writer(dataset: PostProcessingDataset, maintenance, sza_
     dataset.write_irr_analysis_files(filename, wvs)
     print('File Written')
 
+def aod_plotter(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs):
+    print('Initial', len(dataset.radiance))
+    dataset.maintenance_check(maintenance)
+    print('Maintenance', len(dataset.radiance))
+    dataset.sza_check(sza_limit)
+    print('SZA', len(dataset.radiance))
+    dataset.raa_cut(raa_limit)
+    print('RAA', len(dataset.radiance))
+    dataset.clean_irr()
+    print('IRR Flags', len(dataset.radiance))
+    dataset.append_aod()
+    dataset.write_irr_analysis_files(filename, wvs, save = True, plot = True, interp = True)
+    print('Done')
+
+def ndvi_bound_calculator(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit):
+    print('Initial', len(dataset.radiance))
+    dataset.maintenance_check(maintenance)
+    print('Maintenance', len(dataset.radiance))
+    dataset.sza_check(sza_limit)
+    print('SZA', len(dataset.radiance))
+    dataset.raa_cut(raa_limit)
+    print('RAA', len(dataset.radiance))
+    dataset.clean_irr()
+    print('IRR Flags', len(dataset.radiance))
+    dataset.calculate_ndvi()
+    dataset.plot_ndvi_timeseries()
+
 def misalignment_correction_writer(dataset: PostProcessingDataset, vza, vaa,
                                    multiple_periods = False, period_date = None):
     dataset.misalignment_correction(vza, vaa, multiple_periods, period_date)
@@ -1412,22 +1556,22 @@ JSIT_dict = {'NovDec24Jan25': ('2024-11-14', '2025-01-31'),
 JSIT_maintenance_dates = []
 '''
 for k, v in JSIT_dict.items():
-    QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/JSIT_2024-04-09_present_None_None_None_None_misalign_corrected.csv',
-                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/JSIT_irradiance.csv',
+    QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/LOBE_2023-05-31_2023-08-11_None_None_None_None_misalign_corrected.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/LOBEv1_irradiance.csv',
                             r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
-                            'JSIT',
+                            'LOBE',
                             f'JSIT_{k}',
                             '0.1')
 
     new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
                      fit_method = 'bounds', split_by_date = True, start = v[0], end = v[1])
 '''
-QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None.csv',
-                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/LOBE_2025-04-15_present_None_None_None_None.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/LOBEv4_irradiance.csv',
                             r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
-                            'GHNA',
-                            f'GHNAv3_after_new',
-                            '0.1',
+                            'LOBE',
+                            f'LOBEv4',
+                            'median',
                            '550')
 GHNA_maintenance_dates = [
     "20231016",
@@ -1453,9 +1597,10 @@ GHNA_maintenance_dates = [
 
 WWUK_maintenance_dates = []
 JAES_maintenance_dates = []
+LOBE_maintenance_dates = []
 
-
-misalignment_correction_writer(QC,  (1.76, 1.59), (-80, -77), True, '20240521')
+#ndvi_bound_calculator(QC, LOBE_maintenance_dates, 60, 10)
+#misalignment_correction_writer(QC,  (1.76, 1.59), (-80, -77), True, '20240521')
 #new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10, 0, #(1.76,1.59),
  #                  0,# (-80, -77),
   #                 False,
@@ -1472,13 +1617,20 @@ misalignment_correction_writer(QC,  (1.76, 1.59), (-80, -77), True, '20240521')
    #                False,
     #               fit_method = 'bounds')
 
-#new_plane_pipeline(QC, WWUK_maintenance_dates, 70, 10, 0, 0, False,
- #                  fit_method = 'bounds')
+#new_plane_pipeline(QC, WWUK_maintenance_dates, 70, 10, 0.93, 24.8, False,
+      #             fit_method = 'bounds')
 
-#irradiance_analysis_writer(QC, JAES_maintenance_dates, 70, 10,
- #                          'irradiance_JAESv1_analysis',
+#irradiance_analysis_writer(QC, LOBE_maintenance_dates, 60, 10,
+ #                          'irradiance_LOBEv4_analysis',
   #                       [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
 
 
-#new_plane_pipeline(QC, JAES_maintenance_dates, 70, 10, 1.21, 8.6, False,
- #                  fit_method = 'bounds')
+#new_plane_pipeline(QC, JAES_maintenance_dates, 70, 10, 0, 0, False,
+              #     fit_method = 'bounds')
+
+new_plane_pipeline(QC, LOBE_maintenance_dates, 60, 10, 0, 0, False,
+                   fit_method = 'bounds')
+
+#aod_plotter(QC, LOBE_maintenance_dates, 60, 10,
+ #                          'irradiance_LOBEv3_analysis',
+  #                       [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
