@@ -11,7 +11,6 @@ import math
 import datetime
 import matplotlib
 import glob
-from seaborn.external.docscrape import header
 
 wav_df = xr.open_dataset(
     r"T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc"
@@ -586,7 +585,7 @@ class PostProcessingDataset:
 
             self.irradiance['aod'] = aods
 
-    def misalignment_correction(self, vza, vaa, multiple_periods = False, period_date = None):
+    def misalignment_correction(self, vza, vaa, mean_corr, multiple_periods = False, period_date = None):
         szas = self.radiance[' sza']
         saas = self.radiance[' saa']
         data = np.zeros((self.irradiance.shape[0], len(self.irradiance.columns) - 6))
@@ -601,17 +600,17 @@ class PostProcessingDataset:
                     wav, wv)
 
             if not multiple_periods:
-                self.radiance[f' refl_{wv}nm'] = self.radiance[f' refl_{wv}nm'] * ratio_calculator(vza, vaa, szas, saas, dir_to_diff)
+                self.radiance[f' refl_{wv}nm'] = self.radiance[f' refl_{wv}nm'] * ratio_calculator(vza, vaa, szas, saas, dir_to_diff)/mean_corr
             else:
                 divider_idx = np.min(np.argwhere(self.radiance['date'] == period_date))
                 self.radiance[f' refl_{wv}nm'][:divider_idx] = (
                         self.radiance[f' refl_{wv}nm'][:divider_idx] *
                         ratio_calculator(vza[0], vaa[0], szas[:divider_idx], saas[:divider_idx],
-                                         dir_to_diff[:divider_idx]))
+                                         dir_to_diff[:divider_idx]))/mean_corr[0]
                 self.radiance[f' refl_{wv}nm'][divider_idx:] = (
                         self.radiance[f' refl_{wv}nm'][divider_idx:] *
                         ratio_calculator(vza[1], vaa[1], szas[divider_idx:], saas[divider_idx:],
-                                         dir_to_diff[divider_idx:]))
+                                         dir_to_diff[divider_idx:]))/mean_corr[1]
 
 
     def cloud_check(self, tolerance, wavelength, rewrite, rewrite_var = None):
@@ -1443,7 +1442,7 @@ def multi_aod_tolerance_analysis(dataset: PostProcessingDataset, maintenance, sz
     dataset.raa_cut(raa_limit)
     dataset.clean_irr()
 
-def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, misalign_vza, misalign_vaa,
+def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, misalign_vza, misalign_vaa, mean_corr,
                        multiple_periods = False, period_date = None, fit_method = 'plane_fit',
                        split_by_date = False, start = None, end = None):
     print('Initial', len(dataset.radiance))
@@ -1463,7 +1462,7 @@ def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, r
     dataset.calculate_s2tci()
     #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/WWUK_initalQC.csv')
     if misalign_vza != 0 and misalign_vaa != 0:
-        dataset.misalignment_correction(misalign_vza, misalign_vaa, multiple_periods, period_date)
+        dataset.misalignment_correction(misalign_vza, misalign_vaa, mean_corr, multiple_periods, period_date)
     #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_misalignment_corrected.csv')
     dataset.cloud_check(0.9, 550, True, rewrite_var = 'radiance')
     dataset.save('radiance', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_CC.csv')
@@ -1544,9 +1543,9 @@ def ndvi_bound_calculator(dataset: PostProcessingDataset, maintenance, sza_limit
     dataset.calculate_ndvi()
     dataset.plot_ndvi_timeseries()
 
-def misalignment_correction_writer(dataset: PostProcessingDataset, vza, vaa,
+def misalignment_correction_writer(dataset: PostProcessingDataset, vza, vaa, mean_corr,
                                    multiple_periods = False, period_date = None):
-    dataset.misalignment_correction(vza, vaa, multiple_periods, period_date)
+    dataset.misalignment_correction(vza, vaa, mean_corr, multiple_periods, period_date)
     dataset.save('radiance',
                  r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv')
 
@@ -1566,11 +1565,11 @@ for k, v in JSIT_dict.items():
     new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
                      fit_method = 'bounds', split_by_date = True, start = v[0], end = v[1])
 '''
-QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/LOBE_2025-04-15_present_None_None_None_None.csv',
-                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/LOBEv4_irradiance.csv',
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
                             r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
-                            'LOBE',
-                            f'LOBEv4',
+                            'GHNA',
+                            f'GHNA_Oct23_May24',
                             'median',
                            '550')
 GHNA_maintenance_dates = [
@@ -1600,22 +1599,40 @@ JAES_maintenance_dates = []
 LOBE_maintenance_dates = []
 
 #ndvi_bound_calculator(QC, LOBE_maintenance_dates, 60, 10)
-#misalignment_correction_writer(QC,  (1.76, 1.59), (-80, -77), True, '20240521')
-#new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10, 0, #(1.76,1.59),
- #                  0,# (-80, -77),
-  #                 False,
-   #                split_by_date = True, start = '20240521', end = '20250501',
-    #               fit_method = 'bounds')
+misalignment_correction_writer(QC,  (1.96, 1.28), (-72.2, -36.4), (1.009, 1.011), True, '20240521')
+
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
+                            'GHNA',
+                            f'GHNA_Oct23_May24',
+                            'median',
+                           '550')
+
+new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10, 0, #(1.76,1.59),
+                   0,# (-80, -77),
+                   0,
+                   False,
+                   split_by_date = True, start = '20231026', end = '20240521',
+                   fit_method = 'bounds')
+QC.period_name = f'GHNA_May24_Aug25'
+new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10, 0, #(1.76,1.59),
+                   0,# (-80, -77),
+                   0,
+                   False,
+                   split_by_date = True, start = '20240521', end = '20250801',
+                   fit_method = 'bounds')
 
 
 #new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
                  #  fit_method = 'bounds')
 
-#new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10,
- #                  0, #0.69,
-  #                 0, #91,
-   #                False,
-    #               fit_method = 'bounds')
+#new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10,
+ #                  1.01,
+  #                 96.7,
+   #                0.996,
+    #               False,
+     #              fit_method = 'bounds')
 
 #new_plane_pipeline(QC, WWUK_maintenance_dates, 70, 10, 0.93, 24.8, False,
       #             fit_method = 'bounds')
@@ -1628,8 +1645,8 @@ LOBE_maintenance_dates = []
 #new_plane_pipeline(QC, JAES_maintenance_dates, 70, 10, 0, 0, False,
               #     fit_method = 'bounds')
 
-new_plane_pipeline(QC, LOBE_maintenance_dates, 60, 10, 0, 0, False,
-                   fit_method = 'bounds')
+#new_plane_pipeline(QC, LOBE_maintenance_dates, 60, 10, 0, 0, False,
+ #                  fit_method = 'bounds')
 
 #aod_plotter(QC, LOBE_maintenance_dates, 60, 10,
  #                          'irradiance_LOBEv3_analysis',

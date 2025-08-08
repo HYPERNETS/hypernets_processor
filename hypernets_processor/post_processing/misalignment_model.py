@@ -17,7 +17,7 @@ results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment"
 data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv', delimiter = ',')
 data.drop('Unnamed: 0', axis = 'columns')
 
-site = 'LOBEv4'
+site = 'GHNAv3'
 data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site}_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
@@ -113,7 +113,7 @@ data_v1 = xr.Dataset(data_vars = dict(
     ))
 
 
-#data_v1 = data_v1.sel(date = slice('2024-05-24', '2025-01-01'))
+data_v1 = data_v1.sel(date = slice('2024-05-24', '2025-08-01'))
 
 
 
@@ -895,10 +895,11 @@ def wav_together_misalignment_calculator(dataset, wavelength, site):
 
 
 
-def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
+def wav_together_misalignment_calculator_offset(dataset, wavelength, site, normalise = False, norm_width = None):
     ma_dict = {'vza': [], 'unc_vza': [], 'vaa': [], 'ratio': {}, 'unc_ratio': {}, 'unc_vaa': {}, 'num': [],
                'obs_ratio': {}, 'corr_grid': {}, 'offset': {}, 'ratio_grid': {}, 'obs_grid': {}, 'time': {},
-               'unc_grid': {}, 'offset_grid': {}, 'all_grid': {}}
+               'unc_grid': {}, 'offset_grid': {}, 'all_grid': {}, 'norm_corr_grid': {}, 'norm_width': norm_width,
+               'norm_corr_grid_all': {}}
 
     residuals = []
 
@@ -952,6 +953,8 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
         offset_grid = ratio_calculator_only_offsets(*mean_only,
                                            ds.sza.values, ds.saa.values,
                                            ds.dir_diff_ratio.values)
+        
+
 
         ma_dict['ratio'][f'{wav}'] = np.mean(ratio_grid)
         ma_dict['unc_ratio'][f'{wav}'] = np.sqrt(
@@ -966,6 +969,24 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
         ma_dict['time'][f'{wav}'] = np.array(list(ds.time.values))
         ma_dict['unc_grid'][f'{wav}'] = ratio_unc
         residuals += [float(x) for x in list((np.array(list(ds.ratio.values)) - ratio_grid) / ratio_unc)]
+        
+        if normalise:
+            if 'GHNA' in site:
+                noon_saa = 0
+            else:
+                noon_saa = 180
+                
+            if norm_width is None:
+                pass
+            else:
+                ds['correction_factor'] = ('date', correction_grid)
+                mean_corr_factor = np.mean(
+                    ds.where(
+                        (ds.saa > noon_saa - norm_width) | (ds.saa < -(noon_saa - norm_width)), drop = True
+                        ).correction_factor.values)
+                ma_dict['norm_corr_grid'][f'{wav}'] = ma_dict['corr_grid'][f'{wav}'] * mean_corr_factor
+                ma_dict['norm_corr_grid_all'][f'{wav}'] = ma_dict['corr_grid'][f'{wav}'] * np.mean(ds.correction_factor.values)
+        
 
         fig, ax = plt.subplots(3, 1, sharex=True)
         ax[0].scatter(ds.date.values, np.array(list(ds.ratio.values)),
@@ -986,7 +1007,8 @@ def wav_together_misalignment_calculator_offset(dataset, wavelength, site):
 
         # except:
         #     ma_dict[f'{wav}'] = np.nan
-
+    print('Mean Correction Factor', np.mean(ds.correction_factor.values), np.std(ds.correction_factor.values))
+    
     fig = plt.figure()
     ax = fig.add_subplot()
     ax.hist(residuals, 50, density = True, edgecolor = 'black', align = 'mid')
@@ -1064,7 +1086,7 @@ data_v1=data_v1.isel(date=i_time_val)
 
 #before_dict = wav_together_misalignment_calculator_offset(data_before_may24, wavelengths, 'GHNAv3_before')
 #after_dict = wav_together_misalignment_calculator_offset(data_after_may24, wavelengths, 'GHNAv3_after')
-v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, site)
+v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, site, normalise=True, norm_width=5)
 
 for wav in wavelengths:
 
@@ -1116,10 +1138,10 @@ for wav in wavelengths:
       #                                                   bins=bins)
 
     v1_corr_means, bin_edges, binnumber = binned_statistic(list(v1_dict['time'][f'{wav}']),
-                                                           list(v1_dict['corr_grid'][f'{wav}']), statistic='mean',
+                                                           list(v1_dict['norm_corr_grid'][f'{wav}']), statistic='mean',
                                                            bins=bins)
     v1_corr_std, bin_edge, binnumbe = binned_statistic(list(v1_dict['time'][f'{wav}']),
-                                                       list(v1_dict['corr_grid'][f'{wav}']), statistic='std', bins=bins)
+                                                       list(v1_dict['norm_corr_grid'][f'{wav}']), statistic='std', bins=bins)
 
     #before_sza, be, bn = binned_statistic(list(before_dict['time'][f'{wav}']),
      #                                         data_before_may24.sza.values, statistic='median', bins=bins)
@@ -1173,7 +1195,7 @@ for wav in wavelengths:
     axs[1].set_ylabel('Modelled Ratio')
     axs[0].set_ylabel('Observed Ratio')
     axs[2].set_ylabel('Observed-modelled')
-    axs[3].set_ylabel('Corrected Observed Ratio')
+    axs[3].set_ylabel('Normalised Corrected Ratio')
     axs[4].set_ylabel('SZA')
 
     axs[0].set_ylim(0.9,1.1)
@@ -1210,6 +1232,8 @@ for wav in wavelengths:
     refl_obs = np.zeros((len(saa_grid), len(sza_grid)))
     refl_offset =  np.zeros((len(saa_grid), len(sza_grid)))
     refl_all = np.zeros((len(saa_grid), len(sza_grid)))
+    refl_norm = np.zeros((len(saa_grid), len(sza_grid)))
+    refl_norm_all = np.zeros((len(saa_grid), len(sza_grid)))
     for i in range(len(saa_grid) - 1):
         for j in range(len(sza_grid) - 1):
             id_series = np.where((data_v1.sza.values > sza_grid[j]) &
@@ -1221,19 +1245,25 @@ for wav in wavelengths:
                 refl_obs[i, j] = list(v1_dict['obs_grid'][f'{wav}'])[id_series[0]]
                 refl_offset[i, j] = list(v1_dict['offset_grid'][f'{wav}'])[id_series[0]]
                 refl_all[i, j] = list(v1_dict['all_grid'][f'{wav}'])[id_series[0]]
+                refl_norm[i, j] = list(v1_dict['norm_corr_grid'][f'{wav}'])[id_series[0]]
+                refl_norm_all[i, j] = list(v1_dict['norm_corr_grid_all'][f'{wav}'])[id_series[0]]
 
             elif len(id_series) > 1:
                 refl_corr[i, j] = np.mean([list(v1_dict['corr_grid'][f'{wav}'])[k] for k in id_series])
                 refl_obs[i, j] = np.mean([list(v1_dict['obs_grid'][f'{wav}'])[k] for k in id_series])
                 refl_offset[i, j] = np.mean([list(v1_dict['offset_grid'][f'{wav}'])[k] for k in id_series])
                 refl_all[i, j] = np.mean([list(v1_dict['all_grid'][f'{wav}'])[k] for k in id_series])
+                refl_norm[i, j] = np.mean([list(v1_dict['norm_corr_grid'][f'{wav}'])[k] for k in id_series])
+                refl_norm_all[i, j] = np.mean([list(v1_dict['norm_corr_grid_all'][f'{wav}'])[k] for k in id_series])
 
     refl_corr[refl_corr == 0] = np.nan
     refl_obs[refl_obs == 0] = np.nan
     refl_offset[refl_offset == 0] = np.nan
     refl_all[refl_all == 0] = np.nan
-
-    fig, axs = plt.subplots(2, 2, figsize = (20,16), subplot_kw={'projection': 'polar'})
+    refl_norm[refl_norm == 0] = np.nan
+    refl_norm_all[refl_norm_all == 0] = np.nan
+    
+    fig, axs = plt.subplots(2, 3, figsize = (20,16), subplot_kw={'projection': 'polar'})
     norm = matplotlib.colors.CenteredNorm(vcenter = 1, halfrange = 0.1)
     for ax in axs[0]:
         ax.set_theta_direction(-1)
@@ -1272,16 +1302,36 @@ for wav in wavelengths:
         shading="auto",
         cmap='coolwarm',
         norm=norm)
+    
+    im4 = axs[0,2].pcolormesh(
+        saa_mesh,
+        sza_mesh,
+        refl_norm,
+        shading="auto",
+        cmap='coolwarm',
+        norm=norm)        
+    
+    im5 = axs[1,2].pcolormesh(
+        saa_mesh,
+        sza_mesh,
+        refl_norm_all,
+        shading="auto",
+        cmap='coolwarm',
+        norm=norm)     
 
     cbar0 = fig.colorbar(im0, ax = axs[0,0], fraction = 0.1, shrink = 0.8, pad = 0.2)
     cbar1 = fig.colorbar(im1, ax = axs[0,1], fraction = 0.1, shrink = 0.8, pad = 0.2)
     cbar2 = fig.colorbar(im2, ax = axs[1,0], fraction = 0.1, shrink = 0.8, pad = 0.2)
     cbar3 = fig.colorbar(im3, ax=axs[1,1], fraction=0.1, shrink=0.8, pad=0.2)
+    cbar4 = fig.colorbar(im4, ax=axs[0,2], fraction=0.1, shrink=0.8, pad=0.2)
+    cbar5 = fig.colorbar(im5, ax=axs[1,2], fraction=0.1, shrink=0.8, pad=0.2)
 
     axs[0,0].set_title('Observed Ratio')
     axs[0,1].set_title('Corrected Ratio')
     axs[1,0].set_title('Only Offsets Ratio')
     axs[1,1].set_title('Corrected Ratio \nIncluding Offsets')
+    axs[0,2].set_title('Normalised Corrected Ratio \nUsing Mid-Day {} Degree Norm'.format(v1_dict['norm_width']))
+    axs[1,2].set_title('Normalised Corrected Ratio \nUsing All Data')
 
     fig.tight_layout()
     fig.savefig(os.path.join(results_path , f'{site}_ratio_polar_plot_{wav}.png'))
