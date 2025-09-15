@@ -97,6 +97,13 @@ class SiteSpecificQualityChecks:
             self.context.get_config_value("misalignment_vaa_unc")
         )
 
+        misalignment_corr = ast.literal_eval(
+            self.context.get_config_value("misalignment_corr")
+        )
+        misalignment_corr_unc = ast.literal_eval(
+            self.context.get_config_value("misalignment_corr_unc")
+        )
+
         # we loop through each of the different deployment periods and identify the applicable one for this sequence
         seq_within_period = False
         i_dep_save = None
@@ -292,17 +299,20 @@ class SiteSpecificQualityChecks:
             ratio = self.misalignment_ratio_calculator(misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
                                                        sza,
                                                        saa,
+                                                       misalignment_corr[i_dep_save],
                                                        dir_dif_ratio)
             ratio_unc = self.prop.propagate_systematic(self.misalignment_ratio_calculator,
                                                        [misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
                                                         sza,
                                                         saa,
+                                                        misalignment_corr[i_dep_save],
                                                         dir_dif_ratio],
                                                        [misalignment_vza_unc[i_dep_save],
                                                         misalignment_vaa_unc[i_dep_save],
                                                         None,
                                                         None,
                                                         None,
+                                                        misalignment_corr_unc[i_dep_save],
                                                         None])
             dataset_l2b.reflectance.values[:, i_series] /= ratio
             dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] = (
@@ -885,7 +895,7 @@ class SiteSpecificQualityChecks:
 
             return dataset_l1b, flags
 
-    def misalignment_ratio_calculator(self, vza, vaa, offset, sza, saa, direct_to_diffuse=1000):
+    def misalignment_ratio_calculator(self, vza, vaa, offset, sza, saa, corr, direct_to_diffuse=1000):
         if isinstance(vza,np.ndarray):
             vaa[vza < 0] += -180
             vza[vza<0] = -vza[vza<0]
@@ -900,7 +910,7 @@ class SiteSpecificQualityChecks:
         vaa = np.radians(vaa)
         new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
         new_direct_to_diffuse = direct_to_diffuse * np.cos(new_sza) / np.cos(sza)
-        return (new_direct_to_diffuse + 1) / (direct_to_diffuse + 1) + offset
+        return ((new_direct_to_diffuse + 1) / (direct_to_diffuse + 1) + offset) / corr
 
     def calculate_bounds(self,refl_bounds_ds,sza,saa,vza,vaa):
         if refl_bounds_ds is not None:
