@@ -114,6 +114,22 @@ SITE_PERIODS = {
             "HYPSTAR_SN": 222312,
             "comments": "Winter Wheat crop, Flat soil surface",
         },
+        {
+            "start_date": "2024-10-01",
+            "stop_date": "2024-11-13",
+            "lat": 50.55151,
+            "lon": 4.74601,
+            "HYPSTAR_SN": 222312,
+            "comments": "Cover crop, Flat soil surface",
+        },
+        {
+            "start_date": "2025-04-15",
+            "stop_date": "present",
+            "lat": 50.55151 ,
+            "lon": 4.74601,
+            "HYPSTAR_SN": 222312,
+            "comments": "Sugar beet roots, Flat soil surface",
+        }
     ],
     # "PEAN": [],
     "WWUK": [
@@ -134,10 +150,10 @@ SITE_PERIODS = {
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'GHNA':
+        if site != 'LOBE':
             continue
-        #if period['stop_date'] == 'present':
-         #   continue
+        if period['stop_date'] != 'present':
+            continue
         print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
         start_time = period["start_date"]

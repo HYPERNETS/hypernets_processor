@@ -14,9 +14,9 @@ windows_results_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_q
 linux_data_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 windows_data_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-dataframe = pd.read_csv(windows_data_path + r"/JSIT_irradiance.csv")
+dataframe = pd.read_csv(windows_data_path + r"/WWUKv1_irradiance.csv")
 wav_df = xr.open_dataset(
-    "T:/ECO/EOServer/data/insitu/hypernets/archive/JSIT/2024/04/09/SEQ20240409T131202/HYPERNETS_L_JSIT_L1B_IRR_20240409T1312_20240409T1637_v2.0.nc"
+    "T:/ECO/EOServer/data/insitu/hypernets/archive/JAES/2024/08/06/SEQ20240806T140050/HYPERNETS_L_JAES_L1B_IRR_20240806T1400_20240906T0617_v2.1.nc"
 )
 wav = wav_df.wavelength.values
 
@@ -45,7 +45,7 @@ def interpolate_irradiance_sza(sza, ds_irr):
 
 def modelled_data_read_and_interp(sza, aod):
     mod_data = xr.open_dataset(
-        r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\JSIT_clear_sky_medianaod.nc".format(
+        r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\JAES_clear_sky_medianaod.nc".format(
             aod
         )
     )
@@ -94,10 +94,10 @@ szas = df_clean["SZA"]
 
 
 def read_irr(df):
-    data = np.zeros((df.shape[0], len(df.columns) - 7))
+    data = np.zeros((df.shape[0], len(df.columns) - 6))
 
     for j in range(df.shape[0]):
-        for i in range(len(df.columns) - 7):
+        for i in range(len(df.columns) - 6):
             data[j, i] = df["{}".format(i)][j]
 
     return data
@@ -121,15 +121,17 @@ print(len(is_outlier))
 
 #plotting
 print(len(szas))
-print(np.argwhere(IDs == 'SEQ20240409T131202'))
-aod_1_data = modelled_data_read_and_interp(szas[1], 0.1)
+print(np.argwhere(IDs == 'SEQ20240806T140050'))
+ID_num = 1
+aod_1_data = modelled_data_read_and_interp(szas[ID_num], 0.1)
 
-plt.plot(wav[1:], (aod_1_data[1:] - data[1, :])*100/aod_1_data[1:])
+
+plt.plot(wav, (aod_1_data - data[ID_num, :])*100/aod_1_data)
 plt.axis([300,1800,-100,100])
 plt.show()
 
-plt.plot(wav[1:], data[1,:], label = 'Measured Data')
-plt.plot(wav[1:], aod_1_data[1:], label = 'Model')
+plt.plot(wav, data[ID_num,:], label = 'Measured Data')
+plt.plot(wav, aod_1_data, label = 'Model')
 
 plt.ylabel('Irradiance')
 plt.xlabel('Wavelength (nm)')
