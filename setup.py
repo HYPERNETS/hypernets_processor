@@ -102,12 +102,13 @@ setup(
             os.path.join("etc", "job_template.config"),
             os.path.join("etc", "processor_land_defaults.config"),
             os.path.join("etc", "processor_water_defaults.config"),
-            "calibration/calibration_files/*/*/*/*"],
+            "calibration/calibration_files/*/*/*/*",
+        ],
     },
-    setup_requires=['numpy'],
+    setup_requires=["numpy"],
     install_requires=[
         "alembic==1.10.2",
-        "numpy",
+        "numpy>=2.3.1",
         "netCDF4",
         "schedule",
         "matplotlib",
@@ -115,34 +116,33 @@ setup(
         "dataset",
         "sqlalchemy==1.3.20",
         "sqlalchemy-utils",
-        "punpy>=1.0.0",
+        "punpy>=1.0.7",
         "matheo",
-        "comet_maths>=1.0.0",
-        "obsarray>=1.0.0",
         "freezegun",
         "importlib-metadata>=4.0.1",
         "pyhdf",
-        ],
+        "cftime>=1.6.4",
+    ],
     extras_require={
-       "docs": [
-        "sphinx",
-        "sphinx_design",
-        "sphinx_book_theme",
-        "ipython",
-        "sphinx_autosummary_accessors",
-        "sphinx-rtd-theme"
+        "docs": [
+            "sphinx",
+            "sphinx_design",
+            "sphinx_book_theme",
+            "ipython",
+            "sphinx_autosummary_accessors",
+            "sphinx-rtd-theme",
         ],
         "dev": [
-        "pytest >=5.4.1",
-        "pytest-cov >=2.8.1",
-        ]
+            "pytest >=5.4.1",
+            "pytest-cov >=2.8.1",
+        ],
     },
     entry_points={
         "console_scripts": [
             "hypernets_sequence_processor = hypernets_processor.cli.sequence_processor_cli:cli",
             "hypernets_scheduler = hypernets_processor.cli.scheduler_cli:cli",
             "hypernets_processor_setup = hypernets_processor.cli.setup_processor_cli:cli",
-            "hypernets_processor_job_init = hypernets_processor.cli.init_job_cli:cli"
+            "hypernets_processor_job_init = hypernets_processor.cli.init_job_cli:cli",
         ],
     },
 )

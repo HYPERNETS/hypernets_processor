@@ -333,7 +333,7 @@ def read_data_CIMEL_ASCII(self, path):
 
 
 def convert_datetime(
-    date_time: Union[datetime.datetime, datetime.date, str, float, int, np.ndarray]
+    date_time: Union[datetime.datetime, datetime.date, str, float, int, np.ndarray],
 ) -> datetime.datetime:
     """
     Convert input datetimes to a datetime object

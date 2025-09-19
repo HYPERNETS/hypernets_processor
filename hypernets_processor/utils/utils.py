@@ -3,8 +3,9 @@ import numpy as np
 from typing import Optional, Union, List, Any
 from dateutil.parser import parse
 
+
 def convert_datetime(
-    date_time: Union[datetime.datetime, datetime.date, str, float, int, np.ndarray]
+    date_time: Union[datetime.datetime, datetime.date, str, float, int, np.ndarray],
 ) -> datetime.datetime:
     """
     Convert input datetimes to a datetime object
@@ -17,14 +18,18 @@ def convert_datetime(
     elif isinstance(date_time, datetime.datetime):
         return date_time
     elif isinstance(date_time, datetime.date):
-        return datetime.datetime.combine(date_time, datetime.time(),tzinfo=datetime.timezone.utc)
+        return datetime.datetime.combine(
+            date_time, datetime.time(), tzinfo=datetime.timezone.utc
+        )
     elif isinstance(date_time, np.datetime64):
         unix_epoch = np.datetime64(0, "s")
         one_second = np.timedelta64(1, "s")
         seconds_since_epoch = (date_time - unix_epoch) / one_second
-        return datetime.datetime.fromtimestamp(seconds_since_epoch,datetime.timezone.utc)
+        return datetime.datetime.fromtimestamp(
+            seconds_since_epoch, datetime.timezone.utc
+        )
     elif isinstance(date_time, (float, int, np.integer)):
-        return datetime.datetime.fromtimestamp(date_time,datetime.timezone.utc)
+        return datetime.datetime.fromtimestamp(date_time, datetime.timezone.utc)
     elif isinstance(date_time, str) and date_time.lower() == "present":
         return datetime.datetime.now(datetime.timezone.utc)
     else:
@@ -33,9 +38,11 @@ def convert_datetime(
         try:
             dt = parse(date_time, fuzzy=False)
             if dt.tzinfo is None:
-                dt=dt.replace(tzinfo=datetime.timezone.utc)
+                dt = dt.replace(tzinfo=datetime.timezone.utc)
             return dt
         except ValueError:
             raise ValueError(
-                "Unable to discern datetime requested: '{}' ({})".format(date_time,type(date_time))
+                "Unable to discern datetime requested: '{}' ({})".format(
+                    date_time, type(date_time)
+                )
             )

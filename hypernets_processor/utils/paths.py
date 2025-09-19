@@ -1,6 +1,7 @@
 """
 Module of helper functions for file path operations
 """
+
 import warnings
 
 from hypernets_processor.version import __version__
@@ -62,10 +63,14 @@ def parse_sequence_path(path, context=None):
         except:
             if context is not None:
                 context.logger.error(
-                    "The following path does not match the expected format and will not be processed (%s)"%(path))
+                    "The following path does not match the expected format and will not be processed (%s)"
+                    % (path)
+                )
             else:
                 warnings.warn(
-                    "The following path does not match the expected format and will not be processed (%s)" % (path))
+                    "The following path does not match the expected format and will not be processed (%s)"
+                    % (path)
+                )
     return None
 
 

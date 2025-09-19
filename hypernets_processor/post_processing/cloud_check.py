@@ -104,7 +104,7 @@ def read_irr(df):
 
 
 data = read_irr(df_clean)
-'''
+"""
 outliers = pd.read_csv(
     r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_outliers.csv"
 )
@@ -117,24 +117,24 @@ good_IDs = good_data["# id"]
 
 is_outlier = IDs.isin(outliers_IDs)
 print(len(is_outlier))
-'''
+"""
 
-#plotting
+# plotting
 print(len(szas))
-print(np.argwhere(IDs == 'SEQ20240806T140050'))
+print(np.argwhere(IDs == "SEQ20240806T140050"))
 ID_num = 1
 aod_1_data = modelled_data_read_and_interp(szas[ID_num], 0.1)
 
 
-plt.plot(wav, (aod_1_data - data[ID_num, :])*100/aod_1_data)
-plt.axis([300,1800,-100,100])
+plt.plot(wav, (aod_1_data - data[ID_num, :]) * 100 / aod_1_data)
+plt.axis([300, 1800, -100, 100])
 plt.show()
 
-plt.plot(wav, data[ID_num,:], label = 'Measured Data')
-plt.plot(wav, aod_1_data, label = 'Model')
+plt.plot(wav, data[ID_num, :], label="Measured Data")
+plt.plot(wav, aod_1_data, label="Model")
 
-plt.ylabel('Irradiance')
-plt.xlabel('Wavelength (nm)')
+plt.ylabel("Irradiance")
+plt.xlabel("Wavelength (nm)")
 plt.legend()
 plt.show()
 
@@ -308,16 +308,27 @@ def make_new_csvs(data_refl, passes, filepath=None):
         new.to_csv(filepath, index=False)
 
 
-
-refl_data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_prelim_and_raa10.csv')
-'''
+refl_data = pd.read_csv(
+    r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_prelim_and_raa10.csv"
+)
+"""
 val_0_875, pass_0_875 = check(data, 0.875, 550)
 make_new_csvs(refl_data, pass_0_875[:,0], r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\prelim_cc0875.csv')
-'''
+"""
 val_1_9, pass_1_9 = check(data, 0.9, 550)
-make_new_csvs(good_data, pass_1_9[:,1], r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_cc_good.csv')
-make_new_csvs(outliers, pass_1_9[:, 1], r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_cc_outliers.csv')
+make_new_csvs(
+    good_data,
+    pass_1_9[:, 1],
+    r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_cc_good.csv",
+)
+make_new_csvs(
+    outliers,
+    pass_1_9[:, 1],
+    r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\GHNA_2022_cc_outliers.csv",
+)
 
 
-JSIT = xr.open_dataset(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\irr_clear_sky_JSIT_0.0_10.nc')
+JSIT = xr.open_dataset(
+    r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\irr_clear_sky_JSIT_0.0_10.nc"
+)
 print(JSIT)

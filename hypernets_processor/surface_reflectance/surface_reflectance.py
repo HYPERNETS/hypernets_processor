@@ -81,8 +81,8 @@ class SurfaceReflectance:
                 store_unc_percent=True,
             )
         else:
-            measurandstring="water_leaving_radiance"
-            measurand = water_protocol_function.run(L1c)
+            measurandstring = "water_leaving_radiance"
+            measurand = water_protocol_function.run_meas_function(L1c)
             L1c[measurandstring].values = measurand
 
         measurement_function_protocol = self.context.get_config_value(
@@ -110,7 +110,9 @@ class SurfaceReflectance:
             )
         else:
             measurandstring = ["reflectance_nosc", "reflectance", "epsilon"]
-            reflectance_nosc, reflectance, epsilon = water_protocol_function.run(L1c)
+            reflectance_nosc, reflectance, epsilon = (
+                water_protocol_function.run_meas_function(L1c)
+            )
             L1c[measurandstring[0]].values = reflectance_nosc
             L1c[measurandstring[1]].values = reflectance
             L1c[measurandstring[2]].values = epsilon
@@ -250,9 +252,7 @@ class SurfaceReflectance:
                         dataset_l2a, self.context.get_config_value("plot_polar_wav")
                     )
                 if self.context.get_config_value("plot_polar_ndvi") is not None:
-                    self.plot.plot_polar_reflectance(
-                        dataset_l2a, "ndvi"
-                    )
+                    self.plot.plot_polar_reflectance(dataset_l2a, "ndvi")
             if self.context.get_config_value("plot_uncertainty"):
                 self.plot.plot_relative_uncertainty(
                     "reflectance", dataset_l2a, refl=True
@@ -262,7 +262,6 @@ class SurfaceReflectance:
                 self.plot.plot_correlation("reflectance", dataset_l2a, refl=True)
         else:
             self.context.logger.error("network is not correctly defined")
-
 
         if self.context.get_config_value("write_l2a"):
             self.writer.write(

@@ -1,6 +1,7 @@
 """
 Module with functions and classes to read Hypernets data
 """
+
 from datetime import datetime, timezone
 import os, shutil
 import re  # for re.split
@@ -171,7 +172,7 @@ class HypernetsReader:
         return wvl
 
     def read_angles(
-            self, ds, scan_number, specattr, offset_pan, offset_tilt, angle2use, land=False
+        self, ds, scan_number, specattr, offset_pan, offset_tilt, angle2use, land=False
     ):
 
         paa_ask, vza_ask = map(float, specattr["pt_ask"].split(";"))
@@ -198,18 +199,18 @@ class HypernetsReader:
         )
 
         if (
-                ((offset_pan is None) or (offset_tilt is None))
-                & (angle2use == "pt_ask")
-                & (not land)
+            ((offset_pan is None) or (offset_tilt is None))
+            & (angle2use == "pt_ask")
+            & (not land)
         ):
             paa = normalizedeg(
                 float(paa_ask) + ds["solar_azimuth_angle"][scan_number], 0, 360
             )
             vza = vza_ask
         elif (
-                ((offset_pan is None) or (offset_tilt is None))
-                & (angle2use == "pt_ask")
-                & (land)
+            ((offset_pan is None) or (offset_tilt is None))
+            & (angle2use == "pt_ask")
+            & (land)
         ):
             paa = normalizedeg(float(paa_ask), 0, 360)
             vza = vza_ask
@@ -493,21 +494,21 @@ class HypernetsReader:
     #     return ds
 
     def read_series(
-            self,
-            seq_dir,
-            series,
-            lat,
-            lon,
-            metadata,
-            flag,
-            fileformat,
-            cal_data,
-            instrument_id,
-            site_id,
-            azimuth_switch,
-            offset_tilt,
-            offset_pan,
-            angle2use,
+        self,
+        seq_dir,
+        series,
+        lat,
+        lon,
+        metadata,
+        flag,
+        fileformat,
+        cal_data,
+        instrument_id,
+        site_id,
+        azimuth_switch,
+        offset_tilt,
+        offset_pan,
+        angle2use,
     ):
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         model_name = self.model
@@ -518,15 +519,15 @@ class HypernetsReader:
             self.context.logger.debug("processing " + spectra)
             model = dict(zip(model_name, spectra.split("_")[:-1]))
             specBlock = (
-                    model["series_rep"]
-                    + "_"
-                    + model["series_id"]
-                    + "_"
-                    + model["vaa"]
-                    + "_"
-                    + model["azimuth_ref"]
-                    + "_"
-                    + model["vza"]
+                model["series_rep"]
+                + "_"
+                + model["series_id"]
+                + "_"
+                + model["vaa"]
+                + "_"
+                + model["azimuth_ref"]
+                + "_"
+                + model["vza"]
             )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
@@ -576,7 +577,7 @@ class HypernetsReader:
                     "A file (%s) listed in the metadata.txt is missing." % (spectra)
                 )
                 self.context.anomaly_handler.add_anomaly("mf")
-                #break
+                # break
 
         if len(vnir.shape) == 1:
             vnir = vnir[None, :]
@@ -599,15 +600,15 @@ class HypernetsReader:
         for spectra in series:
             model = dict(zip(model_name, spectra.split("_")[:-1]))
             specBlock = (
-                    model["series_rep"]
-                    + "_"
-                    + model["series_id"]
-                    + "_"
-                    + model["vaa"]
-                    + "_"
-                    + model["azimuth_ref"]
-                    + "_"
-                    + model["vza"]
+                model["series_rep"]
+                + "_"
+                + model["series_id"]
+                + "_"
+                + model["vaa"]
+                + "_"
+                + model["azimuth_ref"]
+                + "_"
+                + model["vza"]
             )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
@@ -647,20 +648,19 @@ class HypernetsReader:
                             ds["series_id"][scan_number] = series_id
 
                             # estimate time based on timestamp
-                            ds["acquisition_time"][
-                                scan_number
-                            ] = datetime.datetime.timestamp(acquisitionTime)
+                            ds["acquisition_time"][scan_number] = (
+                                datetime.datetime.timestamp(acquisitionTime)
+                            )
                             if lat is not None:
                                 ds.attrs["site_latitude"] = lat
                                 ds.attrs["site_longitude"] = lon
-                                ds["solar_zenith_angle"][
-                                    scan_number
-                                ] = 90 - get_altitude(
-                                    float(lat), float(lon), acquisitionTime
+                                ds["solar_zenith_angle"][scan_number] = (
+                                    90
+                                    - get_altitude(
+                                        float(lat), float(lon), acquisitionTime
+                                    )
                                 )
-                                ds["solar_azimuth_angle"][
-                                    scan_number
-                                ] = get_azimuth(
+                                ds["solar_azimuth_angle"][scan_number] = get_azimuth(
                                     float(lat), float(lon), acquisitionTime
                                 )
                             elif scan_number == 0:
@@ -671,9 +671,7 @@ class HypernetsReader:
                             ds["integration_time"][
                                 scan_number
                             ] = spectrum.header.exposure_time
-                            ds["temperature"][
-                                scan_number
-                            ] = spectrum.header.temperature
+                            ds["temperature"][scan_number] = spectrum.header.temperature
 
                             ds = self.read_angles(
                                 ds,
@@ -695,24 +693,24 @@ class HypernetsReader:
                             # Acceleration for each axis can be calculated per Eq. (4).
 
                             a = 19.6
-                            b = 2 ** 15
+                            b = 2**15
                             ds["acceleration_x_mean"][scan_number] = (
-                                    spectrum.header.accel_stats.mean_x * a / b
+                                spectrum.header.accel_stats.mean_x * a / b
                             )
                             ds["acceleration_x_std"][scan_number] = (
-                                    spectrum.header.accel_stats.std_x * a / b
+                                spectrum.header.accel_stats.std_x * a / b
                             )
                             ds["acceleration_y_mean"][scan_number] = (
-                                    spectrum.header.accel_stats.mean_y * a / b
+                                spectrum.header.accel_stats.mean_y * a / b
                             )
                             ds["acceleration_y_std"][scan_number] = (
-                                    spectrum.header.accel_stats.std_y * a / b
+                                spectrum.header.accel_stats.std_y * a / b
                             )
                             ds["acceleration_z_mean"][scan_number] = (
-                                    spectrum.header.accel_stats.mean_z * a / b
+                                spectrum.header.accel_stats.mean_z * a / b
                             )
                             ds["acceleration_z_std"][scan_number] = (
-                                    spectrum.header.accel_stats.std_z * a / b
+                                spectrum.header.accel_stats.std_z * a / b
                             )
                             ds["digital_number"][:, scan_number] = scan
                             scan_number += 1
@@ -727,21 +725,21 @@ class HypernetsReader:
         return ds
 
     def read_series_L(
-            self,
-            seq_dir,
-            series,
-            lat,
-            lon,
-            metadata,
-            flag,
-            fileformat,
-            cal_data,
-            cal_data_swir,
-            instrument_id,
-            site_id,
-            offset_tilt,
-            offset_pan,
-            angle2use,
+        self,
+        seq_dir,
+        series,
+        lat,
+        lon,
+        metadata,
+        flag,
+        fileformat,
+        cal_data,
+        cal_data_swir,
+        instrument_id,
+        site_id,
+        offset_tilt,
+        offset_pan,
+        angle2use,
     ):
         FOLDER_NAME = os.path.join(seq_dir, "RADIOMETER/")
         model_name = self.model
@@ -753,15 +751,15 @@ class HypernetsReader:
             self.context.logger.debug("processing " + spectra)
             model = dict(zip(model_name, spectra.split("_")[:-1]))
             specBlock = (
-                    model["series_rep"]
-                    + "_"
-                    + model["series_id"]
-                    + "_"
-                    + model["vaa"]
-                    + "_"
-                    + model["azimuth_ref"]
-                    + "_"
-                    + model["vza"]
+                model["series_rep"]
+                + "_"
+                + model["series_id"]
+                + "_"
+                + model["vaa"]
+                + "_"
+                + model["azimuth_ref"]
+                + "_"
+                + model["vza"]
             )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
@@ -816,10 +814,9 @@ class HypernetsReader:
                     "A file (%s) listed in the metadata.txt is missing." % (spectra)
                 )
 
-        if len(vnir)>0:
+        if len(vnir) > 0:
             if len(vnir.shape) == 1:
                 vnir = vnir[None, :]
-
 
             scanDim = vnir.shape[0]
             wvl = self.read_wavelength(vnir.shape[1], cal_data)
@@ -832,7 +829,7 @@ class HypernetsReader:
             ds["bandwidth"].values = 3 * np.ones_like(wvl)
 
         else:
-            ds=None
+            ds = None
 
         if len(swir) > 0:
             if len(swir.shape) == 1:
@@ -863,15 +860,15 @@ class HypernetsReader:
         for spectra in series:
             model = dict(zip(model_name, spectra.split("_")[:-1]))
             specBlock = (
-                    model["series_rep"]
-                    + "_"
-                    + model["series_id"]
-                    + "_"
-                    + model["vaa"]
-                    + "_"
-                    + model["azimuth_ref"]
-                    + "_"
-                    + model["vza"]
+                model["series_rep"]
+                + "_"
+                + model["series_id"]
+                + "_"
+                + model["vaa"]
+                + "_"
+                + model["azimuth_ref"]
+                + "_"
+                + model["vza"]
             )
             # spectra attributes from metadata file
             specattr = dict(metadata[specBlock])
@@ -913,21 +910,22 @@ class HypernetsReader:
                                 ds["series_id"][scan_number] = series_id
 
                                 # estimate time based on timestamp
-                                ds["acquisition_time"][
-                                    scan_number
-                                ] = datetime.datetime.timestamp(acquisitionTime)
+                                ds["acquisition_time"][scan_number] = (
+                                    datetime.datetime.timestamp(acquisitionTime)
+                                )
                                 if lat is not None:
                                     ds.attrs["site_latitude"] = lat
                                     ds.attrs["site_longitude"] = lon
-                                    ds["solar_zenith_angle"][
-                                        scan_number
-                                    ] = 90 - get_altitude(
-                                        float(lat), float(lon), acquisitionTime
+                                    ds["solar_zenith_angle"][scan_number] = (
+                                        90
+                                        - get_altitude(
+                                            float(lat), float(lon), acquisitionTime
+                                        )
                                     )
-                                    ds["solar_azimuth_angle"][
-                                        scan_number
-                                    ] = get_azimuth(
-                                        float(lat), float(lon), acquisitionTime
+                                    ds["solar_azimuth_angle"][scan_number] = (
+                                        get_azimuth(
+                                            float(lat), float(lon), acquisitionTime
+                                        )
                                     )
                                 elif scan_number == 0:
                                     self.context.logger.warning(
@@ -961,24 +959,24 @@ class HypernetsReader:
                                 # Acceleration for each axis can be calculated per Eq. (4).
 
                                 a = 19.6
-                                b = 2 ** 15
+                                b = 2**15
                                 ds["acceleration_x_mean"][scan_number] = (
-                                        spectrum.header.accel_stats.mean_x * a / b
+                                    spectrum.header.accel_stats.mean_x * a / b
                                 )
                                 ds["acceleration_x_std"][scan_number] = (
-                                        spectrum.header.accel_stats.std_x * a / b
+                                    spectrum.header.accel_stats.std_x * a / b
                                 )
                                 ds["acceleration_y_mean"][scan_number] = (
-                                        spectrum.header.accel_stats.mean_y * a / b
+                                    spectrum.header.accel_stats.mean_y * a / b
                                 )
                                 ds["acceleration_y_std"][scan_number] = (
-                                        spectrum.header.accel_stats.std_y * a / b
+                                    spectrum.header.accel_stats.std_y * a / b
                                 )
                                 ds["acceleration_z_mean"][scan_number] = (
-                                        spectrum.header.accel_stats.mean_z * a / b
+                                    spectrum.header.accel_stats.mean_z * a / b
                                 )
                                 ds["acceleration_z_std"][scan_number] = (
-                                        spectrum.header.accel_stats.std_z * a / b
+                                    spectrum.header.accel_stats.std_z * a / b
                                 )
                                 ds["digital_number"][:, scan_number] = scan
                                 scan_number += 1
@@ -995,9 +993,9 @@ class HypernetsReader:
                                 ds_swir["series_id"][scan_number_swir] = series_id
 
                                 # estimate time based on timestamp
-                                ds_swir["acquisition_time"][
-                                    scan_number_swir
-                                ] = datetime.datetime.timestamp(acquisitionTime)
+                                ds_swir["acquisition_time"][scan_number_swir] = (
+                                    datetime.datetime.timestamp(acquisitionTime)
+                                )
                                 #            #print(datetime.fromtimestamp(acquisitionTime))
 
                                 #             # didn't use acquisition time from instrument
@@ -1020,15 +1018,16 @@ class HypernetsReader:
                                 if lat is not None:
                                     ds_swir.attrs["site_latitude"] = lat
                                     ds_swir.attrs["site_longitude"] = lon
-                                    ds_swir["solar_zenith_angle"][
-                                        scan_number_swir
-                                    ] = 90 - get_altitude(
-                                        float(lat), float(lon), acquisitionTime
+                                    ds_swir["solar_zenith_angle"][scan_number_swir] = (
+                                        90
+                                        - get_altitude(
+                                            float(lat), float(lon), acquisitionTime
+                                        )
                                     )
-                                    ds_swir["solar_azimuth_angle"][
-                                        scan_number_swir
-                                    ] = get_azimuth(
-                                        float(lat), float(lon), acquisitionTime
+                                    ds_swir["solar_azimuth_angle"][scan_number_swir] = (
+                                        get_azimuth(
+                                            float(lat), float(lon), acquisitionTime
+                                        )
                                     )
 
                                 elif scan_number_swir == 0:
@@ -1068,24 +1067,24 @@ class HypernetsReader:
                                 # Acceleration for each axis can be calculated per Eq. (4).
 
                                 a = 19.6
-                                b = 2 ** 15
+                                b = 2**15
                                 ds_swir["acceleration_x_mean"][scan_number_swir] = (
-                                        spectrum.header.accel_stats.mean_x * a / b
+                                    spectrum.header.accel_stats.mean_x * a / b
                                 )
                                 ds_swir["acceleration_x_std"][scan_number_swir] = (
-                                        spectrum.header.accel_stats.std_x * a / b
+                                    spectrum.header.accel_stats.std_x * a / b
                                 )
                                 ds_swir["acceleration_y_mean"][scan_number_swir] = (
-                                        spectrum.header.accel_stats.mean_y * a / b
+                                    spectrum.header.accel_stats.mean_y * a / b
                                 )
                                 ds_swir["acceleration_y_std"][scan_number_swir] = (
-                                        spectrum.header.accel_stats.std_y * a / b
+                                    spectrum.header.accel_stats.std_y * a / b
                                 )
                                 ds_swir["acceleration_z_mean"][scan_number_swir] = (
-                                        spectrum.header.accel_stats.mean_z * a / b
+                                    spectrum.header.accel_stats.mean_z * a / b
                                 )
                                 ds_swir["acceleration_z_std"][scan_number_swir] = (
-                                        spectrum.header.accel_stats.std_z * a / b
+                                    spectrum.header.accel_stats.std_z * a / b
                                 )
                                 ds_swir["digital_number"][:, scan_number_swir] = scan
                                 scan_number_swir += 1
@@ -1269,7 +1268,7 @@ class HypernetsReader:
             # 3. Read series
             # ---------------------------
             # check for radiance and irradiance series within the metadata
-            series_all = metadata.sections()[1: len(metadata)]
+            series_all = metadata.sections()[1 : len(metadata)]
             seriesName = []
             seriesPict = []
             for i in series_all:
@@ -1347,13 +1346,13 @@ class HypernetsReader:
         return data["temp"], data["RH"], data["pressure"], data["lux"]
 
     def read_sequence(
-            self,
-            seq_dir,
-            calibration_data_rad,
-            calibration_data_irr,
-            calibration_data_swir_rad=None,
-            calibration_data_swir_irr=None,
-            single_series=None,
+        self,
+        seq_dir,
+        calibration_data_rad,
+        calibration_data_irr,
+        calibration_data_swir_rad=None,
+        calibration_data_swir_irr=None,
+        single_series=None,
     ):
 
         # define data to return none at end of method if does not exist

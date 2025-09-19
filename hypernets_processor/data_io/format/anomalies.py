@@ -13,7 +13,7 @@ ANOMALIES_DICT = {
     "a": {
         "description": "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
         "error": None,
-        "error_msg":  "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
+        "error_msg": "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
     },
     "m": {
         "description": "Metadata file missing",
@@ -33,7 +33,7 @@ ANOMALIES_DICT = {
     "o": {
         "description": "more than 50% of data has random error above 100% (probably corrupted data)",
         "error": None,
-        "error_msg": "more than 50% of data has random error above 100% (probably corrupted data)"
+        "error_msg": "more than 50% of data has random error above 100% (probably corrupted data)",
     },
     "u": {
         "description": "some of the uncertainties have negative values",
@@ -58,7 +58,7 @@ ANOMALIES_DICT = {
     "ned": {
         "description": "Not enough Ed scans for series",
         "error": None,
-        "error_msg":  "Not enough Ed scans for series",
+        "error_msg": "Not enough Ed scans for series",
     },
     "nu": {
         "description": "Non constant illumination",

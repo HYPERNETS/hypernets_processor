@@ -26,6 +26,7 @@ data_WWUKv3 = pd.read_csv(
     r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/WWUKv3_QC_good.csv"
 )
 
+
 def get_month(data):
     months = []
     for i in range(len(data)):
@@ -92,7 +93,7 @@ def plot_polar_reflectance(
         vmin=vmin,
         vmax=vmax,
     )
-    #ax.scatter(saa_list, sza_list, color="black", marker="o")
+    # ax.scatter(saa_list, sza_list, color="black", marker="o")
 
     cbar = fig.colorbar(im)
 
@@ -219,19 +220,22 @@ def monthly_plotter(data, name):
 
 # plot_polar_reflectance_std(results_path + 'test.png', data_subset[' vza'].values, data_subset[' vaa'].values, data_subset[' refl_550nm'].values, 550)
 # monthly_plotter(data_19, '1_9')
-#monthly_plotter(data_WWUKv3, 'WWUKv3')
-aug = data_WWUKv3[data_WWUKv3['month'] == '08']
-sep = data_WWUKv3[data_WWUKv3['month'] == '09']
+# monthly_plotter(data_WWUKv3, 'WWUKv3')
+aug = data_WWUKv3[data_WWUKv3["month"] == "08"]
+sep = data_WWUKv3[data_WWUKv3["month"] == "09"]
+
 
 def plot_month(data, plotname):
-    plot_polar_reflectance(results_path + plotname,
-                        data[' vza'].values,
-                        data[' vaa'].values,
-                        data[' sza'].values,
-                        data[' saa'].values,
-                        data[' refl_550nm'].values,
-                       550)
+    plot_polar_reflectance(
+        results_path + plotname,
+        data[" vza"].values,
+        data[" vaa"].values,
+        data[" sza"].values,
+        data[" saa"].values,
+        data[" refl_550nm"].values,
+        550,
+    )
 
-plot_month(aug, 'WWUKv3_aug.png')
-plot_month(sep, 'WWUKv3_sep.png')
 
+plot_month(aug, "WWUKv3_aug.png")
+plot_month(sep, "WWUKv3_sep.png")
