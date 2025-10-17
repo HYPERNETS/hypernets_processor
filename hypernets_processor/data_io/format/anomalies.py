@@ -137,4 +137,9 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "No series was present in the sequences after applying all site-specific QC",
     },
+    "hos": {
+        "description": "More than half of series were removed by site-specific QC checks",
+        "error": ValueError,
+        "error_msg": "More than half series were removed by site-specific QC checks",
+    },
 }
