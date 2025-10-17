@@ -202,7 +202,9 @@ class SiteSpecificQualityChecks:
         dataset_l1d_irr.attrs["product_level"] = "L_L1D_IRR"
 
         # next, remove angles for which we know the data is not reliable
-        id_series_valid = np.where(dataset_l2b.solar_azimuth_angle.values<max_sza_period[i_dep_save])[0]
+        id_series_valid = np.where(
+            dataset_l2b.solar_azimuth_angle.values < max_sza_period[i_dep_save]
+        )[0]
         dataset_l2b = dataset_l2b.isel(series=id_series_valid)
 
         ang_tol = self.context.get_config_value("angle_tolerance")
@@ -459,7 +461,7 @@ class SiteSpecificQualityChecks:
         if len(dataset_l2b.series.values) == 0:
             self.context.anomaly_handler.add_anomaly("nos")
 
-        if len(dataset_l2b.series.values) < 1/2 * len(dataset_l2a.series.values):
+        if len(dataset_l2b.series.values) < 1 / 2 * len(dataset_l2a.series.values):
             self.context.anomaly_handler.add_anomaly("hos")
 
         # finally, make plots and write file
