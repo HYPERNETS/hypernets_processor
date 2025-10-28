@@ -51,7 +51,7 @@ def process_sequence():
     # job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20231011T144127"
     job_config["Input"][
         "raw_data_directory"
-    ] = r"\\eoserver\home\data\insitu\hypernets\hypernets_raw_backup\GHNA\DATA\SEQ20250227T090042"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\JAES\SEQ20250227T090042"
     # job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20250604T103132"
     # job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\SEQ20240813T140042"
 

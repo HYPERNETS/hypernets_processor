@@ -203,7 +203,7 @@ class SiteSpecificQualityChecks:
 
         # next, remove angles for which we know the data is not reliable
         id_series_valid = np.where(
-            dataset_l2b.solar_azimuth_angle.values < max_sza_period[i_dep_save]
+            dataset_l2b.solar_zenith_angle.values < max_sza_period[i_dep_save]
         )[0]
         dataset_l2b = dataset_l2b.isel(series=id_series_valid)
 
