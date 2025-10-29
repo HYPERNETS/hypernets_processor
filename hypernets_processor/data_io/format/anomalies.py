@@ -132,6 +132,11 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "this sequences was manually discarded as unreliable in the config file",
     },
+    "wns": {
+        "description": "wrong number of series (l2a and l1b rad do not match in number of series). No L1d file is produced.",
+        "error": None,
+        "error_msg": "wrong number of series (l2a and l1b rad do not match in number of series). No L1d file is produced.",
+    },
     "nos": {
         "description": "No series was present in the sequences after applying all site-specific QC",
         "error": ValueError,
@@ -139,7 +144,7 @@ ANOMALIES_DICT = {
     },
     "hos": {
         "description": "More than half of series were removed by site-specific QC checks",
-        "error": ValueError,
+        "error": None,
         "error_msg": "More than half series were removed by site-specific QC checks",
     },
 }

@@ -470,24 +470,23 @@ class CalibrationConverter:
             if ".pdf" not in path
         ]
 
-        if len(lincaldatepaths) == 0:
-            lincaldatepaths = [
-                path
-                for path in glob.glob(
+        lincaldatepaths += [
+            path
+            for path in glob.glob(
+                os.path.join(
+                    directory, "hypstar_" + str(hypstar), "radiometric", "*"
+                )
+            )
+            if len(
+                glob.glob(
                     os.path.join(
-                        directory, "hypstar_" + str(hypstar), "radiometric", "*"
+                        path,
+                        "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
                     )
                 )
-                if len(
-                    glob.glob(
-                        os.path.join(
-                            path,
-                            "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
-                        )
-                    )
-                )
-                > 0
-            ]
+            )
+            > 0
+        ]
 
         nonlindates = []
         for lincaldatepath in lincaldatepaths:

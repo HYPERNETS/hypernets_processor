@@ -21,6 +21,7 @@ hsn, hypstar_not_deploy_period, L , L2B , HYPSTAR_SN does not match deployment p
 scl, no_clear_sky_site_specific, L , L2B , Site-specific clear sky check has failed (irr not within 10% of model), True,
 npr, no_pre_files, L , L2B , No pre-existing files available, while config is set up to reprocess from pre-existing files, True,
 man, manual_discard, L , L2B , This sequences was manually discarded as unreliable in the config file, True,
+wns, wrong_number_series, L2B , Wrong number of series (l2a and l1b rad do not match in number of series). No L1d file is produced, False, 
 nos, no_series_site_specific, L , L2B , No series was present in the sequences after applying all site-specific QC, True,
 hos, half_of_series_site_specific, L, L2B, More than half series were removed by site-specific QC checks, True,
 x, unexpected_error, L & W , , unexpected error during processing; catches all errors, True,

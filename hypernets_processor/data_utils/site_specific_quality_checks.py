@@ -158,6 +158,9 @@ class SiteSpecificQualityChecks:
         if dataset_l2a.attrs["sequence_id"] in bad_sequences_period[i_dep_save]:
             self.context.anomaly_handler.add_anomaly("man")
 
+        if len(dataset_l2a.series)!=len(dataset_l1b_rad.series):
+            self.context.anomaly_handler.add_anomaly("wns")
+
         # Next, remove data for which any of the bad flags was set in previous QC
         bad_flags = [
             "pt_ref_invalid",
@@ -181,13 +184,7 @@ class SiteSpecificQualityChecks:
         dataset_l2b.attrs["product_name"] = self.pu.create_product_name("L_L2B")
         dataset_l2b.attrs["product_level"] = "L_L2B"
 
-        flagged_l1b_rad = DatasetUtil.get_flags_mask_or(
-            dataset_l1b_rad["quality_flag"], bad_flags
-        )  # bools for each series if any bad flag is set
-        id_series_valid_l1b_rad = np.where(~flagged_l1b_rad)[
-            0
-        ]  # select indexes for which no bad flags are set
-        dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid_l1b_rad)
+        dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid)
         dataset_l1d_rad.attrs["product_name"] = self.pu.create_product_name("L_L1D_RAD")
         dataset_l1d_rad.attrs["product_level"] = "L_L1D_RAD"
 
@@ -206,52 +203,78 @@ class SiteSpecificQualityChecks:
             dataset_l2b.solar_zenith_angle.values < max_sza_period[i_dep_save]
         )[0]
         dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+        dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
 
         ang_tol = self.context.get_config_value("angle_tolerance")
         for angle_tup in bad_viewing_angles_period[i_dep_save]:
             bad_vza, bad_vaa = angle_tup
-            if bad_vza == "all":
-                id_series_valid = np.where(
-                    np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa) % 360
-                    > ang_tol
-                )[0]
-            elif bad_vaa == "all":
-                id_series_valid = np.where(
-                    np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol
-                )[0]
+            if bad_vza == "all" or bad_vza == "*":
+                cond_vza = np.zeros_like(
+                    dataset_l2b.viewing_zenith_angle.values, dtype=bool
+                )
+            elif isinstance(bad_vza, str) and bad_vza[0] == "<":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values >= float(bad_vza[1:])
+            elif isinstance(bad_vza, str) and bad_vza[0] == ">":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values <= float(bad_vza[1:])
             else:
-                id_series_valid = np.where(
-                    (
-                        np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza)
-                        > ang_tol
-                    )
-                    | (
-                        np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa) % 360
-                        > ang_tol
-                    )
-                )[0]
+                cond_vza = (
+                    np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol
+                )
+
+            if bad_vaa == "all" or bad_vaa == "*":
+                cond_vaa = np.zeros_like(
+                    dataset_l2b.viewing_azimuth_angle.values, dtype=bool
+                )
+            elif isinstance(bad_vaa, str) and bad_vaa[0] == "<":
+                cond_vaa = dataset_l2b.viewing_azimuth_angle.values >= float(
+                    bad_vaa[1:]
+                )
+            elif isinstance(bad_vaa, str) and bad_vaa[0] == ">":
+                cond_vaa = dataset_l2b.viewing_azimuth_angle.values <= float(
+                    bad_vaa[1:]
+                )
+            else:
+                cond_vaa = (
+                    np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa) > ang_tol
+                )
+
+            # we only keep data where one of the two conditions is met (the vza or the vaa is good)
+            id_series_valid = np.where(cond_vza | cond_vaa)[0]
             dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
 
         for angle_tup in bad_solar_angles_period[i_dep_save]:
             bad_sza, bad_saa = angle_tup
-            if bad_vza == "all":
-                id_series_valid = np.where(
-                    np.abs(dataset_l2b.solar_azimuth_angle.values - bad_saa) % 360
-                    > ang_tol
-                )[0]
-            elif bad_vaa == "all":
-                id_series_valid = np.where(
-                    np.abs(dataset_l2b.solar_zenith_angle.values - bad_sza) > ang_tol
-                )[0]
+            if bad_sza == "all" or bad_sza == "*":
+                cond_sza = np.zeros_like(
+                    dataset_l2b.solar_zenith_angle.values, dtype=bool
+                )
+            elif isinstance(bad_sza, str) and bad_sza[0] == "<":
+                cond_sza = dataset_l2b.solar_zenith_angle.values >= float(bad_sza[1:])
+            elif isinstance(bad_sza, str) and bad_sza[0] == ">":
+                cond_sza = dataset_l2b.solar_zenith_angle.values <= float(bad_sza[1:])
             else:
-                id_series_valid = np.where(
-                    (np.abs(dataset_l2b.solar_zenith_angle.values - bad_sza) > ang_tol)
-                    | (
-                        np.abs(dataset_l2b.solar_azimuth_angle.values - bad_saa) % 360
-                        > ang_tol
-                    )
-                )[0]
+                cond_sza = (
+                    np.abs(dataset_l2b.solar_zenith_angle.values - bad_sza) > ang_tol
+                )
+
+            if bad_saa == "all" or bad_saa == "*":
+                cond_saa = np.zeros_like(
+                    dataset_l2b.solar_azimuth_angle.values, dtype=bool
+                )
+            elif isinstance(bad_saa, str) and bad_saa[0] == "<":
+                cond_saa = dataset_l2b.solar_azimuth_angle.values >= float(bad_vaa[1:])
+            elif isinstance(bad_saa, str) and bad_saa[0] == ">":
+                cond_saa = dataset_l2b.solar_azimuth_angle.values <= float(bad_vaa[1:])
+            else:
+                cond_saa = (
+                    np.abs(dataset_l2b.solar_azimuth_angle.values - bad_saa) > ang_tol
+                )
+
+            # we only keep data where one of the two conditions is met (the sza or the saa is good)
+            id_series_valid = np.where(cond_sza | cond_saa)[0]
             dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
 
         raa_ang_tol = self.context.get_config_value("raa_angle_tolerance")
         for angle_tup in bad_relative_angles_period[i_dep_save]:
@@ -260,29 +283,40 @@ class SiteSpecificQualityChecks:
                 dataset_l2b.viewing_azimuth_angle.values
                 - dataset_l2b.solar_azimuth_angle.values
             ) % 360
-            if bad_vza == "all":
-                id_series_valid = np.where(np.abs(raa - bad_raa) % 360 > raa_ang_tol)[0]
-            elif bad_vaa == "all":
-                id_series_valid = np.where(
-                    np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol
-                )[0]
+
+            if bad_vza == "all" or bad_vza == "*":
+                cond_vza = np.zeros_like(
+                    dataset_l2b.viewing_zenith_angle.values, dtype=bool
+                )
             elif bad_vza == "sza":
-                id_series_valid = np.where(
-                    (
-                        dataset_l2b.viewing_zenith_angle.values
-                        > (dataset_l2b.solar_zenith_angle.values + ang_tol)
-                    )
-                    | (np.abs(raa - bad_raa) % 360 > raa_ang_tol)
-                )[0]
+                cond_vza = dataset_l2b.viewing_zenith_angle.values > (
+                    dataset_l2b.solar_zenith_angle.values + ang_tol
+                )
+            elif isinstance(bad_vza, str) and bad_vza[0] == "<":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values >= float(bad_vza[1:])
+            elif isinstance(bad_vza, str) and bad_vza[0] == ">":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values <= float(bad_vza[1:])
             else:
-                id_series_valid = np.where(
-                    (
-                        np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza)
-                        > ang_tol
-                    )
-                    | (np.abs(raa - bad_raa) % 360 > raa_ang_tol)
-                )[0]
+                cond_vza = (
+                    np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol
+                )
+
+            if bad_raa == "all" or bad_raa == "*":
+                cond_raa = np.zeros_like(raa, dtype=bool)
+            elif isinstance(bad_raa, str) and bad_raa[0] == "<":
+                cond_raa = raa >= float(bad_raa[1:])
+            elif isinstance(bad_raa, str) and bad_raa[0] == ">":
+                cond_raa = raa <= float(bad_raa[1:])
+            else:
+                cond_raa = np.abs(raa - bad_raa) % 360 > raa_ang_tol
+
+            # we only keep data where one of the two conditions is met (the vza or the raa is good)
+            id_series_valid = np.where(cond_vza | cond_raa)[0]
             dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
+
+        if len(dataset_l2b.series.values) == 0:
+            self.context.anomaly_handler.add_anomaly("nos")
 
         # Then, bad wavelength ranges are omited
         for bad_wav in bad_wavelengths_period[i_dep_save]:
@@ -291,6 +325,7 @@ class SiteSpecificQualityChecks:
                 | (dataset_l2b.wavelength.values > bad_wav[1])
             )[0]
             dataset_l2b = dataset_l2b.isel(wavelength=id_wav_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(wavelength=id_wav_valid)
 
         # Next, the site-specific clear sky check is applied
         irr_model_irrwav = xr.open_dataset(
@@ -457,6 +492,7 @@ class SiteSpecificQualityChecks:
             & (dataset_l2b.reflectance.values[i_550, :] > bounds_down)
         )[0]
         dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+        dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
 
         if len(dataset_l2b.series.values) == 0:
             self.context.anomaly_handler.add_anomaly("nos")
