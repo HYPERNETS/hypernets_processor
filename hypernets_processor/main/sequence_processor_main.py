@@ -88,7 +88,8 @@ def get_target_sequences(context, to_archive):
             if context.get_config_value("max_level") in product["product_level"]
         ]
 
-        print("Already processed products: " + str(processed_products))
+        if context.get_config_value("verbose"):
+            print("Already processed products: " + str(processed_products))
 
         failed_products = [
             anomaly["sequence_name"]
@@ -99,7 +100,8 @@ def get_target_sequences(context, to_archive):
             and not context.get_config_value("reprocess_anomalies")
         ]
 
-        print("Previously failed products: " + str(failed_products))
+        if context.get_config_value("verbose"):
+            print("Previously failed products: " + str(failed_products))
 
         complete_products = processed_products + failed_products
 
@@ -158,7 +160,8 @@ def get_target_sequences(context, to_archive):
                     context.anomaly_handler.anomaly_db.add_anomaly("m")
         
         
-        print("Sequences to process: " + str([os.path.basename(p) for p in paths_to_process]))
+        if context.get_config_value("verbose"):
+            print("Sequences to process: " + str([os.path.basename(p) for p in paths_to_process]))
 
         return paths_to_process
     else:
