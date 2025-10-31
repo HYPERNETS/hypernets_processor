@@ -88,6 +88,8 @@ def get_target_sequences(context, to_archive):
             if context.get_config_value("max_level") in product["product_level"]
         ]
 
+        print("Already processed products: " + str(processed_products))
+
         failed_products = [
             anomaly["sequence_name"]
             for anomaly in context.anomaly_db["anomalies"].find(
@@ -96,6 +98,8 @@ def get_target_sequences(context, to_archive):
             if anomaly["anomaly_id"] != "m"
             and not context.get_config_value("reprocess_anomalies")
         ]
+
+        print("Previously failed products: " + str(failed_products))
 
         complete_products = processed_products + failed_products
 
@@ -152,6 +156,9 @@ def get_target_sequences(context, to_archive):
                         % (incomplete_download_path)
                     )
                     context.anomaly_handler.anomaly_db.add_anomaly("m")
+        
+        
+        print("Sequences to process: " + str([os.path.basename(p) for p in paths_to_process]))
 
         return paths_to_process
     else:
