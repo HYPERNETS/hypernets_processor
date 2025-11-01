@@ -236,6 +236,9 @@ def main(processor_config, job_config, to_archive, parallel=None):
     # Run processor
     target_sequences_total = len(target_sequences)
 
+    print("Sequences to process: " + str(target_sequences))
+    print("Total sequences to process: " + str(target_sequences_total)) 
+
     if target_sequences_total == 0:
         msg = "No sequences to process"
 
