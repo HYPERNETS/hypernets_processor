@@ -359,25 +359,16 @@ class SiteSpecificQualityChecks:
             irradiance_noaer, _ = self.interpolate_irradiance_sza(
                 sza, irr_model_irrwav_noaer
             )
-            dir_dif_intfunc = scipy.interpolate.interp1d(
-                irr_model_irrwav.wavelength.values,
-                dir_dif_ratio,
-                fill_value="extrapolate",
-            )
-            dir_dif_ratio = dir_dif_intfunc(dataset_l1b_irr.wavelength.values)
+
             # before performing the clear sky check, we perform correction for misalignment
-            ratio = self.misalignment_ratio_calculator(
-                misalignment_vza[i_dep_save],
-                misalignment_vaa[i_dep_save],
-                0,
-                sza,
-                saa,
-                misalignment_corr[i_dep_save],
-                dir_dif_ratio,
-            )
-            ratio_unc = self.prop.propagate_systematic(
-                self.misalignment_ratio_calculator,
-                [
+            if misalignment_vza[i_dep_save] is not None:
+                dir_dif_intfunc = scipy.interpolate.interp1d(
+                    irr_model_irrwav.wavelength.values,
+                    dir_dif_ratio,
+                    fill_value="extrapolate",
+                )
+                dir_dif_ratio = dir_dif_intfunc(dataset_l1b_irr.wavelength.values)
+                ratio = self.misalignment_ratio_calculator(
                     misalignment_vza[i_dep_save],
                     misalignment_vaa[i_dep_save],
                     0,
@@ -385,23 +376,34 @@ class SiteSpecificQualityChecks:
                     saa,
                     misalignment_corr[i_dep_save],
                     dir_dif_ratio,
-                ],
-                [
-                    misalignment_vza_unc[i_dep_save],
-                    misalignment_vaa_unc[i_dep_save],
-                    None,
-                    None,
-                    None,
-                    misalignment_corr_unc[i_dep_save],
-                    None,
-                ],
-            )
-            dataset_l1b_irr.irradiance.values[:, i_series] *= ratio
-            dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series] = (
-                dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series]
-                ** 2
-                + (ratio_unc / ratio / 100) ** 2
-            ) ** 0.5
+                )
+                ratio_unc = self.prop.propagate_systematic(
+                    self.misalignment_ratio_calculator,
+                    [
+                        misalignment_vza[i_dep_save],
+                        misalignment_vaa[i_dep_save],
+                        0,
+                        sza,
+                        saa,
+                        misalignment_corr[i_dep_save],
+                        dir_dif_ratio,
+                    ],
+                    [
+                        misalignment_vza_unc[i_dep_save],
+                        misalignment_vaa_unc[i_dep_save],
+                        None,
+                        None,
+                        None,
+                        misalignment_corr_unc[i_dep_save],
+                        None,
+                    ],
+                )
+                dataset_l1b_irr.irradiance.values[:, i_series] *= ratio
+                dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series] = (
+                    dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series]
+                    ** 2
+                    + (ratio_unc / ratio / 100) ** 2
+                ) ** 0.5
 
             # clear sky check is performed
             if (
