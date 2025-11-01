@@ -115,7 +115,6 @@ class SiteSpecificQualityChecks:
         i_dep_save = None
         for i_dep in range(len(deploy_periods)):
             # first, we check if this data is within the deployment ranges:
-            print(deploy_periods[i_dep])
             if convert_datetime(
                 dataset_l2a.acquisition_time.values.min()
             ) > convert_datetime(
