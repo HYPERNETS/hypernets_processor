@@ -237,6 +237,16 @@ class AnomalyDB(dataset.Database):
                 )
             )
         else:
+            print("Adding anomaly without dataset info: " + anomaly_id)
+            print(dict(
+                    anomaly_id=anomaly_id,
+                    sequence_name=self.context.get_config_value("sequence_name"),
+                    sequence_path=self.context.get_config_value("sequence_path"),
+                    site_id=self.context.get_config_value("site_id"),
+                    system_id=self.context.get_config_value("system_id"),
+                    datetime=self.context.get_config_value("time"),
+                    rel_product_dir=self.writer.return_rel_directory(),
+                ))
             tbl.insert(
                 dict(
                     anomaly_id=anomaly_id,
