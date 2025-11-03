@@ -96,7 +96,7 @@ def get_target_sequences(context, to_archive):
             for anomaly in context.anomaly_db["anomalies"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if anomaly["anomaly_id"] not in ['m', 'a', 's', 'o', 'nlu', 'nld', 'ned', 'cl', 'ms', 'd', 'wns', 'hos']
+            if anomaly["anomaly_id"] not in ['m', 'a', 's', 'o', 'nlu', 'nld', 'ned', 'cl', 'd', 'wns', 'hos']
             and not context.get_config_value("reprocess_anomalies")
         ]
 
