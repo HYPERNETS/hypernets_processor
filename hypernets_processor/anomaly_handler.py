@@ -80,13 +80,13 @@ class AnomalyHandler:
         else:
             self.context.logger.info("anomaly added: " + error_description)
 
-    def add_x_anomaly(self):
-        """
-        Adds unexpect error anomaly to anomaly database if expected anomaly not already
-        """
+    # def add_x_anomaly(self):
+    #     """
+    #     Adds unexpect error anomaly to anomaly database if expected anomaly not already
+    #     """
 
-        if self.get_sequence_crashing_anomalies() == []:
-            self.add_anomaly("x")
+    #     if self.get_sequence_crashing_anomalies() == []:
+    #         self.add_anomaly("x")
 
     def get_anomaly_ids(self):
         """

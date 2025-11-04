@@ -191,7 +191,7 @@ def run_sequence(inputs):
 
     except Exception as e:
         print("Exception occurred during processing of sequence: " + target_sequence)
-        context.anomaly_handler.add_x_anomaly()
+        context.anomaly_handler.add_anomaly("x")
         if context.anomaly_handler.anomalies_added is not []:
             context.logger.info(
                 "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)

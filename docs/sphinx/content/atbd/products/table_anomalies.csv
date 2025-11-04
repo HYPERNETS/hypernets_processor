@@ -9,7 +9,7 @@ ms, series_missing , L & W , L1B , Check if there are any missing series (either
 u, negative_unc , L & W , L1B , There are negative uncertainties, True ,
 o, half_of_unc_too_big , L & W , L1B , More than 50\% of data has random error above 100\% (likely corrupted or dark data), False , 17
 nu, check_valid_irradiance , L & W , L1C , Halt processing if `variable_irradiance' flag was triggered at previous level, True ,
-in, check_valid_sequence , L & W , L1C , Halt processing if there are no valid series (flagged by `not_enough_dark_scans'; `not_enough_irr_scans'; `not_enough_rad_scans' or `vza_irradiance')., True ,
+in, check_valid_sequence , L & W , L1C , Halt processing if there are no valid series (not present or flagged by `not_enough_dark_scans'; `not_enough_irr_scans'; `not_enough_rad_scans' or `vza_irradiance')., True ,
 cl, no_clear_sky_sequence , L & W , L1C , If all irradiance series are flagged with the `no_clear_sky_irradiance' flag, False  , 19
 d, discontinuity_VNIR_SWIR , L , L1B , Checks if the VNIR and SWIR are different by more than 25\%, False, 20
 nd, variable_radiance, W , L1C , More than 10\% difference between start and end $L_d$ at 550~nm, True ,
