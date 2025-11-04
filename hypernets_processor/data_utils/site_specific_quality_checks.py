@@ -161,49 +161,12 @@ class SiteSpecificQualityChecks:
         if len(dataset_l2a.series)!=len(dataset_l1b_rad.series):
             self.context.anomaly_handler.add_anomaly("wns")
 
-        # Next, remove data for which any of the bad flags was set in previous QC
-        bad_flags = [
-            "pt_ref_invalid",
-            "half_of_scans_masked",
-            "not_enough_dark_scans",
-            "not_enough_rad_scans",
-            "not_enough_irr_scans",
-            "no_clear_sky_irradiance",
-            "variable_irradiance",
-            "half_of_uncertainties_too_big",
-            "discontinuity_VNIR_SWIR",
-            "single_irradiance_used",
-        ]
-        flagged = DatasetUtil.get_flags_mask_or(
-            dataset_l2a["quality_flag"], bad_flags
-        )  # bools for each series if any bad flag is set
-        id_series_valid = np.where(~flagged)[
-            0
-        ]  # select indexes for which no bad flags are set
-        dataset_l2b = dataset_l2a.isel(series=id_series_valid)
-        dataset_l2b.attrs["product_name"] = self.pu.create_product_name("L_L2B")
-        dataset_l2b.attrs["product_level"] = "L_L2B"
-
-        dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid)
-        dataset_l1d_rad.attrs["product_name"] = self.pu.create_product_name("L_L1D_RAD")
-        dataset_l1d_rad.attrs["product_level"] = "L_L1D_RAD"
-
-        flagged_l1b_irr = DatasetUtil.get_flags_mask_or(
-            dataset_l1b_irr["quality_flag"], bad_flags
-        )  # bools for each series if any bad flag is set
-        id_series_valid_l1b_irr = np.where(~flagged_l1b_irr)[
-            0
-        ]  # select indexes for which no bad flags are set
-        dataset_l1d_irr = dataset_l1b_irr.isel(series=id_series_valid_l1b_irr)
-        dataset_l1d_irr.attrs["product_name"] = self.pu.create_product_name("L_L1D_IRR")
-        dataset_l1d_irr.attrs["product_level"] = "L_L1D_IRR"
-
         # next, remove angles for which we know the data is not reliable
         id_series_valid = np.where(
-            dataset_l2b.solar_zenith_angle.values < max_sza_period[i_dep_save]
+            dataset_l2a.solar_zenith_angle.values < max_sza_period[i_dep_save]
         )[0]
-        dataset_l2b = dataset_l2b.isel(series=id_series_valid)
-        dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
+        dataset_l2b = dataset_l2a.isel(series=id_series_valid)
+        dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid)
 
         ang_tol = self.context.get_config_value("angle_tolerance")
         for angle_tup in bad_viewing_angles_period[i_dep_save]:
@@ -317,6 +280,48 @@ class SiteSpecificQualityChecks:
 
         if len(dataset_l2b.series.values) == 0:
             self.context.anomaly_handler.add_anomaly("nos")
+
+        #store number of angles after removing the bad angle ranges
+        len_angles_removed = len(dataset_l2b.series.values)
+
+        # Next, remove data for which any of the bad flags was set in previous QC
+        bad_flags = [
+            "pt_ref_invalid",
+            "half_of_scans_masked",
+            "not_enough_dark_scans",
+            "not_enough_rad_scans",
+            "not_enough_irr_scans",
+            "no_clear_sky_irradiance",
+            "variable_irradiance",
+            "half_of_uncertainties_too_big",
+            "discontinuity_VNIR_SWIR",
+            "single_irradiance_used",
+        ]
+        flagged = DatasetUtil.get_flags_mask_or(
+            dataset_l2b["quality_flag"], bad_flags
+        )  # bools for each series if any bad flag is set
+        id_series_valid = np.where(~flagged)[
+            0
+        ]  # select indexes for which no bad flags are set
+        dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+        dataset_l2b.attrs["product_name"] = self.pu.create_product_name("L_L2B")
+        dataset_l2b.attrs["product_level"] = "L_L2B"
+
+        dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
+        dataset_l1d_rad.attrs["product_name"] = self.pu.create_product_name("L_L1D_RAD")
+        dataset_l1d_rad.attrs["product_level"] = "L_L1D_RAD"
+
+        flagged_l1b_irr = DatasetUtil.get_flags_mask_or(
+            dataset_l1b_irr["quality_flag"], bad_flags
+        )  # bools for each series if any bad flag is set
+        id_series_valid_l1b_irr = np.where(~flagged_l1b_irr)[
+            0
+        ]  # select indexes for which no bad flags are set
+        dataset_l1d_irr = dataset_l1b_irr.isel(series=id_series_valid_l1b_irr)
+        dataset_l1d_irr.attrs["product_name"] = self.pu.create_product_name("L_L1D_IRR")
+        dataset_l1d_irr.attrs["product_level"] = "L_L1D_IRR"
+
+        
 
         # Then, bad wavelength ranges are omited
         for bad_wav in bad_wavelengths_period[i_dep_save]:
@@ -499,7 +504,7 @@ class SiteSpecificQualityChecks:
         if len(dataset_l2b.series.values) == 0:
             self.context.anomaly_handler.add_anomaly("nos")
 
-        if len(dataset_l2b.series.values) < 1 / 2 * len(dataset_l2a.series.values):
+        if len(dataset_l2b.series.values) < 1 / 2 * len_angles_removed:
             self.context.anomaly_handler.add_anomaly("hos")
 
         # finally, make plots and write file

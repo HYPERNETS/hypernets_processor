@@ -53,7 +53,7 @@ class AnomalyHandler:
         :type ds: xarray.Dataset
         :param ds: producgt that was being processed when anomaly was raised
         """
-
+        print(f"Adding anomaly: {anomaly_id}")
         # Check anomaly defined
         if anomaly_id not in self.get_anomaly_ids():
             self.context.logger.info(

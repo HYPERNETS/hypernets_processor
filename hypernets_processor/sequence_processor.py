@@ -225,7 +225,7 @@ class SequenceProcessor:
 
                 else:
                     self.context.logger.info("Not a standard sequence")
-                    self.context.anomaly_handler.add_anomaly("ms")
+                    self.context.anomaly_handler.add_anomaly("in")
 
             elif self.context.get_config_value("network") == "l":
                 comb = CombineSWIR(self.context)
@@ -364,7 +364,7 @@ class SequenceProcessor:
                         self.context.logger.info("Done")
                 elif not self.context.get_config_value("reprocess_from"):
                     self.context.logger.info("Not a standard sequence")
-                    self.context.anomaly_handler.add_anomaly("ms")
+                    self.context.anomaly_handler.add_anomaly("in")
 
                 if L2a:
                     if self.context.get_config_value("max_level").upper() in [
