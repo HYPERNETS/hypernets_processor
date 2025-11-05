@@ -811,6 +811,7 @@ class PostProcessingDataset:
                         ratio_calculator(vza[1], vaa[1], szas[divider_idx:], saas[divider_idx:],
                                          dir_to_diff[divider_idx:]))/mean_corr[1]
 
+
     def cloud_check(self, tolerance, wavelength, rewrite, rewrite_var=None):
         szas = self.irradiance["SZA"]
         IDs = self.irradiance["ID"]
@@ -1267,38 +1268,18 @@ class PostProcessingDataset:
                     self.bound_iteration += 1
                     iter_num = self.bound_iteration
 
-                binned95, bin_centers_sza, bin_centers_vza, upper_passes, da = (
-                    sza_vza_bin_and_calc(
-                        data_list[i],
-                        data_cutting,
-                        "median_plus_3std",
-                        "upper",
-                        input_wav=self.input_wav,
-                    )
-                )
-                binned5, bin_centers_sza, bin_centers_vza, lower_passes, da = (
-                    sza_vza_bin_and_calc(
-                        data_list[i],
-                        data_cutting,
-                        "median_minus_3std",
-                        "lower",
-                        input_wav=self.input_wav,
-                    )
-                )
 
-                below, below_cov = new_plane_fit(
-                    bin_centers_sza, bin_centers_vza, binned5
-                )
-                above, above_cov = new_plane_fit(
-                    bin_centers_sza, bin_centers_vza, binned95
-                )
+                binned95, bin_centers_sza, bin_centers_vza, upper_passes, da = sza_vza_bin_and_calc(data_list[i],
+                                                                                                    data_cutting,
+                                                                                                    'median_plus_3std',
+                                                                                                    'upper',
+                                                                                                    input_wav = self.input_wav)
+                binned5, bin_centers_sza, bin_centers_vza, lower_passes, da = sza_vza_bin_and_calc(data_list[i],
+                                                                                                   data_cutting,
+                                                                                                   'median_minus_3std',
+                                                                                                   'lower',
+                                                                                                   input_wav = self.input_wav)
 
-                df_below = pd.DataFrame(
-                    {"refl": binned5, "vza": bin_centers_vza, "sza": bin_centers_sza}
-                )
-                df_above = pd.DataFrame(
-                    {"refl": binned95, "vza": bin_centers_vza, "sza": bin_centers_sza}
-                )
 
                 if len(binned5) < 6:
                     print('Too few points to fit')
@@ -2144,21 +2125,18 @@ def alternate_bound_pipeline(dataset: PostProcessingDataset, maintenance, sza_li
 def irradiance_analysis_writer(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs):
     print('Initial', len(dataset.radiance))
     dataset.maintenance_check(maintenance)
-    print("Maintenance", len(dataset.radiance))
+    print('Maintenance', len(dataset.radiance))
     dataset.sza_check(sza_limit)
-    print("SZA", len(dataset.radiance))
+    print('SZA', len(dataset.radiance))
     dataset.raa_cut(raa_limit)
-    print("RAA", len(dataset.radiance))
+    print('RAA', len(dataset.radiance))
     dataset.clean_irr()
-    print("IRR Flags", len(dataset.radiance))
+    print('IRR Flags', len(dataset.radiance))
     dataset.write_irr_analysis_files(filename, wvs)
-    print("File Written")
+    print('File Written')
 
-
-def aod_plotter(
-    dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs
-):
-    print("Initial", len(dataset.radiance))
+def aod_plotter(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs):
+    print('Initial', len(dataset.radiance))
     dataset.maintenance_check(maintenance)
     print("Maintenance", len(dataset.radiance))
     dataset.sza_check(sza_limit)
@@ -2166,10 +2144,10 @@ def aod_plotter(
     dataset.raa_cut(raa_limit)
     print("RAA", len(dataset.radiance))
     dataset.clean_irr()
-    print("IRR Flags", len(dataset.radiance))
+    print('IRR Flags', len(dataset.radiance))
     dataset.append_aod()
-    dataset.write_irr_analysis_files(filename, wvs, save=True, plot=True, interp=True)
-    print("Done")
+    dataset.write_irr_analysis_files(filename, wvs, save = True, plot = True, interp = True)
+    print('Done')
 
 def ndvi_bound_calculator(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit):
     dataset.vza_check_toplimit(90)
@@ -2200,23 +2178,11 @@ def misalignment_correction_writer(dataset: PostProcessingDataset, vza, vaa, mea
     dataset.save('radiance',
                  r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv')
 
-def misalignment_correction_writer(
-    dataset: PostProcessingDataset, vza, vaa, multiple_periods=False, period_date=None
-):
-    dataset.misalignment_correction(vza, vaa, multiple_periods, period_date)
-    dataset.save(
-        "radiance",
-        r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv",
-    )
-
-
-JSIT_dict = {
-    "NovDec24Jan25": ("2024-11-14", "2025-01-31"),
-    "FebApr25": ("2025-02-01", "2025-04-30"),
-}
+JSIT_dict = {'NovDec24Jan25': ('2024-11-14', '2025-01-31'),
+             'FebApr25': ('2025-02-01', '2025-04-30')}
 
 JSIT_maintenance_dates = []
-"""
+'''
 for k, v in JSIT_dict.items():
     QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/LOBE_2023-05-31_2023-08-11_None_None_None_None_misalign_corrected.csv',
                             r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/LOBEv4_irradiance.csv',

@@ -204,14 +204,41 @@ def filter_files_start_stop(
         tod_stop = datetime.datetime.strptime(tod_stop, "%H%M").time()
 
     for file in files:
-        ds_HYP = xr.open_dataset(file)
-        times = [
-            datetime.datetime.utcfromtimestamp(timestamp)
-            for timestamp in ds_HYP["acquisition_time"].values
-        ]
-        if min(times) > start_time and max(times) < stop_time:
-            if (tod_start is None or min(times).time() > tod_start) and (
-                tod_stop is None or max(times).time() < tod_stop
+        try:
+            ds_HYP = xr.open_dataset(file)
+            times = [
+                datetime.datetime.utcfromtimestamp(timestamp)
+                for timestamp in ds_HYP["acquisition_time"].values
+            ]
+            if min(times) > start_time and max(times) < stop_time:
+                if (tod_start is None or min(times).time() > tod_start) and (
+                    tod_stop is None or max(times).time() < tod_stop
+                ):
+                    files_out.append(file)
+        except:
+            continue
+    return files_out
+
+def filter_files_quick(
+    files, start_time, stop_time, tod_start=None, tod_stop=None
+):
+    start_time = convert_datetime(start_time)
+    stop_time = convert_datetime(stop_time)
+    files_out = []
+
+    if tod_start is not None:
+        tod_start = datetime.datetime.strptime(tod_start, "%H%M").time()
+
+    if tod_stop is not None:
+        tod_stop = datetime.datetime.strptime(tod_stop, "%H%M").time()
+
+    for file in files:
+        time_stamp = file.split('\\')[5][3:11]
+        times = datetime.datetime.strptime(time_stamp, '%Y%m%d')
+            
+        if times > start_time and times < stop_time:
+            if (tod_start is None or times.time() > tod_start) and (
+                tod_stop is None or times.time() < tod_stop
             ):
                 files_out.append(file)
     return files_out
