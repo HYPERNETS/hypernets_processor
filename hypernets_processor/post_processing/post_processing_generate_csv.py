@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 
 # for eoserver:
 os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
-data_path = r"/mnt/t/data/insitu/hypernets/archive"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+data_path = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
+results_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
@@ -131,7 +131,26 @@ SITE_PERIODS = {
             "comments": "Sugar beet roots, Flat soil surface",
         }
     ],
-    # "PEAN": [],
+     "PEAN": [
+         {
+            "start_date": "2022-01-26",
+            "stop_date": "2022-02-08",
+            "HYPSTAR_SN": 221233,
+            "comments": "v1 instrument",
+        },
+         {
+            "start_date": "2022-12-25",
+            "stop_date": "2023-02-02",
+            "HYPSTAR_SN": 221233,
+            "comments": "v1 instrument",
+        },
+         {
+            "start_date": "2023-12-30",
+            "stop_date": "2024-01-23",
+            "HYPSTAR_SN": 222313,
+            "comments": "v1 instrument",
+        },
+         ],
     "WWUK": [
         {
             "start_date": "2021-11-18",
@@ -141,6 +160,12 @@ SITE_PERIODS = {
         },
         {
             "start_date": "2024-06-26",
+            "stop_date": "2024-12-31",
+            "HYPSTAR_SN": 222314,
+            "comments": "v3 instrument",
+        },
+        {
+            "start_date": "2025-01-01",
             "stop_date": "present",
             "HYPSTAR_SN": 222314,
             "comments": "v3 instrument",
@@ -150,7 +175,7 @@ SITE_PERIODS = {
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'LOBE':
+        if site != 'JAES':
             continue
         if period['stop_date'] != 'present':
             continue
