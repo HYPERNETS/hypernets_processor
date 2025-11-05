@@ -222,12 +222,19 @@ stop_time = "20230101T0000"
 run_RT = True
 
 tag = "irrwav"
-tag = "_"+tag
+tag = "_" + tag
+
 
 def combine_direct_to_diffuse_ratio_sza(
-    site, aod, irr_files_path=None, median_aod=False, tag="",
+    site,
+    aod,
+    irr_files_path=None,
+    median_aod=False,
+    tag="",
 ):
-    files = glob.glob(os.path.join(irr_files_path, "irr_clear_sky_%s*%s.nc" %(site,tag)))
+    files = glob.glob(
+        os.path.join(irr_files_path, "irr_clear_sky_%s*%s.nc" % (site, tag))
+    )
     files.sort()
     direct_to_diffuse_all = [xr.open_dataset(file) for file in files]
     direct_to_diffuse_subset = [
@@ -353,7 +360,8 @@ for site in SITE_LOCATIONS.keys():
             for szai in np.arange(0, 90, 10):
                 if os.path.exists(
                     os.path.join(
-                        results_path, "irr_clear_sky_%s_%s_%s%s.nc" % (site, aod, szai, tag)
+                        results_path,
+                        "irr_clear_sky_%s_%s_%s%s.nc" % (site, aod, szai, tag),
                     )
                 ):
                     continue
@@ -370,7 +378,7 @@ for site in SITE_LOCATIONS.keys():
                         O3=ds_era5.tco3.values.mean() / (2.1415 * 10 ** (-5)),
                         P=ds_era5.sp.values.mean() / 100,
                         altitude=alt,
-                        band_centres=ds_HYP_irr.wavelength.values
+                        band_centres=ds_HYP_irr.wavelength.values,
                     )
                     ds_irr.attrs["h2o"] = ds_era5.tcwv.values.mean()
                     ds_irr.attrs["O3"] = ds_era5.tco3.values.mean() / (
@@ -383,7 +391,8 @@ for site in SITE_LOCATIONS.keys():
 
                     ds_irr.to_netcdf(
                         os.path.join(
-                            results_path, "irr_clear_sky_%s_%s_%s%s.nc" % (site, aod, szai, tag)
+                            results_path,
+                            "irr_clear_sky_%s_%s_%s%s.nc" % (site, aod, szai, tag),
                         )
                     )
 

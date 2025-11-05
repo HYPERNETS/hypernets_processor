@@ -1,6 +1,7 @@
 """
 test_functions module - module with functions to help with testing
 """
+
 from hypernets_processor.version import __version__
 from hypernets_processor.data_io.hypernets_db_builder import HypernetsDBBuilder
 from hypernets_processor.data_io.hypernets_ds_builder import HypernetsDSBuilder
@@ -10,7 +11,7 @@ from hypernets_processor.utils.logging import configure_logging
 from hypernets_processor.utils.config import (
     PROCESSOR_CONFIG_PATH,
     JOB_CONFIG_TEMPLATE_PATH,
-    PROCESSOR_LAND_DEFAULTS_CONFIG_PATH
+    PROCESSOR_LAND_DEFAULTS_CONFIG_PATH,
 )
 from hypernets_processor.utils.paths import relative_path
 import datetime

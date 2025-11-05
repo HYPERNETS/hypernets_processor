@@ -301,9 +301,9 @@ class RhymerHypstar:
                 if anc_wind is not None:
                     wind.append(anc_wind["w"])
                     now = datetime.now()
-                    l1b.attrs[
-                        "rhof_wind_source"
-                    ] = "NCEP/GDAS FNL 0.25 ds083.3 | DOI: 10.5065/D65Q4T4Z"
+                    l1b.attrs["rhof_wind_source"] = (
+                        "NCEP/GDAS FNL 0.25 ds083.3 | DOI: 10.5065/D65Q4T4Z"
+                    )
 
         l1b["rhof_wind"].values = wind
         return l1b
@@ -326,7 +326,6 @@ class RhymerHypstar:
             ) % 360
 
             rhof_raa[i] = ((ra - 180) % 360) - 180
-
 
             ## get air_water_int reflectance
             if self.context.get_config_value("rhof_option") == "Mobley1999":

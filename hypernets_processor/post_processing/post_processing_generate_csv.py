@@ -27,11 +27,11 @@ if not os.path.exists(results_path):
 # start_times = ["20240409T0000","20220517T0000","20231026T0000", '20240101T0000']
 # stop_times = ["20250101T0000","20231018T0000","20250101T0000", '20250101T0000']
 
-tags = ["GHNA_v3", 'WWUK_2024']
-sites = ["GHNA", 'WWUK']
+tags = ["GHNA_v3", "WWUK_2024"]
+sites = ["GHNA", "WWUK"]
 
-start_times = ["20231026T0000", '20240101T0000']
-stop_times = ["20250101T0000", '20250101T0000']
+start_times = ["20231026T0000", "20240101T0000"]
+stop_times = ["20250101T0000", "20250101T0000"]
 
 wavelength = [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640]
 plot_wavelength = 550
@@ -125,11 +125,11 @@ SITE_PERIODS = {
         {
             "start_date": "2025-04-15",
             "stop_date": "present",
-            "lat": 50.55151 ,
+            "lat": 50.55151,
             "lon": 4.74601,
             "HYPSTAR_SN": 222312,
             "comments": "Sugar beet roots, Flat soil surface",
-        }
+        },
     ],
      "PEAN": [
          {
@@ -177,7 +177,7 @@ for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
         if site != 'JAES':
             continue
-        if period['stop_date'] != 'present':
+        if period["stop_date"] != "present":
             continue
         print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])

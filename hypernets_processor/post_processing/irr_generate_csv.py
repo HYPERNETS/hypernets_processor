@@ -50,6 +50,7 @@ data_clear = xr.open_dataset(
 wav_ori = data_clear.wavelength.values
 print("Got wavelengths")
 
+
 def get_irr(data, wav_val):
     data = xr.open_dataset(r"%s" % data)
     wav = data.wavelength.values
@@ -61,8 +62,8 @@ def get_irr(data, wav_val):
             irr1 = np.zeros(len(wav))
             irr2 = np.zeros(len(wav))
             qual = [999, 999]
-            sza = [999,999]
-            saa = [999,999]
+            sza = [999, 999]
+            saa = [999, 999]
         else:
             irr1 = np.array(irr.iloc[:, 0].values)
             irr2 = np.array(irr.iloc[:, 1].values)
@@ -86,19 +87,33 @@ def get_irr(data, wav_val):
 
 def make_irrs(file_list, wav_val):
     if wav_val is None:
-        irrs = pd.DataFrame(columns=['ID', 'Flag', 'SZA', 'SAA'])
-        refl = np.zeros((len(file_list)*2, len(wav_ori)))
+        irrs = pd.DataFrame(columns=["ID", "Flag", "SZA", "SAA"])
+        refl = np.zeros((len(file_list) * 2, len(wav_ori)))
         for j in range(len(file_list)):
             try:
-                irr1, irr2, wav, qual, sza, saa = get_irr(file_list[j], wav_val = wav_val)
-                new_row1 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[0], 'SZA': sza[0], 'SAA': saa[0]})
-                new_row2 = pd.Series({'ID': file_list[j][62:80], 'Flag': qual[1], 'SZA': sza[1], 'SAA': saa[1]})
+                irr1, irr2, wav, qual, sza, saa = get_irr(file_list[j], wav_val=wav_val)
+                new_row1 = pd.Series(
+                    {
+                        "ID": file_list[j][62:80],
+                        "Flag": qual[0],
+                        "SZA": sza[0],
+                        "SAA": saa[0],
+                    }
+                )
+                new_row2 = pd.Series(
+                    {
+                        "ID": file_list[j][62:80],
+                        "Flag": qual[1],
+                        "SZA": sza[1],
+                        "SAA": saa[1],
+                    }
+                )
                 irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
                 irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
                 refl[2 * j, :] = irr1
                 refl[2 * j + 1, :] = irr2
             except Exception as e:
-                print('failed due to', e)
+                print("failed due to", e)
                 refl[2 * j, :] = np.ones(len(wav_ori)) * -999
                 refl[2 * j + 1, :] = np.ones(len(wav_ori)) * -999
         for k in range(len(wav_ori)):
@@ -144,7 +159,7 @@ print("Files Sorted")
 
 irrs = make_irrs(files, None)
 print(irrs.iloc[1])
-'''
+"""
 data_cloud = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\12\SEQ20240312T070125\HYPERNETS_L_GHNA_L1B_IRR_20240312T0701_20240416T2306_v2.0.nc'
 data_clear = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc'
 
@@ -153,5 +168,4 @@ irr_cloud1, irr_cloud2, wav_cloud, qual_cloud, sza_cloud = get_irr(data_cloud, 5
 
 plt.plot(wav_clear - wav_cloud)
 plt.show()
-'''
-
+"""

@@ -319,14 +319,14 @@ SYSTEM_METADATA = {  # "system_id": system_id,
 }
 
 
-#this needs to be further dicsussed after we have achieved conclusion on what to do in terms of QC for deployment periods
+# this needs to be further dicsussed after we have achieved conclusion on what to do in terms of QC for deployment periods
 DEPLOYMENT_METADATA = {
-    "start_date":"NaN",
-    "intstument_id":"NaN",
-    "hypernets_tools_version":"NaN",
+    "start_date": "NaN",
+    "intstument_id": "NaN",
+    "hypernets_tools_version": "NaN",
     "site_latitude": "NaN",
     "site_longitude": "NaN",
-    #components? how do we gather this info and make sure its up to date?
+    # components? how do we gather this info and make sure its up to date?
 }
 
 SITE_METADATA = {
@@ -460,6 +460,16 @@ METADATA_DEFS = {
         **WATER_NETWORK_METADATA,
         **W_L2A_REF_METADATA,
     },
-    "L_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L_L2A_REF_METADATA},
-    "W_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **W_L2A_REF_METADATA},
+    "L_L2B": {
+        **STANDARD_METADATA,
+        **COMPONENTS_METADATA,
+        **LAND_NETWORK_METADATA,
+        **L_L2A_REF_METADATA,
+    },
+    "W_L2B": {
+        **STANDARD_METADATA,
+        **COMPONENTS_METADATA,
+        **WATER_NETWORK_METADATA,
+        **W_L2A_REF_METADATA,
+    },
 }

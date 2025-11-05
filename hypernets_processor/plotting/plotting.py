@@ -124,9 +124,14 @@ class Plotting:
 
         if len(angle_labels) > 10:
             linestyles = [
-                (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
-                if (np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180)
-                else (0, (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
+                (
+                    (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
+                    if (np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180)
+                    else (
+                        0,
+                        (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0),
+                    )
+                )
                 for i in range(len(dataset["viewing_zenith_angle"].values))
             ]
 
@@ -627,7 +632,7 @@ class Plotting:
         )
 
     def plot_polar_reflectance(self, dataset, wavelength):
-        if wavelength=="ndvi":
+        if wavelength == "ndvi":
             plotpath = os.path.join(
                 self.path,
                 "plot_polar_ndvi_"
@@ -681,7 +686,9 @@ class Plotting:
                 )[0]
                 if len(id_series) == 1:
                     if wavelength == "ndvi":
-                        refl_2d[i, ii] = (refl[id_865, id_series] - refl[id_665, id_series])/(refl[id_865, id_series] + refl[id_665, id_series])
+                        refl_2d[i, ii] = (
+                            refl[id_865, id_series] - refl[id_665, id_series]
+                        ) / (refl[id_865, id_series] + refl[id_665, id_series])
                     else:
                         refl_2d[i, ii] = np.abs(refl[id_wav, id_series])
                 elif len(id_series) > 1:
@@ -700,7 +707,10 @@ class Plotting:
                         )
                     )
                     if wavelength == "ndvi":
-                        refl_2d[i, ii] =  np.mean((refl[id_865, id_series] - refl[id_665, id_series])/(refl[id_865, id_series] + refl[id_665, id_series]))
+                        refl_2d[i, ii] = np.mean(
+                            (refl[id_865, id_series] - refl[id_665, id_series])
+                            / (refl[id_865, id_series] + refl[id_665, id_series])
+                        )
                     else:
                         refl_2d[i, ii] = np.mean(np.abs(refl[id_wav, id_series]))
         refl_2d[refl_2d == 0] = np.nan
@@ -708,8 +718,8 @@ class Plotting:
             vmin = None
             vmax = None
         else:
-            vmin=self.context.get_config_value("plot_polar_min")
-            vmax=self.context.get_config_value("plot_polar_max")
+            vmin = self.context.get_config_value("plot_polar_min")
+            vmax = self.context.get_config_value("plot_polar_max")
 
         fig = plt.figure()
         ax = plt.subplot(1, 1, 1, projection="polar")

@@ -1,6 +1,7 @@
 """
 Module with main to run sequence file processing chain
 """
+
 import datetime
 
 from hypernets_processor.version import __version__
@@ -48,16 +49,26 @@ def get_target_sequences(context, to_archive):
     if parse_sequence_path(context.get_config_value("raw_data_directory")) is not None:
         raw_paths.append(context.get_config_value("raw_data_directory"))
     else:
-        #first add SEQ paths in raw_data_directory
-        paths=os.listdir(context.get_config_value("raw_data_directory"))
-        #then add paths in raw_data_directory/YYYY/mm/DD/SEQ*
-        paths.extend(glob.glob(
-                os.path.join(context.get_config_value("raw_data_directory"), "20*","*","*","SEQ*")
-            ))
+        # first add SEQ paths in raw_data_directory
+        paths = os.listdir(context.get_config_value("raw_data_directory"))
+        # then add paths in raw_data_directory/YYYY/mm/DD/SEQ*
+        paths.extend(
+            glob.glob(
+                os.path.join(
+                    context.get_config_value("raw_data_directory"),
+                    "20*",
+                    "*",
+                    "*",
+                    "SEQ*",
+                )
+            )
+        )
 
         for path in paths:
             if parse_sequence_path(path, context) is not None:
-                sequence_path = os.path.join(context.get_config_value("raw_data_directory"), path)
+                sequence_path = os.path.join(
+                    context.get_config_value("raw_data_directory"), path
+                )
                 if os.path.exists(os.path.join(sequence_path, "metadata.txt")):
                     raw_paths.append(sequence_path)
                 else:
@@ -77,13 +88,20 @@ def get_target_sequences(context, to_archive):
             if context.get_config_value("max_level") in product["product_level"]
         ]
 
+        if context.get_config_value("verbose"):
+            print("Already processed products: " + str(processed_products))
+
         failed_products = [
             anomaly["sequence_name"]
             for anomaly in context.anomaly_db["anomalies"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if anomaly["anomaly_id"] != "m" and not context.get_config_value("reprocess_anomalies")
+            if anomaly["anomaly_id"] not in ['m', 'a', 's', 'o', 'nlu', 'nld', 'ned', 'cl', 'd', 'wns', 'ms'] # skip non-fatal anomalies (so the processor attempts to process these again if no product is found)
+            and not context.get_config_value("reprocess_anomalies")
         ]
+
+        if context.get_config_value("verbose"):
+            print("Previously failed products: " + str(failed_products))
 
         complete_products = processed_products + failed_products
 
@@ -93,7 +111,8 @@ def get_target_sequences(context, to_archive):
                 for product in context.archive_db["products"].find(
                     site_id=context.get_config_value("site_id")
                 )
-                if context.get_config_value("reprocess_from") in product["product_level"]
+                if context.get_config_value("reprocess_from")
+                in product["product_level"]
             ]
         else:
             raw_products = [os.path.basename(raw_path) for raw_path in raw_paths]
@@ -106,15 +125,17 @@ def get_target_sequences(context, to_archive):
             raw_product_datetime = parse_sequence_path(raw_product)["datetime"]
             if raw_product in raw_products:
                 if context.get_config_value("delay_hours") is not None and np.abs(
-                        raw_product_datetime - datetime.datetime.now()) < datetime.timedelta(
-                        hours=context.get_config_value("delay_hours")):
-                    print("%s is not processed yet due to not having reached required delay (%s hours)" % (
-                    raw_product, context.get_config_value("delay_hours")))
+                    raw_product_datetime - datetime.datetime.now()
+                ) < datetime.timedelta(hours=context.get_config_value("delay_hours")):
+                    print(
+                        "%s is not processed yet due to not having reached required delay (%s hours)"
+                        % (raw_product, context.get_config_value("delay_hours"))
+                    )
                 else:
                     paths_to_process.append(raw_paths[i])
 
-        #next, check if incompete downloads have already been added to anomaly db, and if not add them
-        if not context.get_config_value("max_level")=="L2B":
+        # next, check if incompete downloads have already been added to anomaly db, and if not add them
+        if not context.get_config_value("max_level") == "L2B":
             incomplete_products = [
                 anomaly["sequence_name"]
                 for anomaly in context.anomaly_db["anomalies"].find(
@@ -126,16 +147,26 @@ def get_target_sequences(context, to_archive):
             for incomplete_download_path in incomplete_downloads:
                 seq_id = os.path.basename(incomplete_download_path)
                 if not seq_id in incomplete_products:
-                    context.set_config_value("time", parse_sequence_path(incomplete_download_path)["datetime"])
+                    context.set_config_value(
+                        "time",
+                        parse_sequence_path(incomplete_download_path)["datetime"],
+                    )
                     context.set_config_value("sequence_name", seq_id)
                     context.set_config_value("sequence_path", incomplete_download_path)
                     context.logger.error(
-                        "metadata.txt not found in directory %s, will try processing again later" % (incomplete_download_path))
+                        "metadata.txt not found in directory %s, will try processing again later"
+                        % (incomplete_download_path)
+                    )
                     context.anomaly_handler.anomaly_db.add_anomaly("m")
+        
+        
+        if context.get_config_value("verbose"):
+            print("Sequences to process: " + str([os.path.basename(p) for p in paths_to_process]))
 
         return paths_to_process
     else:
         return raw_paths
+
 
 def run_sequence(inputs):
     target_sequence, context, logger = inputs
@@ -159,8 +190,9 @@ def run_sequence(inputs):
         return 1
 
     except Exception as e:
-
+        print("Exception occurred during processing of sequence: " + target_sequence)
         context.anomaly_handler.add_x_anomaly()
+        
         if context.anomaly_handler.anomalies_added is not []:
             context.logger.info(
                 "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)
@@ -204,6 +236,8 @@ def main(processor_config, job_config, to_archive, parallel=None):
 
     # Run processor
     target_sequences_total = len(target_sequences)
+
+    print("Total sequences to process: " + str(target_sequences_total)) 
 
     if target_sequences_total == 0:
         msg = "No sequences to process"

@@ -143,11 +143,11 @@ class QualityChecks:
         datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
             datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_threshold"
         )  # for i in range(len(mask))]
-        datasetl0["quality_flag"][
-            np.where(mask_discontinuity == 1)
-        ] = DatasetUtil.set_flag(
-            datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
-            "L0_discontinuity",
+        datasetl0["quality_flag"][np.where(mask_discontinuity == 1)] = (
+            DatasetUtil.set_flag(
+                datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
+                "L0_discontinuity",
+            )
         )  # for i in range(len(mask))]
 
         return datasetl0, mask
@@ -763,24 +763,24 @@ class QualityChecks:
                 if v > self.context.get_config_value("diff_threshold"):
                     if measurandstring == "irradiance":
                         flags[id] = 1
-                        dataset_l1b["quality_flag"][
-                            dataset_l1b["scan"] == i
-                        ] = DatasetUtil.set_flag(
-                            dataset_l1b["quality_flag"][
-                                np.where(dataset_l1b["scan"] == i)
-                            ],
-                            "temp_variability_irr",
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = (
+                            DatasetUtil.set_flag(
+                                dataset_l1b["quality_flag"][
+                                    np.where(dataset_l1b["scan"] == i)
+                                ],
+                                "temp_variability_irr",
+                            )
                         )
 
                     else:
                         flags[id] = 1
-                        dataset_l1b["quality_flag"][
-                            dataset_l1b["scan"] == i
-                        ] = DatasetUtil.set_flag(
-                            dataset_l1b["quality_flag"][
-                                np.where(dataset_l1b["scan"] == i)
-                            ],
-                            "temp_variability_rad",
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = (
+                            DatasetUtil.set_flag(
+                                dataset_l1b["quality_flag"][
+                                    np.where(dataset_l1b["scan"] == i)
+                                ],
+                                "temp_variability_rad",
+                            )
                         )
 
                     seq = dataset.attrs["sequence_id"]

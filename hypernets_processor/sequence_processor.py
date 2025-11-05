@@ -1,6 +1,7 @@
 """
 Contains main class for processing sequence data
 """
+
 import glob
 import xarray as xr
 
@@ -19,7 +20,9 @@ from hypernets_processor.utils.paths import parse_sequence_path
 from hypernets_processor.calibration.calibration_converter import CalibrationConverter
 from obsarray.templater.dataset_util import DatasetUtil as du
 from hypernets_processor.data_utils.quality_checks import QualityChecks
-from hypernets_processor.data_utils.site_specific_quality_checks import SiteSpecificQualityChecks
+from hypernets_processor.data_utils.site_specific_quality_checks import (
+    SiteSpecificQualityChecks,
+)
 
 import warnings
 import os
@@ -99,17 +102,18 @@ class SequenceProcessor:
 
         # when reprocessing from specific level, read in and set that data
         if self.context.get_config_value("reprocess_from"):
-            directory=writer.return_directory()
+            directory = writer.return_directory()
             if self.context.get_config_value("reprocess_from").upper() == "L2A":
                 L1b_rad = self.find_preexisting_file(directory, "L1B_RAD")
                 L1b_irr = self.find_preexisting_file(directory, "L1B_IRR")
                 L2a = self.find_preexisting_file(directory, "L2A")
-            elif self.context.get_config_value("reprocess_from").upper()=="L1B":
-                L1b_rad = self.find_preexisting_file(directory,"L1B_RAD")
-                L1b_irr = self.find_preexisting_file(directory,"L1B_IRR")
+            elif self.context.get_config_value("reprocess_from").upper() == "L1B":
+                L1b_rad = self.find_preexisting_file(directory, "L1B_RAD")
+                L1b_irr = self.find_preexisting_file(directory, "L1B_IRR")
             else:
-                raise ValueError("It is only possible to reprocess from L2A or L1B files. Please change the `reprocess_from' config value")
-
+                raise ValueError(
+                    "It is only possible to reprocess from L2A or L1B files. Please change the `reprocess_from' config value"
+                )
 
         with warnings.catch_warnings():
             if not self.context.get_config_value("verbose"):
@@ -178,11 +182,14 @@ class SequenceProcessor:
                             calibration_data_irr,
                         )
 
-
                 azis = rhymer.checkazimuths(L1a_rad)
 
-                if L1b_rad and L1b_irr and len(azis)>0:
-                    if self.context.get_config_value("max_level").upper() in ["L1C", "L2A", "L2B"]:
+                if L1b_rad and L1b_irr and len(azis) > 0:
+                    if self.context.get_config_value("max_level").upper() in [
+                        "L1C",
+                        "L2A",
+                        "L2B",
+                    ]:
                         self.context.logger.info("Processing to L1c...")
                         # check if different azimuth angles within single sequence
                         for a in azis:
@@ -204,7 +211,10 @@ class SequenceProcessor:
                             L1c = surf.reflectance_w(L1c_int, L1b_irr, razangle=ra)
                             self.context.logger.info("Done")
 
-                            if self.context.get_config_value("max_level").upper() in ["L2A","L2B"]:
+                            if self.context.get_config_value("max_level").upper() in [
+                                "L2A",
+                                "L2B",
+                            ]:
                                 self.context.logger.info("Processing to L2a...")
                                 # add relative azimuth angle for the filename
                                 L2a = surf.process_l2(L1c, razangle=ra)
@@ -215,7 +225,7 @@ class SequenceProcessor:
 
                 else:
                     self.context.logger.info("Not a standard sequence")
-                    self.context.anomaly_handler.add_anomaly("ms")
+                    self.context.anomaly_handler.add_anomaly("in")
 
             elif self.context.get_config_value("network") == "l":
                 comb = CombineSWIR(self.context)
@@ -283,7 +293,6 @@ class SequenceProcessor:
                         )
                         self.context.logger.info("Done")
 
-
                     if L0a_swir_irr and L0a_swir_bla:
                         self.context.logger.info("Processing to L1a SWIR irradiance...")
                         (
@@ -300,7 +309,12 @@ class SequenceProcessor:
 
                         self.context.logger.info("Done")
 
-                if self.context.get_config_value("max_level").upper() in ["L1B", "L1C", "L2A", "L2B"]:
+                if self.context.get_config_value("max_level").upper() in [
+                    "L1B",
+                    "L1C",
+                    "L2A",
+                    "L2B",
+                ]:
                     if L0a_rad_masked and L0a_swir_rad_masked:
                         self.context.logger.info("Processing to L1b radiance...")
                         L1b_rad = comb.combine(
@@ -327,8 +341,20 @@ class SequenceProcessor:
                         )
                         self.context.logger.info("Done")
 
-                if L1b_rad and L1b_irr and (not self.context.get_config_value("reprocess_from") or not self.context.get_config_value("reprocess_from").upper() == "L2A"):
-                    if self.context.get_config_value("max_level") in ["L1C", "L2A", "L2B"]:
+                if (
+                    L1b_rad
+                    and L1b_irr
+                    and (
+                        not self.context.get_config_value("reprocess_from")
+                        or not self.context.get_config_value("reprocess_from").upper()
+                        == "L2A"
+                    )
+                ):
+                    if self.context.get_config_value("max_level") in [
+                        "L1C",
+                        "L2A",
+                        "L2B",
+                    ]:
                         self.context.logger.info("Processing to L1c...")
                         L1c = intp.interpolate_l1c(L1b_rad, L1b_irr)
                         self.context.logger.info("Done")
@@ -338,10 +364,12 @@ class SequenceProcessor:
                         self.context.logger.info("Done")
                 elif not self.context.get_config_value("reprocess_from"):
                     self.context.logger.info("Not a standard sequence")
-                    self.context.anomaly_handler.add_anomaly("ms")
+                    self.context.anomaly_handler.add_anomaly("in")
 
                 if L2a:
-                    if self.context.get_config_value("max_level").upper() in ["L2B",]:
+                    if self.context.get_config_value("max_level").upper() in [
+                        "L2B",
+                    ]:
                         self.context.logger.info("Processing to L2B...")
                         L2b = ssqc.apply_site_specific_QC(L2a, L1b_rad, L1b_irr)
                         self.context.logger.info("Done")
@@ -366,18 +394,21 @@ class SequenceProcessor:
         :return: product xarray object
         """
 
-        files = glob.glob(os.path.join(directory, "*%s*.nc"%level))
+        files = glob.glob(os.path.join(directory, "*%s*.nc" % level))
         if len(files) > 1:
-            self.context.logger.info("multiple %s files found, using the most recent one"%level)
+            self.context.logger.info(
+                "multiple %s files found, using the most recent one" % level
+            )
 
         elif len(files) == 0:
-            self.context.logger.info("no %s file found for this sequence"%level)
+            self.context.logger.info("no %s file found for this sequence" % level)
             self.context.anomaly_handler.add_anomaly("npr")
             return None
 
         file = files[-1]
         self.context.logger.info("starting from file: %s" % (file))
         return xr.open_dataset(file)
+
 
 if __name__ == "__main__":
     pass

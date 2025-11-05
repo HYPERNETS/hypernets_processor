@@ -1,6 +1,7 @@
 """
 Calibration class
 """
+
 import datetime
 
 from hypernets_processor.version import __version__
@@ -107,7 +108,9 @@ class Calibrate:
                     ] += 50
 
         else:
-            measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
+            measurand = calibrate_function.run_meas_function(
+                dataset_l0_masked, calibration_data
+            )
             dataset_l1a[measurandstring].values = measurand
 
         if self.context.get_config_value("write_l1a"):
@@ -166,7 +169,9 @@ class Calibrate:
                 store_unc_percent=True,
             )
         else:
-            measurand = calibrate_function.run(dataset_l0b, calibration_data)
+            measurand = calibrate_function.run_meas_function(
+                dataset_l0b, calibration_data
+            )
             dataset_l1b[measurandstring].values = measurand
 
         if self.context.get_config_value("mcsteps") > 0:
@@ -376,11 +381,11 @@ class Calibrate:
         datasetl0masked, mask = self.qual.perform_quality_check_L0A(
             datasetl0masked, series_ids
         )
-        datasetl0masked["quality_flag"][
-            np.where(dark_outliers_radscans == 1)
-        ] = DatasetUtil.set_flag(
-            datasetl0masked["quality_flag"][np.where(dark_outliers_radscans == 1)],
-            "dark_masked",
+        datasetl0masked["quality_flag"][np.where(dark_outliers_radscans == 1)] = (
+            DatasetUtil.set_flag(
+                datasetl0masked["quality_flag"][np.where(dark_outliers_radscans == 1)],
+                "dark_masked",
+            )
         )  # for i in range(len(mask))]
 
         # calculate and store random uncertainties on radiance/irradiance

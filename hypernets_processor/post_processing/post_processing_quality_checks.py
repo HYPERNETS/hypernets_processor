@@ -1,6 +1,7 @@
 """
 post processing
 """
+
 import numpy as np
 import warnings
 import os
@@ -570,16 +571,16 @@ if __name__ == "__main__":
                 )
                 for ifile in range(len(site_ds)):
                     ds_curr = site_ds[ifile]
-                    ds_curr.quality_flag.attrs[
-                        "flag_meanings"
-                    ] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
-                        "placeholder1", "postprocessing_outliers"
+                    ds_curr.quality_flag.attrs["flag_meanings"] = (
+                        ds_curr.quality_flag.attrs["flag_meanings"].replace(
+                            "placeholder1", "postprocessing_outliers"
+                        )
                     )
                     if site == "WWUK":
-                        ds_curr.quality_flag.attrs[
-                            "flag_meanings"
-                        ] = ds_curr.quality_flag.attrs["flag_meanings"].replace(
-                            "placeholder1", "postprocessing_outliers"
+                        ds_curr.quality_flag.attrs["flag_meanings"] = (
+                            ds_curr.quality_flag.attrs["flag_meanings"].replace(
+                                "placeholder1", "postprocessing_outliers"
+                            )
                         )
 
                     iseries_file = np.argmin(

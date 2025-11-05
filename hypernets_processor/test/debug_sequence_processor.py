@@ -30,7 +30,7 @@ def process_sequence():
     Command line interface to sequence_processor_main for ad-hoc job processing
     """
 
-    #network = "water"
+    # network = "water"
     network = "land"
 
     job_config_path = JOB_CONFIG_TEMPLATE_PATH
@@ -48,17 +48,20 @@ def process_sequence():
     # Read config file
     job_config = read_config_file([job_config_path, processor_defaults])
 
-    #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20231011T144127"
-    #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20240920T113036"
-    job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20250604T103132"
-    #job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\SEQ20240813T140042"
-
+    # job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\water\SEQ20231011T144127"
+    # job_config["Input"][
+    #     "raw_data_directory"
+    # ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\JAES\SEQ20250227T090042"
+    # job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\GHNA\DATA\SEQ20250604T103132"
+    job_config["Input"]["raw_data_directory"] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\WWUK\DATA\SEQ20230707T090040"
 
     # job_config["Input"][
     #     "raw_data_directory"
     # ] = r"C:\Users\pdv\data\insitu\hypernets\raw_data\ATGE\SEQ20220823T153206"
 
-    job_config["Output"]["archive_directory"] = r"C:\Users\pdv\data\insitu\hypernets\archive_test"
+    job_config["Output"][
+        "archive_directory"
+    ] = r"C:\Users\pdv\data\insitu\hypernets\archive_test"
 
     no_unc = False
 

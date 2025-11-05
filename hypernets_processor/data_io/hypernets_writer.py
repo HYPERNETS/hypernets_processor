@@ -67,11 +67,13 @@ class HypernetsWriter:
                 raise IOError("The file already exists: " + path)
 
         if self.context.get_config_value("mcsteps") < 2:
-            vars_with_unc_comps=[var for var in ds.keys()
-                                 if "unc_comps" in ds[var].attrs
-                                 and len(ds[var].attrs["unc_comps"])>0]
+            vars_with_unc_comps = [
+                var
+                for var in ds.keys()
+                if "unc_comps" in ds[var].attrs and len(ds[var].attrs["unc_comps"]) > 0
+            ]
             for var in vars_with_unc_comps:
-                unc_comps=ds[var].attrs["unc_comps"]
+                unc_comps = ds[var].attrs["unc_comps"]
                 ds[var].attrs["unc_comps"] = []
                 try:
                     ds = ds.drop(unc_comps)
@@ -265,10 +267,20 @@ class HypernetsWriter:
         comp = dict(zlib=True, complevel=compression_level)
 
         encoding = dict()
-        encoding_keys = ("_FillValue", "dtype", "scale_factor", "add_offset", "grid_mapping")
+        encoding_keys = (
+            "_FillValue",
+            "dtype",
+            "scale_factor",
+            "add_offset",
+            "grid_mapping",
+        )
         for var_name in ds.data_vars:
             var_encoding = dict(comp)
-            ds_var_encoding = {encoding_key: ds[var_name].encoding[encoding_key] for encoding_key in encoding_keys if encoding_key in ds[var_name].encoding}
+            ds_var_encoding = {
+                encoding_key: ds[var_name].encoding[encoding_key]
+                for encoding_key in encoding_keys
+                if encoding_key in ds[var_name].encoding
+            }
             var_encoding.update(ds_var_encoding)
             if ds[var_name].values.dtype == np.float64 and encodefloat32:
                 var_encoding["dtype"] = np.float32

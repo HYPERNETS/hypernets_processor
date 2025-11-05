@@ -34,8 +34,10 @@ __status__ = "Development"
 
 dir_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 postprocessing_path = os.path.join(dir_path, "data", "postprocessing")
-irradiance_path = os.path.join(dir_path, "data", "postprocessing","irradiance_data")
-reflectance_bounds_path = os.path.join(dir_path, "data", "postprocessing","qc_reflectance_bounds")
+irradiance_path = os.path.join(dir_path, "data", "postprocessing", "irradiance_data")
+reflectance_bounds_path = os.path.join(
+    dir_path, "data", "postprocessing", "qc_reflectance_bounds"
+)
 
 
 class SiteSpecificQualityChecks:
@@ -45,7 +47,8 @@ class SiteSpecificQualityChecks:
         self.writer = HypernetsWriter(context)
         self.pu = ProductNameUtil(context=self.context)
         self.prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32"#, MCdimlast=True
+            self.context.get_config_value("mcsteps"),
+            dtype="float32",  # , MCdimlast=True
         )
 
     def apply_site_specific_QC(self, dataset_l2a, dataset_l1b_rad, dataset_l1b_irr):
@@ -57,7 +60,7 @@ class SiteSpecificQualityChecks:
         :return:
         """
 
-        #first, we extract all the relevant config values
+        # first, we extract all the relevant config values
         deploy_periods = ast.literal_eval(
             self.context.get_config_value("deployment_periods")
         )
@@ -66,6 +69,9 @@ class SiteSpecificQualityChecks:
         )
         limit_tod_period = ast.literal_eval(
             self.context.get_config_value("limit_tod_period")
+        )
+        max_sza_period = ast.literal_eval(
+            self.context.get_config_value("max_sza_period")
         )
         bad_viewing_angles_period = ast.literal_eval(
             self.context.get_config_value("bad_viewing_angles_period")
@@ -97,6 +103,13 @@ class SiteSpecificQualityChecks:
             self.context.get_config_value("misalignment_vaa_unc")
         )
 
+        misalignment_corr = ast.literal_eval(
+            self.context.get_config_value("misalignment_corr")
+        )
+        misalignment_corr_unc = ast.literal_eval(
+            self.context.get_config_value("misalignment_corr_unc")
+        )
+
         # we loop through each of the different deployment periods and identify the applicable one for this sequence
         seq_within_period = False
         i_dep_save = None
@@ -123,24 +136,153 @@ class SiteSpecificQualityChecks:
             self.context.anomaly_handler.add_anomaly("val")
 
         # anomaly is raised if data is outside time of day limits
-        if limit_tod_period[i_dep_save] is not None and ((convert_datetime(
-                dataset_l2a.acquisition_time.values.max()
-            ).time() < datetime.time.fromisoformat(limit_tod_period[i_dep_save][0])) or (convert_datetime(
-                dataset_l2a.acquisition_time.values.min()
-            ).time() > datetime.time.fromisoformat(limit_tod_period[i_dep_save][1]))):
+        if limit_tod_period[i_dep_save] is not None and (
+            (
+                convert_datetime(dataset_l2a.acquisition_time.values.max()).time()
+                < datetime.time.fromisoformat(limit_tod_period[i_dep_save][0])
+            )
+            or (
+                convert_datetime(dataset_l2a.acquisition_time.values.min()).time()
+                > datetime.time.fromisoformat(limit_tod_period[i_dep_save][1])
+            )
+        ):
             self.context.anomaly_handler.add_anomaly("tod")
 
-
         # anomaly is raised if system id does not match hypstar SN in deployment period
-        if (
-            not dataset_l2a.attrs["system_id"]
-            == "HYPSTAR_" + str(deploy_periods[i_dep_save]["HYPSTAR_SN"])
+        if not dataset_l2a.attrs["system_id"] == "HYPSTAR_" + str(
+            deploy_periods[i_dep_save]["HYPSTAR_SN"]
         ):
             self.context.anomaly_handler.add_anomaly("hsn")
 
         # bad sequences that were manually specified are removed
         if dataset_l2a.attrs["sequence_id"] in bad_sequences_period[i_dep_save]:
             self.context.anomaly_handler.add_anomaly("man")
+
+        if len(dataset_l2a.series)!=len(dataset_l1b_rad.series):
+            self.context.anomaly_handler.add_anomaly("wns")
+
+        # next, remove angles for which we know the data is not reliable
+        id_series_valid = np.where(
+            dataset_l2a.solar_zenith_angle.values < max_sza_period[i_dep_save]
+        )[0]
+        dataset_l2b = dataset_l2a.isel(series=id_series_valid)
+        dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid)
+
+        ang_tol = self.context.get_config_value("angle_tolerance")
+        for angle_tup in bad_viewing_angles_period[i_dep_save]:
+            bad_vza, bad_vaa = angle_tup
+            if bad_vza == "all" or bad_vza == "*":
+                cond_vza = np.zeros_like(
+                    dataset_l2b.viewing_zenith_angle.values, dtype=bool
+                )
+            elif isinstance(bad_vza, str) and bad_vza[0] == "<":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values >= float(bad_vza[1:])
+            elif isinstance(bad_vza, str) and bad_vza[0] == ">":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values <= float(bad_vza[1:])
+            else:
+                cond_vza = (
+                    np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol
+                )
+
+            if bad_vaa == "all" or bad_vaa == "*":
+                cond_vaa = np.zeros_like(
+                    dataset_l2b.viewing_azimuth_angle.values, dtype=bool
+                )
+            elif isinstance(bad_vaa, str) and bad_vaa[0] == "<":
+                cond_vaa = dataset_l2b.viewing_azimuth_angle.values >= float(
+                    bad_vaa[1:]
+                )
+            elif isinstance(bad_vaa, str) and bad_vaa[0] == ">":
+                cond_vaa = dataset_l2b.viewing_azimuth_angle.values <= float(
+                    bad_vaa[1:]
+                )
+            else:
+                cond_vaa = (
+                    np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa) > ang_tol
+                )
+
+            # we only keep data where one of the two conditions is met (the vza or the vaa is good)
+            id_series_valid = np.where(cond_vza | cond_vaa)[0]
+            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
+
+        for angle_tup in bad_solar_angles_period[i_dep_save]:
+            bad_sza, bad_saa = angle_tup
+            if bad_sza == "all" or bad_sza == "*":
+                cond_sza = np.zeros_like(
+                    dataset_l2b.solar_zenith_angle.values, dtype=bool
+                )
+            elif isinstance(bad_sza, str) and bad_sza[0] == "<":
+                cond_sza = dataset_l2b.solar_zenith_angle.values >= float(bad_sza[1:])
+            elif isinstance(bad_sza, str) and bad_sza[0] == ">":
+                cond_sza = dataset_l2b.solar_zenith_angle.values <= float(bad_sza[1:])
+            else:
+                cond_sza = (
+                    np.abs(dataset_l2b.solar_zenith_angle.values - bad_sza) > ang_tol
+                )
+
+            if bad_saa == "all" or bad_saa == "*":
+                cond_saa = np.zeros_like(
+                    dataset_l2b.solar_azimuth_angle.values, dtype=bool
+                )
+            elif isinstance(bad_saa, str) and bad_saa[0] == "<":
+                cond_saa = dataset_l2b.solar_azimuth_angle.values >= float(bad_vaa[1:])
+            elif isinstance(bad_saa, str) and bad_saa[0] == ">":
+                cond_saa = dataset_l2b.solar_azimuth_angle.values <= float(bad_vaa[1:])
+            else:
+                cond_saa = (
+                    np.abs(dataset_l2b.solar_azimuth_angle.values - bad_saa) > ang_tol
+                )
+
+            # we only keep data where one of the two conditions is met (the sza or the saa is good)
+            id_series_valid = np.where(cond_sza | cond_saa)[0]
+            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
+
+        raa_ang_tol = self.context.get_config_value("raa_angle_tolerance")
+        for angle_tup in bad_relative_angles_period[i_dep_save]:
+            bad_vza, bad_raa = angle_tup
+            raa = (
+                dataset_l2b.viewing_azimuth_angle.values
+                - dataset_l2b.solar_azimuth_angle.values
+            ) % 360
+
+            if bad_vza == "all" or bad_vza == "*":
+                cond_vza = np.zeros_like(
+                    dataset_l2b.viewing_zenith_angle.values, dtype=bool
+                )
+            elif bad_vza == "sza":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values > (
+                    dataset_l2b.solar_zenith_angle.values + ang_tol
+                )
+            elif isinstance(bad_vza, str) and bad_vza[0] == "<":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values >= float(bad_vza[1:])
+            elif isinstance(bad_vza, str) and bad_vza[0] == ">":
+                cond_vza = dataset_l2b.viewing_zenith_angle.values <= float(bad_vza[1:])
+            else:
+                cond_vza = (
+                    np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol
+                )
+
+            if bad_raa == "all" or bad_raa == "*":
+                cond_raa = np.zeros_like(raa, dtype=bool)
+            elif isinstance(bad_raa, str) and bad_raa[0] == "<":
+                cond_raa = raa >= float(bad_raa[1:])
+            elif isinstance(bad_raa, str) and bad_raa[0] == ">":
+                cond_raa = raa <= float(bad_raa[1:])
+            else:
+                cond_raa = np.abs(raa - bad_raa) % 360 > raa_ang_tol
+
+            # we only keep data where one of the two conditions is met (the vza or the raa is good)
+            id_series_valid = np.where(cond_vza | cond_raa)[0]
+            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
+
+        if len(dataset_l2b.series.values) == 0:
+            self.context.anomaly_handler.add_anomaly("nos")
+
+        #store number of angles after removing the bad angle ranges
+        len_angles_removed = len(dataset_l2b.series.values)
 
         # Next, remove data for which any of the bad flags was set in previous QC
         bad_flags = [
@@ -156,74 +298,39 @@ class SiteSpecificQualityChecks:
             "single_irradiance_used",
         ]
         flagged = DatasetUtil.get_flags_mask_or(
-            dataset_l2a["quality_flag"], bad_flags
+            dataset_l2b["quality_flag"], bad_flags
         )  # bools for each series if any bad flag is set
-        id_series_valid = np.where(~flagged)[0]  # select indexes for which no bad flags are set
-        dataset_l2b = dataset_l2a.isel(series=id_series_valid)
+        id_series_valid = np.where(~flagged)[
+            0
+        ]  # select indexes for which no bad flags are set
+        dataset_l2b = dataset_l2b.isel(series=id_series_valid)
         dataset_l2b.attrs["product_name"] = self.pu.create_product_name("L_L2B")
         dataset_l2b.attrs["product_level"] = "L_L2B"
 
-        flagged_l1b_rad = DatasetUtil.get_flags_mask_or(
-            dataset_l1b_rad["quality_flag"], bad_flags
-        )  # bools for each series if any bad flag is set
-        id_series_valid_l1b_rad = np.where(~flagged_l1b_rad)[0]  # select indexes for which no bad flags are set
-        dataset_l1d_rad = dataset_l1b_rad.isel(series=id_series_valid_l1b_rad)
+        dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
         dataset_l1d_rad.attrs["product_name"] = self.pu.create_product_name("L_L1D_RAD")
         dataset_l1d_rad.attrs["product_level"] = "L_L1D_RAD"
 
         flagged_l1b_irr = DatasetUtil.get_flags_mask_or(
             dataset_l1b_irr["quality_flag"], bad_flags
         )  # bools for each series if any bad flag is set
-        id_series_valid_l1b_irr = np.where(~flagged_l1b_irr)[0]  # select indexes for which no bad flags are set
+        id_series_valid_l1b_irr = np.where(~flagged_l1b_irr)[
+            0
+        ]  # select indexes for which no bad flags are set
         dataset_l1d_irr = dataset_l1b_irr.isel(series=id_series_valid_l1b_irr)
         dataset_l1d_irr.attrs["product_name"] = self.pu.create_product_name("L_L1D_IRR")
         dataset_l1d_irr.attrs["product_level"] = "L_L1D_IRR"
 
-        # next, remove angles for which we know the data is not reliable
-        ang_tol = self.context.get_config_value("angle_tolerance")
-        for angle_tup in bad_viewing_angles_period[i_dep_save]:
-            bad_vza, bad_vaa = angle_tup
-            if bad_vza == "all":
-                id_series_valid = np.where(np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa)%360 > ang_tol)[0]
-            elif bad_vaa == "all":
-                id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol)[0]
-            else:
-                id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol) | (
-                            np.abs(dataset_l2b.viewing_azimuth_angle.values - bad_vaa)%360 > ang_tol))[0]
-            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
-
-        for angle_tup in bad_solar_angles_period[i_dep_save]:
-            bad_sza, bad_saa = angle_tup
-            if bad_vza=="all":
-                id_series_valid = np.where(np.abs(dataset_l2b.solar_azimuth_angle.values-bad_saa)%360>ang_tol)[0]
-            elif bad_vaa=="all":
-                id_series_valid = np.where(np.abs(dataset_l2b.solar_zenith_angle.values-bad_sza)>ang_tol)[0]
-            else:
-                id_series_valid = np.where((np.abs(dataset_l2b.solar_zenith_angle.values-bad_sza)>ang_tol) | (
-                        np.abs(dataset_l2b.solar_azimuth_angle.values-bad_saa)%360>ang_tol))[0]
-            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
-
-        raa_ang_tol = self.context.get_config_value("raa_angle_tolerance")
-        for angle_tup in bad_relative_angles_period[i_dep_save]:
-            bad_vza, bad_raa = angle_tup
-            raa=(dataset_l2b.viewing_azimuth_angle.values - dataset_l2b.solar_azimuth_angle.values)%360
-            if bad_vza == "all":
-                id_series_valid = np.where(np.abs(raa - bad_raa)%360 > raa_ang_tol)[0]
-            elif bad_vaa == "all":
-                id_series_valid = np.where(np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol)[0]
-            elif bad_vza == "sza":
-                id_series_valid = np.where((dataset_l2b.viewing_zenith_angle.values > (dataset_l2b.solar_zenith_angle.values + ang_tol)) | (
-                        np.abs(raa - bad_raa)%360 > raa_ang_tol))[0]
-            else:
-                id_series_valid = np.where((np.abs(dataset_l2b.viewing_zenith_angle.values - bad_vza) > ang_tol) | (
-                        np.abs(raa - bad_raa)%360 > raa_ang_tol))[0]
-            dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+        
 
         # Then, bad wavelength ranges are omited
         for bad_wav in bad_wavelengths_period[i_dep_save]:
-            id_wav_valid = np.where((dataset_l2b.wavelength.values < bad_wav[0]) | (
-                        dataset_l2b.wavelength.values > bad_wav[1]))[0]
+            id_wav_valid = np.where(
+                (dataset_l2b.wavelength.values < bad_wav[0])
+                | (dataset_l2b.wavelength.values > bad_wav[1])
+            )[0]
             dataset_l2b = dataset_l2b.isel(wavelength=id_wav_valid)
+            dataset_l1d_rad = dataset_l1d_rad.isel(wavelength=id_wav_valid)
 
         # Next, the site-specific clear sky check is applied
         irr_model_irrwav = xr.open_dataset(
@@ -244,78 +351,139 @@ class SiteSpecificQualityChecks:
 
         i_wav_550_data = np.argmin(np.abs(dataset_l1b_irr.wavelength.values - 550))
         i_wav_550_model = np.argmin(np.abs(irr_model_irrwav.wavelength.values - 550))
-        i_wav_550_model_noaer = np.argmin(np.abs(irr_model_irrwav_noaer.wavelength.values - 550))
+        i_wav_550_model_noaer = np.argmin(
+            np.abs(irr_model_irrwav_noaer.wavelength.values - 550)
+        )
 
         for i_series in range(len(dataset_l1b_irr.series.values)):
             sza = dataset_l1b_irr.solar_zenith_angle.values[i_series]
             saa = dataset_l1b_irr.solar_azimuth_angle.values[i_series]
-            irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(sza, irr_model_irrwav)
-            irradiance_noaer, _ = self.interpolate_irradiance_sza(sza, irr_model_irrwav_noaer)
-            dir_dif_intfunc = scipy.interpolate.interp1d(
-                irr_model_irrwav.wavelength.values, dir_dif_ratio, fill_value="extrapolate"
+            irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(
+                sza, irr_model_irrwav
             )
-            dir_dif_ratio = dir_dif_intfunc(dataset_l1b_irr.wavelength.values)
-            # before performing the clear sky check, we perform correction for misalignment
-            ratio = self.misalignment_ratio_calculator(misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
-                                                       sza,
-                                                       saa,
-                                                       dir_dif_ratio)
-            ratio_unc = self.prop.propagate_systematic(self.misalignment_ratio_calculator, [misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
-                                                       sza,
-                                                       saa,
-                                                       dir_dif_ratio],
-                                                     [misalignment_vza_unc[i_dep_save], misalignment_vaa_unc[i_dep_save], None,
-                                                       None,
-                                                       None,
-                                                       None])
-            dataset_l1b_irr.irradiance.values[:, i_series] *= ratio
-            dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series] = (dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series]**2+(ratio_unc/ratio/100)**2)**0.5
+            irradiance_noaer, _ = self.interpolate_irradiance_sza(
+                sza, irr_model_irrwav_noaer
+            )
 
-            #clear sky check is performed
-            if (dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series] < 0.9 * irradiance[i_wav_550_model]) or (
-                dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series] > 1.1 * irradiance[i_wav_550_model_noaer]
+            # before performing the clear sky check, we perform correction for misalignment
+            if misalignment_vza[i_dep_save] is not None:
+                dir_dif_intfunc = scipy.interpolate.interp1d(
+                    irr_model_irrwav.wavelength.values,
+                    dir_dif_ratio,
+                    fill_value="extrapolate",
+                )
+                dir_dif_ratio = dir_dif_intfunc(dataset_l1b_irr.wavelength.values)
+                ratio = self.misalignment_ratio_calculator(
+                    misalignment_vza[i_dep_save],
+                    misalignment_vaa[i_dep_save],
+                    0,
+                    sza,
+                    saa,
+                    misalignment_corr[i_dep_save],
+                    dir_dif_ratio,
+                )
+                ratio_unc = self.prop.propagate_systematic(
+                    self.misalignment_ratio_calculator,
+                    [
+                        misalignment_vza[i_dep_save],
+                        misalignment_vaa[i_dep_save],
+                        0,
+                        sza,
+                        saa,
+                        misalignment_corr[i_dep_save],
+                        dir_dif_ratio,
+                    ],
+                    [
+                        misalignment_vza_unc[i_dep_save],
+                        misalignment_vaa_unc[i_dep_save],
+                        None,
+                        None,
+                        None,
+                        misalignment_corr_unc[i_dep_save],
+                        None,
+                    ],
+                )
+                dataset_l1b_irr.irradiance.values[:, i_series] *= ratio
+                dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series] = (
+                    dataset_l1b_irr.u_rel_systematic_indep_irradiance.values[:, i_series]
+                    ** 2
+                    + (ratio_unc / ratio / 100) ** 2
+                ) ** 0.5
+
+            # clear sky check is performed
+            if (
+                dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series]
+                < 0.9 * irradiance[i_wav_550_model]
+            ) or (
+                dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series]
+                > 1.1 * irradiance_noaer[i_wav_550_model_noaer]
             ):
                 self.context.anomaly_handler.add_anomaly("scl")
 
-
-        #performn correction for reflectance (to account for change in irradiance)
+        # performn correction for reflectance (to account for change in irradiance)
         for i_series in range(len(dataset_l2b.series.values)):
             sza = dataset_l2b.solar_zenith_angle.values[i_series]
             saa = dataset_l2b.solar_azimuth_angle.values[i_series]
-            irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(sza, irr_model_irrwav)
+            irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(
+                sza, irr_model_irrwav
+            )
             dir_dif_intfunc = scipy.interpolate.interp1d(
-                irr_model_irrwav.wavelength.values, dir_dif_ratio, fill_value="extrapolate"
+                irr_model_irrwav.wavelength.values,
+                dir_dif_ratio,
+                fill_value="extrapolate",
             )
             dir_dif_ratio = dir_dif_intfunc(dataset_l2b.wavelength.values)
 
             # Perform correction for misalignment
-            ratio = self.misalignment_ratio_calculator(misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
-                                                       sza,
-                                                       saa,
-                                                       dir_dif_ratio)
-            ratio_unc = self.prop.propagate_systematic(self.misalignment_ratio_calculator,
-                                                       [misalignment_vza[i_dep_save], misalignment_vaa[i_dep_save], 0,
-                                                        sza,
-                                                        saa,
-                                                        dir_dif_ratio],
-                                                       [misalignment_vza_unc[i_dep_save],
-                                                        misalignment_vaa_unc[i_dep_save],
-                                                        None,
-                                                        None,
-                                                        None,
-                                                        None])
+            ratio = self.misalignment_ratio_calculator(
+                misalignment_vza[i_dep_save],
+                misalignment_vaa[i_dep_save],
+                0,
+                sza,
+                saa,
+                misalignment_corr[i_dep_save],
+                dir_dif_ratio,
+            )
+            ratio_unc = self.prop.propagate_systematic(
+                self.misalignment_ratio_calculator,
+                [
+                    misalignment_vza[i_dep_save],
+                    misalignment_vaa[i_dep_save],
+                    0,
+                    sza,
+                    saa,
+                    misalignment_corr[i_dep_save],
+                    dir_dif_ratio,
+                ],
+                [
+                    misalignment_vza_unc[i_dep_save],
+                    misalignment_vaa_unc[i_dep_save],
+                    None,
+                    None,
+                    None,
+                    misalignment_corr_unc[i_dep_save],
+                    None,
+                ],
+            )
             dataset_l2b.reflectance.values[:, i_series] /= ratio
             dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] = (
-                                                                                       dataset_l2b.u_rel_systematic_reflectance.values[
-                                                                                       :, i_series] ** 2 + (
-                                                                                               ratio_unc / ratio / 100) ** 2) ** 0.5
+                dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] ** 2
+                + (ratio_unc / ratio / 100) ** 2
+            ) ** 0.5
 
-        #next, we check if the reflectances are within the bounds
+        # next, we check if the reflectances are within the bounds
         if postprocessing_qc_file_period[i_dep_save] is None:
-            ds_bounds=None
+            ds_bounds = None
         else:
-            ds_bounds = xr.open_dataset(os.path.join(reflectance_bounds_path, postprocessing_qc_file_period[i_dep_save]))
-            raas = [np.array(string.split("_")).astype(float).mean() for string in ds_bounds.raa.values]
+            ds_bounds = xr.open_dataset(
+                os.path.join(
+                    reflectance_bounds_path, postprocessing_qc_file_period[i_dep_save]
+                )
+            )
+            raas = [
+                np.array(string.split("_")).astype(float).mean()
+                for string in ds_bounds.raa.values
+            ]
             raas[-1] = 360
             ds_bounds = ds_bounds.assign_coords(raa=raas)
         i_550 = np.argmin(np.abs(dataset_l2b.wavelength.values - 550))
@@ -325,12 +493,19 @@ class SiteSpecificQualityChecks:
         vza = dataset_l2b.viewing_zenith_angle.values
         vaa = dataset_l2b.viewing_azimuth_angle.values
 
-        bounds_down, bounds_up = self.calculate_bounds(ds_bounds,sza,saa,vza,vaa)
-        id_series_valid = np.where((dataset_l2b.reflectance.values[i_550, :] < bounds_up) & (dataset_l2b.reflectance.values[i_550, :] > bounds_down))[0]
+        bounds_down, bounds_up = self.calculate_bounds(ds_bounds, sza, saa, vza, vaa)
+        id_series_valid = np.where(
+            (dataset_l2b.reflectance.values[i_550, :] < bounds_up)
+            & (dataset_l2b.reflectance.values[i_550, :] > bounds_down)
+        )[0]
         dataset_l2b = dataset_l2b.isel(series=id_series_valid)
+        dataset_l1d_rad = dataset_l1d_rad.isel(series=id_series_valid)
 
-        if len(dataset_l2b.series.values)==0:
+        if len(dataset_l2b.series.values) == 0:
             self.context.anomaly_handler.add_anomaly("nos")
+
+        if len(dataset_l2b.series.values) < 1 / 2 * len_angles_removed:
+            self.context.anomaly_handler.add_anomaly("hos")
 
         # finally, make plots and write file
         if self.context.get_config_value("write_l2b"):
@@ -367,11 +542,11 @@ class SiteSpecificQualityChecks:
                     dataset_l2b, self.context.get_config_value("plot_polar_wav")
                 )
             if self.context.get_config_value("plot_polar_ndvi"):
-                self.plot.plot_polar_reflectance(
-                    dataset_l2b, "ndvi"
-                )
+                self.plot.plot_polar_reflectance(dataset_l2b, "ndvi")
             if self.context.get_config_value("plot_uncertainty"):
-                self.plot.plot_relative_uncertainty("reflectance", dataset_l2b, refl=True)
+                self.plot.plot_relative_uncertainty(
+                    "reflectance", dataset_l2b, refl=True
+                )
 
             if self.context.get_config_value("plot_correlation"):
                 self.plot.plot_correlation("reflectance", dataset_l2b, refl=True)
@@ -379,12 +554,8 @@ class SiteSpecificQualityChecks:
         if self.context.get_config_value("plot_l1d"):
             self.plot.plot_series_in_sequence("radiance", dataset_l1d_rad)
             self.plot.plot_series_in_sequence("irradiance", dataset_l1d_irr)
-            self.plot.plot_series_in_sequence_vaa(
-                    "radiance", dataset_l1d_rad, 98
-                )
-            self.plot.plot_series_in_sequence_vza(
-                    "radiance", dataset_l1d_rad, 30
-                )
+            self.plot.plot_series_in_sequence_vaa("radiance", dataset_l1d_rad, 98)
+            self.plot.plot_series_in_sequence_vza("radiance", dataset_l1d_rad, 30)
 
             if self.context.get_config_value("plot_uncertainty"):
                 self.plot.plot_relative_uncertainty("radiance", dataset_l1d_rad)
@@ -394,21 +565,29 @@ class SiteSpecificQualityChecks:
                 self.plot.plot_correlation("radiance", dataset_l1d_rad)
                 self.plot.plot_correlation("irradiance", dataset_l1d_irr)
 
-
         return dataset_l2b, dataset_l1d_rad, dataset_l1d_irr
 
     def interpolate_irradiance_sza(self, sza, ds_irr):
         ds_irr_temp = ds_irr.copy()
-        ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp["solar_irradiance_BOA"].values / np.cos(
-            ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
-        ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values = ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values / np.cos(
-            ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
+        ds_irr_temp["solar_irradiance_BOA"].values = (
+            ds_irr_temp["solar_irradiance_BOA"].values
+            / np.cos(ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
+        )
+        ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values = (
+            ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values
+            / np.cos(ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
+        )
         ds_irr_temp = ds_irr_temp.interp(sza=sza, method="linear")
-        ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp["solar_irradiance_BOA"].values * np.cos(
-            ds_irr_temp["sza"].values / 180 * np.pi)
-        ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values = ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values * np.cos(
-            ds_irr_temp["sza"].values / 180 * np.pi)
-        return ds_irr_temp["solar_irradiance_BOA"].values, ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values
+        ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp[
+            "solar_irradiance_BOA"
+        ].values * np.cos(ds_irr_temp["sza"].values / 180 * np.pi)
+        ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values = ds_irr_temp[
+            "direct_to_diffuse_irradiance_ratio"
+        ].values * np.cos(ds_irr_temp["sza"].values / 180 * np.pi)
+        return (
+            ds_irr_temp["solar_irradiance_BOA"].values,
+            ds_irr_temp["direct_to_diffuse_irradiance_ratio"].values,
+        )
 
     def perform_quality_check_angles(
         self, datasetl0, scan_number, vza_abs, vza_ref, paa_abs, paa_ref
@@ -512,11 +691,11 @@ class SiteSpecificQualityChecks:
         datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
             datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_threshold"
         )  # for i in range(len(mask))]
-        datasetl0["quality_flag"][
-            np.where(mask_discontinuity == 1)
-        ] = DatasetUtil.set_flag(
-            datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
-            "L0_discontinuity",
+        datasetl0["quality_flag"][np.where(mask_discontinuity == 1)] = (
+            DatasetUtil.set_flag(
+                datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
+                "L0_discontinuity",
+            )
         )  # for i in range(len(mask))]
 
         return datasetl0, mask
@@ -629,7 +808,6 @@ class SiteSpecificQualityChecks:
                     dataset_l1b_swir["quality_flag"][i], "discontinuity_VNIR_SWIR"
                 )
         return dataset_l1b, dataset_l1b_swir
-
 
     def outlier_checks(self, data_subset, k_unc=3):
         intsig = np.nanmean(data_subset, axis=0)
@@ -833,24 +1011,24 @@ class SiteSpecificQualityChecks:
                 if v > self.context.get_config_value("diff_threshold"):
                     if measurandstring == "irradiance":
                         flags[id] = 1
-                        dataset_l1b["quality_flag"][
-                            dataset_l1b["scan"] == i
-                        ] = DatasetUtil.set_flag(
-                            dataset_l1b["quality_flag"][
-                                np.where(dataset_l1b["scan"] == i)
-                            ],
-                            "temp_variability_irr",
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = (
+                            DatasetUtil.set_flag(
+                                dataset_l1b["quality_flag"][
+                                    np.where(dataset_l1b["scan"] == i)
+                                ],
+                                "temp_variability_irr",
+                            )
                         )
 
                     else:
                         flags[id] = 1
-                        dataset_l1b["quality_flag"][
-                            dataset_l1b["scan"] == i
-                        ] = DatasetUtil.set_flag(
-                            dataset_l1b["quality_flag"][
-                                np.where(dataset_l1b["scan"] == i)
-                            ],
-                            "temp_variability_rad",
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = (
+                            DatasetUtil.set_flag(
+                                dataset_l1b["quality_flag"][
+                                    np.where(dataset_l1b["scan"] == i)
+                                ],
+                                "temp_variability_rad",
+                            )
                         )
 
                     seq = dataset.attrs["sequence_id"]
@@ -885,10 +1063,12 @@ class SiteSpecificQualityChecks:
 
             return dataset_l1b, flags
 
-    def misalignment_ratio_calculator(self, vza, vaa, offset, sza, saa, direct_to_diffuse=1000):
-        if isinstance(vza,np.ndarray):
+    def misalignment_ratio_calculator(
+        self, vza, vaa, offset, sza, saa, corr, direct_to_diffuse=1000
+    ):
+        if isinstance(vza, np.ndarray):
             vaa[vza < 0] += -180
-            vza[vza<0] = -vza[vza<0]
+            vza[vza < 0] = -vza[vza < 0]
 
         elif vza < 0:
             vza = -vza
@@ -898,31 +1078,49 @@ class SiteSpecificQualityChecks:
         saa = np.radians(saa)
         vza = np.radians(vza)
         vaa = np.radians(vaa)
-        new_sza = np.arccos(np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa)))
+        new_sza = np.arccos(
+            np.cos(sza) * np.cos(vza) + np.sin(sza) * np.sin(vza) * np.cos((saa - vaa))
+        )
         new_direct_to_diffuse = direct_to_diffuse * np.cos(new_sza) / np.cos(sza)
-        return (new_direct_to_diffuse + 1) / (direct_to_diffuse + 1) + offset
+        return ((new_direct_to_diffuse + 1) / (direct_to_diffuse + 1) + offset) / corr
 
-    def calculate_bounds(self,refl_bounds_ds,sza,saa,vza,vaa):
+    def calculate_bounds(self, refl_bounds_ds, sza, saa, vza, vaa):
         if refl_bounds_ds is not None:
-            raa=(vaa-saa)%360
+            raa = (vaa - saa) % 360
             sza_bounds = refl_bounds_ds.sza.values.flatten()
             vza_bounds = refl_bounds_ds.vza.values.flatten()
-            raa_bounds =  np.repeat(refl_bounds_ds.raa.values,refl_bounds_ds.sza.values.shape[1])
+            raa_bounds = np.repeat(
+                refl_bounds_ds.raa.values, refl_bounds_ds.sza.values.shape[1]
+            )
             lower_bounds = refl_bounds_ds.lower_bound.values.flatten()
             upper_bounds = refl_bounds_ds.upper_bound.values.flatten()
-            id_360 = np.where(raa_bounds==360)[0]
-            sza_bounds = np.concatenate([sza_bounds[id_360],sza_bounds])
-            vza_bounds = np.concatenate([vza_bounds[id_360],vza_bounds])
-            raa_bounds = np.concatenate([np.zeros_like(raa_bounds[id_360]),raa_bounds])
-            lower_bounds = np.concatenate([lower_bounds[id_360],lower_bounds])
-            upper_bounds = np.concatenate([upper_bounds[id_360],upper_bounds])
+            id_360 = np.where(raa_bounds == 360)[0]
+            sza_bounds = np.concatenate([sza_bounds[id_360], sza_bounds])
+            vza_bounds = np.concatenate([vza_bounds[id_360], vza_bounds])
+            raa_bounds = np.concatenate([np.zeros_like(raa_bounds[id_360]), raa_bounds])
+            lower_bounds = np.concatenate([lower_bounds[id_360], lower_bounds])
+            upper_bounds = np.concatenate([upper_bounds[id_360], upper_bounds])
             id_valid = np.where(np.isfinite(lower_bounds))[0]
             # id_valid = np.where((np.isfinite(lower_bounds)) & (sza_bounds < 30) & (vza_bounds < 15))[0]
 
-            lower_interp = LinearNDInterpolator(list(zip(sza_bounds[id_valid], vza_bounds[id_valid], raa_bounds[id_valid])), lower_bounds[id_valid])
-            upper_interp = LinearNDInterpolator(list(zip(sza_bounds[id_valid], vza_bounds[id_valid], raa_bounds[id_valid])), upper_bounds[id_valid])
+            lower_interp = LinearNDInterpolator(
+                list(
+                    zip(
+                        sza_bounds[id_valid], vza_bounds[id_valid], raa_bounds[id_valid]
+                    )
+                ),
+                lower_bounds[id_valid],
+            )
+            upper_interp = LinearNDInterpolator(
+                list(
+                    zip(
+                        sza_bounds[id_valid], vza_bounds[id_valid], raa_bounds[id_valid]
+                    )
+                ),
+                upper_bounds[id_valid],
+            )
             # print(sza[20],vza[20],raa[20], lower_interp(sza[20],vza[20],raa[20]), lower_bounds[id_valid])
 
-            return lower_interp(sza,vza,raa),upper_interp(sza,vza,raa)
+            return lower_interp(sza, vza, raa), upper_interp(sza, vza, raa)
         else:
             return 0.0, 1.1

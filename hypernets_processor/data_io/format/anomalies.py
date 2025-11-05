@@ -13,7 +13,7 @@ ANOMALIES_DICT = {
     "a": {
         "description": "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
         "error": None,
-        "error_msg":  "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
+        "error_msg": "angle achieved by pan >3 and/or tilt >1 deg away from target angle during sequence",
     },
     "m": {
         "description": "Metadata file missing",
@@ -33,7 +33,7 @@ ANOMALIES_DICT = {
     "o": {
         "description": "more than 50% of data has random error above 100% (probably corrupted data)",
         "error": None,
-        "error_msg": "more than 50% of data has random error above 100% (probably corrupted data)"
+        "error_msg": "more than 50% of data has random error above 100% (probably corrupted data)",
     },
     "u": {
         "description": "some of the uncertainties have negative values",
@@ -58,7 +58,7 @@ ANOMALIES_DICT = {
     "ned": {
         "description": "Not enough Ed scans for series",
         "error": None,
-        "error_msg":  "Not enough Ed scans for series",
+        "error_msg": "Not enough Ed scans for series",
     },
     "nu": {
         "description": "Non constant illumination",
@@ -76,9 +76,9 @@ ANOMALIES_DICT = {
         "error_msg": "No clear sky irradiance in sequence (i.e. overcast conditions)",
     },
     "in": {
-        "description": "Invalid sequence (due to not enough valid radiance or irradiance series)",
+        "description": "Invalid sequence (due to no valid radiance or irradiance series)",
         "error": ValueError,
-        "error_msg": "Invalid sequence (due to not enough valid radiance or irradiance series)",
+        "error_msg": "Invalid sequence (due to no valid radiance or irradiance series)",
     },
     "ms": {
         "description": "There are series missing from the standard sequence (either because not present, "
@@ -132,9 +132,19 @@ ANOMALIES_DICT = {
         "error": ValueError,
         "error_msg": "this sequences was manually discarded as unreliable in the config file",
     },
+    "wns": {
+        "description": "wrong number of series (l2a and l1b rad do not match in number of series). No L1d file is produced.",
+        "error": None,
+        "error_msg": "wrong number of series (l2a and l1b rad do not match in number of series). No L1d file is produced.",
+    },
     "nos": {
         "description": "No series was present in the sequences after applying all site-specific QC",
         "error": ValueError,
         "error_msg": "No series was present in the sequences after applying all site-specific QC",
+    },
+    "hos": {
+        "description": "More than half of series were removed by site-specific QC checks (excluding bad viewing angles and bad dates)",
+        "error": ValueError,
+        "error_msg": "More than half series were removed by site-specific QC checks (excluding bad viewing angles and bad dates)",
     },
 }

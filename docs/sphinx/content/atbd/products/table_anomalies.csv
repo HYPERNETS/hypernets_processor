@@ -9,7 +9,7 @@ ms, series_missing , L & W , L1B , Check if there are any missing series (either
 u, negative_unc , L & W , L1B , There are negative uncertainties, True ,
 o, half_of_unc_too_big , L & W , L1B , More than 50\% of data has random error above 100\% (likely corrupted or dark data), False , 17
 nu, check_valid_irradiance , L & W , L1C , Halt processing if `variable_irradiance' flag was triggered at previous level, True ,
-in, check_valid_sequence , L & W , L1C , Halt processing if there are no valid series (flagged by `not_enough_dark_scans'; `not_enough_irr_scans'; `not_enough_rad_scans' or `vza_irradiance')., True ,
+in, check_valid_sequence , L & W , L1C , Halt processing if there are no valid series (not present or flagged by `not_enough_dark_scans'; `not_enough_irr_scans'; `not_enough_rad_scans' or `vza_irradiance')., True ,
 cl, no_clear_sky_sequence , L & W , L1C , If all irradiance series are flagged with the `no_clear_sky_irradiance' flag, False  , 19
 d, discontinuity_VNIR_SWIR , L , L1B , Checks if the VNIR and SWIR are different by more than 25\%, False, 20
 nd, variable_radiance, W , L1C , More than 10\% difference between start and end $L_d$ at 550~nm, True ,
@@ -21,5 +21,7 @@ hsn, hypstar_not_deploy_period, L , L2B , HYPSTAR_SN does not match deployment p
 scl, no_clear_sky_site_specific, L , L2B , Site-specific clear sky check has failed (irr not within 10% of model), True,
 npr, no_pre_files, L , L2B , No pre-existing files available, while config is set up to reprocess from pre-existing files, True,
 man, manual_discard, L , L2B , This sequences was manually discarded as unreliable in the config file, True,
+wns, wrong_number_series, L2B , Wrong number of series (l2a and l1b rad do not match in number of series). No L1d file is produced, False, 
 nos, no_series_site_specific, L , L2B , No series was present in the sequences after applying all site-specific QC, True,
+hos, half_of_series_site_specific, L, L2B, More than half series were removed by site-specific QC checks (excluding bad viewing angles and bad dates), True,
 x, unexpected_error, L & W , , unexpected error during processing; catches all errors, True,
