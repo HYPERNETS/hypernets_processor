@@ -136,7 +136,7 @@ class AnomalyHandler:
         :return: crashing anomaly ids
         """
 
-        crashing_anomalies = []
+        crashing_anomalies = ["x"]
 
         for anomaly_id in self.get_anomaly_ids():
             if self.get_anomaly_error(anomaly_id) is not None:

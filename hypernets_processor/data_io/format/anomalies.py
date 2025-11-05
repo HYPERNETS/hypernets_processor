@@ -78,7 +78,7 @@ ANOMALIES_DICT = {
     "in": {
         "description": "Invalid sequence (due to no valid radiance or irradiance series)",
         "error": ValueError,
-        "error_msg": "Invalid sequence (due to no valid radiance or irradiance series)",
+        "error_msg": "Invalid sequence (due to not enough valid radiance or irradiance series)",
     },
     "ms": {
         "description": "There are series missing from the standard sequence (either because not present, "
