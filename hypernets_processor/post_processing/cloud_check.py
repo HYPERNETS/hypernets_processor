@@ -14,12 +14,11 @@ windows_results_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_q
 linux_data_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 windows_data_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-dataframe = pd.read_csv(windows_data_path + r"/WWUKv1_irradiance.csv")
+dataframe = pd.read_csv(windows_data_path + r"/LOBEv4_irradiance.csv")
 wav_df = xr.open_dataset(
-    "T:/ECO/EOServer/data/insitu/hypernets/archive/JAES/2024/08/06/SEQ20240806T140050/HYPERNETS_L_JAES_L1B_IRR_20240806T1400_20240906T0617_v2.1.nc"
+    "T:/ECO/EOServer/data/insitu/hypernets/archive/LOBE/2025/07/07/SEQ20250707T143048/HYPERNETS_L_LOBE_L1B_IRR_20250707T1430_20250707T1623_v2.1.nc"
 )
 wav = wav_df.wavelength.values
-
 
 def find_nearest_to_wav(array, wv, value):
     wv = np.asarray(wv)
@@ -45,7 +44,7 @@ def interpolate_irradiance_sza(sza, ds_irr):
 
 def modelled_data_read_and_interp(sza, aod):
     mod_data = xr.open_dataset(
-        r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\JAES_clear_sky_medianaod.nc".format(
+        r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\LOBE_clear_sky_medianaod.nc".format(
             aod
         )
     )
@@ -121,17 +120,12 @@ print(len(is_outlier))
 
 # plotting
 print(len(szas))
-print(np.argwhere(IDs == "SEQ20240806T140050"))
-ID_num = 1
+print(np.argwhere(IDs == 'SEQ20250707T143048'))
+ID_num = np.argwhere(IDs == 'SEQ20250707T143048')[1]
 aod_1_data = modelled_data_read_and_interp(szas[ID_num], 0.1)
 
-
-plt.plot(wav, (aod_1_data - data[ID_num, :]) * 100 / aod_1_data)
-plt.axis([300, 1800, -100, 100])
-plt.show()
-
-plt.plot(wav, data[ID_num, :], label="Measured Data")
-plt.plot(wav, aod_1_data, label="Model")
+plt.plot(wav, data[ID_num,:].T, label = 'Measured Data')
+plt.plot(wav, aod_1_data, label = 'Model')
 
 plt.ylabel("Irradiance")
 plt.xlabel("Wavelength (nm)")

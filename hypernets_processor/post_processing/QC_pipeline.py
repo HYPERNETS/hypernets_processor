@@ -11,7 +11,7 @@ import math
 import datetime
 import matplotlib
 import glob
-from seaborn.external.docscrape import header
+import comet_maths as cm
 
 wav_df = xr.open_dataset(
     r"T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc"
@@ -663,6 +663,25 @@ class PostProcessingDataset:
             self.labelled_radiance[" vza"] < vza_limit
         ]:
             x.append(999)
+            
+    def vza_check_toplimit(self, vza_limit):
+        bad_inds = []
+        for i in range(len(self.radiance)):
+            vza = self.radiance[" vza"][i]
+            if vza > vza_limit:
+                bad_index = i
+                bad_inds.append(bad_index)
+            else:
+                continue
+
+        cleaned_data = self.radiance.drop(bad_inds)
+        cleaned_data.reset_index(drop=True, inplace=True)
+        self.radiance = cleaned_data
+
+        for x in self.labelled_radiance["post_processing_flags"].loc[
+            self.labelled_radiance[" vza"] > vza_limit
+        ]:
+            x.append(999)
 
     def raa_cut(self, raa_limit):
         bad_inds = []
@@ -755,11 +774,9 @@ class PostProcessingDataset:
 
             self.irradiance["aod"] = aods
 
-    def misalignment_correction(
-        self, vza, vaa, multiple_periods=False, period_date=None
-    ):
-        szas = self.radiance[" sza"]
-        saas = self.radiance[" saa"]
+    def misalignment_correction(self, vza, vaa, mean_corr, multiple_periods = False, period_date = None):
+        szas = self.radiance[' sza']
+        saas = self.radiance[' saa']
         data = np.zeros((self.irradiance.shape[0], len(self.irradiance.columns) - 6))
         wav_list = [
             int("".join(filter(str.isdigit, s)))
@@ -782,29 +799,17 @@ class PostProcessingDataset:
                 )
 
             if not multiple_periods:
-                self.radiance[f" refl_{wv}nm"] = self.radiance[
-                    f" refl_{wv}nm"
-                ] * ratio_calculator(vza, vaa, szas, saas, dir_to_diff)
+                self.radiance[f' refl_{wv}nm'] = self.radiance[f' refl_{wv}nm'] * ratio_calculator(vza, vaa, szas, saas, dir_to_diff)/mean_corr
             else:
-                divider_idx = np.min(np.argwhere(self.radiance["date"] == period_date))
-                self.radiance[f" refl_{wv}nm"][:divider_idx] = self.radiance[
-                    f" refl_{wv}nm"
-                ][:divider_idx] * ratio_calculator(
-                    vza[0],
-                    vaa[0],
-                    szas[:divider_idx],
-                    saas[:divider_idx],
-                    dir_to_diff[:divider_idx],
-                )
-                self.radiance[f" refl_{wv}nm"][divider_idx:] = self.radiance[
-                    f" refl_{wv}nm"
-                ][divider_idx:] * ratio_calculator(
-                    vza[1],
-                    vaa[1],
-                    szas[divider_idx:],
-                    saas[divider_idx:],
-                    dir_to_diff[divider_idx:],
-                )
+                divider_idx = np.min(np.argwhere(self.radiance['date'] == period_date))
+                self.radiance[f' refl_{wv}nm'][:divider_idx] = (
+                        self.radiance[f' refl_{wv}nm'][:divider_idx] *
+                        ratio_calculator(vza[0], vaa[0], szas[:divider_idx], saas[:divider_idx],
+                                         dir_to_diff[:divider_idx]))/mean_corr[0]
+                self.radiance[f' refl_{wv}nm'][divider_idx:] = (
+                        self.radiance[f' refl_{wv}nm'][divider_idx:] *
+                        ratio_calculator(vza[1], vaa[1], szas[divider_idx:], saas[divider_idx:],
+                                         dir_to_diff[divider_idx:]))/mean_corr[1]
 
     def cloud_check(self, tolerance, wavelength, rewrite, rewrite_var=None):
         szas = self.irradiance["SZA"]
@@ -1295,10 +1300,17 @@ class PostProcessingDataset:
                     {"refl": binned95, "vza": bin_centers_vza, "sza": bin_centers_sza}
                 )
 
-                passes = [
-                    True if v is True and lower_passes[i] is True else False
-                    for i, v in enumerate(upper_passes)
-                ]
+                if len(binned5) < 6:
+                    print('Too few points to fit')
+                    continue
+
+                below, below_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned5)
+                above, above_cov = new_plane_fit(bin_centers_sza, bin_centers_vza, binned95)
+
+                df_below = pd.DataFrame({'refl': binned5, 'vza': bin_centers_vza, 'sza': bin_centers_sza})
+                df_above = pd.DataFrame({'refl': binned95, 'vza': bin_centers_vza, 'sza': bin_centers_sza})
+
+                passes = [True if v is True and lower_passes[i] is True else False for i, v in enumerate(upper_passes)]
                 good_data = data_cutting[passes]
                 outliers = data_cutting[[not el for el in passes]]
                 if save_bounds:
@@ -1347,13 +1359,12 @@ class PostProcessingDataset:
                 cnt_fit = []
 
                 for j, cn in enumerate(count_flat):
-                    if (
-                        (bin_centers_vza[j] <= 5 and cn < 50)
-                        or math.isnan(medians.flatten()[j])
-                        or (bin_centers_vza[j] >= 55 and cn < 50)
-                        or (math.isnan(stds.flatten()[j]))
-                        or cn < 3
-                    ):
+                    if ((bin_centers_vza[j] <= 5 and cn < 3) or
+                            math.isnan(medians.flatten()[j]) or
+                            (bin_centers_vza[j] >= 55 and cn < 50) or
+                            (math.isnan(stds.flatten()[j])) or
+                            cn < 3
+                            ):
                         continue
                     else:
                         sza_fit.append(bin_centers_sza[j])
@@ -1394,19 +1405,12 @@ class PostProcessingDataset:
                         med_fit,
                     )  # count = cnt_fit)
                     plane_med = quad_plane((sza, vza), *med_coeffs)
-                elif self.period_name == "WWUKv3":
-                    std_coeffs, std_cov = new_plane_fit(
-                        sza_fit, vza_fit, std_fit, plane_type="quad"
-                    )  # , count = cnt_fit)
-                    sza, vza = np.meshgrid(
-                        bin_cents[min_sza_idx:max_sza_idx],
-                        bin_cents[min_vza_idx:max_vza_idx],
-                    )
-                    plane_std = quad_plane((sza, vza), *std_coeffs)
-                    med_coeffs, med_cov = new_plane_fit(
-                        sza_fit, vza_fit, med_fit, plane_type="quad"
-                    )  # , count = cnt_fit)
-                    plane_med = quad_plane((sza, vza), *med_coeffs)
+                elif self.site == 'WWUK':
+                    std_coeffs, std_cov = new_plane_fit(sza_fit, vza_fit, std_fit, plane_type='linear')#, count = cnt_fit)
+                    sza, vza = np.meshgrid(bin_cents[min_sza_idx:max_sza_idx], bin_cents[min_vza_idx:max_vza_idx])
+                    plane_std = linear_plane((sza, vza), *std_coeffs)
+                    med_coeffs, med_cov = new_plane_fit(sza_fit, vza_fit, med_fit, plane_type = 'linear')#, count = cnt_fit)
+                    plane_med = linear_plane((sza, vza), *med_coeffs)
                 else:
                     std_coeffs, std_cov = new_plane_fit(
                         sza_fit,
@@ -1428,12 +1432,8 @@ class PostProcessingDataset:
 
                 plane_std[plane_std < 0] = 0
                 plane_med[plane_med < 0] = 0
-                plane_std = np.where(
-                    plane_std < 0.03 * plane_med, 0.03 * plane_med, plane_std
-                )
-                plane_std[plane_std <= 0] = gaussian_filter(plane_std, 1)[
-                    plane_std <= 0
-                ]
+                plane_std = np.where(plane_std <= 0.03*plane_med, 0.03*plane_med, plane_std)
+                plane_std[plane_std <= 0] = gaussian_filter(plane_std, 1)[plane_std <= 0]
 
                 upper_bounds = plane_med + 3 * plane_std
                 lower_bounds = plane_med - 3 * plane_std
@@ -1453,11 +1453,9 @@ class PostProcessingDataset:
                 lower_bounds = lower_bounds.flatten()[~np.isnan(lower_bounds.flatten())]
 
                 lower_bounds[lower_bounds < 0] = 0
-                upper_bounds = np.where(
-                    lower_bounds >= upper_bounds,
-                    lower_bounds + 0.03 * np.mean(plane_med),
-                    upper_bounds,
-                )
+                upper_bounds = np.where(lower_bounds + 0.1*np.mean(plane_med) >= upper_bounds,
+                                        [np.max([x, 0.05]) for x in lower_bounds + 0.1*np.mean(plane_med)],
+                                        upper_bounds)
 
                 df_below = pd.DataFrame(
                     {"refl": lower_bounds, "vza": vza.flatten(), "sza": sza.flatten()}
@@ -1644,11 +1642,110 @@ class PostProcessingDataset:
 
         del outs
         del good
+        
+    def bound_plotter(self, bounds_filepath,):
+        
+        bound_data = xr.open_dataset(bounds_filepath)
+        data = self.radiance
+        
+        data_30_90 = raa_binning(data, (30, 90))
+        data_90_150 = raa_binning(data, (90, 150))
+        data_150_210 = raa_binning(data, (150, 210))
+        data_210_270 = raa_binning(data, (210, 270))
+        data_270_330 = raa_binning(data, (270, 330))
+        data_330_30 = raa_binning(data, (330, 30))
 
-    def tol_optimiser(
-        self, tol_start, tol_stop, tol_step, wavelength, good_limit, plot=False
-    ):
-        IDs = self.irradiance["ID"]
+        data_list = [data_30_90, data_90_150, data_150_210, data_210_270, data_270_330, data_330_30]
+        
+        for i, v in enumerate(bound_data.raa.values):
+            try:
+                raa_bin_data = bound_data.sel(raa = v)
+                data_cutting = data_list[i]
+                raa_bin_data = raa_bin_data.dropna(dim = 'index')
+                
+                sza = raa_bin_data.sza.values
+                vza = raa_bin_data.vza.values
+                lower_bounds = raa_bin_data.lower_bound.values
+                upper_bounds = raa_bin_data.upper_bound.values
+                
+                sza_matrix = sza.reshape((len(np.unique(vza)), np.sum(vza == vza[0])))
+                vza_matrix = vza.reshape((len(np.unique(vza)), np.sum(vza == vza[0])))
+                lower_matrix = lower_bounds.reshape((len(np.unique(vza)), np.sum(vza == vza[0])))
+                upper_matrix = upper_bounds.reshape((len(np.unique(vza)), np.sum(vza == vza[0])))
+                
+                sza_matrix = np.pad(sza_matrix, 1, 'edge')
+                sza_matrix[:,0] = 0
+                try:
+                    sza_matrix[:,-1] = np.nanmax(data_cutting[' sza'])
+                except ValueError:
+                    sza_matrix[:,-1] = np.nanmax(sza_matrix)
+
+                vza_matrix = np.pad(vza_matrix, 1, 'edge')
+                vza_matrix[0, :] = 0
+                try:
+                    vza_matrix[-1, :] = np.nanmax(data_cutting[' vza'])
+                except ValueError:
+                    vza_matrix[-1, :] = np.nanmax(vza_matrix)
+                
+                lower_matrix = np.pad(lower_matrix, 1, 'edge')
+                
+                upper_matrix = np.pad(upper_matrix, 1, 'edge')
+                
+                sza = sza_matrix.flatten()
+                vza = vza_matrix.flatten()
+                lower_bounds = lower_matrix.flatten()
+                upper_bounds = upper_matrix.flatten()
+                
+                lower_interp = LinearNDInterpolator((sza, vza), lower_bounds)
+                lower_passes = [True if v > lower_interp(data_cutting[' sza'], data_cutting[' vza'])[i] else False for i, v in
+                                enumerate(data_cutting[f' refl_{self.input_wav}nm'])]
+
+                upper_interp = LinearNDInterpolator((sza, vza), upper_bounds)
+                upper_passes = [True if v < upper_interp(data_cutting[' sza'], data_cutting[' vza'])[i] else False for i, v in
+                                enumerate(data_cutting[f' refl_{self.input_wav}nm'])]
+                
+                passes = [True if v is True and lower_passes[i] is True else False for i, v in enumerate(upper_passes)]
+                good_data = data_cutting[passes]
+                outliers = data_cutting[[not el for el in passes]]
+                
+                good_data.reset_index(drop=True, inplace=True)
+                outliers.reset_index(drop=True, inplace=True)
+                
+                df_below = pd.DataFrame({'refl': lower_bounds, 'vza': vza, 'sza': sza})
+                df_above = pd.DataFrame({'refl': upper_bounds, 'vza': vza, 'sza': sza})
+                
+                fig, axs = plt.subplots(1, 3, figsize=(6, 4), sharey=True)
+                for j in range(3):
+                    axs[j].set_title(f'SZA = {(j + 1) * 20}')
+                    axs[j].scatter(
+                        outliers[outliers[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vza'].values,
+                        outliers[outliers[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][f' refl_{self.input_wav}nm'].values,
+                        color='red', s=5)
+                    axs[j].scatter(
+                        good_data[good_data[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][' vza'].values,
+                        good_data[good_data[' sza'].between((j + 1) * 20 - 1, (j + 1) * 20 + 1)][f' refl_{self.input_wav}nm'].values,
+                        color='green', s=5)
+
+                    axs[j].scatter(
+                        df_below.loc[(df_below['sza'] > (j + 1)*20 -1) & (df_below['sza'] < (j+1) *20 + 1)]['vza'].values,
+                        df_below.loc[(df_below['sza'] > (j + 1)*20 -1) & (df_below['sza'] < (j+1) *20 + 1)]['refl'].values,
+                        color='blue', s=20, marker = 'v')
+                    axs[j].scatter(
+                        df_above.loc[(df_above['sza'] > (j + 1) * 20 - 1) & (df_above['sza'] < (j + 1) * 20 + 1)]['vza'].values,
+                        df_above.loc[(df_above['sza'] > (j + 1) * 20 - 1) & (df_above['sza'] < (j + 1) * 20 + 1)]['refl'].values,
+                        color='blue', s=20, marker = '^')
+                    axs[j].set_xlabel('VZA')
+                    axs[0].set_ylabel('Reflectance')
+                fig.suptitle('RAA {}'.format(v))
+                fig.savefig(r'T:/ECO/EOServer/joe/hypernets_plots/plane_models/' +
+                            'sza_slices_3sig_{}_{}.png'.format(v, self.period_name))
+            except:
+                continue
+            
+            
+    def tol_optimiser(self, tol_start, tol_stop, tol_step, wavelength, good_limit,
+                      plot = False):
+        IDs = self.irradiance['ID']
         tol = np.arange(tol_start, tol_stop, tol_step)
         outs = []
         good = []
@@ -1694,8 +1791,8 @@ class PostProcessingDataset:
 
     def mask(self, data_type):
 
-        if data_type == "good":
-            data = self.radiance_good
+        if data_type == "radiance":
+            data = self.radiance
         elif data_type == "outliers":
             data = self.radiance_outliers
         elif data_type == "labelled":
@@ -1704,8 +1801,16 @@ class PostProcessingDataset:
             print("data not masked")
             quit()
 
-        mask1 = np.where(
-            ((data[" vza"] < 6) & (data[" saa"] < 90) & (data[" sza"] < 5))
+        mask_LOBE = np.where(
+            ((data[" vza"] < 10.5) & (data[" vza"] > 9.5) & (data[" vaa"] < 114) & (data[" vaa"] > 111))
+        )[0]
+        
+        mask_LOBE_2 = np.where(
+            ((data[" vza"] < 10.5) & (data[" vza"] > 9.5) & (data[" vaa"] < 95) & (data[" vaa"] > 100))
+        )[0]
+        
+        mask_WWUK = np.where(
+            ((data[" vaa"] < 70) | (data[" vaa"] > 300))
         )[0]
 
         mask11 = np.where(
@@ -1768,12 +1873,15 @@ class PostProcessingDataset:
 
         # mask5 = np.where(((data[' vza'] > 45) & (data['raa'] < 230) & (data['raa'] > 210) & (data[' sza'] > 65)))[0] #i think same data as 14 in v3
 
-        mask = np.unique(
-            np.hstack((mask1, mask11, mask12, mask13, mask14, mask2, mask3, mask4))
-        )
+        if self.site == "LOBE":
+            mask1 = np.unique(np.concat((mask_LOBE, mask_LOBE_2)))
+        if self.site == "WWUK":
+            mask1 = mask_WWUK
+        mask = np.unique((mask1))
 
-        if data_type == "good":
-            self.radiance_good = data.loc[~data.index.isin(mask)]
+        if data_type == "radiance":
+            self.radiance = data.loc[~data.index.isin(mask)]
+            self.radiance.reset_index(drop=True, inplace=True)
         elif data_type == "outliers":
             self.radiance_outliers = data.loc[~data.index.isin(mask)]
         elif data_type == "labelled":
@@ -1791,37 +1899,36 @@ class PostProcessingDataset:
         # self.radiance.reset_index(drop = True, inplace = True)
         x = self.radiance.datetimes.values
         y = self.radiance.ndvi.values
-        dates = self.radiance["date"]
-        # summer_dates = [dat for dat in dates if dat[4:6] == '06' or dat[4:6] == '07' or dat[4:6] == '08']
-        # summer_y = [v for i, v in enumerate(y) if dates[i] in summer_dates]
-        # y_mean = np.nanmean(summer_y)
-        # y_std = np.nanstd(summer_y)
+        dates = self.radiance['date']
+        summer_dates = [dat for dat in dates if dat[4:6] == '06' or dat[4:6] == '07' or dat[4:6] == '08']
+        summer_y = [v for i, v in enumerate(y) if dates[i] in summer_dates]
+        y_mean = np.nanmean(summer_y)
+        y_std = np.nanstd(summer_y)
         ys = pd.Series(y)
         rolling_mean = ys.rolling(100).mean()
         rolling_std = ys.rolling(100).std()
-
-        fig, ax = plt.subplots(2, 1, figsize=(20, 14))
-        ax[0].scatter(x, y, color="g", s=2, alpha=0.7)
-        ax[0].plot(x, rolling_mean, color="b")
-        ax[0].fill_between(
-            x,
-            rolling_mean - rolling_std,
-            rolling_mean + rolling_std,
-            color="blue",
-            alpha=0.2,
-        )
-        # ax[0].axhline(y_mean, color = 'black')
-        # ax[0].axhline(y_mean + y_std, color='red')
-        # ax[0].axhline(y_mean - y_std, color='red')
-        # ax[0].axhline(y_mean + 2*y_std, color='orange')
-        # ax[0].axhline(y_mean - 2*y_std, color='orange')
-        # ax[0].axhline(y_mean + 3*y_std, color='yellow')
-        # ax[0].axhline(y_mean - 3*y_std, color='yellow')
+        
+        crossings_inds = np.where(np.diff((rolling_std > 1.5*y_std).astype(int)) != 0)[0]
+        crossings = [int(x) for x in list(set(dates[crossings_inds].values))]
+        crossings.sort()
+        print(crossings)
+        
+        fig, ax = plt.subplots(2, 1, figsize = (20, 14))
+        ax[0].scatter(x, y, color='g', s=2, alpha=0.7)
+        ax[0].plot(x, rolling_mean, color = 'b')
+        ax[0].fill_between(x, rolling_mean - rolling_std, rolling_mean + rolling_std, color = 'blue', alpha = 0.2)
+        #ax[0].axhline(y_mean, color = 'black')
+        #ax[0].axhline(y_mean + y_std, color='red')
+        #ax[0].axhline(y_mean - y_std, color='red')
+        #ax[0].axhline(y_mean + 2*y_std, color='orange')
+        #ax[0].axhline(y_mean - 2*y_std, color='orange')
+        #ax[0].axhline(y_mean + 3*y_std, color='yellow')
+        #ax[0].axhline(y_mean - 3*y_std, color='yellow')
 
         ax[1].plot(x, rolling_std)
-        # ax[1].axhline(y_std, color='red')
-        # ax[1].axhline(2 * y_std, color='orange')
-        # ax[1].axhline(3 * y_std, color='yellow')
+        ax[1].axhline(y_std, color='red')
+        ax[1].axhline(2 * y_std, color='orange')
+        ax[1].axhline(3 * y_std, color='yellow')
 
         ax[0].set_ylabel("NDVI")
         ax[1].set_ylabel("NDVI StD")
@@ -1928,22 +2035,10 @@ def multi_aod_tolerance_analysis(
     dataset.raa_cut(raa_limit)
     dataset.clean_irr()
 
-
-def new_plane_pipeline(
-    dataset: PostProcessingDataset,
-    maintenance,
-    sza_limit,
-    raa_limit,
-    misalign_vza,
-    misalign_vaa,
-    multiple_periods=False,
-    period_date=None,
-    fit_method="plane_fit",
-    split_by_date=False,
-    start=None,
-    end=None,
-):
-    print("Initial", len(dataset.radiance))
+def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, misalign_vza, misalign_vaa, mean_corr,
+                       multiple_periods = False, period_date = None, fit_method = 'plane_fit',
+                       split_by_date = False, start = None, end = None):
+    print('Initial', len(dataset.radiance))
     dataset.maintenance_check(maintenance)
     print("Maintenance", len(dataset.radiance))
     dataset.sza_check(sza_limit)
@@ -1952,83 +2047,102 @@ def new_plane_pipeline(
     print("RAA", len(dataset.radiance))
     if dataset.site == "JSIT":
         dataset.vza_check(7)
-        print("VZA", len(dataset.radiance))
+        print('VZA', len(dataset.radiance))
+    if dataset.site == 'WWUK':
+        dataset.vza_check(15)
+        print('VZA', len(dataset.radiance))
     dataset.clean_irr()
-    print("IRR Flags", len(dataset.radiance))
+    print('IRR Flags', len(dataset.radiance))
+    dataset.vza_check_toplimit(90)
     dataset.calculate_ndvi()
     dataset.calculate_savi()
     dataset.calculate_s2tci()
-    # dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/WWUK_initalQC.csv')
+    
+    #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/WWUK_initalQC.csv')
     if misalign_vza != 0 and misalign_vaa != 0:
-        dataset.misalignment_correction(
-            misalign_vza, misalign_vaa, multiple_periods, period_date
-        )
-    # dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_misalignment_corrected.csv')
-    dataset.cloud_check(0.9, 550, True, rewrite_var="radiance")
-    dataset.save(
-        "radiance",
-        f"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_CC.csv",
-    )
-    print("Cloud Check", len(dataset.radiance))
+        dataset.misalignment_correction(misalign_vza, misalign_vaa, mean_corr, multiple_periods, period_date)
+    #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_misalignment_corrected.csv')
+    dataset.cloud_check(0.9, 550, True, rewrite_var = 'radiance')
+    dataset.save('radiance', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_CC.csv')
+    print('Cloud Check', len(dataset.radiance))
     if split_by_date is True:
         dataset.split_by_date(start, end)
-    dataset.new_plane_fitter(plot=True, method=fit_method)
-    print("1st Iteration")
-    dataset.size("good")
-    dataset.size("outliers")
-    dataset.new_plane_fitter(first_iteration=False, plot=True, method=fit_method)
-    print("2nd Iteration")
-    dataset.size("good")
-    dataset.size("outliers")
-    dataset.new_plane_fitter(
-        first_iteration=False, plot=True, method=fit_method, last_iteration=True
-    )
-    print("3rd Iteration")
-    dataset.size("good")
-    dataset.size("outliers")
-    dataset.save(
-        "good",
-        f"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_bounds_good.csv",
-    )
-    dataset.save(
-        "outliers",
-        f"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_bounds_out.csv",
-    )
+    if dataset.site == 'LOBE' or dataset.site == 'WWUK':
+        dataset.mask('radiance')
+    dataset.new_plane_fitter(plot = True, method = fit_method)
+    print('1st Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = fit_method)
+    print('2nd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = fit_method, last_iteration = True)
+    print('3rd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.save('good', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_bounds_good.csv')
+    dataset.save('outliers', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_bounds_out.csv')
 
-    dataset.new_plane_fitter(first_iteration=False, plot=True, method="plane_std_fit")
-    print("Plane Fit 1st Iteration")
-    dataset.size("good")
-    dataset.size("outliers")
-    dataset.new_plane_fitter(first_iteration=False, plot=True, method="plane_std_fit")
-    print("Plane Fit 2nd Iteration")
-    dataset.size("good")
-    dataset.size("outliers")
-    dataset.new_plane_fitter(
-        first_iteration=False,
-        plot=True,
-        method="plane_std_fit",
-        last_iteration=True,
-        save_bounds=True,
-        nc_path=f"T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/bounds/{dataset.period_name}_bounds.nc",
-    )
-    print("Plane Fit 3rd Iteration")
-    dataset.size("good")
-    dataset.size("outliers")
-    # dataset.count_by_bin()
-    dataset.save(
-        "good",
-        f"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_QC_good.csv",
-    )
-    dataset.save(
-        "outliers",
-        f"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_QC_out.csv",
-    )
-
-
-def irradiance_analysis_writer(
-    dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs
-):
-    print("Initial", len(dataset.radiance))
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = 'plane_std_fit')
+    print('Plane Fit 1st Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = 'plane_std_fit')
+    print('Plane Fit 2nd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    dataset.new_plane_fitter(first_iteration = False, plot = True, method = 'plane_std_fit', last_iteration = True,
+                             save_bounds=True,
+                             nc_path=f'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/bounds/{dataset.period_name}_bounds.nc'
+                             )
+    print('Plane Fit 3rd Iteration')
+    dataset.size('good')
+    dataset.size('outliers')
+    #dataset.count_by_bin()
+    dataset.save('good', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_QC_good.csv')
+    dataset.save('outliers', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_QC_out.csv')
+    
+    
+def alternate_bound_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, misalign_vza, misalign_vaa, mean_corr,
+                       bound_filepath,
+                       multiple_periods = False, period_date = None,
+                       split_by_date = False, start = None, end = None):
+    print('Initial', len(dataset.radiance))
+    dataset.maintenance_check(maintenance)
+    print('Maintenance', len(dataset.radiance))
+    dataset.sza_check(sza_limit)
+    print('SZA', len(dataset.radiance))
+    dataset.raa_cut(raa_limit)
+    print('RAA', len(dataset.radiance))
+    if dataset.site == 'JSIT':
+        dataset.vza_check(7)
+        print('VZA', len(dataset.radiance))
+    if dataset.site == 'WWUK':
+        dataset.vza_check(15)
+        print('VZA', len(dataset.radiance))
+    dataset.clean_irr()
+    print('IRR Flags', len(dataset.radiance))
+    dataset.vza_check_toplimit(90)
+    dataset.calculate_ndvi()
+    dataset.calculate_savi()
+    dataset.calculate_s2tci()
+    
+    #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/WWUK_initalQC.csv')
+    if misalign_vza != 0 and misalign_vaa != 0:
+        dataset.misalignment_correction(misalign_vza, misalign_vaa, mean_corr, multiple_periods, period_date)
+    #dataset.save('radiance', r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_v3_misalignment_corrected.csv')
+    dataset.cloud_check(0.9, 550, True, rewrite_var = 'radiance')
+    dataset.save('radiance', f'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/{dataset.period_name}_CC.csv')
+    print('Cloud Check', len(dataset.radiance))
+    if split_by_date is True:
+        dataset.split_by_date(start, end)
+    if dataset.site == 'LOBE' or dataset.site == 'WWUK':
+        dataset.mask('radiance')
+    dataset.bound_plotter(bound_filepath)
+    
+def irradiance_analysis_writer(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit, filename, wvs):
+    print('Initial', len(dataset.radiance))
     dataset.maintenance_check(maintenance)
     print("Maintenance", len(dataset.radiance))
     dataset.sza_check(sza_limit)
@@ -2057,22 +2171,34 @@ def aod_plotter(
     dataset.write_irr_analysis_files(filename, wvs, save=True, plot=True, interp=True)
     print("Done")
 
-
-def ndvi_bound_calculator(
-    dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit
-):
-    print("Initial", len(dataset.radiance))
+def ndvi_bound_calculator(dataset: PostProcessingDataset, maintenance, sza_limit, raa_limit):
+    dataset.vza_check_toplimit(90)
+    print('Initial', len(dataset.radiance))
     dataset.maintenance_check(maintenance)
     print("Maintenance", len(dataset.radiance))
     dataset.sza_check(sza_limit)
     print("SZA", len(dataset.radiance))
     dataset.raa_cut(raa_limit)
-    print("RAA", len(dataset.radiance))
+    print('RAA', len(dataset.radiance))
+    if dataset.site == 'JSIT':
+        dataset.vza_check(7)
+        print('VZA', len(dataset.radiance))
+    if dataset.site == 'WWUK':
+        dataset.vza_check(15)
+        print('VZA', len(dataset.radiance))
     dataset.clean_irr()
-    print("IRR Flags", len(dataset.radiance))
+    print('IRR Flags', len(dataset.radiance))
+    if dataset.site == 'LOBE' or dataset.site == 'WWUK':
+        dataset.mask('radiance')
+        print('Mask', len(dataset.radiance))
     dataset.calculate_ndvi()
     dataset.plot_ndvi_timeseries()
 
+def misalignment_correction_writer(dataset: PostProcessingDataset, vza, vaa, mean_corr,
+                                   multiple_periods = False, period_date = None):
+    dataset.misalignment_correction(vza, vaa, mean_corr, multiple_periods, period_date)
+    dataset.save('radiance',
+                 r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv')
 
 def misalignment_correction_writer(
     dataset: PostProcessingDataset, vza, vaa, multiple_periods=False, period_date=None
@@ -2093,7 +2219,7 @@ JSIT_maintenance_dates = []
 """
 for k, v in JSIT_dict.items():
     QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/LOBE_2023-05-31_2023-08-11_None_None_None_None_misalign_corrected.csv',
-                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/LOBEv1_irradiance.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/LOBEv4_irradiance.csv',
                             r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
                             'LOBE',
                             f'JSIT_{k}',
@@ -2101,16 +2227,14 @@ for k, v in JSIT_dict.items():
 
     new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
                      fit_method = 'bounds', split_by_date = True, start = v[0], end = v[1])
-"""
-QC = PostProcessingDataset(
-    r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/LOBE_2025-04-15_present_None_None_None_None.csv",
-    r"T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/LOBEv4_irradiance.csv",
-    r"T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/",
-    "LOBE",
-    f"LOBEv4",
-    "median",
-    "550",
-)
+'''
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
+                            'GHNA',
+                            f'GHNA_2023Oct_2025Aug',
+                            'median',
+                           '550')
 GHNA_maintenance_dates = [
     "20231016",
     "20231017",
@@ -2137,37 +2261,75 @@ WWUK_maintenance_dates = []
 JAES_maintenance_dates = []
 LOBE_maintenance_dates = []
 
-# ndvi_bound_calculator(QC, LOBE_maintenance_dates, 60, 10)
-# misalignment_correction_writer(QC,  (1.76, 1.59), (-80, -77), True, '20240521')
-# new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10, 0, #(1.76,1.59),
-#                  0,# (-80, -77),
-#                 False,
-#                split_by_date = True, start = '20240521', end = '20250501',
-#               fit_method = 'bounds')
+#ndvi_bound_calculator(QC, LOBE_maintenance_dates, 60, 10)
+#misalignment_correction_writer(QC,  (1.96, 1.28), (-72.2, -36.4), (1.009, 1.011), True, '20240521')
+
+#QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv',
+ #                           r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+  #                          r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
+   #                         'GHNA',
+    #                        f'GHNA_Oct23_May24',
+     #                       'median',
+      #                     '550')
+
+#new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10, 0, #(1.76,1.59),
+ #                  0,# (-80, -77),
+  #                 0,
+   #                False,
+    #               split_by_date = True, start = '20231026', end = '20240521',
+     #              fit_method = 'bounds')
+#QC.period_name = f'GHNA_May24_Aug25'
+#new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10, 0, #(1.76,1.59),
+ #                  0,# (-80, -77),
+  #                 0,
+   #                False,
+    #               split_by_date = True, start = '20240521', end = '20250801',
+     #              fit_method = 'bounds')
 
 
-# new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
-#  fit_method = 'bounds')
+#new_plane_pipeline(QC, JSIT_maintenance_dates, 60, 10,
+ #                  1.67, 8.9, 0.972,
+  #                 False,
+   #                split_by_date = True, start = '20241114', end = '20250801', 
+    #               fit_method = 'bounds')
 
-# new_plane_pipeline(QC, GHNA_maintenance_dates, 70, 10,
-#                  0, #0.69,
-#                 0, #91,
-#                False,
-#               fit_method = 'bounds')
+#new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10,
+ #                  1.01,
+  #                 96.7,
+   #                0.996,
+    #               False,
+     #              fit_method = 'bounds')
 
-# new_plane_pipeline(QC, WWUK_maintenance_dates, 70, 10, 0.93, 24.8, False,
-#             fit_method = 'bounds')
+#new_plane_pipeline(QC, WWUK_maintenance_dates,
+ #                  60, 10,
+  #                 1.58, -163.7, 1.016, False,
+   #                split_by_date = True, start = '20230429', end = '20231101',
+    #               fit_method = 'bounds')
 
-# irradiance_analysis_writer(QC, LOBE_maintenance_dates, 60, 10,
-#                          'irradiance_LOBEv4_analysis',
-#                       [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
+#irradiance_analysis_writer(QC, LOBE_maintenance_dates, 70, 10,
+ #                          'irradiance_LOBEv3_analysis',
+  #                         [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
 
+ndvi_bound_calculator(QC, GHNA_maintenance_dates, 60, 10)
+#new_plane_pipeline(QC, JAES_maintenance_dates,
+ #                  60, 10,
+  #                 1.23, 42.2, 0.989,
+   #                split_by_date = True, start = '20240605', end = '20240904',
+    #               fit_method = 'bounds')
 
-# new_plane_pipeline(QC, JAES_maintenance_dates, 70, 10, 0, 0, False,
-#     fit_method = 'bounds')
+#new_plane_pipeline(QC, LOBE_maintenance_dates,
+ #                  60, 10,
+  #                 7.80, -7.71, 0.905,
+   #                False,
+    #               split_by_date = True, start = '20250401', end = '20250503',
+     #              fit_method = 'bounds')
 
-new_plane_pipeline(QC, LOBE_maintenance_dates, 60, 10, 0, 0, False, fit_method="bounds")
-
-# aod_plotter(QC, LOBE_maintenance_dates, 60, 10,
-#                          'irradiance_LOBEv3_analysis',
-#                       [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
+#aod_plotter(QC, LOBE_maintenance_dates, 60, 10,
+ #                          'irradiance_LOBEv3_analysis',
+  #                       [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
+  
+#alternate_bound_pipeline(QC, LOBE_maintenance_dates,
+ #                  60, 10,
+  #                 0, 0, 0,
+   #                "T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/bounds/LOBE_2025Apr_2025May_bounds.nc",
+    #               False,)
