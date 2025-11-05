@@ -1,7 +1,5 @@
 import sqlite3
 from sqlite3 import Error
-from datetime import datetime
-import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.gridspec import GridSpec
@@ -9,8 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
-path2figs = "/home/data/insitu/hypernets/QC/"
-path2files = "/home/data/insitu/hypernets/archive/"
+path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
+path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
+
 import sqlite3
 from sqlite3 import Error
 

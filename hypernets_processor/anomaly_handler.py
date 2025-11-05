@@ -87,7 +87,9 @@ class AnomalyHandler:
 
         if self.get_sequence_crashing_anomalies() == []:
             self.add_anomaly("x")
-
+        else:
+            print("Not adding x anomaly as other crashing anomalies already present (%s)" % ",".join(self.get_sequence_crashing_anomalies()))
+            
     def get_anomaly_ids(self):
         """
         Returns available anomaly ids
