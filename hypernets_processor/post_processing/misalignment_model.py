@@ -17,8 +17,9 @@ results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment"
 data = pd.read_csv(r'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv', delimiter = ',')
 data.drop('Unnamed: 0', axis = 'columns')
 
-site = 'GHNAv3'
-data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site}_analysis.csv', delimiter = ',')
+site = 'LOBE_2025Apr_2025May'
+site_file = 'LOBEv4'
+data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site_file}_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
 data_v1 = data_v1.sort_values(by = 'Date')
@@ -72,9 +73,17 @@ data_after_may24 = data.sel(date = slice('2024-05-24', '2025-01-01'))
 
 #cloud check and flag removal
 data_v1 = data_v1[data_v1['model_550nm']*0.9 < data_v1['obs_550nm']]
-data_v1 = data_v1[data_v1['model_550nm']*1.2 > data_v1['obs_550nm']]
+data_v1 = data_v1[data_v1['model_550nm']*1.1 > data_v1['obs_550nm']]
 data_v1 = data_v1[data_v1['Flag'] == 0]
-data_v1 = data_v1[data_v1['Time'] > 830]
+#if site == 'LOBEv4' or site == 'LOBEv2':
+ #   data_v1 = data_v1[data_v1['SZA'] < 50]
+if site == 'WWUK_May22_Oct22':
+    data_v1 = data_v1[data_v1['SZA'] < 50]
+
+if 'GHNA' in site:
+    data_v1 = data_v1[data_v1['Time'] > 830]
+#if site == 'LOBEv2':
+ #   data_v1 = data_v1[data_v1['Time'] > 800]
 
 #format data_v1
 sza_measured_v1 = data_v1['SZA'].values
@@ -112,8 +121,14 @@ data_v1 = xr.Dataset(data_vars = dict(
         wv = ('wv', list(ratio_dict.keys()))
     ))
 
-
-data_v1 = data_v1.sel(date = slice('2024-05-24', '2025-08-01'))
+if site == 'LOBEv4':
+    data_v1 = data_v1.sel(date = slice('2025-06-03', '2025-09-02'))
+if site == 'LOBE_2025Apr_2025May':
+    data_v1 = data_v1.sel(date = slice('2025-04-03', '2025-05-03'))
+if site == 'WWUK_May22_Oct22':
+    data_v1 = data_v1.sel(date = slice('2022-05-05', '2022-10-11'))
+if site == 'WWUK_Apr23_Nov23':
+    data_v1 = data_v1.sel(date = slice('2023-04-29', '2023-11-01'))
 
 
 
