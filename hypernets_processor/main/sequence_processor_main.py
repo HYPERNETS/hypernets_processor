@@ -96,7 +96,7 @@ def get_target_sequences(context, to_archive):
             for anomaly in context.anomaly_db["anomalies"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if anomaly["anomaly_id"] not in ['m', 'a', 's', 'o', 'nlu', 'nld', 'ned', 'cl', 'd', 'wns', 'ms'] # skip non-fatal anomalies (so the processor attempts to process these again if no product is found)
+            if (anomaly["anomaly_id"] in context.anomaly_handler.get_crashing_anomaly_ids()) and anomaly["anomaly_id"]!="m"
             and not context.get_config_value("reprocess_anomalies")
         ]
 
@@ -139,9 +139,8 @@ def get_target_sequences(context, to_archive):
             incomplete_products = [
                 anomaly["sequence_name"]
                 for anomaly in context.anomaly_db["anomalies"].find(
-                    site_id=context.get_config_value("site_id")
+                    site_id=context.get_config_value("site_id"),anomaly_id="m"
                 )
-                if anomaly["anomaly_id"] == "m"
             ]
 
             for incomplete_download_path in incomplete_downloads:

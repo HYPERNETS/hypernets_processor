@@ -87,7 +87,9 @@ class AnomalyHandler:
 
         if self.get_sequence_crashing_anomalies() == []:
             self.add_anomaly("x")
-
+        else:
+            print("Not adding x anomaly as other crashing anomalies already present (%s)" % ",".join(self.get_sequence_crashing_anomalies()))
+            
     def get_anomaly_ids(self):
         """
         Returns available anomaly ids
@@ -136,10 +138,10 @@ class AnomalyHandler:
         :return: crashing anomaly ids
         """
 
-        crashing_anomalies = []
+        crashing_anomalies = ["x"]
 
         for anomaly_id in self.get_anomaly_ids():
-            if self.get_anomaly_error(anomaly_id) is not None:
+            if self.get_anomaly_error(anomaly_id) is not None and anomaly_id != "m":
                 crashing_anomalies.append(anomaly_id)
 
         return crashing_anomalies
