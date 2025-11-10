@@ -131,14 +131,17 @@ def read_data_hypernets(
                         ds_HYP["viewing_azimuth_angle"].values,
                     ]
                 )
-                meas.add_measurement(
-                    geometries,
-                    ds_HYP["acquisition_time"].values,
-                    reflectance,
-                    u_rand_reflectance=u_rand_refl,
-                    u_syst_reflectance=u_syst_refl,
-                    id=ds_HYP.attrs["sequence_id"],
-                )
+                try:
+                    meas.add_measurement(
+                        geometries,
+                        ds_HYP["acquisition_time"].values,
+                        reflectance,
+                        u_rand_reflectance=u_rand_refl,
+                        u_syst_reflectance=u_syst_refl,
+                        id=ds_HYP.attrs["sequence_id"],
+                    )
+                except:
+                    print("Could not add measurement from file: " + files[ii])
 
     return meas
 

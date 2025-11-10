@@ -10,6 +10,8 @@ import matplotlib.dates as md
 path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
 path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
+path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
+
 import sqlite3
 from sqlite3 import Error
 
@@ -24,72 +26,6 @@ def create_connection(path):
 
     return connection
 
-
-def closest_idx(xlist, xval):
-    idx, xret = min(enumerate(xlist), key=lambda x: abs(float(x[1]) - float(xval)))
-    return (idx, xret)
-
-
-def get_flag_encoding(da):
-    """
-    Returns flag encoding for flag type data array
-    :type da: xarray.DataArray
-    :param da: data array
-    :return: flag meanings
-    :rtype: list
-    :return: flag masks
-    :rtype: list
-    """
-
-    try:
-        flag_meanings = da.attrs["flag_meanings"].split()
-        flag_masks = [int(fm) for fm in da.attrs["flag_masks"].split(",")]
-    except KeyError:
-        raise KeyError(da.name + " not a flag variable")
-
-    return flag_meanings, flag_masks
-
-
-def get_flags(da):
-    """
-    Returns flag encoding for flag type data array
-    :type da: xarray.DataArray
-    :param da: data array
-    :return: flag meanings
-    :rtype: list
-    :return: flag masks
-    :rtype: list
-    """
-
-    try:
-        flag_meanings = da.attrs["flag_meanings"].split()
-        flag_masks = [int(fm) for fm in da.attrs["flag_masks"].split(",")]
-    except KeyError:
-        raise KeyError(da.name + " not a flag variable")
-
-    return [
-        ([i], flag_meanings[i], flag_masks[i])
-        for i in range(0, len(flag_meanings))
-        if ds["quality_flag"].values[i] != 0
-    ]
-
-
-def flags(da):
-    qf = da["quality_flag"].values
-    flagsname = get_flag_encoding(da["quality_flag"])[0]
-    flagsval = get_flag_encoding(da["quality_flag"])[1]
-    flags = np.full((len(qf), len(flagsname)), False, dtype=bool)
-    for i in range(0, len(qf)):
-        n = qf[i]
-        while n > 0:
-            r = 2 ** round(np.log2(n))
-            for j in range(0, len(flagsval)):
-                flags[i, j] = r == flagsval[j]
-            n = n - r
-    flags = pd.DataFrame(flags, columns=flagsname)
-    return flags
-
-
 dbcon = create_connection("/{}/anomaly.db".format(path2files))
 SQL_Query = pd.read_sql_query("""select * from anomalies""", dbcon)
 df = pd.DataFrame(SQL_Query)
@@ -101,13 +37,16 @@ print(df["site_id"].unique())
 dbcon = create_connection("/{}/archive.db".format(path2files))
 SQL_Query = pd.read_sql_query("""select * from products""", dbcon)
 prods = pd.DataFrame(SQL_Query)
-all_dates = pd.date_range("2023-01-01", "2023-12-31", freq="M").date
 
 for site in df["site_id"].unique():
     print(site)
     prodsel = prods[prods["site_id"] == site]
     nseq = len(prodsel["sequence_name"].unique())
     dfsel = df[df["site_id"] == site]
+
+    dates=prodsel.datetime_start.unique()
+    dates.sort()
+    sel_dates = pd.date_range(dates[2], dates[-1], freq="M").date
 
     fig = plt.figure(figsize=(10, 15))
     gs = GridSpec(nrows=2, ncols=2)
@@ -131,14 +70,14 @@ for site in df["site_id"].unique():
     dfsel["date"] = pd.to_datetime(dfsel.date)
     cross = pd.crosstab(dfsel.date, dfsel.anomaly_id)  # ,margins=True, dropna=False)
     cross["date"] = cross.index
-    cross = cross.resample("M", on="date").sum().reindex(all_dates)
+    cross = cross.resample("M", on="date").sum().reindex(sel_dates)
     cross.plot(kind="bar", ax=ax2, stacked=False)
     ax2.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Anomalies")
     ax2.set_ylabel("Number of sequences")
 
     filtered_df = prodsel[
         prodsel["product_level"].str.contains(
-            "L0A_RAD|L0A_IRR|L_L1A_RAD|L_L1A_IRR|L_L1B|L_L1C|L_L2A"
+            "L0A_RAD|L0A_IRR|L_L1A_RAD|L_L1A_IRR|L_L1B|L_L1C|L_L2A|L_L2B"
         )
     ]
     filtered_df.index = pd.to_datetime(filtered_df.datetime_SEQ)
@@ -147,7 +86,7 @@ for site in df["site_id"].unique():
         filtered_df.date, filtered_df.product_level
     )  # ,margins=True, dropna=False)
     cross["date"] = cross.index
-    cross = cross.resample("M", on="date").sum().reindex(all_dates)
+    cross = cross.resample("M", on="date").sum().reindex(sel_dates)
     cross.plot(kind="bar", ax=ax3, stacked=False)
 
     ax3.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Proc. level")
