@@ -150,7 +150,9 @@ class ArchiveDB(dataset.Database):
                 rel_product_dir=self.writer.return_rel_directory(),
                 product_level=ds.attrs["product_level"],
                 datetime_SEQ=self.context.get_config_value("time"),
-                datetime_start=dt.fromtimestamp(np.nanmin(ds["acquisition_time"].values)),
+                datetime_start=dt.fromtimestamp(
+                    np.nanmin(ds["acquisition_time"].values)
+                ),
                 datetime_end=dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values)),
                 sequence_name=self.context.get_config_value("sequence_name"),
                 sequence_path=self.context.get_config_value("sequence_path"),

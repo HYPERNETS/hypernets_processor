@@ -95,14 +95,14 @@ class CombineSWIR:
             store_unc_percent=True,
         )
 
-        dataset_l1b_comb[
-            "std_" + measurandstring
-        ].values = combine_function.meas_function(
-            dataset_l1b["wavelength"].values,
-            dataset_l1b["std_" + measurandstring].values,
-            dataset_l1b_swir["wavelength"].values,
-            dataset_l1b_swir["std_" + measurandstring].values,
-            1000,
+        dataset_l1b_comb["std_" + measurandstring].values = (
+            combine_function.meas_function(
+                dataset_l1b["wavelength"].values,
+                dataset_l1b["std_" + measurandstring].values,
+                dataset_l1b_swir["wavelength"].values,
+                dataset_l1b_swir["std_" + measurandstring].values,
+                1000,
+            )
         )
         dataset_l1b_comb["n_valid_scans"].values = dataset_l1b["n_valid_scans"].values
         dataset_l1b_comb["n_valid_scans_SWIR"].values = dataset_l1b_swir[

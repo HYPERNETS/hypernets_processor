@@ -71,9 +71,9 @@ class Interpolate:
                 .sel(scan=upscan)
                 .values
             )
-            dataset_l1c_int[
-                "err_corr_systematic_indep_upwelling_radiance"
-            ].values = dataset_l1a_uprad["err_corr_systematic_indep_radiance"].values
+            dataset_l1c_int["err_corr_systematic_indep_upwelling_radiance"].values = (
+                dataset_l1a_uprad["err_corr_systematic_indep_radiance"].values
+            )
             dataset_l1c_int[
                 "err_corr_systematic_corr_rad_irr_upwelling_radiance"
             ].values = dataset_l1a_uprad[
@@ -135,7 +135,7 @@ class Interpolate:
 
     def interpolate_irradiance(self, dataset_l1c, dataset_l1b_irr, razangle=None):
 
-        dataset_l1c=self.qual.check_overcast(dataset_l1c,dataset_l1b_irr)
+        dataset_l1c = self.qual.check_overcast(dataset_l1c, dataset_l1b_irr)
         flags = [
             "vza_irradiance",
             "not_enough_dark_scans",
@@ -145,13 +145,18 @@ class Interpolate:
         flagged = DatasetUtil.get_flags_mask_or(dataset_l1b_irr["quality_flag"], flags)
         mask_notflagged = np.where(flagged == False)[0]
         if len(mask_notflagged) == 0:
-            raise ValueError("one of the quality checks in previous steps has failed, and not correctly picked up that there is no valid irradiance")
+            raise ValueError(
+                "one of the quality checks in previous steps has failed, and not correctly picked up that there is no valid irradiance"
+            )
 
         measurement_function_interpolate_wav = self.context.get_config_value(
             "measurement_function_interpolate_wav"
         )
         prop = punpy.MCPropagation(
-            self.context.get_config_value("mcsteps"), dtype="float32", parallel_cores=1, verbose=False
+            self.context.get_config_value("mcsteps"),
+            dtype="float32",
+            parallel_cores=1,
+            verbose=False,
         )
         if self.context.get_config_value("network") == "w":
             interpolation_function_wav = self._measurement_function_factory(
@@ -181,10 +186,11 @@ class Interpolate:
                 store_unc_percent=True,
             )
         else:
-            measurandstring = 'irradiance'
-            measurand = interpolation_function_wav.run(
+            measurandstring = "irradiance"
+            measurand = interpolation_function_wav.run_meas_function(
                 dataset_l1c.rename({"wavelength": "radiance_wavelength"}),
-                dataset_l1b_irr)
+                dataset_l1b_irr,
+            )
             dataset_l1c_temp[measurandstring].values = measurand
 
         measurement_function_interpolate_time = self.context.get_config_value(
@@ -227,13 +233,16 @@ class Interpolate:
                 store_unc_percent=True,
             )
         else:
-            measurandstring = 'irradiance'
-            measurand = interpolation_function_time.run(dataset_l1c_temp, {
+            measurandstring = "irradiance"
+            measurand = interpolation_function_time.run_meas_function(
+                dataset_l1c_temp,
+                {
                     "input_time": acqui_irr,
                     "output_time": acqui_rad,
                     "input_sza": input_sza,
                     "output_sza": output_sza,
-                })
+                },
+            )
             dataset_l1c[measurandstring].values = measurand
 
         if len(acqui_irr) == 1:
@@ -277,15 +286,17 @@ class Interpolate:
                 store_unc_percent=True,
             )
         else:
-            measurandstring='downwelling_radiance'
-            measurand = interpolation_function_time.run(dataset_l1b_skyrad, {
+            measurandstring = "downwelling_radiance"
+            measurand = interpolation_function_time.run_meas_function(
+                dataset_l1b_skyrad,
+                {
                     "input_time": acqui_skyrad,
                     "output_time": acqui_rad,
                     "input_sza": input_sza,
                     "output_sza": output_sza,
-                })
+                },
+            )
             dataset_l1c[measurandstring].values = measurand
-
 
         if len(acqui_skyrad) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(

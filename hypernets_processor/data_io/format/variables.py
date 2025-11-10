@@ -1,6 +1,7 @@
 """
 Variable definitions for Hypernets land a water network data products
 """
+
 from typing import Any
 
 from copy import deepcopy
@@ -605,7 +606,7 @@ CAL_VARIABLES = {
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
     },
     "err_corr_systematic_indep_gains": {
-        "dim": [CD_DIM, WL_DIM, WL_DIM+"'"],
+        "dim": [CD_DIM, WL_DIM, WL_DIM + "'"],
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on gains",
@@ -615,7 +616,7 @@ CAL_VARIABLES = {
         "encoding": {"dtype": np.int16, "scale_factor": 0.0001, "offset": 0.0},
     },
     "err_corr_systematic_corr_rad_irr_gains": {
-        "dim": [CD_DIM, WL_DIM, WL_DIM+"'"],
+        "dim": [CD_DIM, WL_DIM, WL_DIM + "'"],
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on gains (correlated radiance and irradiance)",

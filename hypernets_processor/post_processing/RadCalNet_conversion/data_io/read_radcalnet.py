@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import pandas as pd
 
+
 def read_db_radcalnet_BOA(data_folder, db_folder, file, start_date, end_date):
     dbpath = os.path.join(db_folder, file)
     db = np.genfromtxt(dbpath, dtype=str)
@@ -157,7 +158,27 @@ def read_file_radcalnet_BOA(filepath):
     AOD[AOD == 9999] = np.nan
     ang[ang == 9999] = np.nan
 
-    return wav, times, refl, refl_uncs, doy_l, local_time, P, T, H2O, O3, AOD, ang, type, u_P, u_T, u_H2O, u_O3, u_AOD, u_ang
+    return (
+        wav,
+        times,
+        refl,
+        refl_uncs,
+        doy_l,
+        local_time,
+        P,
+        T,
+        H2O,
+        O3,
+        AOD,
+        ang,
+        type,
+        u_P,
+        u_T,
+        u_H2O,
+        u_O3,
+        u_AOD,
+        u_ang,
+    )
 
 
 def read_file_radcalnet_TOA(filepath):

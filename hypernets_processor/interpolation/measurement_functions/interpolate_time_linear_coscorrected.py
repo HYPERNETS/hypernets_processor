@@ -69,7 +69,9 @@ class InterpolationTimeLinearCoscorrected(MeasurementFunction):
         return ["output_time", "input_time", "irradiance", "output_sza", "input_sza"]
 
 
-class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(InterpolationTimeLinearCoscorrected):
+class WaterNetworkInterpolationSkyRadianceLinearCoscorrected(
+    InterpolationTimeLinearCoscorrected
+):
     # def meas_function(self, output_time, input_time, radiance, output_sza, input_sza):
     #     """
     #     This function implements the measurement function.

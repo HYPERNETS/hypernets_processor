@@ -16,9 +16,18 @@ import numpy as np
 from obsarray.templater.dataset_util import DatasetUtil
 from typing import Optional, Union, List, Any
 
-bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
-           "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
-           "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR", "single_irradiance_used"]
+bad_flags = [
+    "pt_ref_invalid",
+    "half_of_scans_masked",
+    "not_enough_dark_scans",
+    "not_enough_rad_scans",
+    "not_enough_irr_scans",
+    "no_clear_sky_irradiance",
+    "variable_irradiance",
+    "half_of_uncertainties_too_big",
+    "discontinuity_VNIR_SWIR",
+    "single_irradiance_used",
+]
 
 
 def read_data_hypernets(
@@ -29,7 +38,7 @@ def read_data_hypernets(
     vzamax=None,
     vza=None,
     vaa=None,
-    filter_flags=True
+    filter_flags=True,
 ) -> BRDFMeasurementsSpectra:
     """
     Function to read full HYPERNETS dataset
@@ -40,10 +49,24 @@ def read_data_hypernets(
     :return:
     """
     if i is not None:
-        ds_HYP = read_hypernets_file(files[i],vza=vza,vaa=vaa,vzamax=vzamax,mask=mask,filter_flags=filter_flags)
+        ds_HYP = read_hypernets_file(
+            files[i],
+            vza=vza,
+            vaa=vaa,
+            vzamax=vzamax,
+            mask=mask,
+            filter_flags=filter_flags,
+        )
     else:
         for ii in range(len(files)):
-            ds_HYP = read_hypernets_file(files[ii],vza=vza,vaa=vaa,vzamax=vzamax,mask=mask,filter_flags=filter_flags)
+            ds_HYP = read_hypernets_file(
+                files[ii],
+                vza=vza,
+                vaa=vaa,
+                vzamax=vzamax,
+                mask=mask,
+                filter_flags=filter_flags,
+            )
             if ds_HYP is not None:
                 break
     reflectance = ds_HYP["reflectance"].values
@@ -61,7 +84,13 @@ def read_data_hypernets(
             ds_HYP["viewing_azimuth_angle"].values,
         ]
     )
-    corr_reflectances_wav = np.mean([ds_HYP.unc["reflectance"][:, i].total_err_corr_matrix() for i in range(len(ds_HYP["solar_zenith_angle"].values))], axis=0)
+    corr_reflectances_wav = np.mean(
+        [
+            ds_HYP.unc["reflectance"][:, i].total_err_corr_matrix()
+            for i in range(len(ds_HYP["solar_zenith_angle"].values))
+        ],
+        axis=0,
+    )
 
     meas = BRDFMeasurementsSpectra(
         ds_HYP["wavelength"].values,
@@ -71,13 +100,19 @@ def read_data_hypernets(
         u_rand_refl,
         u_syst_refl,
         corr_reflectances_wav=corr_reflectances_wav,
-        ids=ds_HYP.attrs["sequence_id"]
+        ids=ds_HYP.attrs["sequence_id"],
     )
 
     if i is None:
         for ii in range(1, len(files)):
-            ds_HYP = read_hypernets_file(files[ii], vza=vza, vaa=vaa, vzamax=vzamax, mask=mask,
-                                         filter_flags=filter_flags)
+            ds_HYP = read_hypernets_file(
+                files[ii],
+                vza=vza,
+                vaa=vaa,
+                vzamax=vzamax,
+                mask=mask,
+                filter_flags=filter_flags,
+            )
 
             if ds_HYP is not None:
                 reflectance = ds_HYP["reflectance"].values
@@ -96,18 +131,24 @@ def read_data_hypernets(
                         ds_HYP["viewing_azimuth_angle"].values,
                     ]
                 )
-                meas.add_measurement(
-                    geometries,
-                    ds_HYP["acquisition_time"].values,
-                    reflectance,
-                    u_rand_reflectance=u_rand_refl,
-                    u_syst_reflectance=u_syst_refl,
-                    id=ds_HYP.attrs["sequence_id"]
-                )
+                try:
+                    meas.add_measurement(
+                        geometries,
+                        ds_HYP["acquisition_time"].values,
+                        reflectance,
+                        u_rand_reflectance=u_rand_refl,
+                        u_syst_reflectance=u_syst_refl,
+                        id=ds_HYP.attrs["sequence_id"],
+                    )
+                except:
+                    print("Could not add measurement from file: " + files[ii])
 
     return meas
 
-def read_hypernets_file(filepath, vza=None, vaa=None, vzamax=None, mask=True, filter_flags=True):
+
+def read_hypernets_file(
+    filepath, vza=None, vaa=None, vzamax=None, mask=True, filter_flags=True
+):
     ds_HYP = xr.open_dataset(filepath)
     if filter_flags:
         flagged = DatasetUtil.get_flags_mask_or(ds_HYP["quality_flag"], bad_flags)
@@ -118,12 +159,12 @@ def read_hypernets_file(filepath, vza=None, vaa=None, vzamax=None, mask=True, fi
             return None
 
     if (vza is not None) and (vaa is not None):
-        vzadiff = (ds_HYP["viewing_zenith_angle"].values - vza)
+        vzadiff = ds_HYP["viewing_zenith_angle"].values - vza
         if vza <= 2.5:
-            vaadiff = (np.abs(ds_HYP["viewing_azimuth_angle"].values - vaa % 180) % 180)
+            vaadiff = np.abs(ds_HYP["viewing_azimuth_angle"].values - vaa % 180) % 180
         else:
-            vaadiff = (np.abs(ds_HYP["viewing_azimuth_angle"].values - vaa % 360))
-        angledif_series = vzadiff ** 2 + vaadiff ** 2
+            vaadiff = np.abs(ds_HYP["viewing_azimuth_angle"].values - vaa % 360)
+        angledif_series = vzadiff**2 + vaadiff**2
         id_series = np.where(angledif_series == np.min(angledif_series))[0]
 
     elif vza is not None:
@@ -131,7 +172,9 @@ def read_hypernets_file(filepath, vza=None, vaa=None, vzamax=None, mask=True, fi
         id_series = np.where(angledif_series == np.min(angledif_series))[0]
 
     elif vaa is not None:
-        angledif_series = (np.abs(ds_HYP["viewing_azimuth_angle"].values - vaa % 360)) ** 2
+        angledif_series = (
+            np.abs(ds_HYP["viewing_azimuth_angle"].values - vaa % 360)
+        ) ** 2
         id_series = np.where(angledif_series == np.min(angledif_series))[0]
 
     else:
@@ -139,34 +182,67 @@ def read_hypernets_file(filepath, vza=None, vaa=None, vzamax=None, mask=True, fi
     ds_HYP = ds_HYP.isel(series=id_series)
 
     if vzamax is not None:
-        ds_HYP = ds_HYP.isel(series=np.where(ds_HYP["viewing_zenith_angle"].values < vzamax)[0])
+        ds_HYP = ds_HYP.isel(
+            series=np.where(ds_HYP["viewing_zenith_angle"].values < vzamax)[0]
+        )
 
     if mask:
         ds_HYP = mask_HYPERNETS_BRDF(ds_HYP)
 
-    if len(ds_HYP.series)>0:
+    if len(ds_HYP.series) > 0:
         return ds_HYP
 
 
-def filter_files_start_stop(files, start_time, stop_time, tod_start=None, tod_stop=None):
+def filter_files_start_stop(
+    files, start_time, stop_time, tod_start=None, tod_stop=None
+):
     start_time = convert_datetime(start_time)
     stop_time = convert_datetime(stop_time)
     files_out = []
 
     if tod_start is not None:
-        tod_start = datetime.datetime.strptime(tod_start, '%H%M').time()
+        tod_start = datetime.datetime.strptime(tod_start, "%H%M").time()
 
     if tod_stop is not None:
-        tod_stop = datetime.datetime.strptime(tod_stop, '%H%M').time()
+        tod_stop = datetime.datetime.strptime(tod_stop, "%H%M").time()
 
     for file in files:
-        ds_HYP = xr.open_dataset(file)
-        times=[datetime.datetime.utcfromtimestamp(timestamp) for timestamp in ds_HYP["acquisition_time"].values]
-        if (
-            min(times) > start_time
-            and max(times) < stop_time
-        ):
-            if (tod_start is None or min(times).time() > tod_start) and (tod_stop is None or max(times).time() < tod_stop):
+        try:
+            ds_HYP = xr.open_dataset(file)
+            times = [
+                datetime.datetime.utcfromtimestamp(timestamp)
+                for timestamp in ds_HYP["acquisition_time"].values
+            ]
+            if min(times) > start_time and max(times) < stop_time:
+                if (tod_start is None or min(times).time() > tod_start) and (
+                    tod_stop is None or max(times).time() < tod_stop
+                ):
+                    files_out.append(file)
+        except:
+            continue
+    return files_out
+
+def filter_files_quick(
+    files, start_time, stop_time, tod_start=None, tod_stop=None
+):
+    start_time = convert_datetime(start_time)
+    stop_time = convert_datetime(stop_time)
+    files_out = []
+
+    if tod_start is not None:
+        tod_start = datetime.datetime.strptime(tod_start, "%H%M").time()
+
+    if tod_stop is not None:
+        tod_stop = datetime.datetime.strptime(tod_stop, "%H%M").time()
+
+    for file in files:
+        time_stamp = file.split('\\')[5][3:11]
+        times = datetime.datetime.strptime(time_stamp, '%Y%m%d')
+            
+        if times > start_time and times < stop_time:
+            if (tod_start is None or times.time() > tod_start) and (
+                tod_stop is None or times.time() < tod_stop
+            ):
                 files_out.append(file)
     return files_out
 
@@ -174,21 +250,25 @@ def filter_files_start_stop(files, start_time, stop_time, tod_start=None, tod_st
 def mask_HYPERNETS_BRDF(ds_HYP):
 
     # mask_boom
-    mask_shadow = np.where(~((ds_HYP["viewing_azimuth_angle"].values > 345)|(ds_HYP["viewing_azimuth_angle"].values < 15)))[0]
-    ds_HYP = ds_HYP.isel(series=mask_shadow)
-
-
-    # mask feet and mast here using bitwise operators such as: | for or , & for and
     mask_shadow = np.where(
         ~(
-            (
-                (ds_HYP["viewing_azimuth_angle"].values > 225)
-                | (ds_HYP["viewing_azimuth_angle"].values < 90)
-            )
-            & (ds_HYP["viewing_zenith_angle"].values < 15)
+            (ds_HYP["viewing_azimuth_angle"].values > 345)
+            | (ds_HYP["viewing_azimuth_angle"].values < 15)
         )
     )[0]
     ds_HYP = ds_HYP.isel(series=mask_shadow)
+
+    # mask feet and mast here using bitwise operators such as: | for or , & for and
+    # mask_shadow = np.where(
+    #     ~(
+    #         (
+    #             (ds_HYP["viewing_azimuth_angle"].values > 225)
+    #             | (ds_HYP["viewing_azimuth_angle"].values < 90)
+    #         )
+    #         & (ds_HYP["viewing_zenith_angle"].values < 15)
+    #     )
+    # )[0]
+    # ds_HYP = ds_HYP.isel(series=mask_shadow)
 
     mask_shadow = np.where(
         ~(
@@ -200,7 +280,6 @@ def mask_HYPERNETS_BRDF(ds_HYP):
         )
     )[0]
     ds_HYP = ds_HYP.isel(series=mask_shadow)
-
 
     # mask sun shadow
 
@@ -221,29 +300,29 @@ def mask_HYPERNETS_BRDF(ds_HYP):
     )[0]
     ds_HYP = ds_HYP.isel(series=mask_shadow)
 
-    #additional mask for specific additional mast anomalies (AM)
-    mask_shadow = np.where(
-       ~(
-            (
-                (ds_HYP["viewing_azimuth_angle"].values > 15)
-                & (ds_HYP["viewing_azimuth_angle"].values < 30)
-            )
-            & (ds_HYP["viewing_zenith_angle"].values < 30)
-       )
-    )[0]
-    ds_HYP = ds_HYP.isel(series=mask_shadow)
-
-    #additional mask for single additional high anomaly (PM)
-    mask_shadow = np.where(
-       ~(
-            (
-                (ds_HYP["viewing_azimuth_angle"].values > 285)
-                & (ds_HYP["viewing_azimuth_angle"].values < 300)
-            )
-            & (ds_HYP["viewing_zenith_angle"].values < 15)
-       )
-    )[0]
-    ds_HYP = ds_HYP.isel(series=mask_shadow)
+    # additional mask for specific additional mast anomalies (AM)
+    # mask_shadow = np.where(
+    #    ~(
+    #         (
+    #             (ds_HYP["viewing_azimuth_angle"].values > 15)
+    #             & (ds_HYP["viewing_azimuth_angle"].values < 30)
+    #         )
+    #         & (ds_HYP["viewing_zenith_angle"].values < 30)
+    #    )
+    # )[0]
+    # ds_HYP = ds_HYP.isel(series=mask_shadow)
+    #
+    # #additional mask for single additional high anomaly (PM)
+    # mask_shadow = np.where(
+    #    ~(
+    #         (
+    #             (ds_HYP["viewing_azimuth_angle"].values > 285)
+    #             & (ds_HYP["viewing_azimuth_angle"].values < 300)
+    #         )
+    #         & (ds_HYP["viewing_zenith_angle"].values < 15)
+    #    )
+    # )[0]
+    # ds_HYP = ds_HYP.isel(series=mask_shadow)
 
     return ds_HYP
 
@@ -284,7 +363,7 @@ def read_data_CIMEL_ASCII(self, path):
 
 
 def convert_datetime(
-    date_time: Union[datetime.datetime, datetime.date, str, float, int, np.ndarray]
+    date_time: Union[datetime.datetime, datetime.date, str, float, int, np.ndarray],
 ) -> datetime.datetime:
     """
     Convert input datetimes to a datetime object
@@ -314,6 +393,7 @@ def convert_datetime(
             raise ValueError(
                 "Unable to discern datetime requested: '{}'".format(date_time)
             )
+
 
 if __name__ == "__main__":
     pass

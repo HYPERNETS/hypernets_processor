@@ -312,10 +312,9 @@ class RhymerAncillary:
         ## Bug fix for West longitudes 2024-06-08
         ## change from hypstar lon formaat (-180° to +180°) to GDAS (0° to 360°)
         if lon > 0:
-            lon360=lon
+            lon360 = lon
         else:
-            lon360=lon+360
-
+            lon360 = lon + 360
 
         ## date time
         now = datetime.datetime.utcnow()
