@@ -92,6 +92,12 @@ SITE_PERIODS = {
     "JSIT": [
         {
             "start_date": "2024-04-09",
+            "stop_date": "2025-07-01",
+            "HYPSTAR_SN": 222315,
+            "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat",
+        },
+        {
+            "start_date": "2025-07-01",
             "stop_date": "present",
             "HYPSTAR_SN": 222315,
             "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat",
@@ -170,15 +176,16 @@ SITE_PERIODS = {
             "HYPSTAR_SN": 222314,
             "comments": "v3 instrument",
         },
+        
     ],
 }
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'JAES':
+        if site != 'JSIT':
             continue
-        if period["stop_date"] != "present":
-            continue
+        #if period["stop_date"] != "present":
+         #   continue
         print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
         start_time = period["start_date"]
@@ -189,7 +196,7 @@ for site in SITE_PERIODS.keys():
         files = glob.glob(os.path.join(data_path, site, "*", "*", "*", "*", "*L2A*.nc"))
         print(files)
         for ii in range(len(start_tod)):
-            files = data_io.filter_files_start_stop(
+            files = data_io.filter_files_quick(
                 files,
                 start_time,
                 stop_time,
