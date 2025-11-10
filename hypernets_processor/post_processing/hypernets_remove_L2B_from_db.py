@@ -15,8 +15,9 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 # set your archive path, and database names
-archive_path = r"/archive/"
-#archive_path = r"C:\Users\pdv\data\insitu\hypernets\archive"
+archive_path = r"/archive/test/"
+# archive_path = r"C:\Users\pdv\data\insitu\hypernets\archive"
+
 archive_db = "archive.db"
 anomaly_db = "anomaly.db"
 metadata_db = "metadata.db"
@@ -26,7 +27,6 @@ metadata_db = "metadata.db"
 # To avoid being prompted, set these to the appropriate values for what you want to remove 
 # (see examples below)
 
-db_choice = None  # which db should be queried to identify sequences that should be removed (the selected sequences wil be removed from all three db)
 bad_sequence_list = None # instead of using a SQL query, it is also possible to provide manually a list of Sequence_names
 sql_query = None # Here provide using SQLite the conditions (i.e. the WHERE clause in SQL) for which you would like to remove sequences
 list_info = False # If True, show list of all the products/anomalies that will be removed (this is slower). If False, only sequence_name and product_dir will be shown.
@@ -56,22 +56,29 @@ db_choice = "anomaly"
 
 # bad_sequence_list = ["SEQ20231026T080128", "SEQ20231031T073028"]
 
-sql_query = "anomaly_id IN ('x', 'ms') AND site_id = 'WWUK'"
+sql_query = "site_id = 'JSIT'"
 
-
-
-def get_sequences(db_path, table_name, sql_query):
+def get_products(db_path, sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     sequences = []
-    for row in cursor.execute(f"SELECT sequence_name,rel_product_dir FROM {table_name} WHERE {sql_query}"):
+    for row in cursor.execute(f"SELECT sequence_name,rel_product_dir,product_name FROM products WHERE product_level='L_L2B' AND {sql_query}"):
         sequences.append(row)
     conn.close()
     sequences=np.array(sequences)
     if len(sequences)==0:
         return sequences
-    unique_ids=np.unique(sequences[:,0],return_index=True)[1]
+    unique_ids=np.unique(sequences[:,2],return_index=True)[1]
     sequences=sequences[unique_ids]
+    return sequences
+
+def get_amomalies_from_anomaly_db(db_path, sql_query):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    sequences = []
+    for row in cursor.execute(f"SELECT sequence_name,rel_product_dir,anomaly_id FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query}"):
+        sequences.append(row)
+    conn.close()
     return sequences
 
 def get_all_info(db_path, table_name, sequence_id):
@@ -87,16 +94,23 @@ def get_all_info(db_path, table_name, sequence_id):
     conn.close()
     return sequence_info
 
-def remove_sequence_from_db(db_path, table_name, sequence_id, metadata=False):
+def remove_from_anomaly_db(db_path, seq_name,sql_query):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND sequence_name='{seq_name}' AND {sql_query}")
+    conn.commit()
+    conn.close()
+
+def remove_product_from_db(db_path, table_name, product_name, metadata=False):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     if metadata:
         try:
-            cursor.execute(f"DELETE FROM {table_name} WHERE sequence_id=?", (sequence_id,))
+            cursor.execute(f"DELETE FROM {table_name} WHERE product_name=?", (product_name,))
         except:
-            print(f"sequence_id not found in {table_name} in metadata.db")
+            print(f"product_name not found in {table_name} in metadata.db")
     else:
-        cursor.execute(f"DELETE FROM {table_name} WHERE sequence_name=?", (sequence_id,))
+        cursor.execute(f"DELETE FROM {table_name} WHERE product_name=?", (product_name,))
     conn.commit()
     conn.close()
 
@@ -109,34 +123,26 @@ def load_table_names(db_a):
 def delete_files(file_path):
     if os.path.exists(file_path):
         try:
-            shutil.rmtree(file_path)
-            print(f"Deleted folder: {file_path}")
+            os.remove(file_path)
+            print(f"Deleted file: {file_path}")
         except Exception as e:
             print(f"Error deleting {file_path}: {e}")
     else:
         print(f"File/Folder does not exist: {file_path}")
 
-def main(archive_path=None, db_choice=None, bad_sequence_list=None, sql_query=None):
+def main(archive_path=None, bad_sequence_list=None, sql_query=None):
     if archive_path is None:
         archive_path = input("Enter the archive path (where the .db files are located): ").strip()
-    if db_choice is None:
-        db_choice = input("Select database (archive/anomaly): ").strip().lower()
-    db_file = archive_db if db_choice == "archive" else anomaly_db
+    db_file = archive_db 
     db_path = os.path.join(archive_path, db_file)
-    conn = sqlite3.connect(db_path)
-    table_names = load_table_names(conn)
-    conn.close()
     if bad_sequence_list is not None:
-        sql_query = f"sequence_name IN {str(tuple(bad_sequence_list))}"
+        sql_query = f"product_level = 'L_L2B' AND sequence_name IN {str(tuple(bad_sequence_list))}"
     elif sql_query is None:
         sql_query = input("Enter SQL WHERE clause to filter sequences (e.g., date < '2023-01-01'): ").strip()
-    sequences = get_sequences(db_path, table_names[0], sql_query)
-    print(f"Found {len(sequences)} sequences.")
+    sequences = get_products(db_path, sql_query)
+    print(f"Found {len(sequences)} products.")
     for idx, seq in enumerate(sequences):
-        if list_info:
-            print(f"[{idx}] ID: {seq[0]}, product_path: {seq[1]}, ids: {get_all_info(db_path, table_names[0], seq[0])}")
-        else:
-            print(f"[{idx}] ID: {seq[0]}, product_path: {seq[1]}")
+        print(f"[{idx}] ID: {seq[0]}, product_path: {seq[1]}, product: {seq[2]}")
 
     to_remove = input("Enter comma-separated indices of sequences to remove (or `*' for all): ").strip()
     if to_remove == "*":
@@ -146,8 +152,8 @@ def main(archive_path=None, db_choice=None, bad_sequence_list=None, sql_query=No
     
     for i in indices:
         seq = sequences[i]
-        delete_files(os.path.join(archive_path,seq[1]))
-    for db in [metadata_db,anomaly_db,archive_db]:
+        delete_files(os.path.join(archive_path,seq[1],seq[2]+".nc"))
+    for db in [metadata_db,archive_db]:
         db_path = os.path.join(archive_path, db)
         conn = sqlite3.connect(db_path)
         table_names = load_table_names(conn)
@@ -155,10 +161,28 @@ def main(archive_path=None, db_choice=None, bad_sequence_list=None, sql_query=No
         for table_name in table_names:
             for i in indices:
                 seq = sequences[i]
-                remove_sequence_from_db(db_path, table_name, seq[0], metadata=(db==metadata_db))
+                remove_product_from_db(db_path, table_name, seq[2], metadata=(db==metadata_db))
                 print(f"Sequence {seq[0]} removed from {table_name} in {db}.")
 
-    print(f"Sequences have been removed from all the db and files deleted.")
+    print(f"L2B products have been removed from archive db and files deleted.")
+    
+    db_path = os.path.join(archive_path, anomaly_db)
+    get_amomalies_from_anomaly_db(db_path,sql_query)
+
+    print(f"Found {len(sequences)} anomalies.")
+    for idx, seq in enumerate(sequences):
+        print(f"[{idx}] ID: {seq[0]}, product_path: {seq[1]}, anomaly: {seq[2]}")
+    to_remove = input("Enter comma-separated indices of sequences to remove (or `*' for all): ").strip()
+    if to_remove == "*":
+        indices = range(len(sequences))
+    else:
+        indices = [int(i) for i in to_remove.split(",") if i.isdigit()]
+    
+    for i in indices:
+        seq = sequences[i]
+        remove_from_anomaly_db(db_path, seq[0], sql_query)
+                
+    print(f"Sequences have been removed from anomaly db")
 
 if __name__ == "__main__":
-    main(archive_path, db_choice, bad_sequence_list, sql_query)
+    main(archive_path, bad_sequence_list, sql_query)

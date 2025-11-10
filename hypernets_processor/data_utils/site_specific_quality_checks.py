@@ -416,11 +416,11 @@ class SiteSpecificQualityChecks:
                 < 0.9 * irradiance[i_wav_550_model]
             ) or (
                 dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series]
-                > 1.1 * irradiance_noaer[i_wav_550_model_noaer]
+                > 1.05 * irradiance_noaer[i_wav_550_model_noaer]
             ):
                 self.context.anomaly_handler.add_anomaly("scl")
 
-        # performn correction for reflectance (to account for change in irradiance)
+        # perform correction for reflectance (to account for change in irradiance)
         for i_series in range(len(dataset_l2b.series.values)):
             sza = dataset_l2b.solar_zenith_angle.values[i_series]
             saa = dataset_l2b.solar_azimuth_angle.values[i_series]
