@@ -14,8 +14,10 @@ path2figs = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
 # path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
 
-import sqlite3
-from sqlite3 import Error
+include_sites = None
+include_sites = ["GHNA","WWUK","JSIT","JAES","LOBE"]
+start_date = "2022-01-01" #include all dates
+stop_date = None #include all dates
 
 
 def create_connection(path):
@@ -39,6 +41,24 @@ print(df["site_id"].unique())
 dbcon = create_connection("/{}/archive.db".format(path2files))
 SQL_Query = pd.read_sql_query("""select * from products""", dbcon)
 prods = pd.DataFrame(SQL_Query)
+
+#only select relevant sites and product levels
+if include_sites is None:
+    prodsel = prods
+else:
+    prodsel = prods[
+        prods["site_id"].str.contains(
+            "|".join(include_sites)
+        )
+    ]
+#only select valid date range
+prodsel.index = pd.to_datetime(prodsel.datetime_start, format='mixed')
+prodsel["date"] = prodsel.index.floor("D")
+prodsel["date"] = pd.to_datetime(prodsel.date)
+if start_date is not None:
+    prodsel = prodsel[prodsel.index >= pd.to_datetime(start_date)]
+if stop_date is not None:
+    prodsel = prodsel[prodsel.index <= pd.to_datetime(stop_date)]   
 
 for site in df["site_id"].unique():
     print(site)
