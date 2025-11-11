@@ -7,12 +7,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
-path2files = r"/archive/test"
-path2figs = r"/home/admin/post_processing/"
+# path2files = r"/archive/test"
+# path2figs = r"/home/admin/post_processing/"
 # path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
-# path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
+path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-# path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
+path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
 
 include_sites = None
 include_sites = ["GHNA","WWUK","JSIT","JAES","LOBE"]
@@ -60,7 +60,7 @@ if start_date is not None:
 if stop_date is not None:
     prodsel = prodsel[prodsel.index <= pd.to_datetime(stop_date)]   
 
-for site in df["site_id"].unique():
+for site in prodsel["site_id"].unique():
     print(site)
     prodsel = prods[prods["site_id"] == site]
     nseq = len(prodsel["sequence_name"].unique())
@@ -68,7 +68,7 @@ for site in df["site_id"].unique():
 
     dates=prodsel.datetime_start.unique()
     dates.sort()
-    sel_dates = pd.date_range(dates[2], dates[-1], freq="M").date
+    sel_dates = pd.date_range(dates[2], dates[-1], freq="ME").date
 
     fig = plt.figure(figsize=(10, 15))
     gs = GridSpec(nrows=2, ncols=2)
@@ -92,7 +92,7 @@ for site in df["site_id"].unique():
     dfsel["date"] = pd.to_datetime(dfsel.date)
     cross = pd.crosstab(dfsel.date, dfsel.anomaly_id)  # ,margins=True, dropna=False)
     cross["date"] = cross.index
-    cross = cross.resample("M", on="date").sum().reindex(sel_dates)
+    cross = cross.resample("ME", on="date").sum().reindex(sel_dates)
     cross.plot(kind="bar", ax=ax2, stacked=False)
     ax2.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Anomalies")
     ax2.set_ylabel("Number of sequences")

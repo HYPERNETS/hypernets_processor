@@ -7,12 +7,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
-path2files = r"/archive/test"
-path2figs = r"/home/admin/post_processing/"
+# path2files = r"/archive/test"
+# path2figs = r"/home/admin/post_processing/"
 # path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
-# path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
+path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-# path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
+path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
 
 include_sites = ["GHNA", "JSIT", "WWUK", "LOBE", "JAES"]
 start_date = "2022-01-01" #include all dates
@@ -69,23 +69,17 @@ plt.tight_layout()
 plt.savefig("{}/all_products_archive.png".format(path2figs))
 
 for site in prodsel["site_id"].unique():
-    prodsel = prodsel[prodsel["site_id"] == site]
-    prodsel = prodsel[
-        prodsel["product_level"].str.contains(
-            "L_L1B|L_L2A|L_L2B"
-        )
-    ]
-    print(site,prodsel.date.nanmin(), prodsel.date.nanmax())
+    prodsel_s = prodsel[prodsel["site_id"] == site]
 
-    sel_dates = pd.date_range(str(prodsel.date.min()), str(prodsel.date.max()), freq="M").date
+    sel_dates = pd.date_range(str(prodsel_s.date.min()), str(prodsel_s.date.max()), freq="ME").date
     
     fig = plt.figure(figsize=(15, 5))
     ax = fig.add_subplot(1, 1, 1)
     print(sel_dates)
 
-    cross = pd.crosstab(prodsel.date, prodsel.product_level)  # ,margins=True, dropna=False)
+    cross = pd.crosstab(prodsel_s.date, prodsel_s.product_level)  # ,margins=True, dropna=False)
     cross["date"] = cross.index
-    cross = cross.resample("M", on="date").sum().reindex(sel_dates)
+    cross = cross.resample("ME", on="date").sum().reindex(sel_dates)
     cross.plot(kind="bar", ax=ax, stacked=False)
     ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Products")
     ax.set_ylabel("Number of sequences")
