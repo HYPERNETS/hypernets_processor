@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
 path2files = r"/archive/test"
-path2figs = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+path2figs = r"/home/admin/post_processing/"
 # path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
 # path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
