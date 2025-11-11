@@ -7,10 +7,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
-path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
-path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
+path2files = r"/archive/test"
+path2figs = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+# path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
+# path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
+# path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
 
 include_sites = ["GHNA", "JSIT", "WWUK", "LOBE", "JAES"]
 start_date = "2022-01-01" #include all dates
