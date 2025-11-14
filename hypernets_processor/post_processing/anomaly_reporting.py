@@ -12,10 +12,13 @@ import matplotlib.dates as md
 # path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
 path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
+path2files = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Documents\MobaXterm\home"
 
 include_sites = None
 include_sites = ["GHNA","WWUK","JSIT","JAES","LOBE"]
+
+include_anomalies = None
+include_anomalies = ["cl","scl","nu", "nos", "val", "x"]
 start_date = "2022-01-01" #include all dates
 stop_date = None #include all dates
 
@@ -70,7 +73,7 @@ for site in prodsel["site_id"].unique():
     dates.sort()
     sel_dates = pd.date_range(dates[2], dates[-1], freq="ME").date
 
-    fig = plt.figure(figsize=(10, 15))
+    fig = plt.figure(figsize=(15, 10))
     gs = GridSpec(nrows=2, ncols=2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, :])
@@ -87,6 +90,12 @@ for site in prodsel["site_id"].unique():
     ax1.set_ylabel("Number of sequences")
     ax1.set_title("Anomalies for {} seqs. at {}".format(nseq, site))
 
+    if include_anomalies is not None:
+        dfsel = dfsel[
+            dfsel["anomaly_id"].str.contains(
+                "|".join(include_anomalies)
+            )
+        ]
     dfsel.index = pd.to_datetime(dfsel.datetime)
     dfsel["date"] = dfsel.index.floor("D")
     dfsel["date"] = pd.to_datetime(dfsel.date)

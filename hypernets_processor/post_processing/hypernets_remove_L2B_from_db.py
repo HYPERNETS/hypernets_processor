@@ -15,7 +15,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 # set your archive path, and database names
-archive_path = r"/archive/test/"
+archive_path = r"/archive/"
 # archive_path = r"C:\Users\pdv\data\insitu\hypernets\archive"
 
 archive_db = "archive.db"
@@ -56,7 +56,7 @@ db_choice = "anomaly"
 
 # bad_sequence_list = ["SEQ20231026T080128", "SEQ20231031T073028"]
 
-sql_query = "site_id = 'JSIT'"
+sql_query = "site_id = 'GHNA'"
 
 def get_products(db_path, sql_query):
     conn = sqlite3.connect(db_path)
@@ -152,17 +152,14 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
     
     for i in indices:
         seq = sequences[i]
+        # remove file
         delete_files(os.path.join(archive_path,seq[1],seq[2]+".nc"))
-    for db in [metadata_db,archive_db]:
-        db_path = os.path.join(archive_path, db)
-        conn = sqlite3.connect(db_path)
-        table_names = load_table_names(conn)
-        conn.close()
-        for table_name in table_names:
-            for i in indices:
-                seq = sequences[i]
-                remove_product_from_db(db_path, table_name, seq[2], metadata=(db==metadata_db))
-                print(f"Sequence {seq[0]} removed from {table_name} in {db}.")
+        #removem product from metadata db
+        db_path = os.path.join(archive_path, metadata_db)
+        remove_product_from_db(db_path, "L_L2B", seq[2], metadata=True)
+        #removem product from archive db
+        db_path = os.path.join(archive_path, archive_db)
+        remove_product_from_db(db_path, "products", seq[2], metadata=False)
 
     print(f"L2B products have been removed from archive db and files deleted.")
     
