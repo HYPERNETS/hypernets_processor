@@ -101,9 +101,7 @@ def remove_from_anomaly_db(db_path, seq_name,sql_query):
     conn.commit()
     conn.close()
 
-def remove_product_from_db(db_path, table_name, product_name, metadata=False):
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+def remove_product_from_db(cursor, table_name, product_name, metadata=False):
     if metadata:
         try:
             cursor.execute(f"DELETE FROM {table_name} WHERE product_name=?", (product_name,))
@@ -111,8 +109,7 @@ def remove_product_from_db(db_path, table_name, product_name, metadata=False):
             print(f"product_name not found in {table_name} in metadata.db")
     else:
         cursor.execute(f"DELETE FROM {table_name} WHERE product_name=?", (product_name,))
-    conn.commit()
-    conn.close()
+    
 
 def load_table_names(db_a):
     cursor_a = db_a.cursor()
@@ -154,13 +151,26 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
         seq = sequences[i]
         # remove file
         delete_files(os.path.join(archive_path,seq[1],seq[2]+".nc"))
-        #removem product from metadata db
-        db_path = os.path.join(archive_path, metadata_db)
-        remove_product_from_db(db_path, "L_L2B", seq[2], metadata=True)
-        #removem product from archive db
-        db_path = os.path.join(archive_path, archive_db)
-        remove_product_from_db(db_path, "products", seq[2], metadata=False)
+    
+    #removem product from metadata db
+    db_path = os.path.join(archive_path, metadata_db)
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    for i in indices:
+        seq = sequences[i]
+        remove_product_from_db(cursor, "L_L2B", seq[2], metadata=True)
+    conn.commit()
+    conn.close()
 
+    #removem product from archive db
+    db_path = os.path.join(archive_path, archive_db)
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    for i in indices:
+        seq = sequences[i]
+        remove_product_from_db(cursor, "products", seq[2], metadata=False)
+    conn.commit()
+    conn.close()
     print(f"L2B products have been removed from archive db and files deleted.")
     
     db_path = os.path.join(archive_path, anomaly_db)
