@@ -15,10 +15,12 @@ data. However, no site-specific QC has been applied in the processing to L2A.
 
 To ensure the highest quality of the L2A data over the Cal/Val sites, additional
 quality checks are applied to the data. This is done in two stages:
+
 1. An offline analysis is performed for each deployment period at each site, to identify
    periods with known issues (e.g. due to site heterogeneity, bad deployment conditions,
    unsuitable viewing or solar angles, etc). Based on this offline analysis, a range of config
    values are determined for each site and deployment period, which are then stored in the job.config file (see :ref:`config`).
+
 2. During processing to L2B, the site-specific quality checks are applied to the data,
    using the config values determined in the offline analysis. Only data suitable for Cal/Val
    are retained in the L2B data.
@@ -26,9 +28,13 @@ quality checks are applied to the data. This is done in two stages:
 Flags Set in the L2A Data
 -------------------------
 
-Data flagged in L2A and L1B data are removed, as detailed in the hypernets_processor documentation. 
-Specifically, the flags that are filtered out can be found in De Vis et al 2024, or 
-https://hypernets-processor.readthedocs.io/en/latest/content/atbd/products/flags.html.
+Data flagged with a critical issue in L2A and L1B data are removed. Specifically, the following flags are removed (see also :ref:`using_hypernets`)::
+
+   bad_flags=["pt_ref_invalid", "half_of_scans_masked", "not_enough_dark_scans", "not_enough_rad_scans",
+           "not_enough_irr_scans", "no_clear_sky_irradiance", "variable_irradiance",
+           "half_of_uncertainties_too_big", "discontinuity_VNIR_SWIR", "single_irradiance_used"]
+
+See :ref:`flags` for more information on these flags.
 
 Sequences Outside Any Valid Deployment Date Ranges
 --------------------------------------------------
@@ -48,6 +54,7 @@ Periods with Site Heterogeneity
 Homogeneous periods are defined using NDVI at vegetated sites. We first define a reference period through manual analysis 
 of images from sites and conversations with site owners and calculate the standard deviation of the NDVI in this period. 
 The homogeneous periods are then defined as periods where a rolling standard deviation of NDVI is below 1.5 times the reference standard deviation.
+Any measurements outside these homogeneous periods are removed.
 
 .. figure:: NDVI_LOBE.png
    :width: 600px
@@ -59,7 +66,7 @@ The homogeneous periods are then defined as periods where a rolling standard dev
 Unsuitable Viewing Zenith & Azimuth Angle
 -----------------------------------------
 
-Such angles with tolerances can be revealed as part of the offline analysis, or can be known by the site owner due to expert site knowledge, knowledge about the deployment, etc. 
+Such angles with tolerances can be revealed as part of the offline analysis (e.g. see Figure below), or can be known by the site owner due to expert site knowledge, knowledge about the deployment, etc. 
 To mask out shadows, there is also the option to specify the relative azimuth angle (shadows typically at 0 degrees) and to select all zenith angles smaller than the solar zenith angle.
 
 .. figure:: NDVI_JSIT.png
@@ -67,7 +74,7 @@ To mask out shadows, there is also the option to specify the relative azimuth an
    :align: center
    :alt: NDVI Timeseries for JSIT Jan – Jul 2025 coloured by viewing zenith angle
 
-   NDVI Timeseries for JSIT Jan – Jul 2025 coloured by viewing zenith angle, lower NDVI can be seen close to nadir (0 and 5 degrees).
+   NDVI Timeseries for JSIT Jan – Jul 2025 coloured by viewing zenith angle, lower NDVI can be seen close to nadir (0 and 5 degrees). Close to nadir the sensor is looking at bare soil next to the mast and this data is removed in L2B.
 
 Unsuitable Sun Zenith Angle
 --------------------------
@@ -106,7 +113,7 @@ Sequences with erroneous irradiances were spotted with the likely cause being a 
 More Stringent Clear Sky Check
 ------------------------------
 
-The improved clear sky consists of discarding any sequences where the measured irradiances (after correction for misalignment) are either more than 10% higher than the model without aerosols at 550 nm, or more than 10% smaller than the clear sky model with median aerosols. Note that various thresholds and aerosol loads were experimented with, and this combination was found to hold the best trade-off between masking erroneous sequences and wrongfully masking valid sequences.
+The improved clear sky consists of discarding any sequences where the measured irradiances (after correction for misalignment) are either more than 5% higher than the model without aerosols at 550 nm, or more than 10% smaller than the clear sky model with median aerosols. Note that various thresholds and aerosol loads were experimented with, and this combination was found to hold the best trade-off between masking erroneous sequences and wrongfully masking valid sequences.
 
 .. figure:: CLOUDY_SCENE_LOBE.png
    :width: 600px
