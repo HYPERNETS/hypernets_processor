@@ -172,6 +172,11 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
         seq = sequences[i]
         # remove file
         delete_files(os.path.join(archive_path,seq[1],seq[2]+".nc"))
+        #remove plots
+        glob_files = glob.glob(os.path.join(archive_path,seq[1],"plots/*L2B*.nc"))
+        if len(glob_files)>0:
+            for gf in glob_files:
+                delete_files(gf)    
     
     #removem product from metadata db
     db_path = os.path.join(archive_path, metadata_db)
