@@ -54,9 +54,9 @@ list_info = False # If True, show list of all the products/anomalies that will b
 db_choice = "anomaly"
 # db_choice = "archive"
 
-# bad_sequence_list = ["SEQ20231026T080128", "SEQ20231031T073028"]
+bad_sequence_list = ["SEQ20251114T110045"]
 
-sql_query = "site_id = 'GHNA' AND datetime_SEQ >= '2025-03-27'"
+# sql_query = "site_id = 'GHNA' AND datetime_SEQ >= '2025-03-27'"
 
 def get_products(db_path, sql_query):
     conn = sqlite3.connect(db_path)
