@@ -101,6 +101,15 @@ def remove_from_anomaly_db(db_path, seq_name,sql_query):
     conn.commit()
     conn.close()
 
+def remove_all_from_anomaly_db(cursor,sql_query):
+    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query}")
+
+def remove_all_from_metadata_db(cursor,sql_query):
+    cursor.execute(f"DELETE FROM L_L2B WHERE {sql_query}")
+
+def remove_all_from_archive_db(cursor,sql_query):
+    cursor.execute(f"DELETE FROM products WHERE product_level='L_L2B' AND {sql_query}")
+        
 def remove_product_from_db(cursor, table_name, product_name, metadata=False):
     if metadata:
         try:
@@ -156,9 +165,12 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
     db_path = os.path.join(archive_path, metadata_db)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    for i in indices:
-        seq = sequences[i]
-        remove_product_from_db(cursor, "L_L2B", seq[2], metadata=True)
+    if to_remove == "*":
+        remove_all_from_metadata_db(cursor, sql_query)
+    else:
+        for i in indices:
+            seq = sequences[i]
+            remove_product_from_db(cursor, "L_L2B", seq[2], metadata=True)
     conn.commit()
     conn.close()
 
@@ -166,9 +178,12 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
     db_path = os.path.join(archive_path, archive_db)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    for i in indices:
-        seq = sequences[i]
-        remove_product_from_db(cursor, "products", seq[2], metadata=False)
+    if to_remove == "*":
+        remove_all_from_archive_db(cursor, sql_query)
+    else:
+        for i in indices:
+            seq = sequences[i]
+            remove_product_from_db(cursor, "products", seq[2], metadata=False)
     conn.commit()
     conn.close()
     print(f"L2B products have been removed from archive db and files deleted.")
