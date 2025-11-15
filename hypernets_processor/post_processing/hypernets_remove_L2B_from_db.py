@@ -56,8 +56,7 @@ db_choice = "anomaly"
 
 # bad_sequence_list = ["SEQ20231026T080128", "SEQ20231031T073028"]
 
-sql_query = "site_id = 'GHNA'"
-
+e
 def get_products(db_path, sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
