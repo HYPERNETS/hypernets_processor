@@ -56,7 +56,7 @@ db_choice = "anomaly"
 
 #bad_sequence_list = ["SEQ20251114T110045"]
 
-sql_query = "site_id = 'JAES'"
+sql_query = "site_id = 'JSIT' and datetime_SEQ < '2025-03-10' and datetime_SEQ >= '2024-11-27'"
 
 def get_products(db_path, sql_query):
     conn = sqlite3.connect(db_path)
@@ -165,7 +165,7 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
     db_path = os.path.join(archive_path, metadata_db)
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    if to_remove == "*":
+    if to_remove == "*" and "datetime" not in sql_query:
         remove_all_from_metadata_db(cursor, sql_query)
     else:
         for i in indices:
