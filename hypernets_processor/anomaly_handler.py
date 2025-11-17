@@ -43,6 +43,7 @@ class AnomalyHandler:
 
         self.anomalies_dict = anomalies_dict
         self.anomalies_added = []
+        self.anomalies_SEQ = []
 
     def add_anomaly(self, anomaly_id, ds=None):
         """
@@ -63,6 +64,9 @@ class AnomalyHandler:
 
         # Add anomaly to list of anomalies added during current processing
         self.anomalies_added.append(anomaly_id)
+
+        # Add anomaly to list of anomalies for current sequence
+        self.anomalies_SEQ.append(anomaly_id)
 
         # Add anomaly to db
         if self.anomaly_db is not None:
