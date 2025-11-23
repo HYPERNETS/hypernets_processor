@@ -233,7 +233,7 @@ def filter_files_quick(
         tod_stop = datetime.datetime.strptime(tod_stop, "%H%M").time()
 
     for file in files:
-        time_stamp = file.split('\\')[5][3:11]
+        time_stamp = file.split('\\')[-2][3:11]
         times = datetime.datetime.strptime(time_stamp, '%Y%m%d')
             
         if times > start_time and times < stop_time:

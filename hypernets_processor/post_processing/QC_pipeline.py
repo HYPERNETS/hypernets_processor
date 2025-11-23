@@ -108,6 +108,9 @@ def sza_vza_bin_and_calc(
         62.5,
         67.5,
         72.5,
+        77.5,
+        82.5,
+        87.5,
     ]
     bin_centers = [(bins[i] + bins[i + 1]) / 2 for i in range(len(bins) - 1)]
 
@@ -702,6 +705,26 @@ class PostProcessingDataset:
             | (self.labelled_radiance["raa"] > 360 - raa_limit)
         ]:
             x.append(6)
+        
+    def raa_180_cut(self, raa_limit):
+        bad_inds = []
+        for i in range(len(self.radiance)):
+            raa = self.radiance["raa"][i]
+            if (raa < raa_limit + 180) & (raa > 180 - raa_limit):
+                bad_index = i
+                bad_inds.append(bad_index)
+            else:
+                continue
+
+        cleaned_data = self.radiance.drop(bad_inds)
+        cleaned_data.reset_index(drop=True, inplace=True)
+        self.radiance = cleaned_data
+
+        for x in self.labelled_radiance["post_processing_flags"].loc[
+            (self.labelled_radiance["raa"] < raa_limit)
+            | (self.labelled_radiance["raa"] > 360 - raa_limit)
+        ]:
+            x.append(7)
 
     def clean_irr(self):
         IDs = self.irradiance["ID"]
@@ -1881,7 +1904,7 @@ class PostProcessingDataset:
         x = self.radiance.datetimes.values
         y = self.radiance.ndvi.values
         dates = self.radiance['date']
-        summer_dates = [dat for dat in dates if dat[4:6] == '06' or dat[4:6] == '07' or dat[4:6] == '08']
+        summer_dates = [dat for dat in dates if dat[4:6] == '07' or dat[4:6] == '08']#'07' or dat[4:6] == '08']
         summer_y = [v for i, v in enumerate(y) if dates[i] in summer_dates]
         y_mean = np.nanmean(summer_y)
         y_std = np.nanstd(summer_y)
@@ -2026,6 +2049,9 @@ def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, r
     print("SZA", len(dataset.radiance))
     dataset.raa_cut(raa_limit)
     print("RAA", len(dataset.radiance))
+    if dataset.site == "PEAN":
+        dataset.raa_180_cut(20)
+        print('RAA Opposite', len(dataset.radiance))
     if dataset.site == "JSIT":
         dataset.vza_check(7)
         print('VZA', len(dataset.radiance))
@@ -2194,11 +2220,11 @@ for k, v in JSIT_dict.items():
     new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
                      fit_method = 'bounds', split_by_date = True, start = v[0], end = v[1])
 '''
-QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None.csv',
-                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/GHNAv3_irradiance.csv',
+QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/PEAN_2023-12-30_2024-01-23_None_None_None_None.csv',
+                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/PEANv3_irradiance.csv',
                             r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
-                            'GHNA',
-                            f'GHNA_2023Oct_2025Aug',
+                            'PEAN',
+                            f'PEAN_2023Dec_2024Jan',
                             'median',
                            '550')
 GHNA_maintenance_dates = [
@@ -2226,8 +2252,9 @@ GHNA_maintenance_dates = [
 WWUK_maintenance_dates = []
 JAES_maintenance_dates = []
 LOBE_maintenance_dates = []
+PEAN_maintenance_dates = []
 
-#ndvi_bound_calculator(QC, LOBE_maintenance_dates, 60, 10)
+#ndvi_bound_calculator(QC, JAES_maintenance_dates, 60, 10)
 #misalignment_correction_writer(QC,  (1.96, 1.28), (-72.2, -36.4), (1.009, 1.011), True, '20240521')
 
 #QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv',
@@ -2256,7 +2283,13 @@ LOBE_maintenance_dates = []
 #new_plane_pipeline(QC, JSIT_maintenance_dates, 60, 10,
  #                  1.67, 8.9, 0.972,
   #                 False,
-   #                split_by_date = True, start = '20241114', end = '20250801', 
+   #                split_by_date = True, start = '20250701', end = '20250801',
+    #               fit_method = 'bounds')
+    
+#new_plane_pipeline(QC, JAES_maintenance_dates, 60, 10,
+ #                  4.68, 20.0, 0.942,
+  #                 False,
+   #                split_by_date = True, start = '20250704', end = '20250903',
     #               fit_method = 'bounds')
 
 #new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10,
@@ -2265,6 +2298,13 @@ LOBE_maintenance_dates = []
    #                0.996,
     #               False,
      #              fit_method = 'bounds')
+     
+new_plane_pipeline(QC, PEAN_maintenance_dates, 80, 10,
+                   0.96,
+                   99.4,
+                   0.997,
+                   False,
+                   fit_method = 'bounds')
 
 #new_plane_pipeline(QC, WWUK_maintenance_dates,
  #                  60, 10,
@@ -2272,11 +2312,11 @@ LOBE_maintenance_dates = []
    #                split_by_date = True, start = '20230429', end = '20231101',
     #               fit_method = 'bounds')
 
-#irradiance_analysis_writer(QC, LOBE_maintenance_dates, 70, 10,
- #                          'irradiance_LOBEv3_analysis',
+#irradiance_analysis_writer(QC, PEAN_maintenance_dates, 80, 10,
+ #                          'irradiance_PEAN_2023Dec_2024Jan_analysis',
   #                         [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
 
-ndvi_bound_calculator(QC, GHNA_maintenance_dates, 60, 10)
+#ndvi_bound_calculator(QC, GHNA_maintenance_dates, 60, 10)
 #new_plane_pipeline(QC, JAES_maintenance_dates,
  #                  60, 10,
   #                 1.23, 42.2, 0.989,

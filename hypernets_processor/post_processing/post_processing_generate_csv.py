@@ -63,6 +63,12 @@ SITE_PERIODS = {
         },
         {
             "start_date": "2023-10-26",
+            "stop_date": "2025-10-15",
+            "HYPSTAR_SN": 222316,
+            "comments": "v3 instrument",
+        },
+        {
+            "start_date": "2025-10-15",
             "stop_date": "present",
             "HYPSTAR_SN": 222316,
             "comments": "v3 instrument",
@@ -84,6 +90,12 @@ SITE_PERIODS = {
         },
         {
             "start_date": "2024-11-13",
+            "stop_date": "2025-06-16",
+            "HYPSTAR_SN": 222317,
+            "comments": "",
+        },
+        {
+            "start_date": "2025-06-16",
             "stop_date": "present",
             "HYPSTAR_SN": 222317,
             "comments": "",
@@ -92,6 +104,12 @@ SITE_PERIODS = {
     "JSIT": [
         {
             "start_date": "2024-04-09",
+            "stop_date": "2025-01-01",
+            "HYPSTAR_SN": 222315,
+            "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat",
+        },
+        {
+            "start_date": "2025-01-01",
             "stop_date": "2025-07-01",
             "HYPSTAR_SN": 222315,
             "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat",
@@ -182,10 +200,10 @@ SITE_PERIODS = {
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'JSIT':
+        if site != 'GHNA':
             continue
-        #if period["stop_date"] != "present":
-         #   continue
+        if period["stop_date"] != "present":
+            continue
         print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
         start_time = period["start_date"]
