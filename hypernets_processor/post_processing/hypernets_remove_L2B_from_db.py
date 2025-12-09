@@ -98,14 +98,14 @@ def get_all_info(db_path, table_name, sequence_id):
 def remove_from_anomaly_db(db_path, seq_name,sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND sequence_name='{seq_name}' AND {sql_query}")
+    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND sequence_name='{seq_name}' AND {sql_query.replace('datetime_SEQ','datetime')}")
     conn.commit()
     conn.close()
 
 def remove_all_from_anomaly_db(db_path,sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query}")
+    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query.replace('datetime_SEQ','datetime')}")
     conn.commit()
     conn.close()
 
