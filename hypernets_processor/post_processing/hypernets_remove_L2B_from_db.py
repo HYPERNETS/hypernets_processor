@@ -193,7 +193,7 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
         conn.commit()
         conn.close()
 
-    #removem product from archive db
+    #remove product from archive db
     db_path = os.path.join(archive_path, archive_db)
     
     if to_remove == "*":
@@ -209,7 +209,7 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
     print(f"L2B products have been removed from archive db and files deleted.")
     
     db_path = os.path.join(archive_path, anomaly_db)
-    get_amomalies_from_anomaly_db(db_path,sql_query)
+    sequences = get_amomalies_from_anomaly_db(db_path,sql_query)
 
     print(f"Found {len(sequences)} anomalies.")
     for idx, seq in enumerate(sequences):
