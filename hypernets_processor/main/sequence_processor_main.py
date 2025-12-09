@@ -245,7 +245,7 @@ def main(processor_config, job_config, to_archive, parallel=None):
         msg = "No sequences to process"
 
     else:
-        success = np.zeros_like(target_sequences, dtype=int)
+        success = np.zeros_like(target_sequences, dtype=str)
 
         for i, target_sequence in enumerate(target_sequences):
             success[i] = run_sequence((target_sequence, context, logger))
