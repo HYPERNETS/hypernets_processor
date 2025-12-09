@@ -76,6 +76,7 @@ def get_amomalies_from_anomaly_db(db_path, sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     sequences = []
+    print(f"SELECT sequence_name,rel_product_dir,anomaly_id FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query.replace('datetime_SEQ','datetime')}")
     for row in cursor.execute(f"SELECT sequence_name,rel_product_dir,anomaly_id FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query.replace('datetime_SEQ','datetime')}"):
         sequences.append(row)
     conn.close()
