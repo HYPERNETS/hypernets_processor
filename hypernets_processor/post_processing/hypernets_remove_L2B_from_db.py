@@ -56,7 +56,7 @@ db_choice = "anomaly"
 
 #bad_sequence_list = ["SEQ20251114T110045"]
 
-sql_query = "site_id = 'L2B' and datetime_SEQ >= '2025-09-01'"
+sql_query = "site_id = 'GHNA' and datetime_SEQ >= '2025-09-01'"
 
 def get_products(db_path, sql_query):
     conn = sqlite3.connect(db_path)
