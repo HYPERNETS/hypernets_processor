@@ -96,8 +96,8 @@ def get_target_sequences(context, to_archive):
             for anomaly in context.anomaly_db["anomalies"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if (anomaly["anomaly_id"] in context.anomaly_handler.get_crashing_anomaly_ids()) and anomaly["anomaly_id"]!="m"
-            and not context.get_config_value("reprocess_anomalies")
+            if ((anomaly["anomaly_id"] in context.anomaly_handler.get_crashing_anomaly_ids()) and anomaly["anomaly_id"]!="m"
+            and not context.get_config_value("reprocess_anomalies"))
         ]
 
         if context.get_config_value("verbose"):
