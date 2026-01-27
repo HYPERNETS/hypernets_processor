@@ -251,11 +251,11 @@ def main(processor_config, job_config, to_archive, parallel=None):
             success[i] = run_sequence((target_sequence, context, logger))
 
         msg = (
-            str(np.sum(success[np.where(success == "L2B")]))
+            str(np.count_nonzero(success == "L2B"))
             + "/"
             + str(target_sequences_total)
             + " sequences successfully processed to L2B and an additional"
-            + str(np.sum(success[np.where(success == "L2A")]))
+            + str(np.count_nonzero(success == "L2A"))
             + "/"
             + str(target_sequences_total)
             + " sequences successfully processed to L2A (but failed to reach L2B)."
