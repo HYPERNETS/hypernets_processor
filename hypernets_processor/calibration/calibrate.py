@@ -113,6 +113,11 @@ class Calibrate:
             )
             dataset_l1a[measurandstring].values = measurand
 
+        # add keys containing calibration file info
+        for key in calibration_data.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                dataset_l1a.attrs[key] = calibration_data.attrs[key]
+
         if self.context.get_config_value("write_l1a"):
             self.writer.write(
                 dataset_l1a,
@@ -206,6 +211,11 @@ class Calibrate:
             * dataset_l0b["std_digital_number"].values
             / dataset_l0b["digital_number"].values
         )
+
+        # add keys containing calibration file info
+        for key in calibration_data.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                dataset_l1b.attrs[key] = calibration_data.attrs[key]
 
         if self.context.get_config_value("network") == "w":
             dataset_l1b = dataset_l1b.drop("n_valid_scans_SWIR")

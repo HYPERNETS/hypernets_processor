@@ -362,6 +362,7 @@ class RhymerHypstar:
         # because we average to Lu scan we propagate values from radiance!
         dataset_l1flags = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
 
+
         # print(pd.DataFrame(du.unpack_flags(dataset_l1b['quality_flag']).to_dataframe()))
         # No temporal quality checks but check if downwelling radiance varies by less than 10%
         dataset_l1flags, flags_rad = self.qual.qc_scan(
@@ -414,5 +415,9 @@ class RhymerHypstar:
         L1c_int.attrs["nld"] = dataset_l1flags.attrs["nld"]
         L1c_int.attrs["nlu"] = dataset_l1flags.attrs["nlu"]
         # L1c_int.attrs["ned"] = dataset_l1flags.attrs["ned"]
+
+        for key in L1b_irr.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                L1c_int.attrs[key] = L1b_irr.attrs[key]
 
         return L1c_int
