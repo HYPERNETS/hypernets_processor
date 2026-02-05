@@ -205,6 +205,7 @@ def run_sequence(inputs):
             context.anomaly_handler.anomalies_SEQ.clear()
             return "L2A"
         else:
+            context.anomaly_handler.anomalies_SEQ.clear()
             return "L1"
 
 def main(processor_config, job_config, to_archive, parallel=None):
@@ -248,14 +249,14 @@ def main(processor_config, job_config, to_archive, parallel=None):
         success = np.zeros_like(target_sequences, dtype=str)
 
         for i, target_sequence in enumerate(target_sequences):
-            success[i] = run_sequence((target_sequence, context, logger))
+            success[i] = run_sequence((target_sequence, context, logger)).lower()
 
         msg = (
-            str(np.count_nonzero(success == "L2B"))
+            str(np.count_nonzero(success == "l2b"))
             + "/"
             + str(target_sequences_total)
             + " sequences successfully processed to L2B and an additional"
-            + str(np.count_nonzero(success == "L2A"))
+            + str(np.count_nonzero(success == "l2a"))
             + "/"
             + str(target_sequences_total)
             + " sequences successfully processed to L2A (but failed to reach L2B)."
