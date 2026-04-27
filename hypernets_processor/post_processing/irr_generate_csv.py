@@ -146,7 +146,7 @@ def make_irrs(file_list, wav_val):
 
 ##running
 
-files = glob.glob(os.path.join(data_path, "GHNA", "*", "*", "*", "*", "*L1B_IRR*.nc"))
+files = glob.glob(os.path.join(data_path, "GHNA", "2025", "*", "*", "*", "*L1B_IRR*.nc"))
 
 print("Files In")
 

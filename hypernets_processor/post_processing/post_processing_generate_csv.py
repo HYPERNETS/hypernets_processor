@@ -200,7 +200,7 @@ SITE_PERIODS = {
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'GHNA':
+        if site != 'LOBE':
             continue
         if period["stop_date"] != "present":
             continue

@@ -2049,9 +2049,9 @@ def new_plane_pipeline(dataset: PostProcessingDataset, maintenance, sza_limit, r
     print("SZA", len(dataset.radiance))
     dataset.raa_cut(raa_limit)
     print("RAA", len(dataset.radiance))
-    if dataset.site == "PEAN":
-        dataset.raa_180_cut(20)
-        print('RAA Opposite', len(dataset.radiance))
+    #if dataset.site == "PEAN":
+     #   dataset.raa_180_cut(20)
+      #  print('RAA Opposite', len(dataset.radiance))
     if dataset.site == "JSIT":
         dataset.vza_check(7)
         print('VZA', len(dataset.radiance))
@@ -2254,7 +2254,7 @@ JAES_maintenance_dates = []
 LOBE_maintenance_dates = []
 PEAN_maintenance_dates = []
 
-#ndvi_bound_calculator(QC, JAES_maintenance_dates, 60, 10)
+#ndvi_bound_calculator(QC, GHNA_maintenance_dates, 60, 10)
 #misalignment_correction_writer(QC,  (1.96, 1.28), (-72.2, -36.4), (1.009, 1.011), True, '20240521')
 
 #QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/GHNA_2023-10-26_present_None_None_None_None_misalign_corrected.csv',
@@ -2293,18 +2293,18 @@ PEAN_maintenance_dates = []
     #               fit_method = 'bounds')
 
 #new_plane_pipeline(QC, GHNA_maintenance_dates, 60, 10,
- #                  1.01,
-  #                 96.7,
-   #                0.996,
+ #                  0,
+  #                 0,
+   #                1,
     #               False,
      #              fit_method = 'bounds')
      
-new_plane_pipeline(QC, PEAN_maintenance_dates, 80, 10,
-                   0.96,
-                   99.4,
-                   0.997,
-                   False,
-                   fit_method = 'bounds')
+#new_plane_pipeline(QC, PEAN_maintenance_dates, 80, 10,
+ #                  0.96,
+  #                 99.4,
+   #                0.997,
+    #              False,
+     #               fit_method = 'bounds')
 
 #new_plane_pipeline(QC, WWUK_maintenance_dates,
  #                  60, 10,
@@ -2312,9 +2312,9 @@ new_plane_pipeline(QC, PEAN_maintenance_dates, 80, 10,
    #                split_by_date = True, start = '20230429', end = '20231101',
     #               fit_method = 'bounds')
 
-#irradiance_analysis_writer(QC, PEAN_maintenance_dates, 80, 10,
- #                          'irradiance_PEAN_2023Dec_2024Jan_analysis',
-  #                         [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
+irradiance_analysis_writer(QC, PEAN_maintenance_dates, 80, 10,
+                           'irradiance_PEAN_2023Dec_2024Jan_analysis',
+                           [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
 
 #ndvi_bound_calculator(QC, GHNA_maintenance_dates, 60, 10)
 #new_plane_pipeline(QC, JAES_maintenance_dates,

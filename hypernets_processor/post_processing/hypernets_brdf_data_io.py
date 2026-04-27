@@ -6,7 +6,7 @@ __author__ = [
 ]
 __all__ = []
 
-from brdf_model import BRDFMeasurementsSpectra
+from pydirectional import BRDFMeasurements
 import glob
 import os
 import xarray as xr
@@ -39,7 +39,7 @@ def read_data_hypernets(
     vza=None,
     vaa=None,
     filter_flags=True,
-) -> BRDFMeasurementsSpectra:
+) -> BRDFMeasurements:
     """
     Function to read full HYPERNETS dataset
 
@@ -92,16 +92,28 @@ def read_data_hypernets(
         axis=0,
     )
 
-    meas = BRDFMeasurementsSpectra(
-        ds_HYP["wavelength"].values,
-        geometries,
-        ds_HYP["acquisition_time"].values,
-        reflectance,
-        u_rand_refl,
-        u_syst_refl,
-        corr_reflectances_wav=corr_reflectances_wav,
-        ids=ds_HYP.attrs["sequence_id"],
+    meas = BRDFMeasurements(
+        reflectance=reflectance,
+        measurand="BRF",
+        reflectance_dims=["wavelength", "angle_index"],
+        solar_zenith_angle=geometries[0],
+        viewing_zenith_angle=geometries[1],
+        solar_azimuth_angle=geometries[2],
+        viewing_azimuth_angle=geometries[3],
+        wavelength=ds_HYP["wavelength"].values,
+        u_rand_reflectance=u_rand_refl,
+        u_syst_reflectance=u_syst_refl,
+        err_corr_along_wav=corr_reflectances_wav,
+        acquisition_times=ds_HYP["acquisition_time"].values,
+        acquisition_time_dims=["angle_index"],
     )
+    
+    ids=ds_HYP.attrs["sequence_id"]
+    if hasattr(meas.get_solar_zenith_angle(), "__len__") and len(meas.get_solar_zenith_angle()) > 1 and len(meas.get_angles()) != len(ids):
+        meas.ds["ids"] = np.repeat(ids, len(geometries[0]))
+    else:
+        meas.ds["ids"] = np.array(ids)
+
 
     if i is None:
         for ii in range(1, len(files)):
@@ -132,13 +144,22 @@ def read_data_hypernets(
                     ]
                 )
                 meas.add_measurement(
-                    geometries,
-                    ds_HYP["acquisition_time"].values,
-                    reflectance,
+                    reflectance=reflectance,
+                    solar_zenith_angle=geometries[0],
+                    viewing_zenith_angle=geometries[1],
+                    solar_azimuth_angle=geometries[2],
+                    viewing_azimuth_angle=geometries[3],
+                    wavelength=ds_HYP["wavelength"].values,
                     u_rand_reflectance=u_rand_refl,
                     u_syst_reflectance=u_syst_refl,
-                    id=ds_HYP.attrs["sequence_id"],
+                    acquisition_times=ds_HYP["acquisition_time"].values,
                 )
+                
+                ids=ds_HYP.attrs["sequence_id"]
+                if hasattr(meas.get_solar_zenith_angle(), "__len__") and len(meas.get_solar_zenith_angle()) > 1 and len(meas.get_angles()) != len(ids):
+                    meas.ds["ids"] = np.hstack((meas.ds["ids"].values, np.repeat(ids, len(geometries[0]))))
+                else:
+                    meas.ds["ids"] = np.hstack((meas.ds["ids"].values, np.array(ids)))
 
     return meas
 
@@ -335,7 +356,7 @@ def read_data_hypernets_sequence(self, path):
     pass
 
 
-def read_data_CIMEL(self, path, start_time, stop_time) -> BRDFMeasurementsSpectra:
+def read_data_CIMEL(self, path, start_time, stop_time) -> BRDFMeasurements:
     """
     Function to read CIMEL dataset
 
