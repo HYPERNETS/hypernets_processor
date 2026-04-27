@@ -96,8 +96,8 @@ def get_target_sequences(context, to_archive):
             for anomaly in context.anomaly_db["anomalies"].find(
                 site_id=context.get_config_value("site_id")
             )
-            if (anomaly["anomaly_id"] in context.anomaly_handler.get_crashing_anomaly_ids()) and anomaly["anomaly_id"]!="m"
-            and not context.get_config_value("reprocess_anomalies")
+            if ((anomaly["anomaly_id"] in context.anomaly_handler.get_crashing_anomaly_ids()) and anomaly["anomaly_id"]!="m"
+            and not context.get_config_value("reprocess_anomalies"))
         ]
 
         if context.get_config_value("verbose"):
@@ -178,31 +178,34 @@ def run_sequence(inputs):
         # profiler.disable()
         # stats = pstats.Stats(profiler).sort_stats('tottime')
         # stats.print_stats(100)
-        if context.anomaly_handler.anomalies_added is not []:
+        if context.anomaly_handler.anomalies_SEQ is not []:
             context.logger.info(
-                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)
+                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_SEQ)
             )
 
         context.logger.info(target_sequence + " Complete")
         del sp
         gc.collect()
-        return 1
+        return context.get_config_value("max_level")
 
     except Exception as e:
         print("Exception occurred during processing of sequence: " + target_sequence)
         context.anomaly_handler.add_x_anomaly()
-        
-        if context.anomaly_handler.anomalies_added is not []:
+
+        if context.anomaly_handler.anomalies_SEQ is not []:
             context.logger.info(
-                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_added)
+                "Processing Anomalies: " + str(context.anomaly_handler.anomalies_SEQ)
             )
 
         logger.error(target_sequence + "Failed: " + repr(e))
         logger.info(traceback.format_exc())
         del sp
         gc.collect()
-        return 0
-
+        if np.any([anomaly in ['per','val','tod','hsn','scl','npr','man','wns','nos','hos'] for anomaly in context.anomaly_handler.anomalies_SEQ]):
+            context.anomaly_handler.anomalies_SEQ.clear()
+            return "L2A"
+        else:
+            return "L1"
 
 def main(processor_config, job_config, to_archive, parallel=None):
     """
@@ -242,16 +245,20 @@ def main(processor_config, job_config, to_archive, parallel=None):
         msg = "No sequences to process"
 
     else:
-        success = np.zeros_like(target_sequences, dtype=int)
+        success = np.zeros_like(target_sequences, dtype=str)
 
         for i, target_sequence in enumerate(target_sequences):
             success[i] = run_sequence((target_sequence, context, logger))
 
         msg = (
-            str(np.sum(success))
+            str(np.count_nonzero(success == "L2B"))
             + "/"
             + str(target_sequences_total)
-            + " sequences successfully processed"
+            + " sequences successfully processed to L2B and an additional"
+            + str(np.count_nonzero(success == "L2A"))
+            + "/"
+            + str(target_sequences_total)
+            + " sequences successfully processed to L2A (but failed to reach L2B)."
         )
 
     return msg

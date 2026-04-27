@@ -61,7 +61,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - system longitude
      - longitude of site
    * - angle2use
-     - Ange used to compute the viewing geometry (i.e. pt_ref is the pan and tilt angles with the HYPSTAR as reference - use offset pan and tilt to retrieve viewing geometry with true North)
+     - Angle used to compute the viewing geometry (i.e. pt_ref is the pan and tilt angles with the HYPSTAR as reference - use offset pan and tilt to retrieve viewing geometry with true North)
      - pt_ref, pt_ask or pt_abs
 
 **Table 2: Processor**
@@ -84,7 +84,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - 0 no uncertainties, suggested > 100 when uncertainties
    * - max_level
      - maximum level of processing
-     - Default: L2A
+     - Default: L2B
    * - uncertainty_l1a
      - uncertainty computation of the level L1A
      - Default: False
@@ -92,7 +92,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - wavelength ranges for which uncertainties are expected to be high and ignored when triggering flags and anomalies
      - Default: 757.5-767.5, 1350-1390
    * - delay_hours
-     - minimum delay between sequence aquisition and processing (e.g. to allow time for ancillary data download)
+     - minimum delay between sequence acquisition and processing (e.g. to allow time for ancillary data download)
      - Default: 48
    * - verbose
      - printing warnings and errors in terminal
@@ -100,6 +100,9 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - archive_directory
      - directory where products will be saved when running automated processing
      -
+   * - reprocess_from
+     - Optional processing level from which to restart reprocessing (overrides defaults if set)
+     - e.g. L1B
 
 
 **Table 3: Databases**
@@ -225,7 +228,7 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
      - e.g. previous or linear
    * - calibration_file_version
      - version of the calibration file to be used
-     - e.g. 2.1
+     - e.g. 2.4
 
 **Table 8: Interpolate**
 
@@ -544,6 +547,12 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - archive_directory
      - directory where products will be saved when running automated processing
      -
+   * - delay_hours
+     - minimum delay between sequence acquisition and processing (e.g. to allow time for ancillary data download)
+     - e.g. 1
+   * - reprocess_from
+     - Optional processing level from which to restart reprocessing (overrides defaults if set)
+     - e.g. L1B
 
 **Table 3: Databases**
 
@@ -741,6 +750,12 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - write_l2a
      - Write output file L2A
      - Default: True
+   * - write_l2b
+     - Write output file L2B
+     - Default: True
+   * - write_l1d
+     - Write output file L1D
+     - Default: True
 
 **Table 12: Plotting**
 
@@ -778,6 +793,12 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - plot_l2a
      - Plotting L2A data
      - Default: True
+   * - plot_l2b
+     - Plotting L2B data
+     - Default: True
+   * - plot_l1d
+     - Plotting L1D data
+     - Default: True
    * - plot_uncertainty
      - Plotting uncertainties
      - Default: True
@@ -796,4 +817,74 @@ Default configuration files can be changed in `hypernets_processor/hypernets_pro
    * - plot_polar_max
      - macimum reflectace in the colourscale for polar plot showing the angular variation in reflectance
      -
+   * - plot_polar_ndvi
+     - Plot NDVI in polar plots
+     - Default: True
+
+**Table 13: Site_specific_QC**
+
+.. list-table::
+   :widths: 20 60 20
+   :header-rows: 1
+
+   * - Configuration parameter
+     - Definition
+     - Options/example
+   * - deployment_periods
+     - List of deployment periods with start/stop dates, instrument serial number, validity, and comments.
+     - e.g [{"start_date": "2022-05-17", "stop_date": "2023-10-17", "HYPSTAR_SN": 220261, "valid": True, "comments": "v1 instrument"}, ...]
+   * - bad_dates_period
+     - List of date ranges to exclude for each period.
+     - e.g. [None, None, ...]
+   * - limit_tod_period
+     - List of time-of-day limits for each period.
+     - e.g. [["08:30","19:00"], ...]
+   * - bad_sequences_period
+     - List of sequence IDs to exclude for each period.
+     - e.g. [[], [], ...]
+   * - max_sza_period
+     - Maximum solar zenith angle allowed for each period.
+     - e.g. [60, 60, ...]
+   * - bad_viewing_angles_period
+     - List of viewing zenith/azimuth angle pairs to mask for each period.
+     - e.g. [[(0, "all"), (5, "all")], ...]
+   * - bad_solar_angles_period
+     - List of solar angle pairs to mask for each period.
+     - e.g. [[], [], ...]
+   * - bad_relative_angles_period
+     - List of relative angles to mask for each period.
+     - e.g. [[("sza", 0), ("sza", 360)], ...]
+   * - angle_tolerance
+     - Tolerance for angle matching for bad angle masking (degrees).
+     - e.g. 1
+   * - raa_angle_tolerance
+     - Tolerance for relative azimuth angle matching for bad angle masking (degrees).
+     - e.g. 10
+   * - bad_wavelengths_period
+     - List of wavelength ranges to exclude for each period.
+     - e.g. [[], [], ...]
+   * - postprocessing_qc_file_period
+     - List of filenames for post-processing QC bounds for each period.
+     - e.g. ["GHNA_2022May_2023Oct_bounds.nc", ...]
+   * - misalignment_vza
+     - Misalignment viewing zenith angle for each period.
+     - e.g. [1.01, 1.96, ...]
+   * - misalignment_vza_unc
+     - Uncertainty for misalignment viewing zenith angle.
+     - e.g. [0.07, 0.06, ...]
+   * - misalignment_vaa
+     - Misalignment viewing azimuth angle for each period.
+     - e.g. [97, -72, ...]
+   * - misalignment_vaa_unc
+     - Uncertainty for misalignment viewing azimuth angle.
+     - e.g. [6, 3, ...]
+   * - misalignment_corr
+     - Correction factor for misalignment.
+     - e.g. [0.99, 1.01, ...]
+   * - misalignment_corr_unc
+     - Uncertainty for correction factor.
+     - e.g. [0.01, 0.02, ...]
+   * - apply_site_specific_cloud_check
+     - Enable/disable site-specific cloud checks.
+     - True/False
 

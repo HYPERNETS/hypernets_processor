@@ -416,37 +416,27 @@ class SiteSpecificQualityChecks:
                 < 0.9 * irradiance[i_wav_550_model]
             ) or (
                 dataset_l1b_irr.irradiance.values[i_wav_550_data, i_series]
-                > 1.1 * irradiance_noaer[i_wav_550_model_noaer]
+                > 1.05 * irradiance_noaer[i_wav_550_model_noaer]
             ):
                 self.context.anomaly_handler.add_anomaly("scl")
 
-        # performn correction for reflectance (to account for change in irradiance)
-        for i_series in range(len(dataset_l2b.series.values)):
-            sza = dataset_l2b.solar_zenith_angle.values[i_series]
-            saa = dataset_l2b.solar_azimuth_angle.values[i_series]
-            irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(
-                sza, irr_model_irrwav
-            )
-            dir_dif_intfunc = scipy.interpolate.interp1d(
-                irr_model_irrwav.wavelength.values,
-                dir_dif_ratio,
-                fill_value="extrapolate",
-            )
-            dir_dif_ratio = dir_dif_intfunc(dataset_l2b.wavelength.values)
+        # perform correction for reflectance (to account for change in irradiance)
+        if misalignment_vza[i_dep_save] is not None:
+            for i_series in range(len(dataset_l2b.series.values)):
+                sza = dataset_l2b.solar_zenith_angle.values[i_series]
+                saa = dataset_l2b.solar_azimuth_angle.values[i_series]
+                irradiance, dir_dif_ratio = self.interpolate_irradiance_sza(
+                    sza, irr_model_irrwav
+                )
+                dir_dif_intfunc = scipy.interpolate.interp1d(
+                    irr_model_irrwav.wavelength.values,
+                    dir_dif_ratio,
+                    fill_value="extrapolate",
+                )
+                dir_dif_ratio = dir_dif_intfunc(dataset_l2b.wavelength.values)
 
-            # Perform correction for misalignment
-            ratio = self.misalignment_ratio_calculator(
-                misalignment_vza[i_dep_save],
-                misalignment_vaa[i_dep_save],
-                0,
-                sza,
-                saa,
-                misalignment_corr[i_dep_save],
-                dir_dif_ratio,
-            )
-            ratio_unc = self.prop.propagate_systematic(
-                self.misalignment_ratio_calculator,
-                [
+                # Perform correction for misalignment
+                ratio = self.misalignment_ratio_calculator(
                     misalignment_vza[i_dep_save],
                     misalignment_vaa[i_dep_save],
                     0,
@@ -454,22 +444,33 @@ class SiteSpecificQualityChecks:
                     saa,
                     misalignment_corr[i_dep_save],
                     dir_dif_ratio,
-                ],
-                [
-                    misalignment_vza_unc[i_dep_save],
-                    misalignment_vaa_unc[i_dep_save],
-                    None,
-                    None,
-                    None,
-                    misalignment_corr_unc[i_dep_save],
-                    None,
-                ],
-            )
-            dataset_l2b.reflectance.values[:, i_series] /= ratio
-            dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] = (
-                dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] ** 2
-                + (ratio_unc / ratio / 100) ** 2
-            ) ** 0.5
+                )
+                ratio_unc = self.prop.propagate_systematic(
+                    self.misalignment_ratio_calculator,
+                    [
+                        misalignment_vza[i_dep_save],
+                        misalignment_vaa[i_dep_save],
+                        0,
+                        sza,
+                        saa,
+                        misalignment_corr[i_dep_save],
+                        dir_dif_ratio,
+                    ],
+                    [
+                        misalignment_vza_unc[i_dep_save],
+                        misalignment_vaa_unc[i_dep_save],
+                        None,
+                        None,
+                        None,
+                        misalignment_corr_unc[i_dep_save],
+                        None,
+                    ],
+                )
+                dataset_l2b.reflectance.values[:, i_series] /= ratio
+                dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] = (
+                    dataset_l2b.u_rel_systematic_reflectance.values[:, i_series] ** 2
+                    + (ratio_unc / ratio / 100) ** 2
+                ) ** 0.5
 
         # next, we check if the reflectances are within the bounds
         if postprocessing_qc_file_period[i_dep_save] is None:
