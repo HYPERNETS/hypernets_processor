@@ -15,8 +15,8 @@ path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 # path2files = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Documents\MobaXterm\home"
 
 include_sites = ["GHNA", "JSIT", "WWUK", "LOBE", "JAES"]
-start_date = "2022-01-01" #include all dates
-stop_date = None #include all dates
+start_date = "2025-01-01" #include all dates
+stop_date = "2026-01-01" #include all dates
 
 # start_date = "2022-01-01"
 # stop_date = "2025-12-31"

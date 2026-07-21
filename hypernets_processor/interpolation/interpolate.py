@@ -303,6 +303,7 @@ class Interpolate:
             )
             dataset_l1c[measurandstring].values = measurand
 
+
         if len(acqui_skyrad) == 1:
             dataset_l1c["quality_flag"] = DatasetUtil.set_flag(
                 dataset_l1c["quality_flag"], "single_skyradiance_used"

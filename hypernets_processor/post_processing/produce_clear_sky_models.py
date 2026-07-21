@@ -11,15 +11,6 @@ from forts.utils.produce_example_1d import ProduceExample1D
 import pytz
 import xarray as xr
 import pandas as pd
-from scrappi.interface import (
-    set_credentials,
-    perform_query,
-    make_query_with_tolerance,
-    download_product,
-    list_satellite_products_api,
-    make_fs,
-    generate_bounding_lat_lon,
-)
 
 from scrappi.utils.download_utils import download_and_read_ERA5, download_and_read_CAMS
 
@@ -404,4 +395,5 @@ for site in SITE_LOCATIONS.keys():
                 comb_irr_ds = combine_direct_to_diffuse_ratio_sza(
                     site, aod, results_path, tag=tag
                 )
-            interpolate_irradiance_sza(13.5, comb_irr_ds)
+            comb_irr_ds = interpolate_irradiance_sza(13.5, comb_irr_ds)
+            print(comb_irr_ds)

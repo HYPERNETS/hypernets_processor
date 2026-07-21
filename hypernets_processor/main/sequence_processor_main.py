@@ -166,7 +166,6 @@ def get_target_sequences(context, to_archive):
     else:
         return raw_paths
 
-
 def run_sequence(inputs):
     target_sequence, context, logger = inputs
     sp = SequenceProcessor(context=context)

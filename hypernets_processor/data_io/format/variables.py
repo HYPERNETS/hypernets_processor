@@ -97,7 +97,7 @@ COMMON_VARIABLES_SERIES = {
             "is 180 degrees different from the viewing_azimuth_angle.",
             "units": "degrees",
             "reference": "True North",
-            "preferred_symbol": "vaa",
+            "preferred_symbol": "paa",
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
     },
@@ -606,7 +606,7 @@ CAL_VARIABLES = {
         "encoding": {"dtype": np.uint16, "scale_factor": 0.01, "offset": 0.0},
     },
     "err_corr_systematic_indep_gains": {
-        "dim": [CD_DIM, WL_DIM, WL_DIM + "'"],
+        "dim": [CD_DIM, WL_DIM, WL_DIM+"'"],
         "dtype": np.float32,
         "attributes": {
             "standard_name": "independent correlation matrix of systematic error on gains",
@@ -616,7 +616,7 @@ CAL_VARIABLES = {
         "encoding": {"dtype": np.int16, "scale_factor": 0.0001, "offset": 0.0},
     },
     "err_corr_systematic_corr_rad_irr_gains": {
-        "dim": [CD_DIM, WL_DIM, WL_DIM + "'"],
+        "dim": [CD_DIM, WL_DIM, WL_DIM+"'"],
         "dtype": np.float32,
         "attributes": {
             "standard_name": "correlation matrix of systematic error on gains (correlated radiance and irradiance)",
