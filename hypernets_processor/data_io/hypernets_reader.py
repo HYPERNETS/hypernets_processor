@@ -694,6 +694,7 @@ class HypernetsReader:
 
                             a = 19.6
                             b = 2**15
+                            spectrum.header.accel_stats.mean_x
                             ds["acceleration_x_mean"][scan_number] = (
                                 spectrum.header.accel_stats.mean_x * a / b
                             )
