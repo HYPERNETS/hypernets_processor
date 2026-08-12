@@ -7,13 +7,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
-path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
+# path2files = r"/archive/test"
+# path2figs = r"/home/admin/post_processing/"
+# path2files = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
 path2figs = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
 
-path2files = r"C:\Users\pdv\data\insitu\hypernets\archive"
+path2files = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Documents\MobaXterm\home"
 
-import sqlite3
-from sqlite3 import Error
+include_sites = None
+include_sites = ["GHNA","WWUK","JSIT","JAES","LOBE"]
+
+include_anomalies = None
+include_anomalies = ["cl","scl","nu", "nos", "val", "x"]
+start_date = "2022-01-01" #include all dates
+stop_date = None #include all dates
 
 
 def create_connection(path):
@@ -38,7 +45,25 @@ dbcon = create_connection("/{}/archive.db".format(path2files))
 SQL_Query = pd.read_sql_query("""select * from products""", dbcon)
 prods = pd.DataFrame(SQL_Query)
 
-for site in df["site_id"].unique():
+#only select relevant sites and product levels
+if include_sites is None:
+    prodsel = prods
+else:
+    prodsel = prods[
+        prods["site_id"].str.contains(
+            "|".join(include_sites)
+        )
+    ]
+#only select valid date range
+prodsel.index = pd.to_datetime(prodsel.datetime_start, format='mixed')
+prodsel["date"] = prodsel.index.floor("D")
+prodsel["date"] = pd.to_datetime(prodsel.date)
+if start_date is not None:
+    prodsel = prodsel[prodsel.index >= pd.to_datetime(start_date)]
+if stop_date is not None:
+    prodsel = prodsel[prodsel.index <= pd.to_datetime(stop_date)]   
+
+for site in prodsel["site_id"].unique():
     print(site)
     prodsel = prods[prods["site_id"] == site]
     nseq = len(prodsel["sequence_name"].unique())
@@ -46,9 +71,9 @@ for site in df["site_id"].unique():
 
     dates=prodsel.datetime_start.unique()
     dates.sort()
-    sel_dates = pd.date_range(dates[2], dates[-1], freq="M").date
+    sel_dates = pd.date_range(dates[2], dates[-1], freq="ME").date
 
-    fig = plt.figure(figsize=(10, 15))
+    fig = plt.figure(figsize=(15, 10))
     gs = GridSpec(nrows=2, ncols=2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, :])
@@ -65,12 +90,18 @@ for site in df["site_id"].unique():
     ax1.set_ylabel("Number of sequences")
     ax1.set_title("Anomalies for {} seqs. at {}".format(nseq, site))
 
+    if include_anomalies is not None:
+        dfsel = dfsel[
+            dfsel["anomaly_id"].str.contains(
+                "|".join(include_anomalies)
+            )
+        ]
     dfsel.index = pd.to_datetime(dfsel.datetime)
     dfsel["date"] = dfsel.index.floor("D")
     dfsel["date"] = pd.to_datetime(dfsel.date)
     cross = pd.crosstab(dfsel.date, dfsel.anomaly_id)  # ,margins=True, dropna=False)
     cross["date"] = cross.index
-    cross = cross.resample("M", on="date").sum().reindex(sel_dates)
+    cross = cross.resample("ME", on="date").sum().reindex(sel_dates)
     cross.plot(kind="bar", ax=ax2, stacked=False)
     ax2.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Anomalies")
     ax2.set_ylabel("Number of sequences")

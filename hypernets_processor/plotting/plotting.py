@@ -320,13 +320,14 @@ class Plotting:
                         ),
                     )
                 )
+
             self.plot_variable(
                 "relative uncertainty " + measurandstring + " (%)",
                 plotpath,
                 dataset["wavelength"].values,
                 yerr,
                 labels=ylabel,
-                ylim=[0, 20],
+                ylim=[0, self.context.get_config_value("plot_unc_ymax")],
             )
 
     def plot_correlation(self, measurandstring, dataset, refl=False):
@@ -640,6 +641,7 @@ class Plotting:
                 + "."
                 + self.plot_format,
             )
+            label="NDVI"
         else:
             plotpath = os.path.join(
                 self.path,
@@ -648,6 +650,7 @@ class Plotting:
                 + "."
                 + self.plot_format,
             )
+            label="reflectance at %s nm" % wavelength
 
         saa = np.mean(dataset.solar_azimuth_angle.values % 360)
         sza = np.mean(dataset.solar_zenith_angle.values)
@@ -738,7 +741,7 @@ class Plotting:
         ax.plot(np.radians(saa), sza, color="k", ls="none", marker="o")
 
         cbar = fig.colorbar(im)
-        cbar.set_label("reflectance at %s nm" % wavelength, rotation=270, labelpad=15)
+        cbar.set_label(label, rotation=270, labelpad=15)
 
         fig.savefig(plotpath)
         plt.close(fig)

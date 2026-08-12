@@ -21,8 +21,8 @@ data = pd.read_csv(
 )
 data.drop("Unnamed: 0", axis="columns")
 
-site = 'LOBE_2025Apr_2025May'
-site_file = 'LOBEv4'
+site = 'PEAN_2023Dec_2024Jan'
+site_file = 'PEAN_2023Dec_2024Jan'
 data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site_file}_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
@@ -79,14 +79,14 @@ data_after_may24 = data.sel(date=slice("2024-05-24", "2025-01-01"))
 
 
 # cloud check and flag removal
-data_v1 = data_v1[data_v1["model_550nm"] * 0.9 < data_v1["obs_550nm"]]
+data_v1 = data_v1[data_v1["model_550nm"] * 0.8 < data_v1["obs_550nm"]]
 data_v1 = data_v1[data_v1["model_550nm"] * 1.2 > data_v1["obs_550nm"]]
 data_v1 = data_v1[data_v1["Flag"] == 0]
-data_v1 = data_v1[data_v1["Time"] > 830]
+#data_v1 = data_v1[data_v1["Time"] > 830]
 
 #cloud check and flag removal
-data_v1 = data_v1[data_v1['model_550nm']*0.9 < data_v1['obs_550nm']]
-data_v1 = data_v1[data_v1['model_550nm']*1.1 > data_v1['obs_550nm']]
+#data_v1 = data_v1[data_v1['model_550nm']*0.9 < data_v1['obs_550nm']]
+#data_v1 = data_v1[data_v1['model_550nm']*1.1 > data_v1['obs_550nm']]
 data_v1 = data_v1[data_v1['Flag'] == 0]
 #if site == 'LOBEv4' or site == 'LOBEv2':
  #   data_v1 = data_v1[data_v1['SZA'] < 50]
@@ -147,7 +147,10 @@ if site == 'WWUK_May22_Oct22':
     data_v1 = data_v1.sel(date = slice('2022-05-05', '2022-10-11'))
 if site == 'WWUK_Apr23_Nov23':
     data_v1 = data_v1.sel(date = slice('2023-04-29', '2023-11-01'))
-
+if site == 'JAES_2025May_2025Jun':
+    data_v1 = data_v1.sel(date = slice('2025-05-01', '2025-06-16'))
+if site == 'JAES_2025Jul_2025Sep':
+    data_v1 = data_v1.sel(date = slice('2025-07-04', '2025-09-03'))
 
 
 def ratio_calculator(vza, vaa, sza, saa, direct_to_diffuse=1000):
@@ -1495,7 +1498,7 @@ plt.show()
 # find_misalignment_angles(data_after_may24, 0.02)
 # plot_misalign_sza(data,  '1640')
 # wav_separated_misalignment_calculator(data, wavelengths)
-bins = [
+other_bins = [
     630,
     715,
     745,
@@ -1514,7 +1517,7 @@ bins = [
     1515,
     1545,
 ]
-time = [
+other_time = [
     "0700",
     "0730",
     "0800",
@@ -1533,7 +1536,53 @@ time = [
     "1530",
 ]
 # wavelengths = ["550"]
-
+bins = [
+    0,
+    15,
+    45, 115, 145, 215, 245, 315, 345, 415, 445, 515, 545, 615,
+    645,
+    715,
+    745,
+    815,
+    845,
+    915,
+    945,
+    1015,
+    1045,
+    1115,
+    1145,
+    1315,
+    1345,
+    1415,
+    1445,
+    1515,
+    1545,
+    1615, 1645, 1715, 1745, 1815, 1845, 1915, 1945, 2015, 2045, 2115, 2145, 2215, 2245, 2315, 2345
+]
+time = [
+    "0000", "0030", "0100", "0130", "0200", "0230", "0300", "0330", "0400", "0430", "0500",
+    "0530",
+    "0600",
+    "0630",
+    "0700",
+    "0730",
+    "0800",
+    "0830",
+    "0900",
+    "0930",
+    "1000",
+    "1030",
+    "1100",
+    "1130",
+    "1300",
+    "1330",
+    "1400",
+    "1430",
+    "1500",
+    "1530",
+    "1600", "1630", "1700", "1730", "1800", "1830", "1900", "1930", "2000", "2030", "2100", "2130",
+    "2200", "2230", "2300", "2330"
+]
 """
 times=np.array([int(x) for x in data_before_may24.time.values])
 i_time_val=np.where((times>800))[0]
@@ -1554,7 +1603,7 @@ data_v1=data_v1.isel(date=i_time_val)
 
 #before_dict = wav_together_misalignment_calculator_offset(data_before_may24, wavelengths, 'GHNAv3_before')
 #after_dict = wav_together_misalignment_calculator_offset(data_after_may24, wavelengths, 'GHNAv3_after')
-v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, site, normalise=True, norm_width=5)
+v1_dict = wav_together_misalignment_calculator_offset(data_v1, wavelengths, site, normalise=True, norm_width=180)
 
 for wav in wavelengths:
 
@@ -1738,10 +1787,10 @@ for wav in wavelengths:
     axs[3].set_ylabel('Normalised Corrected Ratio')
     axs[4].set_ylabel('SZA')
 
-    axs[0].set_ylim(0.9,1.1)
-    axs[1].set_ylim(0.9,1.1)
+    axs[0].set_ylim(0.8,1.2)
+    axs[1].set_ylim(0.8,1.2)
     axs[2].set_ylim(-0.05,0.05)
-    axs[3].set_ylim(0.9,1.1)
+    axs[3].set_ylim(0.8,1.2)
 
     axs[0].legend()
     axs[0].grid(color="black", alpha=0.5, axis="y")

@@ -56,7 +56,7 @@ db_choice = "anomaly"
 
 # bad_sequence_list = ["SEQ20231026T080128", "SEQ20231031T073028"]
 
-sql_query = "anomaly_id IN ('x', 'ms') AND site_id = 'WWUK'"
+sql_query = "site_id = 'GHNA' and datetime_SEQ >= '2025-09-01' and datetime_SEQ < '2025-10-15'"
 
 
 

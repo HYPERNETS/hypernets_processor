@@ -15,7 +15,7 @@ __email__ = "pieter.de.vis@npl.co.uk"
 __status__ = "Development"
 
 # set your archive path, and database names
-archive_path = r"/archive/test/"
+archive_path = r"/archive/"
 # archive_path = r"C:\Users\pdv\data\insitu\hypernets\archive"
 
 archive_db = "archive.db"
@@ -54,9 +54,9 @@ list_info = False # If True, show list of all the products/anomalies that will b
 db_choice = "anomaly"
 # db_choice = "archive"
 
-# bad_sequence_list = ["SEQ20231026T080128", "SEQ20231031T073028"]
+#bad_sequence_list = ["SEQ20251114T110045"]
 
-sql_query = "site_id = 'JSIT'"
+sql_query = "site_id = 'GHNA' and datetime_SEQ >= '2025-09-01'"
 
 def get_products(db_path, sql_query):
     conn = sqlite3.connect(db_path)
@@ -76,7 +76,8 @@ def get_amomalies_from_anomaly_db(db_path, sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     sequences = []
-    for row in cursor.execute(f"SELECT sequence_name,rel_product_dir,anomaly_id FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query}"):
+    print(f"SELECT sequence_name,rel_product_dir,anomaly_id FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query.replace('datetime_SEQ','datetime')}")
+    for row in cursor.execute(f"SELECT sequence_name,rel_product_dir,anomaly_id FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query.replace('datetime_SEQ','datetime')}"):
         sequences.append(row)
     conn.close()
     return sequences
@@ -97,13 +98,32 @@ def get_all_info(db_path, table_name, sequence_id):
 def remove_from_anomaly_db(db_path, seq_name,sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND sequence_name='{seq_name}' AND {sql_query}")
+    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND sequence_name='{seq_name}' AND {sql_query.replace('datetime_SEQ','datetime')}")
     conn.commit()
     conn.close()
 
-def remove_product_from_db(db_path, table_name, product_name, metadata=False):
+def remove_all_from_anomaly_db(db_path,sql_query):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    cursor.execute(f"DELETE FROM anomalies WHERE anomaly_id IN ('per','val','tod','hsn','scl','npr','man','wns','nos','hos') AND {sql_query.replace('datetime_SEQ','datetime')}")
+    conn.commit()
+    conn.close()
+
+def remove_all_from_metadata_db(db_path,sql_query):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"DELETE FROM L_L2B WHERE {sql_query}")
+    conn.commit()
+    conn.close()
+
+def remove_all_from_archive_db(db_path,sql_query):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute(f"DELETE FROM products WHERE product_level='L_L2B' AND {sql_query}")
+    conn.commit()
+    conn.close()
+
+def remove_product_from_db(cursor, table_name, product_name, metadata=False):
     if metadata:
         try:
             cursor.execute(f"DELETE FROM {table_name} WHERE product_name=?", (product_name,))
@@ -111,8 +131,7 @@ def remove_product_from_db(db_path, table_name, product_name, metadata=False):
             print(f"product_name not found in {table_name} in metadata.db")
     else:
         cursor.execute(f"DELETE FROM {table_name} WHERE product_name=?", (product_name,))
-    conn.commit()
-    conn.close()
+    
 
 def load_table_names(db_a):
     cursor_a = db_a.cursor()
@@ -152,22 +171,45 @@ def main(archive_path=None, bad_sequence_list=None, sql_query=None):
     
     for i in indices:
         seq = sequences[i]
+        # remove file
         delete_files(os.path.join(archive_path,seq[1],seq[2]+".nc"))
-    for db in [metadata_db,archive_db]:
-        db_path = os.path.join(archive_path, db)
+        #remove plots
+        glob_files = glob.glob(os.path.join(archive_path,seq[1],"plots/*L2B*.nc"))
+        if len(glob_files)>0:
+            for gf in glob_files:
+                delete_files(gf)    
+    
+    #removem product from metadata db
+    db_path = os.path.join(archive_path, metadata_db)
+    
+    if to_remove == "*" and "datetime" not in sql_query:
+        remove_all_from_metadata_db(db_path, sql_query)
+    else:
         conn = sqlite3.connect(db_path)
-        table_names = load_table_names(conn)
+        cursor = conn.cursor()
+        for i in indices:
+            seq = sequences[i]
+            remove_product_from_db(cursor, "L_L2B", seq[2], metadata=True)
+        conn.commit()
         conn.close()
-        for table_name in table_names:
-            for i in indices:
-                seq = sequences[i]
-                remove_product_from_db(db_path, table_name, seq[2], metadata=(db==metadata_db))
-                print(f"Sequence {seq[0]} removed from {table_name} in {db}.")
 
+    #remove product from archive db
+    db_path = os.path.join(archive_path, archive_db)
+    
+    if to_remove == "*":
+        remove_all_from_archive_db(db_path, sql_query)
+    else:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        for i in indices:
+            seq = sequences[i]
+            remove_product_from_db(cursor, "products", seq[2], metadata=False)
+        conn.commit()
+        conn.close()
     print(f"L2B products have been removed from archive db and files deleted.")
     
     db_path = os.path.join(archive_path, anomaly_db)
-    get_amomalies_from_anomaly_db(db_path,sql_query)
+    sequences = get_amomalies_from_anomaly_db(db_path,sql_query)
 
     print(f"Found {len(sequences)} anomalies.")
     for idx, seq in enumerate(sequences):

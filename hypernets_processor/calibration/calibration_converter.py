@@ -8,6 +8,7 @@ from hypernets_processor.test.test_functions import (
 )
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
+from hypernets_processor.utils.utils import convert_datetime
 
 import numpy as np
 import os.path
@@ -139,9 +140,15 @@ class CalibrationConverter:
         calibration_data_rad = self.interpolate_calibration_ds(
             calibration_data_rad, sequence_dt64
         )
+        calibration_data_rad.attrs["instrument_calibration_file_rad"] = name
+        calibration_data_rad.attrs["instrument_calibration_date_rad"] = str(convert_datetime(calibration_data_rad.calibrationdates.values).date())
+        
+
         calibration_data_irr = self.interpolate_calibration_ds(
             calibration_data_irr, sequence_dt64
         )
+        calibration_data_irr.attrs["instrument_calibration_file_irr"] = name
+        calibration_data_irr.attrs["instrument_calibration_date_irr"] = str(convert_datetime(calibration_data_irr.calibrationdates.values).date())
 
         if self.context.get_config_value("network") == "l":
             name = (
@@ -181,9 +188,14 @@ class CalibrationConverter:
             calibration_data_rad_swir = self.interpolate_calibration_ds(
                 calibration_data_rad_swir, sequence_dt64
             )
+            calibration_data_rad_swir.attrs["instrument_calibration_file_rad_swir"] = name
+            calibration_data_rad_swir.attrs["instrument_calibration_date_rad_swir"] = str(convert_datetime(calibration_data_rad_swir.calibrationdates.values).date())
+
             calibration_data_irr_swir = self.interpolate_calibration_ds(
                 calibration_data_irr_swir, sequence_dt64
             )
+            calibration_data_irr_swir.attrs["instrument_calibration_file_irr_swir"] = name
+            calibration_data_irr_swir.attrs["instrument_calibration_date_irr_swir"] = str(convert_datetime(calibration_data_irr_swir.calibrationdates.values).date())
 
         #
         # if self.context.get_config_value("calibration_interpolation_method")=="previous" or sequence_datetime>np.max(calibration_data_times):

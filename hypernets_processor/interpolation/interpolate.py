@@ -109,6 +109,11 @@ class Interpolate:
             "acquisition_time"
         ].values
 
+        # Add calibration metadata
+        for key in dataset_l1b_irr.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                dataset_l1c.attrs[key] = dataset_l1b_irr.attrs[key]
+
         # dataset_l1b_rad,dataset_l1b_irr=self.qual.perform_quality_check_interpolate(dataset_l1b_rad,dataset_l1b_irr)
 
         dataset_l1c = self.interpolate_irradiance(dataset_l1c, dataset_l1b_irr)
