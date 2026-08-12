@@ -1,18 +1,16 @@
 import numpy as np
-from brdf_model import BRDFModelFactory
 import hypernets_brdf_data_io as data_io
-from brdf_model import Comparisons
-from curepy import MCMCRetrieval, plot_trace, plot_corner
 import os
 import glob
-import matplotlib.pyplot as plt
 from pysolar.solar import *
-from forts.utils.produce_example_1d import ProduceExample1D
-import pytz
 import xarray as xr
 import pandas as pd
-
-from scrappi.utils.download_utils import download_and_read_ERA5, download_and_read_CAMS
+from scene_forge import run_RT, SceneForgeContext
+from scene_forge.utils.helpers import run_BOA_irradiance_simulation_basics
+import ancillary_tools as at
+from eoio import read
+import numpy as np
+import xarray as xr
 
 # for windows:
 data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
@@ -22,33 +20,23 @@ results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradi
 data_path = r"/mnt/t/data/insitu/hypernets/archive"
 results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/irradiance"
 
+yaml_path = os.path.join(results_path, "example_hypernets_BOA.yaml")
+
 if not os.path.exists(results_path):
     os.mkdir(results_path)
-
-# SITE_LOCATIONS = {
-#     "ATGE": [52.466778, 12.959778],
-#     # "BASP": [39.049139, -2.075917],
-#     "DEGE": [53.868278, 13.268556],
-#     "GHNA": [-23.60153, 15.12589],
-#     "IFAR": [-34.592322, -58.479017],
-#     "JAES": [58.281975, 27.312959],
-#     "JSIT": [44.874305, 11.979201],
-#     "LOBE": [50.551493, 4.745911],
-#     "PEAN": [-71.940128, 23.305260],
-#     "WWUK": [51.777206,-1.338494],
-# }
 
 SITE_LOCATIONS = {
     # "ATGE": [52.466778, 12.959778],
     # # "BASP": [39.049139, -2.075917],
     # "DEGE": [53.868278, 13.268556],
-    "GHNA": [-23.60153, 15.12589],
-    # "IFAR": [-34.592322, -58.479017],
-    "JAES": [58.281975, 27.312959],
-    "JSIT": [44.874305, 11.979201],
-    "LOBE": [50.551493, 4.745911],
-    "PEAN": [-71.940128, 23.305260],
-    "WWUK": [51.777206, -1.338494],
+    # "GHNA": [-23.60153, 15.12589],
+    # # "IFAR": [-34.592322, -58.479017],
+    # "JAES": [58.281975, 27.312959],
+    # "JSIT": [44.874305, 11.979201],
+    # "LOBE": [50.551493, 4.745911],
+    # "PEAN": [-71.940128, 23.305260],
+    # "WWUK": [51.777206, -1.338494],
+    "SPAR": [-33.81329, -59.88987],
 }
 
 SITE_ALTITUDE = {
@@ -61,6 +49,7 @@ SITE_ALTITUDE = {
     "LOBE": 0.168,
     "PEAN": 1.297,
     "WWUK": 0.125,
+    "SPAR": 0.031,
 }
 
 atmosphere_type = {
@@ -74,6 +63,7 @@ atmosphere_type = {
     "LOBE": "midlatitude_summer",
     "PEAN": "midlatitude_summer",
     "WWUK": "midlatitude_summer",
+    "SPAR": "midlatitude_summer",
 }
 
 aerosol_type = {
@@ -87,6 +77,7 @@ aerosol_type = {
     "LOBE": "continental_average",
     "PEAN": "antarctic",
     "WWUK": "continental_average",
+    "SPAR": "continental_average",
 }
 
 file_paths = {
@@ -148,6 +139,15 @@ file_paths = {
         "SEQ20220426T113243",
         "HYPERNETS_L_WWUK_L2A_REF_20220426T1132_20240101T1641_v2.0.nc",
     ),
+    "SPAR": os.path.join(
+            data_path,
+            "SPAR",
+            "2026",
+            "05",
+            "04",
+            "SEQ20260504T150055",
+            "HYPERNETS_L_SPAR_L2A_REF_20260504T1500_20260504T1830_v2.2.nc",
+        ),
 }
 
 file_paths_irr = {
@@ -206,9 +206,18 @@ file_paths_irr = {
         "SEQ20220426T113243",
         "HYPERNETS_L_WWUK_L1B_IRR_20220426T1132_20240101T1641_v2.0.nc",
     ),
+    "SPAR": os.path.join(
+        data_path,
+        "SPAR",
+        "2026",
+        "05",
+        "04",
+        "SEQ20260504T150055",
+        "HYPERNETS_L_SPAR_L1B_IRR_20260504T1500_20260504T1830_v2.2.nc",
+    ),
 }
-start_time = "20220101T0000"
-stop_time = "20230101T0000"
+start_time = "20240101T0000"
+stop_time = "20251231T0000"
 
 run_RT = True
 
@@ -261,91 +270,36 @@ def interpolate_irradiance_sza(sza, ds_irr):
     ].values * np.cos(ds_irr_temp["sza"].values / 180 * np.pi)
     return ds_irr_temp["solar_irradiance_BOA"].values
 
-
 for site in SITE_LOCATIONS.keys():
     lat, lon = SITE_LOCATIONS[site]
 
-    # query = {
-    #     "collections": ["COP_DEM_GLO30_DTED"],
-    #     "geom": [lat - 0.25, lon - 0.25, lat + 0.25, lon + 0.25],
-    #     # making sure there are at least 2 grid points in query
-    # }
-    #
-    # products = perform_query(
-    #     "eodag",
-    #     query,
-    #     config_dict={"config_file_path": os.path.join(results_path, "eodag.yml")},
-    # )
-    #
-    # products.set_fs("t-drive")
-
-    # path = download_product(
-    #     "eodag",
-    #     products,
-    #     config_dict={"config_file_path": os.path.join(results_path, "eodag.yml")},
-    # )
-    # print(path)
-
-    path_era5 = os.path.join(
-        results_path, "ds_era5_%s_%s_%s.nc" % (site, start_time, stop_time)
-    )
-    if os.path.exists(path_era5):
-        ds_era5 = xr.open_dataset(path_era5)
+    if os.path.exists(os.path.join(results_path, "atmosphere_%s_%s_%s.nc" % (site, start_time, stop_time))):
+        ds_atm = xr.open_dataset(os.path.join(results_path, "atmosphere_%s_%s_%s.nc" % (site, start_time, stop_time)))
     else:
-        ds_era5 = download_and_read_ERA5(
-            start_time,
-            stop_time,
-            lat,
-            lon,
-            config_path=os.path.join(results_path, "eodag.yml"),
+        ds = at.get_variables(
+        variables=["surface_pressure", "total_column_water_vapour", "total_column_ozone", "aerosol_optical_depth"],
+        roi=(lon-0.75, lat-0.75, lon+0.75,  lat+0.75),  # (lon_min, lat_min, lon_max, lat_max)
+        roi_crs_epsg="EPSG:4326",  # default; roi can be given in any CRS
+        time_range= (start_time, stop_time),  # (start_time, end_time)
         )
-
-        ds_era5.to_netcdf(path_era5)
-
-    path_cams = os.path.join(
-        results_path, "ds_cams_%s_%s_%s.nc" % (site, start_time, stop_time)
-    )
-    if os.path.exists(path_cams):
-        ds_cams = xr.open_dataset(path_cams)
-    else:
-        ds_cams = download_and_read_CAMS(
-            start_time,
-            stop_time,
-            lat,
-            lon,
-            config_path=os.path.join(results_path, "eodag.yml"),
-        )
-        ds_cams.to_netcdf(path_cams)
+        ds_atm = ds.interp(latitude=lat, longitude=lon)
+        ds_atm.to_netcdf(os.path.join(results_path, "atmosphere_%s_%s_%s.nc" % (site, start_time, stop_time)))
 
     if run_RT:
-
-        ds_HYP = data_io.read_hypernets_file(
-            file_paths[site],
-            vza=20,
-        )
-        ds_HYP = ds_HYP.mean(dim="series")
-
-        ds_HYP_irr = data_io.read_hypernets_file(
-            file_paths_irr[site],
-        )
+        ds_HYP_irr = read(
+                    file_paths_irr[site],
+                )
         ds_HYP_irr = ds_HYP_irr.mean(dim="series")
 
-        atmosphere_ex = {}
-        atmosphere_ex["shape"] = None
-        atmosphere_ex["atmosphere_type"] = atmosphere_type[site]
-        atmosphere_ex["aerosol_type"] = aerosol_type[
-            site
-        ]  # by default aerosol type is urban
-        atmosphere_ex["AOD"] = -99  # by default aerosol type is urban
-        atmosphere_ex["H2O"] = -99  # by default aerosol type is urban
-        atmosphere_ex["O3"] = -99  # by default aerosol type is urban
-        atmosphere_ex["CH4"] = -99  # by default aerosol type is urban
-        atmosphere_ex["CO2"] = -99  # by default aerosol type is urban
-        atmosphere_ex["P"] = -99  # by default aerosol type is urban
-
+        ds_HYP = read(
+            file_paths[site],
+            subset={"angle": {"vza": {"nearest": 20, "tolerance": 1}}},
+        )
+        ds_HYP = ds_HYP.mean(dim="series")
+       
         alt = SITE_ALTITUDE[site]
 
-        median_aod = np.median(ds_cams.aod550.values)
+        median_aod = np.median(ds_atm.aerosol_optical_depth.values)
 
         for aod in [0.0, 0.1, 0.2, 0.3, median_aod]:
             for szai in np.arange(0, 90, 10):
@@ -357,25 +311,36 @@ for site in SITE_LOCATIONS.keys():
                 ):
                     continue
                 else:
-                    forts_prod = ProduceExample1D(
-                        resolution="coarse", atmosphere=atmosphere_ex
-                    )
-                    print(ds_HYP_irr.wavelength.values)
-                    ds_irr = forts_prod.produce_solar_irradiance_hypernets(
-                        ds_HYP,
-                        szai,
-                        aod=aod,
-                        h2o=ds_era5.tcwv.values.mean(),
-                        O3=ds_era5.tco3.values.mean() / (2.1415 * 10 ** (-5)),
-                        P=ds_era5.sp.values.mean() / 100,
-                        altitude=alt,
-                        band_centres=ds_HYP_irr.wavelength.values,
-                    )
-                    ds_irr.attrs["h2o"] = ds_era5.tcwv.values.mean()
-                    ds_irr.attrs["O3"] = ds_era5.tco3.values.mean() / (
+                    context = SceneForgeContext(str(yaml_path))
+                    context["atmosphere"]["vertical_profiles"]["values"] = atmosphere_type[site]
+                    context["atmosphere"]["aerosols"]["values"] = aerosol_type[site]
+                    ds_irr = run_BOA_irradiance_simulation_basics(context, 
+                                                                  ds_HYP, 
+                                                                  ds_atm.total_column_water_vapour.values.mean(), 
+                                                                  ds_atm.total_column_ozone.values.mean(), 
+                                                                  ds_atm.surface_pressure.values.mean(), 
+                                                                  aod, 
+                                                                  h2o_unit=ds_atm.total_column_water_vapour.attrs["units"], 
+                                                                  o3_unit=ds_atm.total_column_ozone.attrs["units"], 
+                                                                  p_unit=ds_atm.surface_pressure.attrs["units"], 
+                                                                  sza = szai, 
+                                                                  saa = 0, 
+                                                                  lat=lat, 
+                                                                  lon=lon, 
+                                                                  ds_SRF = ds_HYP_irr, 
+                                                                  dem=alt)
+    
+                                     
+            
+                    # result.assign_coords(datetime=context["scene"]["datetime"]).expand_dims("datetime")                
+                    # ds_comb = xr.concat(ds_list, dim="datetime")
+                    # ds_comb.to_netcdf(os.path.join(context["output"]["output_path"],"irradiances_%s_%s.nc"%(start_time, stop_time)))
+                    
+                    ds_irr.attrs["h2o"] = ds_atm.total_column_water_vapour.values.mean()
+                    ds_irr.attrs["O3"] = ds_atm.total_column_ozone.values.mean() / (
                         2.1415 * 10 ** (-5)
                     )
-                    ds_irr.attrs["P"] = ds_era5.sp.values.mean() / 100
+                    ds_irr.attrs["P"] = ds_atm.surface_pressure.values.mean() / 100
                     ds_irr.attrs["aod"] = aod
                     ds_irr.attrs["sza"] = szai
                     ds_irr.attrs["altitude"] = alt
@@ -397,3 +362,8 @@ for site in SITE_LOCATIONS.keys():
                 )
             comb_irr_ds = interpolate_irradiance_sza(13.5, comb_irr_ds)
             print(comb_irr_ds)
+            comb_irr_ds.to_netcdf(
+                os.path.join(
+                    results_path, "irr_clear_sky_%s_%s_comb%s.nc" % (site, aod, tag)
+                )
+            )
