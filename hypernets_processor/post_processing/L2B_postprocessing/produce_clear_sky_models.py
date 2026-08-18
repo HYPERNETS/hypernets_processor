@@ -1,5 +1,5 @@
 import numpy as np
-import hypernets_brdf_data_io as data_io
+import hypernets_processor.post_processing.L2B_postprocessing.hypernets_brdf_data_io as data_io
 import os
 import glob
 from pysolar.solar import *
