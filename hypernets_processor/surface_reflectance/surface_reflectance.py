@@ -263,6 +263,7 @@ class SurfaceReflectance:
         else:
             self.context.logger.error("network is not correctly defined")
 
+
         if self.context.get_config_value("write_l2a"):
             self.writer.write(
                 dataset_l2a,

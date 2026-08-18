@@ -327,7 +327,7 @@ SYSTEM_METADATA = {  # "system_id": system_id,
     "system_documentation_references": "TBD",
     "system_deployment_date": "TBD",
     "system_deployment_height": "TBD",
-    "system_comment": "system below bird nest, bad luck",
+    "system_comment": "TBD (e.g. system below bird nest, bad luck)",
 }
 
 

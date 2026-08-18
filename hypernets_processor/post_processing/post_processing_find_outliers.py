@@ -300,8 +300,8 @@ def extract_reflectances(files, wavs, vza, vaa, site):
         if len(ds.quality_flag.values) == 1:
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = ds.reflectance.values[ids, 0]
-            times[i] = datetime.datetime.utcfromtimestamp(
-                ds.acquisition_time.values[0],
+            times[i] = datetime.datetime.fromtimestamp(
+                ds.acquisition_time.values[0], tz=datetime.timezone.utc
             )
 
             if (times[i] > start_datetime) and (times[i] < end_datetime):
@@ -339,8 +339,8 @@ def extract_reflectances(files, wavs, vza, vaa, site):
             ids = [np.argmin(np.abs(ds.wavelength.values - wav)) for wav in wavs]
             refl[i] = np.mean(ds.reflectance.values[ids, :])
             print(ds, ds.acquisition_time.values[:])
-            times[i] = datetime.datetime.utcfromtimestamp(
-                np.mean(ds.acquisition_time.values)
+            times[i] = datetime.datetime.fromtimestamp(
+                np.mean(ds.acquisition_time.values), tz=datetime.timezone.utc
             )
 
     times = times[np.where(valid)]

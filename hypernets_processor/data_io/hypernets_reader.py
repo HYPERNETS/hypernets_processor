@@ -694,6 +694,7 @@ class HypernetsReader:
 
                             a = 19.6
                             b = 2**15
+                            spectrum.header.accel_stats.mean_x
                             ds["acceleration_x_mean"][scan_number] = (
                                 spectrum.header.accel_stats.mean_x * a / b
                             )
@@ -996,25 +997,7 @@ class HypernetsReader:
                                 ds_swir["acquisition_time"][scan_number_swir] = (
                                     datetime.datetime.timestamp(acquisitionTime)
                                 )
-                                #            #print(datetime.fromtimestamp(acquisitionTime))
-
-                                #             # didn't use acquisition time from instrument
-                                #             # possibility that acquisition time is time since reboot, but how to now reboot time?
-                                #             # if we use the metadata time header
-                                #             timestamp=header['acquisition_time']
-                                #             ts = int(timestamp)/1000
-
-                                #             date_time_str = timereboot+'UTC'
-                                #             print(date_time_str)
-                                #             date_time_obj = datetime.strptime(date_time_str, '%Y%m%dT%H%M%S%Z')
-                                #             print(date_time_obj)
-
-                                #             timereboot = datetime.timestamp(date_time_obj)
-                                #             print("timereboot =", timereboot)
-                                #             print(datetime.fromtimestamp(timereboot))
-
-                                #             print(datetime.fromtimestamp(int(ts+timereboot)))
-                                #             print(datetime.fromtimestamp(int(ts+timereboot))-date_time_obj)
+                               
                                 if lat is not None:
                                     ds_swir.attrs["site_latitude"] = lat
                                     ds_swir.attrs["site_longitude"] = lon

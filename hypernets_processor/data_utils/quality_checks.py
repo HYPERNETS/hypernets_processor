@@ -313,7 +313,6 @@ class QualityChecks:
             irr_scaled = np.zeros_like(dataset_l1b_irr["irradiance"].values)
             for i, vza in enumerate(vzas):
 
-                # irrtot=pysolar.radiation.get_radiation_direct(datetime.datetime.fromtimestamp(dataset_l1b_irr["acquisition_time"][i]),90-dataset_l1b_irr["solar_zenith_angle"].values[i])
                 irr_scaled[:, i] = (
                     dataset_l1b_irr["irradiance"].values[:, i]
                     / np.cos(
@@ -784,8 +783,8 @@ class QualityChecks:
                         )
 
                     seq = dataset.attrs["sequence_id"]
-                    ts = datetime.datetime.utcfromtimestamp(
-                        dataset["acquisition_time"][i]
+                    ts = datetime.datetime.fromtimestamp(
+                        dataset["acquisition_time"][i], tz=datetime.timezone.utc
                     )
 
                     if verbosity > 2:

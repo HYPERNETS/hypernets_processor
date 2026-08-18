@@ -219,10 +219,6 @@ if __name__ == "__main__":
             product = row[1]
             # print(os.path.join(hypernets_path,path,product))
             if os.path.exists(os.path.join(hypernets_path, path, product + ".nc")):
-                # ds = xr.open_dataset(os.path.join(hypernets_path,path,product+".nc"))
-                # #print(min(ds.acquisition_time.values),max(ds.acquisition_time.values))
-                # query = "update products set datetime_start = '%s', datetime_end = '%s' WHERE product_name='%s'" % (dt.fromtimestamp(np.nanmin(ds["acquisition_time"].values)),dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values)),product)
-                # cursor.execute(query)
                 continue
             else:
                 query = "delete FROM products WHERE product_name='%s'" % (product)

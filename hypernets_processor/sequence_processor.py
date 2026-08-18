@@ -184,12 +184,8 @@ class SequenceProcessor:
 
                 azis = rhymer.checkazimuths(L1a_rad)
 
-                if L1b_rad and L1b_irr and len(azis) > 0:
-                    if self.context.get_config_value("max_level").upper() in [
-                        "L1C",
-                        "L2A",
-                        "L2B",
-                    ]:
+                if L1b_rad and L1b_irr:
+                    if self.context.get_config_value("max_level") in ["L1C", "L2A"]:
                         self.context.logger.info("Processing to L1c...")
                         # check if different azimuth angles within single sequence
                         for a in azis:

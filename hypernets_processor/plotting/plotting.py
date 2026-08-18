@@ -16,7 +16,7 @@ import numpy as np
 import os.path
 import warnings
 from obsarray.templater.dataset_util import DatasetUtil
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -110,7 +110,7 @@ class Plotting:
 
         if measurandstring == "irradiance":
             angle_labels = [
-                datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 for timestamp in dataset["acquisition_time"].values
             ]
         else:
@@ -163,7 +163,7 @@ class Plotting:
 
         if measurandstring == "irradiance":
             angle_labels = [
-                datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 for timestamp in dataset["acquisition_time"].values
             ]
         else:
@@ -205,7 +205,7 @@ class Plotting:
 
         if measurandstring == "irradiance":
             angle_labels = [
-                datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 for timestamp in dataset["acquisition_time"].values
             ]
         else:
@@ -618,8 +618,8 @@ class Plotting:
 
         angle_labels = [
             "time= {}, sza= {:.2f}, rescaled to sza= {:.0f}".format(
-                datetime.utcfromtimestamp(
-                    dataset["acquisition_time"].values[i]
+                datetime.fromtimestamp(
+                    dataset["acquisition_time"].values[i], tz=timezone.utc
                 ).strftime("%Y-%m-%d %H:%M:%S"),
                 dataset["solar_zenith_angle"].values[i],
                 refsza,
