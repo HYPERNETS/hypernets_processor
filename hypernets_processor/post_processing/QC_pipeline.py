@@ -2220,11 +2220,11 @@ for k, v in JSIT_dict.items():
     new_plane_pipeline(QC, JSIT_maintenance_dates, 70, 10, 0.78, 176.9, False,
                      fit_method = 'bounds', split_by_date = True, start = v[0], end = v[1])
 '''
-QC = PostProcessingDataset(r'T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc/PEAN_2023-12-30_2024-01-23_None_None_None_None.csv',
-                            r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/PEANv3_irradiance.csv',
+QC = PostProcessingDataset(r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\LOBE_2025-12-15_2026-03-24_None_None_None_None.csv",
+                            r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\LOBE_2025Dec_2026Mar_irradiance.csv",
                             r'T:/ECO/EOServer//data/insitu/hypernets/post_processing_qc/irradiance/',
-                            'PEAN',
-                            f'PEAN_2023Dec_2024Jan',
+                            'LOBE',
+                            f'LOBE_2025Dec_2026Mar',
                             'median',
                            '550')
 GHNA_maintenance_dates = [
@@ -2312,11 +2312,11 @@ PEAN_maintenance_dates = []
    #                split_by_date = True, start = '20230429', end = '20231101',
     #               fit_method = 'bounds')
 
-irradiance_analysis_writer(QC, PEAN_maintenance_dates, 80, 10,
-                           'irradiance_PEAN_2023Dec_2024Jan_analysis',
+irradiance_analysis_writer(QC, LOBE_maintenance_dates, 70, 10,
+                           'irradiance_LOBE_2025Dec_2026Mar_analysis',
                            [415, 490, 550, 665, 675, 705, 740, 765, 842, 870, 1020, 1640])
 
-#ndvi_bound_calculator(QC, GHNA_maintenance_dates, 60, 10)
+#ndvi_bound_calculator(QC, LOBE_maintenance_dates, 70, 10)
 #new_plane_pipeline(QC, JAES_maintenance_dates,
  #                  60, 10,
   #                 1.23, 42.2, 0.989,
@@ -2325,9 +2325,9 @@ irradiance_analysis_writer(QC, PEAN_maintenance_dates, 80, 10,
 
 #new_plane_pipeline(QC, LOBE_maintenance_dates,
  #                  60, 10,
-  #                 7.80, -7.71, 0.905,
+  #                 1.000, 46.4, 0.984,
    #                False,
-    #               split_by_date = True, start = '20250401', end = '20250503',
+    #               split_by_date = False,
      #              fit_method = 'bounds')
 
 #aod_plotter(QC, LOBE_maintenance_dates, 60, 10,

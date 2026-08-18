@@ -7,7 +7,7 @@ import xarray as xr
 from scipy.stats import chisquare
 from scipy.stats import binned_statistic, binned_statistic_2d
 import datetime
-from curepy import MCMCRetrieval, plot_trace, plot_corner
+from curepy import MCMC, RetrievalInput, plot_corner
 import os
 import matplotlib
 
@@ -21,8 +21,8 @@ data = pd.read_csv(
 )
 data.drop("Unnamed: 0", axis="columns")
 
-site = 'PEAN_2023Dec_2024Jan'
-site_file = 'PEAN_2023Dec_2024Jan'
+site = 'LOBE_2025Dec_2026Mar'
+site_file = 'LOBE_2025Dec_2026Mar'
 data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site_file}_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
@@ -544,42 +544,23 @@ def chi_square_minimiser_MCMC_offset(
 def chi_square_minimiser_MCMC_10offsets(
     sza, saa, dir_diff_ratio, measured_ratio, plot_name=""
 ):
-    mcmc = MCMCRetrieval(
-        ratio_calculator_10offsets,
-        measured_ratio,
-        rand_uncertainty=0.05,
-        syst_uncertainty=0.05,
-        initial_guess=[
-            2,
-            -40,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-        ],
-        downlims=[-90, -360, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-        uplims=[90, 360, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        # initial_guess=[2, -40,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        # downlims=[-90, -180, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
-        # uplims=[90, 180, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-        n_input=14,
-        b=[sza, saa, dir_diff_ratio],
-        u_b=[0, 0, 0],
-        b_iter=1,
-        circular=True,
-    )
-    mean, unc, corr, samples = mcmc.run_retrieval(
-        100, 10000, 1000, return_corr=True, return_samples=True
-    )
-    chisq = mcmc.find_chisum(mean)
+    
+    inp = RetrievalInput()
+    inp.build_retrieval_inputs(ratio_calculator_10offsets,
+                                                  [2, -40, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01,],
+                                                  measured_ratio,
+                                                  u_y_rand = 0.05 * np.ones_like(measured_ratio),
+                                                  u_y_syst = 0.05 * np.ones_like(measured_ratio),
+                                                  prior_shape=["uniform"]*14,
+                                                  prior_params=[{"minimum": -90, "maximum": 90},{"minimum": -360, "maximum": 360}] + [{"minimum": -1, "maximum": 1}]*12,
+                                                  b = [sza, saa, dir_diff_ratio],
+                                                  b_MC_steps = 1
+                                                  )
+    ret = MCMC(100, 10000, 1000)
+    res = ret.run_retrieval(inp, return_corr = True, return_samples = True)
+    mean = res.values
+    unc = res.uncertainties
+    chisq = ret.find_chisum(mean)
     print("CHI", len(sza) - 14, chisq, chisq / (len(sza) - 14))
 
     # plot_corner(
@@ -600,40 +581,23 @@ def chi_square_minimiser_MCMC_10offsets(
 def chi_square_minimiser_MCMC_only_offsets(
     sza, saa, dir_diff_ratio, measured_ratio, plot_name=""
 ):
-    mcmc = MCMCRetrieval(
-        ratio_calculator_only_offsets,
-        measured_ratio,
-        rand_uncertainty=0.05,
-        syst_uncertainty=0.05,
-        initial_guess=[
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-            0.01,
-        ],
-        downlims=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-        uplims=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        # initial_guess=[2, -40,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        # downlims=[-90, -180, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
-        # uplims=[90, 180, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
-        n_input=12,
-        b=[sza, saa, dir_diff_ratio],
-        u_b=[0, 0, 0],
-        b_iter=1,
-        circular=True,
-    )
-    mean, unc, corr, samples = mcmc.run_retrieval(
-        100, 10000, 1000, return_corr=True, return_samples=True
-    )
-    chisq = mcmc.find_chisum(mean)
+    
+    inp = RetrievalInput()
+    inp.build_retrieval_inputs(ratio_calculator_only_offsets,
+                                                [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01,],
+                                                measured_ratio,
+                                                u_y_rand = 0.05 * np.ones_like(measured_ratio),
+                                                u_y_syst = 0.05 * np.ones_like(measured_ratio),
+                                                prior_shape=["uniform"]*12,
+                                                prior_params=[{"minimum": -1, "maximum": 1}]*12,
+                                                b = [sza, saa, dir_diff_ratio],
+                                                b_MC_steps = 1
+                                                )
+    ret = MCMC(100, 10000, 1000)
+    res = ret.run_retrieval(inp, return_corr = True, return_samples = True)
+    mean = res.values
+    unc = res.uncertainties
+    chisq = ret.find_chisum(mean)
     print("Only Offsets CHI", len(sza) - 10, chisq, chisq / (len(sza) - 10))
 
     return mean, unc, chisq / (len(sza) - 10)
