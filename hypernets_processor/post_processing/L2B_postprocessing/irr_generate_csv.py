@@ -12,13 +12,13 @@ import pandas as pd
 # set appropriate folders (different for linux or windows) and settings
 data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
 results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
-site = "GHNA"
+site = "SPAR"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
     os.mkdir(results_path)
-start_time = "20251015T0000"
-stop_time = "20251201T0000"
+start_time = "20260128T0000"
+stop_time = "20260501T0000"
 wavelength = 550
 
 # start_tod = ["0900","0930","1000","1030","1100"]
@@ -46,7 +46,7 @@ def find_nearest_to_wav(array, wv, value):
 
 
 data_clear = xr.open_dataset(
-    "T:/ECO/EOServer/data/insitu/hypernets/archive/GHNA/2025/11/05/SEQ20251105T123143/HYPERNETS_L_GHNA_L1B_IRR_20251105T1231_20251113T0335_v2.2.nc")
+    "T:/ECO/EOServer/data/insitu/hypernets/archive/SPAR/2026/03/04/SEQ20260304T173050/HYPERNETS_L_SPAR_L1B_IRR_20260304T1730_20260304T1802_v2.2.nc")
 wav_ori = data_clear.wavelength.values
 print("Got wavelengths")
 
@@ -140,13 +140,13 @@ def make_irrs(file_list, wav_val):
             irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
             irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
 
-    irrs.to_csv(results_path + '\GHNA_2025Oct_2025Nov_irradiance.csv', index=False)
+    irrs.to_csv(results_path + '\SPAR_2026Jan_2026Apr_irradiance.csv', index=False)
     return irrs
 
 
 ##running
 
-files = glob.glob(os.path.join(data_path, "GHNA", "2025", "*", "*", "*", "*L1B_IRR*.nc"))
+files = glob.glob(os.path.join(data_path, "SPAR", "*", "*", "*", "*", "*L1B_IRR*.nc"))
 
 print("Files In")
 

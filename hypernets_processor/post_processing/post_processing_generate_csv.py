@@ -6,6 +6,57 @@ import os
 import glob
 import matplotlib.pyplot as plt
 
+def export_csv(meas, path, wavs, model_refl=None):
+    if isinstance(wavs, (int, float)):
+        wavs = [wavs]
+
+    if model_refl is not None and len(model_refl) != len(wavs):
+        model_refl = [model_refl]
+
+    table = np.empty((0, len(meas.get_datetimes())))
+    header = ""
+    if meas.ds.ids is not None:
+        header += "id, "
+        table = np.vstack(
+            [table, meas.ds.ids]
+        )
+
+    if meas.get_datetimes() is not None:
+        header += "acquisition_time, "
+        table = np.vstack(
+            [table, meas.get_datetimes()]
+        )
+
+        header += "doy, "
+        table = np.vstack(
+            [table, [dt.strftime('%j') for dt in meas.get_datetimes()]]
+        )
+
+        header += "tod, "
+        table = np.vstack(
+            [table, [float(dt.strftime('%H')) + float(dt.strftime('%M')) / 60 for dt in meas.get_datetimes()]]
+        )
+
+    if meas.get_angles() is not None:
+        header += "sza, vza, saa, vaa, "
+        table = np.vstack(
+            [table, meas.get_angles()]
+        )
+
+    for iw in range(len(wavs)):
+        header += "refl_%snm, " % wavs[iw]
+        table = np.vstack(
+            [table, meas.get_reflectance(wavs[iw])]
+        )
+        if model_refl is not None:
+            header += "percent_residual_%snm, " % wavs[iw]
+            table = np.vstack(
+                [table, (meas.get_reflectance(wavs[iw]) - model_refl[iw]) / meas.get_reflectance(wavs[iw]) * 100]
+            )
+
+    np.savetxt(path, table.T, delimiter=",", header=header[:-2], fmt='%s')
+
+
 # set appropriate folders (different for linux or windows) and settings
 
 # for windows:
@@ -148,12 +199,21 @@ SITE_PERIODS = {
         },
         {
             "start_date": "2025-04-15",
-            "stop_date": "present",
+            "stop_date": "2025-12-14",
             "lat": 50.55151,
             "lon": 4.74601,
             "HYPSTAR_SN": 222312,
             "comments": "Sugar beet roots, Flat soil surface",
         },
+        {
+            "start_date": "2025-12-15",
+            "stop_date": "2026-03-24",
+            "lat": 50.55151,
+            "lon": 4.74601,
+            "HYPSTAR_SN": 222312,
+            "valid": False,
+            "comments": "Site is fallow with flat soil surface",
+        }
     ],
      "PEAN": [
          {
@@ -193,14 +253,22 @@ SITE_PERIODS = {
             "stop_date": "present",
             "HYPSTAR_SN": 222314,
             "comments": "v3 instrument",
+        },  
+    ],
+    "SPAR": [
+        {
+            "start_date": "2026-01-28",
+            "stop_date": "present",
+            "HYPSTAR_SN": 221211,
+            "valid": False,
+            "comments": "Site installed in San Pedro, Argentina, waiting for grass to regrow",
         },
-        
     ],
 }
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'LOBE':
+        if site != 'SPAR':
             continue
         if period["stop_date"] != "present":
             continue
@@ -229,7 +297,7 @@ for site in SITE_PERIODS.keys():
                         files, i=None, vza=vza, vaa=vaa, mask=False
                     )
 
-                    HCRFmeas.export_csv(
+                    export_csv(HCRFmeas,
                         os.path.join(
                             results_path,
                             "%s_%s_%s_%s_%s.csv"
