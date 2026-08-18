@@ -1033,8 +1033,8 @@ class SiteSpecificQualityChecks:
                         )
 
                     seq = dataset.attrs["sequence_id"]
-                    ts = datetime.datetime.utcfromtimestamp(
-                        dataset["acquisition_time"][i]
+                    ts = datetime.datetime.fromtimestamp(
+                        dataset["acquisition_time"][i], tz=datetime.timezone.utc
                     )
 
                     if verbosity > 2:

@@ -228,7 +228,7 @@ def filter_files_start_stop(
         try:
             ds_HYP = xr.open_dataset(file)
             times = [
-                datetime.datetime.utcfromtimestamp(timestamp)
+                datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
                 for timestamp in ds_HYP["acquisition_time"].values
             ]
             if min(times) > start_time and max(times) < stop_time:
@@ -399,9 +399,9 @@ def convert_datetime(
         unix_epoch = np.datetime64(0, "s")
         one_second = np.timedelta64(1, "s")
         seconds_since_epoch = (date_time - unix_epoch) / one_second
-        return datetime.datetime.utcfromtimestamp(seconds_since_epoch)
+        return datetime.datetime.fromtimestamp(seconds_since_epoch, tz=datetime.timezone.utc)
     elif isinstance(date_time, (float, int, np.uint)):
-        return datetime.datetime.utcfromtimestamp(date_time)
+        return datetime.datetime.fromtimestamp(date_time, tz=datetime.timezone.utc)
     else:
         if date_time[-1] == "Z":
             date_time = date_time[:-1]
