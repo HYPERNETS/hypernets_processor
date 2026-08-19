@@ -15,6 +15,7 @@ import datetime
 import numpy as np
 from obsarray.templater.dataset_util import DatasetUtil
 from typing import Optional, Union, List, Any
+from tqdm import tqdm
 
 bad_flags = [
     "pt_ref_invalid",
@@ -116,7 +117,7 @@ def read_data_hypernets(
 
 
     if i is None:
-        for ii in range(1, len(files)):
+        for ii in tqdm(range(1, len(files))):
             ds_HYP = read_hypernets_file(
                 files[ii],
                 vza=vza,
