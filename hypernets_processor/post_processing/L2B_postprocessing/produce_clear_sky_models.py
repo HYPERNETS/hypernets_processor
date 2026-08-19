@@ -1,5 +1,5 @@
 import numpy as np
-import hypernets_processor.post_processing.L2B_postprocessing.hypernets_brdf_data_io as data_io
+import hypernets_brdf_data_io as data_io
 import os
 import glob
 from pysolar.solar import *
@@ -18,7 +18,7 @@ results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradi
 
 # for eoserver:
 data_path = r"/mnt/t/data/insitu/hypernets/archive"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/irradiance"
+results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/scene_forge_irradiance"
 
 yaml_path = os.path.join(results_path, "example_hypernets_BOA.yaml")
 
@@ -29,13 +29,13 @@ SITE_LOCATIONS = {
     # "ATGE": [52.466778, 12.959778],
     # # "BASP": [39.049139, -2.075917],
     # "DEGE": [53.868278, 13.268556],
-    # "GHNA": [-23.60153, 15.12589],
-    # # "IFAR": [-34.592322, -58.479017],
-    # "JAES": [58.281975, 27.312959],
-    # "JSIT": [44.874305, 11.979201],
-    # "LOBE": [50.551493, 4.745911],
-    # "PEAN": [-71.940128, 23.305260],
-    # "WWUK": [51.777206, -1.338494],
+    "GHNA": [-23.60153, 15.12589],
+    # "IFAR": [-34.592322, -58.479017],
+    "JAES": [58.281975, 27.312959],
+    "JSIT": [44.874305, 11.979201],
+    "LOBE": [50.551493, 4.745911],
+    "PEAN": [-71.940128, 23.305260],
+    "WWUK": [51.777206, -1.338494],
     "SPAR": [-33.81329, -59.88987],
 }
 
@@ -232,19 +232,24 @@ def combine_direct_to_diffuse_ratio_sza(
     median_aod=False,
     tag="",
 ):
-    files = glob.glob(
+    files = set(glob.glob(
         os.path.join(irr_files_path, "irr_clear_sky_%s*%s.nc" % (site, tag))
-    )
-    files.sort()
+    ))
+    excluded = set(glob.glob(
+        os.path.join(irr_files_path, "irr_clear_sky_%s*comb%s.nc" % (site, tag))
+    ))
+
+    files= sorted(files-excluded)
     direct_to_diffuse_all = [xr.open_dataset(file) for file in files]
     direct_to_diffuse_subset = [
-        direct_to_diffuse
+        direct_to_diffuse.drop_vars("sza")
         for direct_to_diffuse in direct_to_diffuse_all
         if direct_to_diffuse.attrs["aod"] == aod
     ]
     szas = [
         direct_to_diffuse.attrs["sza"] for direct_to_diffuse in direct_to_diffuse_subset
     ]
+
     comb_ds = xr.concat(direct_to_diffuse_subset, pd.Index(szas, name="sza"))
     comb_ds.attrs["aod"] = aod
     if median_aod:
@@ -260,15 +265,15 @@ def combine_direct_to_diffuse_ratio_sza(
 
 def interpolate_irradiance_sza(sza, ds_irr):
     ds_irr_temp = ds_irr.copy()
-    ds_irr_temp["solar_irradiance_BOA"].values = (
-        ds_irr_temp["solar_irradiance_BOA"].values
+    ds_irr_temp["irradiance"].values = (
+        ds_irr_temp["irradiance"].values
         / np.cos(ds_irr_temp["sza"].values / 180 * np.pi)[:, None]
     )
     ds_irr_temp = ds_irr_temp.interp(sza=sza, method="linear")
-    ds_irr_temp["solar_irradiance_BOA"].values = ds_irr_temp[
-        "solar_irradiance_BOA"
+    ds_irr_temp["irradiance"].values = ds_irr_temp[
+        "irradiance"
     ].values * np.cos(ds_irr_temp["sza"].values / 180 * np.pi)
-    return ds_irr_temp["solar_irradiance_BOA"].values
+    return ds_irr_temp
 
 for site in SITE_LOCATIONS.keys():
     lat, lon = SITE_LOCATIONS[site]
@@ -314,6 +319,7 @@ for site in SITE_LOCATIONS.keys():
                     context = SceneForgeContext(str(yaml_path))
                     context["atmosphere"]["vertical_profiles"]["values"] = atmosphere_type[site]
                     context["atmosphere"]["aerosols"]["values"] = aerosol_type[site]
+
                     ds_irr = run_BOA_irradiance_simulation_basics(context, 
                                                                   ds_HYP, 
                                                                   ds_atm.total_column_water_vapour.values.mean(), 
