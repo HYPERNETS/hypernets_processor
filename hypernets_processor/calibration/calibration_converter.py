@@ -152,11 +152,11 @@ class CalibrationConverter:
 
         if self.context.get_config_value("network") == "l":
             name = (
-                "HYPERNETS_CAL_"
-                + hypstar.upper()
-                + "_RAD_SWIR_v"
-                + str(self.version)
-                + ".nc"
+                    "HYPERNETS_CAL_"
+                    + hypstar.upper()
+                    + "_RAD_SWIR_v"
+                    + str(self.version)
+                    + ".nc"
             )
             if os.path.exists(os.path.join(hypstar_path, name)):
                 calibration_data_rad_swir = xarray.open_dataset(
@@ -169,11 +169,11 @@ class CalibrationConverter:
                 )
 
             name = (
-                "HYPERNETS_CAL_"
-                + hypstar.upper()
-                + "_IRR_SWIR_v"
-                + str(self.version)
-                + ".nc"
+                    "HYPERNETS_CAL_"
+                    + hypstar.upper()
+                    + "_IRR_SWIR_v"
+                    + str(self.version)
+                    + ".nc"
             )
             if os.path.exists(os.path.join(hypstar_path, name)):
                 calibration_data_irr_swir = xarray.open_dataset(
@@ -755,7 +755,15 @@ class CalibrationConverter:
                             np.eye(len(gains[:, 2])),
                             gains[:, 2] * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5,
                         )
+                        cov_other = cm.convert_corr_to_cov(
+                            np.eye(len(gains[:, 2])),
+                            gains[:, 2] * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5,
+                        )
 
+                        cov_filament = cm.convert_corr_to_cov(
+                            np.ones((len(gains[:, 2]), len(gains[:, 2]))),
+                            gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
+                        )
                         cov_filament = cm.convert_corr_to_cov(
                             np.ones((len(gains[:, 2]), len(gains[:, 2]))),
                             gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
