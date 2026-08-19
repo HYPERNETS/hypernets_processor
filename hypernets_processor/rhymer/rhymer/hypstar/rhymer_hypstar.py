@@ -3,7 +3,7 @@
 ## zenith angle is used to differentiate Lsky and Lu
 ## QV July 2018
 ## Last modifications: 2019-07-10 (QV) renamed from PANTR, added .lower() to sensor ID as it is in some cases uppercase in the current deployment (RBINS ROOF)
-from datetime import datetime
+from datetime import datetime, timezone
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.rhymer.rhymer.ancillary.rhymer_ancillary import RhymerAncillary
 from hypernets_processor.rhymer.rhymer.processing.rhymer_processing import (
@@ -136,8 +136,7 @@ class RhymerHypstar:
                 senz = scani["viewing_zenith_angle"].values
                 if self.context.logger is not None:
                     self.context.logger.debug(scani["acquisition_time"].values)
-                ts = datetime.utcfromtimestamp(int(scani["acquisition_time"].values))
-                # not fromtimestamp?
+                ts = datetime.fromtimestamp(int(scani["acquisition_time"].values), tz=timezone.utc)
 
                 if (senz != "NULL") & (sena != "NULL"):
                     senz = float(senz)
@@ -285,8 +284,8 @@ class RhymerHypstar:
                 )
 
             elif self.context.get_config_value("wind_ancillary") == "NCEP":
-                isotime = datetime.utcfromtimestamp(
-                    l1b["acquisition_time"].values[i]
+                isotime = datetime.fromtimestamp(
+                    l1b["acquisition_time"].values[i], tz=timezone.utc
                 ).strftime("%Y-%m-%d %H:%M:%S")
                 anc_wind = self.rhymeranc.ts_wind(isotime, l1b.attrs["site_id"])
                 if anc_wind is not None:
@@ -294,8 +293,8 @@ class RhymerHypstar:
                 l1b.attrs["rhof_wind_source"] = "NCEP"
 
             elif self.context.get_config_value("wind_ancillary") == "GDAS":
-                isotime = datetime.utcfromtimestamp(
-                    l1b["acquisition_time"].values[i]
+                isotime = datetime.fromtimestamp(
+                    l1b["acquisition_time"].values[i], tz=timezone.utc
                 ).strftime("%Y-%m-%d %H:%M:%S")
                 anc_wind = self.rhymeranc.gdas_extract(isotime, lon, lat)
                 if anc_wind is not None:

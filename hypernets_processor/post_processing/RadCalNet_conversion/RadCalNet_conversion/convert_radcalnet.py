@@ -91,7 +91,7 @@ class Convert_RadCalNet:
             unix_epoch = np.datetime64(0, "s")
             one_second = np.timedelta64(1, "s")
             seconds_since_epoch = (date_time - unix_epoch) / one_second
-            return datetime.datetime.utcfromtimestamp(seconds_since_epoch)
+            return datetime.datetime.fromtimestamp(seconds_since_epoch, tz=datetime.timezone.utc)
         elif isinstance(
             date_time,
             (
@@ -106,7 +106,7 @@ class Convert_RadCalNet:
                 np.uint32,
             ),
         ):
-            return datetime.datetime.utcfromtimestamp(date_time)
+            return datetime.datetime.fromtimestamp(date_time, tz=datetime.timezone.utc)
         else:
             print(type(date_time))
             if date_time[-1] == "Z":

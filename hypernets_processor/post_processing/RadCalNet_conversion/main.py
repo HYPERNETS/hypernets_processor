@@ -13,7 +13,7 @@ from GHNA_processing.RadCalNet_conversion.convert_radcalnet import Convert_RadCa
 
 """___Third-Party Modules___"""
 import datetime as dt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import numpy as np
 import os
 import matplotlib.pyplot as plt
@@ -278,7 +278,7 @@ def process_matchup(matchup):
             output_path,
             "plots",
             "comparison_%s.png"
-            % (datetime.fromtimestamp(rcn_datetime).strftime("%Y%m%dT%H%M%S")),
+            % (datetime.fromtimestamp(rcn_datetime, tz=timezone.utc).strftime("%Y%m%dT%H%M%S")),
         )
     )
     plt.clf()
@@ -297,7 +297,7 @@ def process_matchup(matchup):
             output_path,
             "plots",
             "comparison_%s_reldiff.png"
-            % (datetime.fromtimestamp(rcn_datetime).strftime("%Y%m%dT%H%M%S")),
+            % (datetime.fromtimestamp(rcn_datetime, tz=timezone.utc).strftime("%Y%m%dT%H%M%S")),
         )
     )
     plt.clf()
