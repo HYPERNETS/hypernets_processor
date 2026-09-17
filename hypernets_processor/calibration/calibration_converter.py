@@ -395,7 +395,7 @@ class CalibrationConverter:
             for path in glob.glob(
                 os.path.join(directory, "hypstar_" + str(hypstar), "radiometric", "*")
             )
-            if ".pdf" not in path
+            if ".pdf" not in path and "bad_pixels" not in path
         ]
         caldates = []
         gains = np.zeros(9999)

@@ -266,9 +266,31 @@ SITE_PERIODS = {
     ],
 }
 
+from pathlib import Path
+import pandas as pd
+
+def get_files_for_period(base_path, site, start_date, stop_date):
+    files = []
+
+    dates = pd.date_range(start_date, stop_date, freq="D")
+
+    for d in dates:
+        day_path = (
+            Path(base_path)
+            / site
+            / f"{d.year:04d}"
+            / f"{d.month:02d}"
+            / f"{d.day:02d}"
+        )
+
+        if day_path.exists():
+            files.extend(day_path.rglob("*L2A*.nc"))
+
+    return [str(f) for f in files]
+
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'SPAR':
+        if site != 'GHNA':
             continue
         if period["stop_date"] != "present":
             continue
@@ -279,11 +301,16 @@ for site in SITE_PERIODS.keys():
         if stop_time == "present":
             stop_time = datetime.datetime.now()
 
-        files = glob.glob(os.path.join(data_path, site, "*", "*", "*", "*", "*L2A*.nc"))
-        print(files)
+        all_files = get_files_for_period(
+            data_path,
+            site,
+            start_time,
+            stop_time
+        )
+        print(all_files)
         for ii in range(len(start_tod)):
             files = data_io.filter_files_quick(
-                files,
+                all_files,
                 start_time,
                 stop_time,
                 tod_start=start_tod[ii],
