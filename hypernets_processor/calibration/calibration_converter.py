@@ -107,17 +107,35 @@ class CalibrationConverter:
                 self.context.logger.warning(
                     "No SN set for hypstar instrument! using hypstar_cal_number from config file instead."
                 )
+
+            sequence_dt64 = np.datetime64(parse_sequence_path(sequence_path)["datetime"])
+            
+            if self.context.get_config_value("site_id") != "TEST":
+                site_id = self.context.get_config_value("site_id")
+            elif "site_id" in (globalattr.keys()):
+                site_id = str(globalattr["site_id"]).strip()
+                self.context.set_config_value("site_id", site_id)
+            elif "site_name" in (globalattr.keys()):
+                site_id = str(globalattr["site_name"]).strip()
+                self.context.set_config_value("site_id", site_id)
+            else:
+                self.context.error("site_id not found. Using default TEST instead.")
+            
         else:
             self.context.logger.error("Metadata missing")
             self.context.anomaly_handler.add_anomaly("m")
 
+        if site_id == "GHNA" and instrument_id != "220261" and sequence_dt64 > np.datetime64("2022-05-17T00:00:00") and sequence_dt64 <= np.datetime64("2023-10-17T00:00:00"):
+            self.context.logger.warning(
+                "Site GHNA has the wrong instrument_id set in metadata. Overwriting manualy in calibration_converter.read_calib_files()."
+            )
+            instrument_id = "220261"
+        
         hypstar = "hypstar_" + str(
             instrument_id
         )  # self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf, hypstar)
         name = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(self.version) + ".nc"
-
-        # print("using calibration file:", name)
 
         if os.path.exists(os.path.join(hypstar_path, name)):
             calibration_data_rad = xarray.open_dataset(os.path.join(hypstar_path, name))
@@ -135,11 +153,14 @@ class CalibrationConverter:
                 os.path.join(hypstar_path, name) + " calibration file does not exist"
             )
 
-        sequence_dt64 = np.datetime64(parse_sequence_path(sequence_path)["datetime"])
+        
+        
 
         calibration_data_rad = self.interpolate_calibration_ds(
             calibration_data_rad, sequence_dt64
         )
+        calibration_data_rad.attrs["site_id"] = site_id
+        calibration_data_rad.attrs["instrument_id"] = instrument_id
         calibration_data_rad.attrs["instrument_calibration_file_rad"] = name
         calibration_data_rad.attrs["instrument_calibration_date_rad"] = str(convert_datetime(calibration_data_rad.calibrationdates.values).date())
         
@@ -147,6 +168,8 @@ class CalibrationConverter:
         calibration_data_irr = self.interpolate_calibration_ds(
             calibration_data_irr, sequence_dt64
         )
+        calibration_data_irr.attrs["site_id"] = site_id
+        calibration_data_irr.attrs["instrument_id"] = instrument_id
         calibration_data_irr.attrs["instrument_calibration_file_irr"] = name
         calibration_data_irr.attrs["instrument_calibration_date_irr"] = str(convert_datetime(calibration_data_irr.calibrationdates.values).date())
 
@@ -188,12 +211,16 @@ class CalibrationConverter:
             calibration_data_rad_swir = self.interpolate_calibration_ds(
                 calibration_data_rad_swir, sequence_dt64
             )
+            calibration_data_rad_swir.attrs["site_id"] = site_id
+            calibration_data_rad_swir.attrs["instrument_id"] = instrument_id
             calibration_data_rad_swir.attrs["instrument_calibration_file_rad_swir"] = name
             calibration_data_rad_swir.attrs["instrument_calibration_date_rad_swir"] = str(convert_datetime(calibration_data_rad_swir.calibrationdates.values).date())
 
             calibration_data_irr_swir = self.interpolate_calibration_ds(
                 calibration_data_irr_swir, sequence_dt64
             )
+            calibration_data_irr_swir.attrs["site_id"] = site_id
+            calibration_data_irr_swir.attrs["instrument_id"] = instrument_id
             calibration_data_irr_swir.attrs["instrument_calibration_file_irr_swir"] = name
             calibration_data_irr_swir.attrs["instrument_calibration_date_irr_swir"] = str(convert_datetime(calibration_data_irr_swir.calibrationdates.values).date())
 

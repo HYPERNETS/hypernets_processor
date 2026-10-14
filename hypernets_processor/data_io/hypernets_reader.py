@@ -1081,7 +1081,7 @@ class HypernetsReader:
                         chunk_counter += 1
         return ds, ds_swir
 
-    def read_metadata(self, seq_dir):
+    def read_metadata(self, seq_dir, site_id):
 
         model_name = self.model
         flag = 0
@@ -1128,19 +1128,6 @@ class HypernetsReader:
                 globalattr = dict(metadata["Metadata"])
             else:
                 globalattr = []
-
-            # first retrieve site name to get site specific attributes, if any
-
-            if self.context.get_config_value("site_id") != "TEST":
-                site_id = self.context.get_config_value("site_id")
-            elif "site_id" in (globalattr.keys()):
-                site_id = str(globalattr["site_id"]).strip()
-                self.context.set_config_value("site_id", site_id)
-            elif "site_name" in (globalattr.keys()):
-                site_id = str(globalattr["site_name"]).strip()
-                self.context.set_config_value("site_id", site_id)
-            else:
-                self.context.error("site_id not found. Using default TEST instead.")
 
             # need to check which angle to use as a reference to calculate vaa (~azimuth swith, offset, ...)
             angle2use = self.context.get_config_value("angle2use")
@@ -1203,15 +1190,6 @@ class HypernetsReader:
                 print("Longitude is not given, use default or add it in metadata.txt")
                 lon = self.context.get_config_value("lon")
                 flag = flag + 2 ** FLAG_COMMON.index("lon_default")
-
-            if "hypstar_sn" in (globalattr.keys()):
-                instrument_id = int(globalattr["hypstar_sn"])
-            elif "sn_hypstar" in (globalattr.keys()):
-                instrument_id = int(globalattr["sn_hypstar"])
-            else:
-                instrument_id = self.context.get_config_value("hypstar_cal_number")
-                self.context.logger.error("No SN for hypstar instrument!")
-                # self.context.anomaly_handler.add_anomaly("x")
 
             if "azimuth_switch" in (globalattr.keys()):
                 azimuth_switch = float(globalattr["azimuth_switch"])
@@ -1291,8 +1269,6 @@ class HypernetsReader:
             seriesBlack,
             seriesPict,
             flag,
-            instrument_id,
-            site_id,
             azimuth_switch,
             offset_tilt,
             offset_pan,
@@ -1337,6 +1313,9 @@ class HypernetsReader:
         calibration_data_swir_irr=None,
         single_series=None,
     ):
+        #use previously extracted site_id and instrument_id from the calibration_data
+        site_id = calibration_data_rad.attrs["site_id"]
+        instrument_id = calibration_data_rad.attrs["instrument_id"]
 
         # define data to return none at end of method if does not exist
         l0a_irr = None
@@ -1356,13 +1335,11 @@ class HypernetsReader:
             seriesBlack,
             seriesPict,
             flag,
-            instrument_id,
-            site_id,
             azimuth_switch,
             offset_tilt,
             offset_pan,
             angle2use,
-        ) = self.read_metadata(seq_dir)
+        ) = self.read_metadata(seq_dir, site_id)
 
         if single_series is not None:
             if single_series in seriesIrr:

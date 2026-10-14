@@ -4,22 +4,20 @@ import os
 import glob
 from pysolar.solar import *
 import xarray as xr
+import matplotlib.pyplot as plt
 import pandas as pd
-from scene_forge import run_RT, SceneForgeContext
-from scene_forge.utils.helpers import run_BOA_irradiance_simulation_basics
-import ancillary_tools as at
 from eoio import read
 import numpy as np
 import xarray as xr
 
 # for windows:
 data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance"
-results_path2 = os.path.dirname(__file__)
+results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\scene_forge_irradiance"
+results_path2 = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),"data", "postprocessing", "irradiance_data")
 
-# for eoserver:
-data_path = r"/mnt/t/data/insitu/hypernets/archive"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/scene_forge_irradiance"
+# # for eoserver:
+# data_path = r"/mnt/t/data/insitu/hypernets/archive"
+# results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/scene_forge_irradiance"
 
 yaml_path = os.path.join(results_path, "example_hypernets_BOA.yaml")
 
@@ -228,10 +226,87 @@ tag = "_" + tag
 
 for site in SITE_LOCATIONS.keys():
     lat, lon = SITE_LOCATIONS[site]
+    for aod in ["medianaod", "aod0.0"]:
 
-    if os.path.exists(os.path.join(results_path, "atmosphere_%s_%s_%s.nc" % (site, start_time, stop_time))):
-        ds_atm = xr.open_dataset(os.path.join(results_path, "atmosphere_%s_%s_%s.nc" % (site, start_time, stop_time)))
-        ds_atm2 = xr.open_dataset(os.path.join(results_path2, "atmosphere_%s_%s_%s.nc" % (site, start_time, stop_time)))
-    
-    #compare (plot) the irradiances at the different sza for the different sites
-    
+        if os.path.exists(os.path.join(results_path, "%s_clear_sky_%s%s.nc" % (site, aod, tag))) and os.path.exists(os.path.join(results_path2, "%s_clear_sky_%s%s.nc" % (site, aod, tag))):
+            ds_irr = xr.open_dataset(os.path.join(results_path, "%s_clear_sky_%s%s.nc" % (site, aod, tag)))
+            ds_irr2 = xr.open_dataset(os.path.join(results_path2, "%s_clear_sky_%s%s.nc" % (site, aod, tag)))
+
+            da_irr = ds_irr["irradiance"]
+            da_irr2 = ds_irr2["solar_irradiance_BOA"]
+
+            #compare (plot) the irradiances at the different sza for the different sites
+            # determine wavelength coordinate name and values
+            def _find_wavelength_coord(da):
+                # prefer common names
+                for name in ("wavelength", "wvl", "wl", "wavelengths", "nm", "band"):
+                    if name in da.coords:
+                        return name, da.coords[name].values
+                # try any coord that looks like wavelength
+                for name in da.coords:
+                    lname = name.lower()
+                    if "wave" in lname or lname.startswith("wl") or "nm" in lname or "band" in lname:
+                        return name, da.coords[name].values
+                # fallback: assume last dim is wavelength
+                wl_dim = da.dims[-1]
+                return wl_dim, da.coords[wl_dim].values
+
+            # get wavelength for either DataArray
+            try:
+                wl_name, wl_vals = _find_wavelength_coord(da_irr)
+            except Exception:
+                wl_name, wl_vals = _find_wavelength_coord(da_irr2)
+
+            # reduce to 1-D by averaging over all non-wavelength dims
+            def _reduce_to_spectrum(da, wl_dim_name):
+                # if wl_dim_name is a dim name, ensure it's used; otherwise assume last dim
+                dims_to_mean = [d for d in da.dims if d != wl_dim_name]
+                if dims_to_mean:
+                    return da.mean(dim=dims_to_mean, skipna=True)
+                return da
+
+            da1 = _reduce_to_spectrum(da_irr, wl_name)
+            da2 = _reduce_to_spectrum(da_irr2, wl_name)
+
+            # align and convert to numpy
+            try:
+                da1, da2 = xr.align(da1, da2, join="inner")
+            except Exception:
+                pass
+
+            spec1 = da1.values.astype(float)
+            spec2 = da2.values.astype(float)
+            wl = np.asarray(wl_vals).astype(float)
+
+            # mask invalids
+            mask = np.isfinite(wl) & np.isfinite(spec1) & np.isfinite(spec2)
+            if mask.sum() == 0:
+                print(f"No valid wavelength/spectral values for {site} {aod}")
+            else:
+                wl = wl[mask]
+                spec1 = spec1[mask]
+                spec2 = spec2[mask]
+
+                # compute relative difference (spec1 - spec2) / spec2
+                with np.errstate(divide='ignore', invalid='ignore'):
+                    rel_diff = (spec1 - spec2) / spec2
+
+                # plotting
+                fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+                ax1.plot(wl, spec1, label='da_irr')
+                ax1.plot(wl, spec2, label='da_irr2')
+                ax1.set_ylabel('Irradiance')
+                ax1.legend()
+                ax1.grid(True)
+
+                ax2.plot(wl, rel_diff * 100)
+                ax2.set_ylabel('Relative difference (%)')
+                ax2.set_xlabel('Wavelength')
+                ax2.grid(True)
+
+                outfn = os.path.join(results_path, f"{site}_{aod}_irr_comparison{tag}.png")
+                fig.suptitle(f"{site} {aod} irradiance comparison")
+                fig.tight_layout(rect=[0, 0.03, 1, 0.95])
+                fig.savefig(outfn, dpi=150)
+                plt.close(fig)
+            
