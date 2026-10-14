@@ -105,21 +105,25 @@ QC_METADATA = {
 L1A_RAD_METADATA = {
     "title": "HYPSTAR dataset of radiance",  # example of irradiance file
     "instrument_calibration_file_rad": "NaN",
+    "instrument_calibration_date_rad": "NaN",
 }
 
 L1A_IRR_METADATA = {
     "title": "HYPSTAR dataset of irradiance",  # example of irradiance file
     "instrument_calibration_file_irr": "NaN",
+    "instrument_calibration_date_irr": "NaN",
 }
 
 L1B_RAD_METADATA = {
     "title": "HYPSTAR dataset of radiance averaged over scans",  # example of irradiance file
     "instrument_calibration_file_rad": "NaN",
+    "instrument_calibration_date_rad": "NaN",
 }
 
 L1B_IRR_METADATA = {
     "title": "HYPSTAR dataset of irradiance averaged over scans",  # example of irradiance file
     "instrument_calibration_file_irr": "NaN",
+    "instrument_calibration_date_irr": "NaN",
 }
 
 W_L1C_WLR_METADATA = {
@@ -127,6 +131,8 @@ W_L1C_WLR_METADATA = {
     " radiance and water leaving radiance",  # example of irradiance file
     "instrument_calibration_file_rad": "NaN",
     "instrument_calibration_file_irr": "NaN",
+    "instrument_calibration_date_rad": "NaN",
+    "instrument_calibration_date_irr": "NaN",
     "rhof_option": "NaN",
     "rhof_wind_source": "NaN",
     "similarity_waveref": "NaN",
@@ -140,12 +146,16 @@ L_L1C_METADATA = {
     "title": "HYPSTAR Land network dataset of radiance and irradiance",  # example of irradiance file
     "instrument_calibration_file_rad": "NaN",
     "instrument_calibration_file_irr": "NaN",
+    "instrument_calibration_date_rad": "NaN",
+    "instrument_calibration_date_irr": "NaN",
 }
 
 W_L2A_REF_METADATA = {
     "title": "HYPSTAR Water network dataset of spectral surface reflectance",
     "instrument_calibration_file_rad": "NaN",
     "instrument_calibration_file_irr": "NaN",
+    "instrument_calibration_date_rad": "NaN",
+    "instrument_calibration_date_irr": "NaN",
     "rhof_option": "NaN",
     "similarity_waveref": "NaN",
     "similarity_wavethres": "NaN",
@@ -158,6 +168,8 @@ L_L2A_REF_METADATA = {
     "title": "HYPSTAR Land network dataset of spectral surface reflectance",
     "instrument_calibration_file_rad": "NaN",
     "instrument_calibration_file_irr": "NaN",
+    "instrument_calibration_date_rad": "NaN",
+    "instrument_calibration_date_irr": "NaN",
 }
 
 LAND_NETWORK_METADATA = {
@@ -315,18 +327,18 @@ SYSTEM_METADATA = {  # "system_id": system_id,
     "system_documentation_references": "TBD",
     "system_deployment_date": "TBD",
     "system_deployment_height": "TBD",
-    "system_comment": "system below bird nest, bad luck",
+    "system_comment": "TBD (e.g. system below bird nest, bad luck)",
 }
 
 
-#this needs to be further dicsussed after we have achieved conclusion on what to do in terms of QC for deployment periods
+# this needs to be further dicsussed after we have achieved conclusion on what to do in terms of QC for deployment periods
 DEPLOYMENT_METADATA = {
-    "start_date":"NaN",
-    "intstument_id":"NaN",
-    "hypernets_tools_version":"NaN",
+    "start_date": "NaN",
+    "intstument_id": "NaN",
+    "hypernets_tools_version": "NaN",
     "site_latitude": "NaN",
     "site_longitude": "NaN",
-    #components? how do we gather this info and make sure its up to date?
+    # components? how do we gather this info and make sure its up to date?
 }
 
 SITE_METADATA = {
@@ -460,6 +472,16 @@ METADATA_DEFS = {
         **WATER_NETWORK_METADATA,
         **W_L2A_REF_METADATA,
     },
-    "L_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **LAND_NETWORK_METADATA, **L_L2A_REF_METADATA},
-    "W_L2B": {**STANDARD_METADATA, **COMPONENTS_METADATA, **WATER_NETWORK_METADATA, **W_L2A_REF_METADATA},
+    "L_L2B": {
+        **STANDARD_METADATA,
+        **COMPONENTS_METADATA,
+        **LAND_NETWORK_METADATA,
+        **L_L2A_REF_METADATA,
+    },
+    "W_L2B": {
+        **STANDARD_METADATA,
+        **COMPONENTS_METADATA,
+        **WATER_NETWORK_METADATA,
+        **W_L2A_REF_METADATA,
+    },
 }

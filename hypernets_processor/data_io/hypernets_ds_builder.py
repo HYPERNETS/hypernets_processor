@@ -56,7 +56,6 @@ class HypernetsDSBuilder:
         angles: object = False,
         ds=None,
     ) -> object:
-
         """
         Returns empty Hypernets dataset
 
@@ -142,6 +141,11 @@ class HypernetsDSBuilder:
                 ]
                 metadata["system_pressure"] = ds.attrs["system_pressure"]
                 metadata["illuminance"] = ds.attrs["illuminance"]
+
+                # add keys containing calibration file info (file and date)
+                for key in ds.attrs.keys():
+                    if key.startswith("instrument_calibration"):
+                        metadata[key] = ds.attrs[key]
 
             metadata["processor_version"] = str(version)
             metadata["processor_configuration_file"] = "TBD"

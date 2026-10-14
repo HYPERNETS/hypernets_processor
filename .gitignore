@@ -24,3 +24,8 @@ docs/sphinx/content/API
 /hypernets_processor/etc/working_directory.txt
 /hypernets_processor/etc/processor.config
 /data/calibration_files_ascii
+.eggs/
+.vscode/
+__pycache__/
+hypernets_processor/post_processing/.scene_forge
+hypernets_processor/post_processing/*/.scene_forge

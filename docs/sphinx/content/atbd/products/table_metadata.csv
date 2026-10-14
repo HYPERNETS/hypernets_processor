@@ -49,8 +49,14 @@ common, both, responsible_party
 common, both, creator_name
 common, both, creator_email
 common, both, title
-L1A_RAD/L1B_RAD/L1C_ALL/L2A_REF, both, instrument_calibration_file_rad
-L1A_IRR/L1B_IRR/L1C_ALL/L2A_REF, both, instrument_calibration_file_irr
+L1A_RAD/L1B_RAD/L1C_ALL/L2A_REF/L2B_REF, both, instrument_calibration_file_rad
+L1A_IRR/L1B_IRR/L1C_ALL/L2A_REF/L2B_REF, both, instrument_calibration_file_irr
+L1A_RAD/L1B_RAD/L1C_ALL/L2A_REF/L2B_REF, both, instrument_calibration_date_rad
+L1A_IRR/L1B_IRR/L1C_ALL/L2A_REF/L2B_REF, both, instrument_calibration_date_irr
+L1A_RAD/L1B_RAD/L1C_ALL/L2A_REF/L2B_REF, L, instrument_calibration_file_rad_swir
+L1A_IRR/L1B_IRR/L1C_ALL/L2A_REF/L2B_REF, L, instrument_calibration_file_irr_swir
+L1A_RAD/L1B_RAD/L1C_ALL/L2A_REF/L2B_REF, L, instrument_calibration_date_rad_swir
+L1A_IRR/L1B_IRR/L1C_ALL/L2A_REF/L2B_REF, L, instrument_calibration_date_irr_swir
 L1C_ALL/L2A_REF, W, rhof_option
 L1C_ALL/L2A_REF, W, rhof_wind_source
 L1C_ALL/L2A_REF, W, similarity_waveref

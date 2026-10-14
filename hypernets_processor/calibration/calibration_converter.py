@@ -8,6 +8,7 @@ from hypernets_processor.test.test_functions import (
 )
 from hypernets_processor.data_io.hypernets_writer import HypernetsWriter
 from hypernets_processor.utils.paths import parse_sequence_path
+from hypernets_processor.utils.utils import convert_datetime
 
 import numpy as np
 import os.path
@@ -47,35 +48,43 @@ class CalibrationConverter:
                 "Enter hypernets_processor version for which you are generating calib files:"
             )
 
-    def convert_coordinates_dt64(self,ds):
+    def convert_coordinates_dt64(self, ds):
         ds = ds.assign_coords(
-            calibrationdates=[datetime.strptime(date, "%y%m%dT%H%M%S") for date in
-                              ds["calibrationdates"].values])
+            calibrationdates=[
+                datetime.strptime(date, "%y%m%dT%H%M%S")
+                for date in ds["calibrationdates"].values
+            ]
+        )
         ds = ds.assign_coords(
-            nonlineardates=[datetime.strptime(date, "%y%m%dT%H%M%S") for date in
-                            ds["nonlineardates"].values])
+            nonlineardates=[
+                datetime.strptime(date, "%y%m%dT%H%M%S")
+                for date in ds["nonlineardates"].values
+            ]
+        )
         ds = ds.assign_coords(
-            wavdates=[datetime.strptime(date, "%y%m%dT%H%M%S") for date in
-                      ds["wavdates"].values])
+            wavdates=[
+                datetime.strptime(date, "%y%m%dT%H%M%S")
+                for date in ds["wavdates"].values
+            ]
+        )
         return ds
 
-
-    def interpolate_calibration_ds(self,ds,sequence_dt64):
+    def interpolate_calibration_ds(self, ds, sequence_dt64):
         ds = self.convert_coordinates_dt64(ds)
-        for coord in ["calibrationdates","nonlineardates","wavdates"]:
-            dt64s=ds[coord].values
-            if self.context.get_config_value("calibration_interpolation_method")=="previous" or sequence_dt64>np.max(dt64s):
-                i = [
-                    x
-                    for x, date in enumerate(dt64s)
-                    if date < sequence_dt64
-                ][-1]
-                ds = ds.isel(
-                    indexers={coord: i}
+        for coord in ["calibrationdates", "nonlineardates", "wavdates"]:
+            dt64s = ds[coord].values
+            if self.context.get_config_value(
+                "calibration_interpolation_method"
+            ) == "previous" or sequence_dt64 > np.max(dt64s):
+                i = [x for x, date in enumerate(dt64s) if date < sequence_dt64][-1]
+                ds = ds.isel(indexers={coord: i})
+            elif sequence_dt64 <= np.max(dt64s) and sequence_dt64 >= np.min(dt64s):
+                ds = ds.interp(
+                    coords={coord: sequence_dt64},
+                    method=self.context.get_config_value(
+                        "calibration_interpolation_method"
+                    ),
                 )
-            elif sequence_dt64<=np.max(dt64s) and sequence_dt64>=np.min(dt64s):
-                ds = ds.interp(coords={coord:sequence_dt64},
-                               method=self.context.get_config_value("calibration_interpolation_method"))
             else:
                 raise NotImplementedError
         return ds
@@ -98,17 +107,35 @@ class CalibrationConverter:
                 self.context.logger.warning(
                     "No SN set for hypstar instrument! using hypstar_cal_number from config file instead."
                 )
+
+            sequence_dt64 = np.datetime64(parse_sequence_path(sequence_path)["datetime"])
+            
+            if self.context.get_config_value("site_id") != "TEST":
+                site_id = self.context.get_config_value("site_id")
+            elif "site_id" in (globalattr.keys()):
+                site_id = str(globalattr["site_id"]).strip()
+                self.context.set_config_value("site_id", site_id)
+            elif "site_name" in (globalattr.keys()):
+                site_id = str(globalattr["site_name"]).strip()
+                self.context.set_config_value("site_id", site_id)
+            else:
+                self.context.error("site_id not found. Using default TEST instead.")
+            
         else:
             self.context.logger.error("Metadata missing")
             self.context.anomaly_handler.add_anomaly("m")
 
+        if site_id == "GHNA" and instrument_id != "220261" and sequence_dt64 > np.datetime64("2022-05-17T00:00:00") and sequence_dt64 <= np.datetime64("2023-10-17T00:00:00"):
+            self.context.logger.warning(
+                "Site GHNA has the wrong instrument_id set in metadata. Overwriting manualy in calibration_converter.read_calib_files()."
+            )
+            instrument_id = "220261"
+        
         hypstar = "hypstar_" + str(
             instrument_id
         )  # self.context.get_config_value("hypstar_cal_number"))
         hypstar_path = os.path.join(self.path_netcdf, hypstar)
         name = "HYPERNETS_CAL_" + hypstar.upper() + "_RAD_v" + str(self.version) + ".nc"
-
-        # print("using calibration file:", name)
 
         if os.path.exists(os.path.join(hypstar_path, name)):
             calibration_data_rad = xarray.open_dataset(os.path.join(hypstar_path, name))
@@ -126,10 +153,25 @@ class CalibrationConverter:
                 os.path.join(hypstar_path, name) + " calibration file does not exist"
             )
 
-        sequence_dt64 = np.datetime64(parse_sequence_path(sequence_path)["datetime"])
+        
+        
 
-        calibration_data_rad = self.interpolate_calibration_ds(calibration_data_rad,sequence_dt64)
-        calibration_data_irr = self.interpolate_calibration_ds(calibration_data_irr,sequence_dt64)
+        calibration_data_rad = self.interpolate_calibration_ds(
+            calibration_data_rad, sequence_dt64
+        )
+        calibration_data_rad.attrs["site_id"] = site_id
+        calibration_data_rad.attrs["instrument_id"] = instrument_id
+        calibration_data_rad.attrs["instrument_calibration_file_rad"] = name
+        calibration_data_rad.attrs["instrument_calibration_date_rad"] = str(convert_datetime(calibration_data_rad.calibrationdates.values).date())
+        
+
+        calibration_data_irr = self.interpolate_calibration_ds(
+            calibration_data_irr, sequence_dt64
+        )
+        calibration_data_irr.attrs["site_id"] = site_id
+        calibration_data_irr.attrs["instrument_id"] = instrument_id
+        calibration_data_irr.attrs["instrument_calibration_file_irr"] = name
+        calibration_data_irr.attrs["instrument_calibration_date_irr"] = str(convert_datetime(calibration_data_irr.calibrationdates.values).date())
 
         if self.context.get_config_value("network") == "l":
             name = (
@@ -166,8 +208,21 @@ class CalibrationConverter:
                     + " calibration file does not exist"
                 )
 
-            calibration_data_rad_swir = self.interpolate_calibration_ds(calibration_data_rad_swir,sequence_dt64)
-            calibration_data_irr_swir = self.interpolate_calibration_ds(calibration_data_irr_swir,sequence_dt64)
+            calibration_data_rad_swir = self.interpolate_calibration_ds(
+                calibration_data_rad_swir, sequence_dt64
+            )
+            calibration_data_rad_swir.attrs["site_id"] = site_id
+            calibration_data_rad_swir.attrs["instrument_id"] = instrument_id
+            calibration_data_rad_swir.attrs["instrument_calibration_file_rad_swir"] = name
+            calibration_data_rad_swir.attrs["instrument_calibration_date_rad_swir"] = str(convert_datetime(calibration_data_rad_swir.calibrationdates.values).date())
+
+            calibration_data_irr_swir = self.interpolate_calibration_ds(
+                calibration_data_irr_swir, sequence_dt64
+            )
+            calibration_data_irr_swir.attrs["site_id"] = site_id
+            calibration_data_irr_swir.attrs["instrument_id"] = instrument_id
+            calibration_data_irr_swir.attrs["instrument_calibration_file_irr_swir"] = name
+            calibration_data_irr_swir.attrs["instrument_calibration_date_irr_swir"] = str(convert_datetime(calibration_data_irr_swir.calibrationdates.values).date())
 
         #
         # if self.context.get_config_value("calibration_interpolation_method")=="previous" or sequence_datetime>np.max(calibration_data_times):
@@ -367,7 +422,7 @@ class CalibrationConverter:
             for path in glob.glob(
                 os.path.join(directory, "hypstar_" + str(hypstar), "radiometric", "*")
             )
-            if ".pdf" not in path
+            if ".pdf" not in path and "bad_pixels" not in path
         ]
         caldates = []
         gains = np.zeros(9999)
@@ -380,7 +435,7 @@ class CalibrationConverter:
                         "hypstar_" + str(hypstar) + "_radcal_L_*_%s.dat" % (sensortag),
                     )
                 )
-                if len(filelist)==1:
+                if len(filelist) == 1:
                     calpath = filelist[0]
                     caldate = calpath[-15:-9]
                     print(os.path.basename(caldatepath))
@@ -394,10 +449,18 @@ class CalibrationConverter:
                         caldate += "T120000"
                     print(caldate)
                 else:
-                    warnings.warn("the number of files matching %s is not equal to 1: %s"%(os.path.join(
-                        caldatepath,
-                        "hypstar_" + str(hypstar) + "_radcal_L_*_%s.dat" % (sensortag),
-                    ),filelist))
+                    warnings.warn(
+                        "the number of files matching %s is not equal to 1: %s"
+                        % (
+                            os.path.join(
+                                caldatepath,
+                                "hypstar_"
+                                + str(hypstar)
+                                + "_radcal_L_*_%s.dat" % (sensortag),
+                            ),
+                            filelist,
+                        )
+                    )
             else:
                 filelist = glob.glob(
                     os.path.join(
@@ -405,7 +468,7 @@ class CalibrationConverter:
                         "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
                     )
                 )
-                if len(filelist)==1:
+                if len(filelist) == 1:
                     calpath = filelist[0]
                     caldate = calpath[-15:-9]
                     if ("b" in os.path.basename(caldatepath)) or (
@@ -417,10 +480,18 @@ class CalibrationConverter:
                     else:
                         caldate += "T120000"
                 else:
-                    warnings.warn("the number of files matching %s is not equal to 1: %s" % (os.path.join(
-                        caldatepath,
-                        "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
-                    ), filelist))
+                    warnings.warn(
+                        "the number of files matching %s is not equal to 1: %s"
+                        % (
+                            os.path.join(
+                                caldatepath,
+                                "hypstar_"
+                                + str(hypstar)
+                                + "_radcal_E_*_%s.dat" % (sensortag),
+                            ),
+                            filelist,
+                        )
+                    )
             if os.path.exists(calpath):
                 caldates = np.append(caldates, caldate)
                 gains_temp = np.genfromtxt(calpath)
@@ -435,26 +506,26 @@ class CalibrationConverter:
             for path in glob.glob(
                 os.path.join(directory, "hypstar_" + str(hypstar), "linearity", "*")
             )
+            if ".pdf" not in path
         ]
 
-        if len(lincaldatepaths) == 0:
-            lincaldatepaths = [
-                path
-                for path in glob.glob(
+        lincaldatepaths += [
+            path
+            for path in glob.glob(
+                os.path.join(
+                    directory, "hypstar_" + str(hypstar), "radiometric", "*"
+                )
+            )
+            if len(
+                glob.glob(
                     os.path.join(
-                        directory, "hypstar_" + str(hypstar), "radiometric", "*"
+                        path,
+                        "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
                     )
                 )
-                if len(
-                    glob.glob(
-                        os.path.join(
-                            path,
-                            "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
-                        )
-                    )
-                )
-                > 0
-            ]
+            )
+            > 0
+        ]
 
         nonlindates = []
         for lincaldatepath in lincaldatepaths:
@@ -468,7 +539,7 @@ class CalibrationConverter:
                 nonlinpath = filelist[0]
                 lincaldate = nonlinpath[-10:-4]
                 if ("b" in os.path.basename(lincaldatepath)) or (
-                        "10C" in os.path.basename(lincaldatepath)
+                    "10C" in os.path.basename(lincaldatepath)
                 ):
                     lincaldate += "T235959"
                 elif "a" in os.path.basename(lincaldatepath):
@@ -476,11 +547,18 @@ class CalibrationConverter:
                 else:
                     lincaldate += "T120000"
             else:
-                warnings.warn("the number of files matching %s is not equal to 1: %s" % (os.path.join(
-                    caldatepath,
-                    "hypstar_" + str(hypstar) + "_radcal_E_*_%s.dat" % (sensortag),
-                ), filelist))
-
+                warnings.warn(
+                    "the number of files matching %s is not equal to 1: %s"
+                    % (
+                        os.path.join(
+                            caldatepath,
+                            "hypstar_"
+                            + str(hypstar)
+                            + "_radcal_E_*_%s.dat" % (sensortag),
+                        ),
+                        filelist,
+                    )
+                )
 
             if os.path.exists(nonlinpath):
                 nonlindates = np.append(nonlindates, lincaldate)
@@ -525,12 +603,15 @@ class CalibrationConverter:
         i_nonlin = 0
         # todo remove [-1] and use all calibrations and interpolate?
         for lincaldatepath in lincaldatepaths:
-            nonlinpath = glob.glob(
-                os.path.join(
-                    lincaldatepath,
-                    "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
-                )
-            )[0]
+            try:
+                nonlinpath = glob.glob(
+                    os.path.join(
+                        lincaldatepath,
+                        "hypstar_" + str(hypstar) + "_nonlin_corr_coefs_*.dat",
+                    )
+                )[0]
+            except:
+                stop
             if os.path.exists(nonlinpath):
                 if swir:
                     non_linear_cals = np.genfromtxt(nonlinpath)[:, 1]
@@ -549,13 +630,13 @@ class CalibrationConverter:
                                     float(line.strip()[8::]) / 2
                                 )  # reading in from comments in non_lin files, and convert to k=1
 
-                calibration_data["non_linearity_coefficients"].values[
-                    i_nonlin
-                ] = np.pad(
-                    non_linear_cals,
-                    (0, 13 - len(non_linear_cals)),
-                    "constant",
-                    constant_values=(0, 0),
+                calibration_data["non_linearity_coefficients"].values[i_nonlin] = (
+                    np.pad(
+                        non_linear_cals,
+                        (0, 13 - len(non_linear_cals)),
+                        "constant",
+                        constant_values=(0, 0),
+                    )
                 )
                 i_nonlin += 1
 
@@ -600,9 +681,8 @@ class CalibrationConverter:
                     )
                 )
 
-            if len(filelist)==1:
+            if len(filelist) == 1:
                 calpath = filelist[0]
-
 
                 if os.path.exists(calpath):
                     caldates = np.append(caldates, caldate)
@@ -692,11 +772,16 @@ class CalibrationConverter:
                         calibration_data["u_rel_systematic_corr_rad_irr_gains"].values[
                             i_cal, :
                         ] = (
-                            (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2) ** 0.5
+                            (gains[:, 4] ** 2 + gains[:, 5] ** 2 + gains[:, 18] ** 2)
+                            ** 0.5
                         )[
                             :gainlen
                         ]
 
+                        cov_other = cm.convert_corr_to_cov(
+                            np.eye(len(gains[:, 2])),
+                            gains[:, 2] * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5,
+                        )
                         cov_other = cm.convert_corr_to_cov(
                             np.eye(len(gains[:, 2])),
                             gains[:, 2] * (gains[:, 4] ** 2 + gains[:, 18] ** 2) ** 0.5,
@@ -706,10 +791,16 @@ class CalibrationConverter:
                             np.ones((len(gains[:, 2]), len(gains[:, 2]))),
                             gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
                         )
+                        cov_filament = cm.convert_corr_to_cov(
+                            np.ones((len(gains[:, 2]), len(gains[:, 2]))),
+                            gains[:, 2] * (gains[:, 5] ** 2) ** 0.5,
+                        )
 
-                        calibration_data["err_corr_systematic_corr_rad_irr_gains"].values[
-                            i_cal, :, :
-                        ] = cm.correlation_from_covariance(cov_other + cov_filament)[
+                        calibration_data[
+                            "err_corr_systematic_corr_rad_irr_gains"
+                        ].values[i_cal, :, :] = cm.correlation_from_covariance(
+                            cov_other + cov_filament
+                        )[
                             :gainlen, :gainlen
                         ]
                     # except:

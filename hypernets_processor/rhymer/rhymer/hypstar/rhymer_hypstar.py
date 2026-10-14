@@ -3,7 +3,7 @@
 ## zenith angle is used to differentiate Lsky and Lu
 ## QV July 2018
 ## Last modifications: 2019-07-10 (QV) renamed from PANTR, added .lower() to sensor ID as it is in some cases uppercase in the current deployment (RBINS ROOF)
-from datetime import datetime
+from datetime import datetime, timezone
 from hypernets_processor.rhymer.rhymer.shared.rhymer_shared import RhymerShared
 from hypernets_processor.rhymer.rhymer.ancillary.rhymer_ancillary import RhymerAncillary
 from hypernets_processor.rhymer.rhymer.processing.rhymer_processing import (
@@ -136,8 +136,7 @@ class RhymerHypstar:
                 senz = scani["viewing_zenith_angle"].values
                 if self.context.logger is not None:
                     self.context.logger.debug(scani["acquisition_time"].values)
-                ts = datetime.utcfromtimestamp(int(scani["acquisition_time"].values))
-                # not fromtimestamp?
+                ts = datetime.fromtimestamp(int(scani["acquisition_time"].values), tz=timezone.utc)
 
                 if (senz != "NULL") & (sena != "NULL"):
                     senz = float(senz)
@@ -285,8 +284,8 @@ class RhymerHypstar:
                 )
 
             elif self.context.get_config_value("wind_ancillary") == "NCEP":
-                isotime = datetime.utcfromtimestamp(
-                    l1b["acquisition_time"].values[i]
+                isotime = datetime.fromtimestamp(
+                    l1b["acquisition_time"].values[i], tz=timezone.utc
                 ).strftime("%Y-%m-%d %H:%M:%S")
                 anc_wind = self.rhymeranc.ts_wind(isotime, l1b.attrs["site_id"])
                 if anc_wind is not None:
@@ -294,16 +293,16 @@ class RhymerHypstar:
                 l1b.attrs["rhof_wind_source"] = "NCEP"
 
             elif self.context.get_config_value("wind_ancillary") == "GDAS":
-                isotime = datetime.utcfromtimestamp(
-                    l1b["acquisition_time"].values[i]
+                isotime = datetime.fromtimestamp(
+                    l1b["acquisition_time"].values[i], tz=timezone.utc
                 ).strftime("%Y-%m-%d %H:%M:%S")
                 anc_wind = self.rhymeranc.gdas_extract(isotime, lon, lat)
                 if anc_wind is not None:
                     wind.append(anc_wind["w"])
                     now = datetime.now()
-                    l1b.attrs[
-                        "rhof_wind_source"
-                    ] = "NCEP/GDAS FNL 0.25 ds083.3 | DOI: 10.5065/D65Q4T4Z"
+                    l1b.attrs["rhof_wind_source"] = (
+                        "NCEP/GDAS FNL 0.25 ds083.3 | DOI: 10.5065/D65Q4T4Z"
+                    )
 
         l1b["rhof_wind"].values = wind
         return l1b
@@ -326,7 +325,6 @@ class RhymerHypstar:
             ) % 360
 
             rhof_raa[i] = ((ra - 180) % 360) - 180
-
 
             ## get air_water_int reflectance
             if self.context.get_config_value("rhof_option") == "Mobley1999":
@@ -362,6 +360,7 @@ class RhymerHypstar:
 
         # because we average to Lu scan we propagate values from radiance!
         dataset_l1flags = self.templ.l1c_int_template_from_l1a_dataset_water(l1a_rad)
+
 
         # print(pd.DataFrame(du.unpack_flags(dataset_l1b['quality_flag']).to_dataframe()))
         # No temporal quality checks but check if downwelling radiance varies by less than 10%
@@ -415,5 +414,9 @@ class RhymerHypstar:
         L1c_int.attrs["nld"] = dataset_l1flags.attrs["nld"]
         L1c_int.attrs["nlu"] = dataset_l1flags.attrs["nlu"]
         # L1c_int.attrs["ned"] = dataset_l1flags.attrs["ned"]
+
+        for key in L1b_irr.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                L1c_int.attrs[key] = L1b_irr.attrs[key]
 
         return L1c_int
