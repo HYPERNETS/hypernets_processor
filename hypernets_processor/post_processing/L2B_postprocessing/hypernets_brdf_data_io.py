@@ -168,7 +168,11 @@ def read_data_hypernets(
 def read_hypernets_file(
     filepath, vza=None, vaa=None, vzamax=None, mask=True, filter_flags=True
 ):
-    ds_HYP = xr.open_dataset(filepath)
+    try:
+        ds_HYP = xr.open_dataset(filepath)
+    except:
+        return None
+
     if filter_flags:
         flagged = DatasetUtil.get_flags_mask_or(ds_HYP["quality_flag"], bad_flags)
         id_series = np.where(~flagged)[0]
