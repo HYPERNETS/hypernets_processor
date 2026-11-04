@@ -27,3 +27,5 @@ docs/sphinx/content/API
 .eggs/
 .vscode/
 __pycache__/
+hypernets_processor/post_processing/.scene_forge
+hypernets_processor/post_processing/*/.scene_forge

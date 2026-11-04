@@ -151,7 +151,7 @@ class ArchiveDB(dataset.Database):
                 product_level=ds.attrs["product_level"],
                 datetime_SEQ=self.context.get_config_value("time"),
                 datetime_start=dt.fromtimestamp(
-                    np.nanmin(ds["acquisition_time"].values, tz=timezone.utc)
+                    np.nanmin(ds["acquisition_time"].values), tz=timezone.utc
                 ),
                 datetime_end=dt.fromtimestamp(np.nanmax(ds["acquisition_time"].values), tz=timezone.utc),
                 sequence_name=self.context.get_config_value("sequence_name"),
