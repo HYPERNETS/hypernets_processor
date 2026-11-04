@@ -1,6 +1,7 @@
 """
 Variable definitions for Hypernets land a water network data products
 """
+
 from typing import Any
 
 from copy import deepcopy
@@ -96,7 +97,7 @@ COMMON_VARIABLES_SERIES = {
             "is 180 degrees different from the viewing_azimuth_angle.",
             "units": "degrees",
             "reference": "True North",
-            "preferred_symbol": "vaa",
+            "preferred_symbol": "paa",
         },
         "encoding": {"dtype": np.uint16, "scale_factor": 0.0055, "offset": 0.0},
     },

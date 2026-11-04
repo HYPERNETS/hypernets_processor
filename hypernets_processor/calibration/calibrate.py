@@ -1,6 +1,7 @@
 """
 Calibration class
 """
+
 import datetime
 
 from hypernets_processor.version import __version__
@@ -107,8 +108,15 @@ class Calibrate:
                     ] += 50
 
         else:
-            measurand = calibrate_function.run(dataset_l0_masked, calibration_data)
+            measurand = calibrate_function.run_meas_function(
+                dataset_l0_masked, calibration_data
+            )
             dataset_l1a[measurandstring].values = measurand
+
+        # add keys containing calibration file info
+        for key in calibration_data.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                dataset_l1a.attrs[key] = calibration_data.attrs[key]
 
         if self.context.get_config_value("write_l1a"):
             self.writer.write(
@@ -166,7 +174,9 @@ class Calibrate:
                 store_unc_percent=True,
             )
         else:
-            measurand = calibrate_function.run(dataset_l0b, calibration_data)
+            measurand = calibrate_function.run_meas_function(
+                dataset_l0b, calibration_data
+            )
             dataset_l1b[measurandstring].values = measurand
 
         if self.context.get_config_value("mcsteps") > 0:
@@ -201,6 +211,11 @@ class Calibrate:
             * dataset_l0b["std_digital_number"].values
             / dataset_l0b["digital_number"].values
         )
+
+        # add keys containing calibration file info
+        for key in calibration_data.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                dataset_l1b.attrs[key] = calibration_data.attrs[key]
 
         if self.context.get_config_value("network") == "w":
             dataset_l1b = dataset_l1b.drop("n_valid_scans_SWIR")
@@ -376,11 +391,11 @@ class Calibrate:
         datasetl0masked, mask = self.qual.perform_quality_check_L0A(
             datasetl0masked, series_ids
         )
-        datasetl0masked["quality_flag"][
-            np.where(dark_outlier_rad == 1)
-        ] = DatasetUtil.set_flag(
-            datasetl0masked["quality_flag"][np.where(dark_outlier_rad == 1)],
-            "dark_masked",
+        datasetl0masked["quality_flag"][np.where(dark_outliers_radscans == 1)] = (
+            DatasetUtil.set_flag(
+                datasetl0masked["quality_flag"][np.where(dark_outliers_radscans == 1)],
+                "dark_masked",
+            )
         )  # for i in range(len(mask))]
 
         # calculate and store random uncertainties on radiance/irradiance

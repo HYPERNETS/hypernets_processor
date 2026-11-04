@@ -43,6 +43,7 @@ class AnomalyHandler:
 
         self.anomalies_dict = anomalies_dict
         self.anomalies_added = []
+        self.anomalies_SEQ = []
 
     def add_anomaly(self, anomaly_id, ds=None):
         """
@@ -53,7 +54,7 @@ class AnomalyHandler:
         :type ds: xarray.Dataset
         :param ds: producgt that was being processed when anomaly was raised
         """
-
+        print(f"Adding anomaly: {anomaly_id}")
         # Check anomaly defined
         if anomaly_id not in self.get_anomaly_ids():
             self.context.logger.info(
@@ -63,6 +64,9 @@ class AnomalyHandler:
 
         # Add anomaly to list of anomalies added during current processing
         self.anomalies_added.append(anomaly_id)
+
+        # Add anomaly to list of anomalies for current sequence
+        self.anomalies_SEQ.append(anomaly_id)
 
         # Add anomaly to db
         if self.anomaly_db is not None:
@@ -87,7 +91,9 @@ class AnomalyHandler:
 
         if self.get_sequence_crashing_anomalies() == []:
             self.add_anomaly("x")
-
+        else:
+            print("Not adding x anomaly as other crashing anomalies already present (%s)" % ",".join(self.get_sequence_crashing_anomalies()))
+            
     def get_anomaly_ids(self):
         """
         Returns available anomaly ids
@@ -136,10 +142,10 @@ class AnomalyHandler:
         :return: crashing anomaly ids
         """
 
-        crashing_anomalies = []
+        crashing_anomalies = ["x"]
 
         for anomaly_id in self.get_anomaly_ids():
-            if self.get_anomaly_error(anomaly_id) is not None:
+            if self.get_anomaly_error(anomaly_id) is not None and anomaly_id != "m":
                 crashing_anomalies.append(anomaly_id)
 
         return crashing_anomalies
