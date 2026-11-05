@@ -5,6 +5,8 @@ import hypernets_processor.post_processing.L2B_postprocessing.hypernets_brdf_dat
 import os
 import glob
 import matplotlib.pyplot as plt
+from eoio import read_multi
+import pandas as pd
 
 def export_csv(meas, path, wavs, model_refl=None):
     if isinstance(wavs, (int, float)):
@@ -296,7 +298,7 @@ def get_files_for_period(base_path, site, start_date, stop_date):
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'JAES':
+        if site != 'GHNA':
             continue
         if period["stop_date"] != "present":
             continue
@@ -326,42 +328,14 @@ for site in SITE_PERIODS.keys():
             for vza in vzas:
                 for vaa in vaas:
                     # read in hypernets data (which returns object of brdf_model.BRDFMeasurements)
-                    HCRFmeas = data_io.read_data_hypernets(
-                        files, i=None, vza=vza, vaa=vaa, mask=False
-                    )
-
-                    export_csv(HCRFmeas,
-                        os.path.join(
-                            results_path,
-                            "%s_%s_%s_%s_%s.csv"
-                            % (tag, vza, vaa, start_tod[ii], stop_tod[ii]),
-                        ),
-                        wavelength,
-                    )
-
-                    fig1, ax1 = plt.subplots()
-                    ax1.plot(
-                        HCRFmeas.get_datetimes(),
-                        HCRFmeas.get_reflectance(plot_wavelength),
-                        "o",
-                        label="before",
-                    )
-                    ax1.set_xlabel("datetime")
-                    ax1.set_ylabel("reflectance")
-                    ax1.legend(ncol=2)
-                    ax1.set_ylim([vmin, vmax])
-                    fig1.savefig(
-                        os.path.join(
-                            results_path,
-                            "refl_calibration_diff_%s_%s_%s_%s_%s_%s.png"
-                            % (
-                                tag,
-                                vza,
-                                vaa,
-                                start_tod[ii],
-                                stop_tod[ii],
-                                plot_wavelength,
-                            ),
-                        )
-                    )
-                    plt.clf()
+                    ds = read_multi(files, 
+                                    vars_sel = {
+                                        "meas": ["reflectance"], 
+                                        "aux": ["viewing_zenith_angle", "viewing_azimuth_angle", "solar_zenith_angle", "solar_azimuth_angle", "acquisition_time"]
+                                        }, 
+                                    read_params = {"include_uncertainties": False}, 
+                                    subset= {"wavelength": {"nearest": 550}},
+                                    concat_coord = "product_datetime")
+                    ds = ds.where(ds.quality_flag == 0)
+                    ds = ds.assign_coords(time=pd.DatetimeIndex(ds.time.values).tz_localize(None))
+                    ds.to_netcdf(os.path.join(results_path, f"{tag}_{vza}_{vaa}.nc"))
