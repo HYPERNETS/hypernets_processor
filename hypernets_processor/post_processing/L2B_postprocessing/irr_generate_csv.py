@@ -3,11 +3,180 @@ import hypernets_processor.post_processing.L2B_postprocessing.hypernets_brdf_dat
 import os
 import glob
 import matplotlib
+import datetime
 
 matplotlib.use("Qt5Agg")
 import matplotlib.pyplot as plt
 import xarray as xr
 import pandas as pd
+
+SITE_PERIODS = {
+    "GHNA": [
+        {
+            "start_date": "2022-05-17",
+            "stop_date": "2023-10-17",
+            "HYPSTAR_SN": 220261,
+            "comments": "v1 instrument",
+        },
+        {
+            "start_date": "2023-10-26",
+            "stop_date": "2025-10-15",
+            "HYPSTAR_SN": 222316,
+            "comments": "v3 instrument",
+        },
+        {
+            "start_date": "2025-10-15",
+            "stop_date": "present",
+            "HYPSTAR_SN": 222316,
+            "comments": "v3 instrument",
+        },
+    ],
+    # "IFAR": [{"start_date": "2022-06-17", "stop_date": "2022-10-12" ,"HYPSTAR_SN": 221211, "comments": ""},{"start_date": "2023-08-04" , "stop_date": "2024-08-03" ,"HYPSTAR_SN": 221211, "comments": "Calibration E: 2023-01-25, L: 2023-01-27"}],
+    "JAES": [
+        {
+            "start_date": "2023-04-14",
+            "stop_date": "2024-05-09",
+            "HYPSTAR_SN": 221461,
+            "comments": "2023-05-20 leaves on (subjective judgement); 2023-09-19 cleaned optics; 2023-10-18 first snow, leaves off",
+        },
+        {
+            "start_date": "2024-06-05",
+            "stop_date": "2024-11-13",
+            "HYPSTAR_SN": 221461,
+            "comments": "",
+        },
+        {
+            "start_date": "2024-11-13",
+            "stop_date": "2025-06-16",
+            "HYPSTAR_SN": 222317,
+            "comments": "",
+        },
+        {
+            "start_date": "2025-06-16",
+            "stop_date": "2025-09-03",
+            "HYPSTAR_SN": 222317,
+            "comments": "",
+        },
+        {
+            "start_date": "2025-09-03",
+            "stop_date": "present",
+            "HYPSTAR_SN": 222317,
+            "comments": "",
+        },
+    ],
+    "JSIT": [
+        {
+            "start_date": "2024-04-09",
+            "stop_date": "2025-01-01",
+            "HYPSTAR_SN": 222315,
+            "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat",
+        },
+        {
+            "start_date": "2025-01-01",
+            "stop_date": "2025-07-01",
+            "HYPSTAR_SN": 222315,
+            "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat",
+        },
+        {
+            "start_date": "2025-07-01",
+            "stop_date": "present",
+            "HYPSTAR_SN": 222315,
+            "comments": "2024 soybean (sowing date 08/04/2023); 2024/2025 durum wheat",
+        }
+    ],
+    "LOBE": [
+        {
+            "start_date": "2023-05-31",
+            "stop_date": "2023-08-11",
+            "lat": 50.55149,
+            "lon": 4.74591,
+            "HYPSTAR_SN": 222312,
+            "comments": "Potato crop, furrowed ground; Non-standard sequence used, all data has quality flag `vza_irradiance' raised",
+        },
+        {
+            "start_date": "2024-05-17",
+            "stop_date": "2024-07-17",
+            "lat": 50.55151,
+            "lon": 4.74601,
+            "HYPSTAR_SN": 222312,
+            "comments": "Winter Wheat crop, Flat soil surface",
+        },
+        {
+            "start_date": "2024-10-01",
+            "stop_date": "2024-11-13",
+            "lat": 50.55151,
+            "lon": 4.74601,
+            "HYPSTAR_SN": 222312,
+            "comments": "Cover crop, Flat soil surface",
+        },
+        {
+            "start_date": "2025-04-15",
+            "stop_date": "2025-12-14",
+            "lat": 50.55151,
+            "lon": 4.74601,
+            "HYPSTAR_SN": 222312,
+            "comments": "Sugar beet roots, Flat soil surface",
+        },
+        {
+            "start_date": "2025-12-15",
+            "stop_date": "2026-03-24",
+            "lat": 50.55151,
+            "lon": 4.74601,
+            "HYPSTAR_SN": 222312,
+            "valid": False,
+            "comments": "Site is fallow with flat soil surface",
+        }
+    ],
+     "PEAN": [
+         {
+            "start_date": "2022-01-26",
+            "stop_date": "2022-02-08",
+            "HYPSTAR_SN": 221233,
+            "comments": "v1 instrument",
+        },
+         {
+            "start_date": "2022-12-25",
+            "stop_date": "2023-02-02",
+            "HYPSTAR_SN": 221233,
+            "comments": "v1 instrument",
+        },
+         {
+            "start_date": "2023-12-30",
+            "stop_date": "2024-01-23",
+            "HYPSTAR_SN": 222313,
+            "comments": "v1 instrument",
+        },
+         ],
+    "WWUK": [
+        {
+            "start_date": "2021-11-18",
+            "stop_date": "2024-01-16",
+            "HYPSTAR_SN": 220251,
+            "comments": "v1 instrument",
+        },
+        {
+            "start_date": "2024-06-26",
+            "stop_date": "2024-12-31",
+            "HYPSTAR_SN": 222314,
+            "comments": "v3 instrument",
+        },
+        {
+            "start_date": "2025-01-01",
+            "stop_date": "present",
+            "HYPSTAR_SN": 222314,
+            "comments": "v3 instrument",
+        },  
+    ],
+    "SPAR": [
+        {
+            "start_date": "2026-01-28",
+            "stop_date": "present",
+            "HYPSTAR_SN": 221211,
+            "valid": False,
+            "comments": "Site installed in San Pedro, Argentina, waiting for grass to regrow",
+        },
+    ],
+}
 
 # set appropriate folders (different for linux or windows) and settings
 data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
@@ -140,24 +309,32 @@ def make_irrs(file_list, wav_val):
             irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
             irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
 
-    irrs.to_csv(results_path + '\SPAR_2026Jan_2026Apr_irradiance.csv', index=False)
+    irrs.to_csv(results_path + "\\%s_irradiance.csv" % tag, index=False)
     return irrs
 
 
 ##running
 
-files = glob.glob(os.path.join(data_path, "SPAR", "*", "*", "*", "*", "*L1B_IRR*.nc"))
+for site in SITE_PERIODS.keys():
+    for period in SITE_PERIODS[site]:
+        print(site, period)
+        tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
+        start_time = period["start_date"]
+        stop_time = period["stop_date"]
+        if stop_time == "present":
+            stop_time = datetime.datetime.now()
 
-print("Files In")
+        files = glob.glob(os.path.join(data_path, f"{site}", "*", "*", "*", "*", "*L1B_IRR*.nc"))
 
-for ii in range(len(start_tod)):
-    files = data_io.filter_files_quick(
-        files, start_time, stop_time, tod_start=start_tod[ii], tod_stop=stop_tod[ii]
-    )
-print("Files Sorted")
+        print("Files In")
 
-irrs = make_irrs(files, None)
-print(irrs.iloc[1])
+        for ii in range(len(start_tod)):
+            files = data_io.filter_files_quick(
+                files, start_time, stop_time, tod_start=start_tod[ii], tod_stop=stop_tod[ii]
+            )
+        print("Files Sorted")
+
+        irrs = make_irrs(files, None)
 """
 data_cloud = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\12\SEQ20240312T070125\HYPERNETS_L_GHNA_L1B_IRR_20240312T0701_20240416T2306_v2.0.nc'
 data_clear = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc'
