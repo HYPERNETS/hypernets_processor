@@ -253,7 +253,7 @@ def get_irr(data, wav_val):
     return irr1, irr2, wav, qual, sza, saa
 
 
-def make_irrs(file_list, wav_val):
+def make_irrs(file_list, wav_val, tag):
     if wav_val is None:
         irrs = pd.DataFrame(columns=["ID", "Flag", "SZA", "SAA"])
         refl = np.zeros((len(file_list) * 2, len(wav_ori)))
@@ -334,7 +334,7 @@ for site in SITE_PERIODS.keys():
             )
         print("Files Sorted")
 
-        irrs = make_irrs(files, None)
+        irrs = make_irrs(files, None, tag)
 """
 data_cloud = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\12\SEQ20240312T070125\HYPERNETS_L_GHNA_L1B_IRR_20240312T0701_20240416T2306_v2.0.nc'
 data_clear = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc'
