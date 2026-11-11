@@ -5,7 +5,7 @@ import glob
 import matplotlib
 import datetime
 
-matplotlib.use("Qt5Agg")
+
 import matplotlib.pyplot as plt
 import xarray as xr
 import pandas as pd
@@ -179,8 +179,8 @@ SITE_PERIODS = {
 }
 
 # set appropriate folders (different for linux or windows) and settings
-data_path = r"T:\ECO\EOServer\data\insitu\hypernets\archive"
-results_path = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc"
+data_path = r"/mnt/t/data/insitu/hypernets/archive"
+results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/meteor_reprocessing"
 site = "SPAR"
 
 # results_path = os.path.join(results_path,brdf_model)
@@ -215,7 +215,7 @@ def find_nearest_to_wav(array, wv, value):
 
 
 data_clear = xr.open_dataset(
-    "T:/ECO/EOServer/data/insitu/hypernets/archive/SPAR/2026/03/04/SEQ20260304T173050/HYPERNETS_L_SPAR_L1B_IRR_20260304T1730_20260304T1802_v2.2.nc")
+    "/mnt/t/data/insitu/hypernets/archive/SPAR/2026/03/04/SEQ20260304T173050/HYPERNETS_L_SPAR_L1B_IRR_20260304T1730_20260304T1802_v2.2.nc")
 wav_ori = data_clear.wavelength.values
 print("Got wavelengths")
 
@@ -253,7 +253,7 @@ def get_irr(data, wav_val):
     return irr1, irr2, wav, qual, sza, saa
 
 
-def make_irrs(file_list, wav_val, tag):
+def make_irrs(file_list, wav_val, tag, wav_ori):
     if wav_val is None:
         irrs = pd.DataFrame(columns=["ID", "Flag", "SZA", "SAA"])
         refl = np.zeros((len(file_list) * 2, len(wav_ori)))
@@ -262,7 +262,7 @@ def make_irrs(file_list, wav_val, tag):
                 irr1, irr2, wav, qual, sza, saa = get_irr(file_list[j], wav_val=wav_val)
                 new_row1 = pd.Series(
                     {
-                        "ID": file_list[j][62:80],
+                        "ID": file_list[j].split("/")[-1].split("_")[-3],
                         "Flag": qual[0],
                         "SZA": sza[0],
                         "SAA": saa[0],
@@ -270,7 +270,7 @@ def make_irrs(file_list, wav_val, tag):
                 )
                 new_row2 = pd.Series(
                     {
-                        "ID": file_list[j][62:80],
+                        "ID": file_list[j].split("/")[-1].split("_")[-3],
                         "Flag": qual[1],
                         "SZA": sza[1],
                         "SAA": saa[1],
@@ -292,7 +292,7 @@ def make_irrs(file_list, wav_val, tag):
             irr1, irr2, wav, qual, sza = get_irr(file_list[j], wav_val=wav_val)
             new_row1 = pd.Series(
                 {
-                    "ID": file_list[j][62:80],
+                    "ID": file_list[j].split("/")[-1].split("_")[-3],
                     "Flag": qual[0],
                     "SZA": sza[0],
                     "Data": irr1,
@@ -300,7 +300,7 @@ def make_irrs(file_list, wav_val, tag):
             )
             new_row2 = pd.Series(
                 {
-                    "ID": file_list[j][62:80],
+                    "ID": file_list[j].split("/")[-1].split("_")[-3],
                     "Flag": qual[1],
                     "SZA": sza[1],
                     "Data": irr2,
@@ -309,16 +309,20 @@ def make_irrs(file_list, wav_val, tag):
             irrs = pd.concat([irrs, new_row1.to_frame().T], ignore_index=True)
             irrs = pd.concat([irrs, new_row2.to_frame().T], ignore_index=True)
 
-    irrs.to_csv(results_path + "\\%s_irradiance.csv" % tag, index=False)
+    irrs.to_csv(results_path + "/%s_irradiance.csv" % tag, index=False)
     return irrs
 
 
 ##running
 
 for site in SITE_PERIODS.keys():
+    if site == "GHNA":
+        continue
     for period in SITE_PERIODS[site]:
         print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
+        if os.path.exists(os.path.join(results_path, f"{tag}_irradiance.csv")):
+            continue
         start_time = period["start_date"]
         stop_time = period["stop_date"]
         if stop_time == "present":
@@ -334,7 +338,11 @@ for site in SITE_PERIODS.keys():
             )
         print("Files Sorted")
 
-        irrs = make_irrs(files, None, tag)
+        data_clear = xr.open_dataset(files[0])
+        wav_ori = data_clear.wavelength.values
+        print("Got wavelengths")
+
+        irrs = make_irrs(files, None, tag, wav_ori)
 """
 data_cloud = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\12\SEQ20240312T070125\HYPERNETS_L_GHNA_L1B_IRR_20240312T0701_20240416T2306_v2.0.nc'
 data_clear = 'T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc'

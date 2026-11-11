@@ -67,8 +67,8 @@ def export_csv(meas, path, wavs, model_refl=None):
 
 # for eoserver:
 os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
-data_path = r"T:/ECO/EOServer/data/insitu/hypernets/archive"
-results_path = r"T:/ECO/EOServer/data/insitu/hypernets/post_processing_qc"
+data_path = r"/mnt/t/data/insitu/hypernets/archive/test2"
+results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
@@ -298,10 +298,7 @@ def get_files_for_period(base_path, site, start_date, stop_date):
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'GHNA':
-            continue
-        if period["stop_date"] != "present":
-            continue
+
         print(site, period)
         tag = "%s_%s_%s" % (site, period["start_date"], period["stop_date"])
         start_time = period["start_date"]
@@ -334,8 +331,10 @@ for site in SITE_PERIODS.keys():
                                         "aux": ["viewing_zenith_angle", "viewing_azimuth_angle", "solar_zenith_angle", "solar_azimuth_angle", "acquisition_time"]
                                         }, 
                                     read_params = {"include_uncertainties": False}, 
-                                    subset= {"wavelength": {"nearest": 550}},
+                                    subset= {"wavelength": {"min": 540, "max": 850}},
+                                    processors={"populate_grid": {"reference_grid": r"/mnt/t/data/insitu/hypernets/grids/viewing_angles_standard_sequence.nc"}},
                                     concat_coord = "product_datetime")
                     ds = ds.where(ds.quality_flag == 0)
                     ds = ds.assign_coords(time=pd.DatetimeIndex(ds.time.values).tz_localize(None))
+                    ds = ds.drop_attrs()
                     ds.to_netcdf(os.path.join(results_path, f"{tag}_{vza}_{vaa}.nc"))
