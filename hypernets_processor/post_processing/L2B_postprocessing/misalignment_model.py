@@ -13,7 +13,7 @@ import matplotlib
 
 matplotlib.use("Qt5Agg")
 
-results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment\GHNA_test_end_july"
+results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment\GHNA_2025-10-15_present_20261110_JUL26-NOV26"
 # read in data
 data = pd.read_csv(
     r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv",
@@ -21,9 +21,12 @@ data = pd.read_csv(
 )
 data.drop("Unnamed: 0", axis="columns")
 
-site = 'GHNA_2025Oct_2026Sep'
-site_file = 'GHNA_2025Oct_2026Sep'
-data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site_file}_analysis.csv', delimiter = ',')
+if not os.path.exists(results_path):
+    os.makedirs(results_path)
+
+site = 'GHNA_2025-10-15_present'
+site_file = site
+data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\meteor_reprocessing\{site_file}_irradiance_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
 data_v1 = data_v1.sort_values(by="Date")
@@ -79,8 +82,8 @@ data_after_may24 = data.sel(date=slice("2024-05-24", "2025-01-01"))
 
 
 # cloud check and flag removal
-data_v1 = data_v1[data_v1["model_550nm"] * 0.8 < data_v1["obs_550nm"]]
-data_v1 = data_v1[data_v1["model_550nm"] * 1.2 > data_v1["obs_550nm"]]
+data_v1 = data_v1[data_v1["model_550nm"] * 0.6 < data_v1["obs_550nm"]]
+data_v1 = data_v1[data_v1["model_550nm"] * 1.4 > data_v1["obs_550nm"]]
 data_v1 = data_v1[data_v1["Flag"] == 0]
 #data_v1 = data_v1[data_v1["Time"] > 830]
 
@@ -153,7 +156,8 @@ if site == 'JAES_2025Jul_2025Sep':
     data_v1 = data_v1.sel(date = slice('2025-07-04', '2025-09-03'))
 if site == 'GHNA_2025Oct_2026Sep':
     data_v1 = data_v1.sel(date = slice('2026-07-22', '2026-09-03'))
-
+if site == 'GHNA_2025-10-15_present':
+    data_v1 = data_v1.sel(date = slice('2026-07-01', '2026-12-01'))
 
 def ratio_calculator(vza, vaa, sza, saa, direct_to_diffuse=1000):
     """
