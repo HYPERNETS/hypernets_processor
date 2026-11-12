@@ -67,8 +67,8 @@ def export_csv(meas, path, wavs, model_refl=None):
 
 # for eoserver:
 os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'
-data_path = r"/mnt/t/data/insitu/hypernets/archive/test2"
-results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc"
+data_path = r"/mnt/t/data/insitu/hypernets/archive"
+results_path = r"/mnt/t/data/insitu/hypernets/post_processing_qc/meteor_reprocessing"
 
 # results_path = os.path.join(results_path,brdf_model)
 if not os.path.exists(results_path):
@@ -131,6 +131,8 @@ def get_files_for_period(base_path, site, start_date, stop_date):
     return [str(f) for f in files]
 
 for site in SITE_PERIODS.keys():
+    if site == 'GHNA':
+        continue
     for period in SITE_PERIODS[site]:
 
         print(site, period)
@@ -158,6 +160,9 @@ for site in SITE_PERIODS.keys():
             print("selected", files)
             for vza in vzas:
                 for vaa in vaas:
+                    if os.path.exists(os.path.join(results_path, f"{tag}_{vza}_{vaa}.nc")):
+                        print("Already processed, skipping")
+                        continue
                     # read in hypernets data (which returns object of brdf_model.BRDFMeasurements)
                     ds = read_multi(files, 
                                     vars_sel = {

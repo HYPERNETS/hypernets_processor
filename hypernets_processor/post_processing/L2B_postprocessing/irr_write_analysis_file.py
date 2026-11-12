@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 
 wav_df = xr.open_dataset(
-    r"T:\ECO\EOServer\data\insitu\hypernets\\archive\GHNA\\2024\\03\\14\SEQ20240314T070025\HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc"
+    r"/mnt/t/data/insitu/hypernets/archive/GHNA/2024/03/14/SEQ20240314T070025/HYPERNETS_L_GHNA_L1B_IRR_20240314T0700_20240416T1138_v2.0.nc"
 )
 wav = wav_df.wavelength.values
 
@@ -42,13 +42,13 @@ def modelled_data_read_and_interp(sza, mod_data, variable):
 def write_irr_analysis_files(
     filename, wavelengths
 ):
-    site = filename.split("\\")[-1].split("_")[0]
+    site = filename.split("/")[-1].split("_")[0]
     irradiance = pd.read_csv(filename)
     szas = irradiance["SZA"]
     IDs = irradiance["ID"]
     saas = irradiance["SAA"]
     clear_sky_model = xr.open_dataset(
-                    "T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\irradiance\{}_clear_sky_medianaod.nc".format(
+                    r"/mnt/t/data/insitu/hypernets/post_processing_qc/irradiance/{}_clear_sky_medianaod.nc".format(
                         site
                     )
                 )
@@ -97,34 +97,11 @@ def write_irr_analysis_files(
         output_data[f"dir_diff_ratio_{wv}nm"] = dir_to_diff
         output_data[f"ratio_{wv}nm"] = model / observ
 
-        fig, ax = plt.subplots(
-            1,
-            1,
-        )
-        ax.scatter(output_data['Date'], output_data.where(output_data['Flag'] != 0)[f'ratio_{wv}nm'], color = 'r', alpha = 0.3)
-        ax.scatter(output_data['Date'], output_data.where(output_data['Flag'] == 0)[f'ratio_{wv}nm'], color = 'g', alpha = 0.5)
-        fig.savefig(
-            r"T:\ECO\EOServer\joe\hypernets_plots\meteor_processing\{}_irr_ratio_{}.png".format(
-                site, wv
-            )
-        )
-        plt.close()
-        fig, ax = plt.subplots(
-                    1,
-                    1,
-                )
-        ax.scatter(output_data['Date'], output_data.where(output_data['Flag'] == 0)[f'ratio_{wv}nm'], color = 'g', alpha = 0.5)
-        fig.savefig(
-            r"T:\ECO\EOServer\joe\hypernets_plots\meteor_processing\{}_irr_ratio_pass_{}.png".format(
-                site, wv
-            )
-        )
-        plt.close()
-
+        
     output_data = output_data.where(output_data['Flag'] == 0).dropna()
     output_data.to_csv(filename.replace(".csv", "_analysis.csv"))
 
-data_folder = r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\meteor_reprocessing"
+data_folder = r"/mnt/t/data/insitu/hypernets/post_processing_qc/meteor_reprocessing"
 
 for filename in os.listdir(data_folder):
     if filename.endswith("irradiance.csv"):
