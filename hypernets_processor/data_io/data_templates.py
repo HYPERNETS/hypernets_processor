@@ -312,6 +312,12 @@ class DataTemplates:
         dataset_l1b["quality_flag"].values = (
             dataset["quality_flag"].values + dataset_SWIR["quality_flag"].values
         )
+
+        # add keys containing calibration file info (file and date)
+        for key in dataset_SWIR.attrs.keys():
+            if key.startswith("instrument_calibration"):
+                dataset_l1b.attrs[key] = dataset_SWIR.attrs[key]
+
         return dataset_l1b
 
     def l1c_from_l1b_dataset(self, dataset_l1b, razangle=None):

@@ -16,14 +16,6 @@ The naming convention is intended to allow the unique identification of all prod
 
 *SYSTEM_NETWORK_SITEID_LEVEL_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_version.nc*
 
-For the HYPSTAR calibration data, the file name is similar except that it includes the system_id and the date and time of the calibration.
-
-*SYSTEM_NETWORK_SYSTEMID_TYPE_CALIBRATIONDATETIME_version.nc*
-
-For the RGB images taken during the measurements, the file name is similar except that it also includes the series ID, viewing and azimuth angle.
-
-*SYSTEM_NETWORK_SITEID_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_SERIESID_ZENITH_AZIMUTH_version.nc*
-
 The files are stored in the NetCDF data format and so have the extension “.nc” (except for the RGB images taken during the measurements by the instrument). The definition of the data fields and their allowed contents is described as follows:
 
 **Table 1: File name conventions**
@@ -79,6 +71,15 @@ Table 2 defines the abbreviated name convention applicable to the individual Hyp
 +---------+----------------------------------------------------------+
 | VEIT    | Aqua Alta Oceanographic Tower, Venice, Italy             |
 +---------+----------------------------------------------------------+
+
+For the HYPSTAR calibration data, the file name is similar except that it includes the system_id and the date and time of the calibration.
+
+*SYSTEM_NETWORK_SYSTEMID_TYPE_CALIBRATIONDATETIME_version.nc*
+
+For the RGB images taken during the measurements, the file name is similar except that it also includes the series ID, viewing and azimuth angle.
+
+*SYSTEM_NETWORK_SITEID_TYPE_ACQUISITIONDATETIME_PROCESSINGDATETIME_SERIESID_ZENITH_AZIMUTH_version.nc*
+
 
 Data level
 ----------

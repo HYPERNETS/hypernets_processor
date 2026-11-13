@@ -39,6 +39,10 @@ DS_FORMAT_FNAMES = {
     "W_L2A": "L2A_REF",
     "L_L2B": "L2B_REF",
     "W_L2B": "L2B_REF",
+    "L_L1D_RAD": "L1D_RAD",
+    "L_L1D_IRR": "L1D_IRR",
+    "W_L1D_RAD": "L1D_RAD",
+    "W_L1D_IRR": "L1D_IRR",
     "IMG": "IMG",
 }
 

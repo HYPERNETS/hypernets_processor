@@ -39,6 +39,13 @@ def configure_parser():
         description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
+    # parser.add_argument(
+    #     "-o",
+    #     "--output-directory",
+    #     action="store",
+    #     help="Directory to write output data to",
+    # )
+
     return parser
 
 
