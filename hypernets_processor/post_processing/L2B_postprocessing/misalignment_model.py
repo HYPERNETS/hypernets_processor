@@ -13,7 +13,7 @@ import matplotlib
 
 matplotlib.use("Qt5Agg")
 
-results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment"
+results_path = r"T:\ECO\EOServer\joe\hypernets_plots\misalignment\GHNA_test_end_july"
 # read in data
 data = pd.read_csv(
     r"T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_GHNA_v3_analysis.csv",
@@ -21,8 +21,8 @@ data = pd.read_csv(
 )
 data.drop("Unnamed: 0", axis="columns")
 
-site = 'LOBE_2025Dec_2026Mar'
-site_file = 'LOBE_2025Dec_2026Mar'
+site = 'GHNA_2025Oct_2026Sep'
+site_file = 'GHNA_2025Oct_2026Sep'
 data_v1 = pd.read_csv(f'T:\ECO\EOServer\data\insitu\hypernets\post_processing_qc\joe\irradiance_{site_file}_analysis.csv', delimiter = ',')
 data_v1.drop('Unnamed: 0', axis = 'columns')
 
@@ -151,6 +151,8 @@ if site == 'JAES_2025May_2025Jun':
     data_v1 = data_v1.sel(date = slice('2025-05-01', '2025-06-16'))
 if site == 'JAES_2025Jul_2025Sep':
     data_v1 = data_v1.sel(date = slice('2025-07-04', '2025-09-03'))
+if site == 'GHNA_2025Oct_2026Sep':
+    data_v1 = data_v1.sel(date = slice('2026-07-22', '2026-09-03'))
 
 
 def ratio_calculator(vza, vaa, sza, saa, direct_to_diffuse=1000):

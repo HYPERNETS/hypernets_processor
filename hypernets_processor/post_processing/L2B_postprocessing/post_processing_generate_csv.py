@@ -147,6 +147,12 @@ SITE_PERIODS = {
         },
         {
             "start_date": "2025-06-16",
+            "stop_date": "2025-09-03",
+            "HYPSTAR_SN": 222317,
+            "comments": "",
+        },
+        {
+            "start_date": "2025-09-03",
             "stop_date": "present",
             "HYPSTAR_SN": 222317,
             "comments": "",
@@ -290,7 +296,7 @@ def get_files_for_period(base_path, site, start_date, stop_date):
 
 for site in SITE_PERIODS.keys():
     for period in SITE_PERIODS[site]:
-        if site != 'GHNA':
+        if site != 'JAES':
             continue
         if period["stop_date"] != "present":
             continue
