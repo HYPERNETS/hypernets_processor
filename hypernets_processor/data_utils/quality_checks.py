@@ -143,11 +143,11 @@ class QualityChecks:
         datasetl0["quality_flag"][np.where(mask_threshold == 1)] = DatasetUtil.set_flag(
             datasetl0["quality_flag"][np.where(mask_threshold == 1)], "L0_threshold"
         )  # for i in range(len(mask))]
-        datasetl0["quality_flag"][
-            np.where(mask_discontinuity == 1)
-        ] = DatasetUtil.set_flag(
-            datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
-            "L0_discontinuity",
+        datasetl0["quality_flag"][np.where(mask_discontinuity == 1)] = (
+            DatasetUtil.set_flag(
+                datasetl0["quality_flag"][np.where(mask_discontinuity == 1)],
+                "L0_discontinuity",
+            )
         )  # for i in range(len(mask))]
 
         return datasetl0, mask
@@ -192,7 +192,7 @@ class QualityChecks:
     def perform_quality_check_rand_unc(self, dataset, measurandstring):
 
         if np.count_nonzero(dataset["u_rel_random_" + measurandstring].values < 0) > 0:
-            self.context.anomaly_handler.add_anomaly("u") #, dataset)
+            self.context.anomaly_handler.add_anomaly("u")  # , dataset)
 
         if (
             np.count_nonzero(dataset["u_rel_random_" + measurandstring].values > 100)
@@ -201,7 +201,7 @@ class QualityChecks:
             dataset["quality_flag"][:] = DatasetUtil.set_flag(
                 dataset["quality_flag"][:], "half_of_uncertainties_too_big"
             )
-            self.context.anomaly_handler.add_anomaly("o") #, dataset)
+            self.context.anomaly_handler.add_anomaly("o")  # , dataset)
 
     def perform_quality_check_comb(
         self, dataset_l1b, dataset_l1b_swir, measurandstring
@@ -313,7 +313,6 @@ class QualityChecks:
             irr_scaled = np.zeros_like(dataset_l1b_irr["irradiance"].values)
             for i, vza in enumerate(vzas):
 
-                # irrtot=pysolar.radiation.get_radiation_direct(datetime.datetime.fromtimestamp(dataset_l1b_irr["acquisition_time"][i]),90-dataset_l1b_irr["solar_zenith_angle"].values[i])
                 irr_scaled[:, i] = (
                     dataset_l1b_irr["irradiance"].values[:, i]
                     / np.cos(
@@ -763,29 +762,29 @@ class QualityChecks:
                 if v > self.context.get_config_value("diff_threshold"):
                     if measurandstring == "irradiance":
                         flags[id] = 1
-                        dataset_l1b["quality_flag"][
-                            dataset_l1b["scan"] == i
-                        ] = DatasetUtil.set_flag(
-                            dataset_l1b["quality_flag"][
-                                np.where(dataset_l1b["scan"] == i)
-                            ],
-                            "temp_variability_irr",
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = (
+                            DatasetUtil.set_flag(
+                                dataset_l1b["quality_flag"][
+                                    np.where(dataset_l1b["scan"] == i)
+                                ],
+                                "temp_variability_irr",
+                            )
                         )
 
                     else:
                         flags[id] = 1
-                        dataset_l1b["quality_flag"][
-                            dataset_l1b["scan"] == i
-                        ] = DatasetUtil.set_flag(
-                            dataset_l1b["quality_flag"][
-                                np.where(dataset_l1b["scan"] == i)
-                            ],
-                            "temp_variability_rad",
+                        dataset_l1b["quality_flag"][dataset_l1b["scan"] == i] = (
+                            DatasetUtil.set_flag(
+                                dataset_l1b["quality_flag"][
+                                    np.where(dataset_l1b["scan"] == i)
+                                ],
+                                "temp_variability_rad",
+                            )
                         )
 
                     seq = dataset.attrs["sequence_id"]
-                    ts = datetime.datetime.utcfromtimestamp(
-                        dataset["acquisition_time"][i]
+                    ts = datetime.datetime.fromtimestamp(
+                        dataset["acquisition_time"][i], tz=datetime.timezone.utc
                     )
 
                     if verbosity > 2:

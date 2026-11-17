@@ -16,7 +16,7 @@ import numpy as np
 import os.path
 import warnings
 from obsarray.templater.dataset_util import DatasetUtil
-from datetime import datetime
+from datetime import datetime, timezone
 
 """___Authorship___"""
 __author__ = "Pieter De Vis"
@@ -110,7 +110,7 @@ class Plotting:
 
         if measurandstring == "irradiance":
             angle_labels = [
-                datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 for timestamp in dataset["acquisition_time"].values
             ]
         else:
@@ -124,9 +124,14 @@ class Plotting:
 
         if len(angle_labels) > 10:
             linestyles = [
-                (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
-                if (np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180)
-                else (0, (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
+                (
+                    (0, (3, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0))
+                    if (np.abs(dataset["viewing_azimuth_angle"].values[i]) < 180)
+                    else (
+                        0,
+                        (1, np.abs(dataset["viewing_zenith_angle"].values[i]) / 10.0),
+                    )
+                )
                 for i in range(len(dataset["viewing_zenith_angle"].values))
             ]
 
@@ -158,7 +163,7 @@ class Plotting:
 
         if measurandstring == "irradiance":
             angle_labels = [
-                datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 for timestamp in dataset["acquisition_time"].values
             ]
         else:
@@ -200,7 +205,7 @@ class Plotting:
 
         if measurandstring == "irradiance":
             angle_labels = [
-                datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
                 for timestamp in dataset["acquisition_time"].values
             ]
         else:
@@ -315,13 +320,14 @@ class Plotting:
                         ),
                     )
                 )
+
             self.plot_variable(
                 "relative uncertainty " + measurandstring + " (%)",
                 plotpath,
                 dataset["wavelength"].values,
                 yerr,
                 labels=ylabel,
-                ylim=[0, 20],
+                ylim=[0, self.context.get_config_value("plot_unc_ymax")],
             )
 
     def plot_correlation(self, measurandstring, dataset, refl=False):
@@ -612,8 +618,8 @@ class Plotting:
 
         angle_labels = [
             "time= {}, sza= {:.2f}, rescaled to sza= {:.0f}".format(
-                datetime.utcfromtimestamp(
-                    dataset["acquisition_time"].values[i]
+                datetime.fromtimestamp(
+                    dataset["acquisition_time"].values[i], tz=timezone.utc
                 ).strftime("%Y-%m-%d %H:%M:%S"),
                 dataset["solar_zenith_angle"].values[i],
                 refsza,
@@ -627,13 +633,24 @@ class Plotting:
         )
 
     def plot_polar_reflectance(self, dataset, wavelength):
-        plotpath = os.path.join(
-            self.path,
-            "plot_polar_reflectance_"
-            + dataset.attrs["product_name"]
-            + "."
-            + self.plot_format,
-        )
+        if wavelength == "ndvi":
+            plotpath = os.path.join(
+                self.path,
+                "plot_polar_ndvi_"
+                + dataset.attrs["product_name"]
+                + "."
+                + self.plot_format,
+            )
+            label="NDVI"
+        else:
+            plotpath = os.path.join(
+                self.path,
+                "plot_polar_reflectance_"
+                + dataset.attrs["product_name"]
+                + "."
+                + self.plot_format,
+            )
+            label="reflectance at %s nm" % wavelength
 
         saa = np.mean(dataset.solar_azimuth_angle.values % 360)
         sza = np.mean(dataset.solar_zenith_angle.values)
@@ -646,7 +663,12 @@ class Plotting:
         vza_grid = np.array([0, 5, 10, 20, 30, 40, 50, 60])
         raa_grid = vaa_grid - saa
 
-        id_wav = np.argmin(np.abs(wavelength - dataset.wavelength.values))
+        if wavelength == "ndvi":
+            id_865 = np.argmin(np.abs(865 - dataset.wavelength.values))
+            id_665 = np.argmin(np.abs(665 - dataset.wavelength.values))
+
+        else:
+            id_wav = np.argmin(np.abs(wavelength - dataset.wavelength.values))
 
         vaa_mesh, vza_mesh = np.meshgrid(np.radians(vaa_grid), vza_grid)
 
@@ -666,7 +688,12 @@ class Plotting:
                     )
                 )[0]
                 if len(id_series) == 1:
-                    refl_2d[i, ii] = np.abs(refl[id_wav, id_series])
+                    if wavelength == "ndvi":
+                        refl_2d[i, ii] = (
+                            refl[id_865, id_series] - refl[id_665, id_series]
+                        ) / (refl[id_865, id_series] + refl[id_665, id_series])
+                    else:
+                        refl_2d[i, ii] = np.abs(refl[id_wav, id_series])
                 elif len(id_series) > 1:
                     self.context.logger.info(
                         "There are multiple series that match the same vaa (%s) and vza (%s) "
@@ -682,8 +709,20 @@ class Plotting:
                             ),
                         )
                     )
-                    refl_2d[i, ii] = np.mean(np.abs(refl[id_wav, id_series]))
+                    if wavelength == "ndvi":
+                        refl_2d[i, ii] = np.mean(
+                            (refl[id_865, id_series] - refl[id_665, id_series])
+                            / (refl[id_865, id_series] + refl[id_665, id_series])
+                        )
+                    else:
+                        refl_2d[i, ii] = np.mean(np.abs(refl[id_wav, id_series]))
         refl_2d[refl_2d == 0] = np.nan
+        if wavelength == "ndvi":
+            vmin = None
+            vmax = None
+        else:
+            vmin = self.context.get_config_value("plot_polar_min")
+            vmax = self.context.get_config_value("plot_polar_max")
 
         fig = plt.figure()
         ax = plt.subplot(1, 1, 1, projection="polar")
@@ -695,14 +734,14 @@ class Plotting:
             refl_2d.T,
             shading="auto",
             cmap=plt.get_cmap("jet"),
-            vmin=self.context.get_config_value("plot_polar_min"),
-            vmax=self.context.get_config_value("plot_polar_max"),
+            vmin=vmin,
+            vmax=vmax,
         )
 
         ax.plot(np.radians(saa), sza, color="k", ls="none", marker="o")
 
         cbar = fig.colorbar(im)
-        cbar.set_label("reflectance at %s nm" % wavelength, rotation=270, labelpad=15)
+        cbar.set_label(label, rotation=270, labelpad=15)
 
         fig.savefig(plotpath)
         plt.close(fig)

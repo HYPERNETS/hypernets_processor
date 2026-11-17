@@ -2,7 +2,6 @@
 Spectrum class, written by Kaspars Laizans at Tartu University
 """
 
-
 import struct
 from enum import Enum
 
@@ -112,9 +111,9 @@ class Spectrum:
                 "Sensor temperature: {} 'C\n"
                 "Pixel count: {}\n"
                 "Tilt:\n"
-                "\tx:{}\u00B1{}\n"
-                "\t y:{}\u00B1{}\n"
-                "\t z:{}\u00B1{}\n".format(
+                "\tx:{}\u00b1{}\n"
+                "\t y:{}\u00b1{}\n"
+                "\t z:{}\u00b1{}\n".format(
                     self.header.total_length,
                     self.header.timestamp,
                     hex(self.crc32[0]),
@@ -146,9 +145,9 @@ class Spectrum:
             "Sensor temperature: {} 'C \t"
             "Pixel count: {}\n"
             "Tilt:\n"
-            "\tx:{}\u00B1{}\n"
-            "\t y:{}\u00B1{}\n"
-            "\t z:{}\u00B1{}\n".format(
+            "\tx:{}\u00b1{}\n"
+            "\t y:{}\u00b1{}\n"
+            "\t z:{}\u00b1{}\n".format(
                 self.header.spectrum_type.optics.name,
                 self.header.spectrum_type.radiometer.name,
                 self.header.exposure_time,
