@@ -14,10 +14,10 @@ path2figs = r"/home/admin/post_processing/"
 
 # path2files = r"C:\Users\pdv\OneDrive - National Physical Laboratory\Documents\MobaXterm\home"
 
-include_sites = ["GHNA", "JSIT", "WWUK", "LOBE", "JAES", "ATGE", "BASP", "DEGE", "IFAR", "PEAN", "SPAR"]
-#include_sites = ["GHNA", "JSIT", "WWUK", "LOBE", "JAES"]
-start_date = "2025-01-01" #include all dates
-stop_date = "2026-01-01" #include all dates
+#include_sites = ["GHNA", "JSIT", "WWUK", "LOBE", "JAES", "ATGE", "BASP", "DEGE", "IFAR", "PEAN", "SPAR"]
+include_sites = ["GHNA", "JSIT", "WWUK", "LOBE", "JAES", "WGUK", "SPAR"]
+start_date = "2025-11-01" #include all dates
+stop_date = "2026-11-01" #include all dates
 
 # start_date = "2022-01-01"
 # stop_date = "2025-12-31"
